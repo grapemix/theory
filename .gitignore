@@ -3,6 +3,7 @@
 *.swo
 venv/*
 logs/*
+backup/*
 
 # Numerous always-ignore extensions
 *.diff
