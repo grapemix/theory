@@ -29,8 +29,8 @@ class IndentFormatFix(BaseCommand):
   def run(self, *args, **kwargs):
     for filename in self.files:
       lines = self._readFileLine(filename)
-      #newLines = self._forceHalfIndent(lines)
-      newLines = self._convertDjango(lines)
+      newLines = self._forceHalfIndent(lines)
+      #newLines = self._convertDjango(lines)
       self._writeToFile(newLines, filename)
 
   def _writeToFile(self, lines, oldFilename):
