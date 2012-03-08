@@ -4,6 +4,7 @@
 venv/*
 logs/*
 backup/*
+Theory.egg-info/*
 
 # Numerous always-ignore extensions
 *.diff
