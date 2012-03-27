@@ -1,6 +1,7 @@
 import logging
 import sys
-from theory.core import mail
+# TODO: to change another default way to send message
+#from theory.core import mail
 
 # Make sure a NullHandler is available
 # This was added in Python 2.7/3.2
@@ -49,7 +50,7 @@ if not logger.handlers:
 
 class AdminEmailHandler(logging.Handler):
   def __init__(self, include_html=False):
-    logging.Handler.__init__(self)        
+    logging.Handler.__init__(self)
     self.include_html = include_html
 
   """An exception log handler that e-mails log entries to site admins.
@@ -97,5 +98,5 @@ class AdminEmailHandler(logging.Handler):
     message = "%s\n\n%s" % (stack_trace, request_repr)
     reporter = ExceptionReporter(request, is_email=True, *exc_info)
     html_message = self.include_html and reporter.get_traceback_html() or None
-    mail.mail_admins(subject, message, fail_silently=True,
-             html_message=html_message)
+    #mail.mail_admins(subject, message, fail_silently=True,
+    #         html_message=html_message)

@@ -5,6 +5,10 @@ import os
 import sys
 
 ##### Theory lib #####
+from theory.command import fileSelector
+from theory.core.commandScan.commandScanManager import CommandScanManager
+import theory.db
+from theory.model import Command
 from theory.utils.importlib import import_module
 
 ##### Theory third-party lib #####
@@ -58,7 +62,7 @@ def setup_environ(settings_mod, original_settings_path=None):
 
   return mood_directory
 
-def find_management_module(app_name):
+def find_commands(app_name):
   """
   Determines the path to the management module for the given app_name,
   without actually importing the application or the management module.
@@ -66,7 +70,7 @@ def find_management_module(app_name):
   Raises ImportError if the management module cannot be found for any reason.
   """
   parts = app_name.split('.')
-  parts.append('management')
+  parts.append('command')
   parts.reverse()
   part = parts.pop()
   path = None
@@ -86,19 +90,14 @@ def find_management_module(app_name):
   while parts:
     part = parts.pop()
     f, path, descr = imp.find_module(part, path and [path] or None)
-  return path
 
-def load_command_class(app_name, name):
-  """
-  Given a command name and an application name, returns the Command
-  class instance. All errors raised by the import process
-  (ImportError, AttributeError) are allowed to propagate.
-  """
-  module = import_module('%s.management.commands.%s' % (app_name, name))
-  return module.Command()
-
+  return (path, [i[:-3] for i in os.listdir(path) if(i.endswith(".py") and i!="__init__.py")])
 
 def wakeup(settings_mod, argv=None):
+  if(Command.objects.all().count()==0):
+    reprobeAllModule(settings_mod, argv)
+
+def reprobeAllModule(settings_mod, argv=None):
   """
   Returns a dictionary mapping command names to their callback applications.
 
@@ -122,6 +121,7 @@ def wakeup(settings_mod, argv=None):
   The dictionary is cached on the first call and reused on subsequent
   calls.
   """
+  print "Reprobing all modules"
   if(settings_mod!=None):
     setup_environ(settings_mod)
 
@@ -132,21 +132,31 @@ def wakeup(settings_mod, argv=None):
   except (AttributeError, EnvironmentError, ImportError):
     apps = []
 
-  # Find the mood directory
+  # Find the project directory
   try:
     from theory.conf import settings
     module = import_module(settings.SETTINGS_MODULE)
-    mood_directory = setup_environ(module, settings.SETTINGS_MODULE)
+    project_directory = setup_environ(module, settings.SETTINGS_MODULE)
   except (AttributeError, EnvironmentError, ImportError, KeyError):
-    mood_directory = None
+    project_directory = None
 
-  # Find and load the management module for each installed app.
+  # TODO: Find the mood directory
+
+  (path, cmdLst) = find_commands("theory")
+  cmdManager = CommandScanManager()
+  cmdManager.cmdList = [("theory", i, os.path.join(path, i + ".py"), "dev") for i in cmdLst]
+  #probeModule("theory", cmdLst)
+
+  # Find and load the command module for each installed app.
   for app_name in apps:
     try:
-      path = find_management_module(app_name)
+      (path, cmdLst) = find_commands(app_name)
+      cmdManager.cmdList.extend([(app_name, i, os.path.join(path, i + ".py"), app_name) for i in cmdLst])
+      #probeModule(app_name, cmdLst)
       #_commands.update(dict([(name, app_name)
       #                       for name in find_commands(path)]))
     except ImportError:
       pass # No management module - ignore this app
+  cmdManager.scan()
 
   return
