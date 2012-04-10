@@ -4,7 +4,7 @@
 ##### System wide lib #####
 
 ##### Theory lib #####
-from theory.db import models
+from theory.db import *
 
 ##### Theory third-party lib #####
 

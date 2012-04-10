@@ -125,26 +125,24 @@ class Settings(object):
       # ... then invoke it with the logging settings
       logging_config_func(self.LOGGING)
 
-
-##
-# Holder for user configured settings.
 class UserSettingsHolder(object):
+#class UserSettingsHolder(BaseSettings):
+  """
+  Holder for user configured settings.
+  """
   # SETTINGS_MODULE doesn't make much sense in the manually configured
   # (standalone) case.
   SETTINGS_MODULE = None
-
-  ##
-  #    Requests for configuration variables not in this class are satisfied
-  #    from the module specified in default_settings (if possible).
   def __init__(self, default_settings):
+    """
+    Requests for configuration variables not in this class are satisfied
+    from the module specified in default_settings (if possible).
+    """
     self.default_settings = default_settings
-
   def __getattr__(self, name):
     return getattr(self.default_settings, name)
-
   def __dir__(self):
     return self.__dict__.keys() + dir(self.default_settings)
-
   # For Python < 2.6:
   __members__ = property(lambda self: self.__dir__())
 
