@@ -31,6 +31,9 @@ INTERNAL_IPS = ()
 # systems may support all possibilities).
 TIME_ZONE = 'America/Chicago'
 
+# If you set this to True, Django will use timezone-aware datetimes.
+USE_TZ = False
+
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-us'
@@ -130,12 +133,12 @@ FILE_CHARSET = 'utf-8'
 
 # Database connection info.
 # Legacy format
-DATABASE_ENGINE = ''           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = ''             # Or path to database file if using sqlite3.
-DATABASE_USER = ''             # Not used with sqlite3.
-DATABASE_PASSWORD = ''         # Not used with sqlite3.
-DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
-DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
+DATABASE_ENGINE = ''           # 'mongoengone'
+DATABASE_NAME = ''
+DATABASE_USER = ''
+DATABASE_PASSWORD = ''
+DATABASE_HOST = ''             # Set to empty string for localhost.
+DATABASE_PORT = ''             # Set to empty string for default.
 DATABASE_OPTIONS = {}          # Set to empty dictionary for default.
 
 # New format
@@ -264,6 +267,11 @@ NUMBER_GROUPING = 0
 
 # Thousand separator symbol
 THOUSAND_SEPARATOR = ','
+
+# The User-Agent string to use when checking for URL validity through the
+# isExistingURL validator.
+from theory import get_version
+URL_VALIDATOR_USER_AGENT = "Theory/%s (https://www.theoryproject.com)" % get_version()
 
 # The tablespaces to use for each model when not specified otherwise.
 DEFAULT_TABLESPACE = ''

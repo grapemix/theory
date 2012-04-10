@@ -22,7 +22,7 @@ MANAGERS = ADMINS
 
 DATABASES = {
   'default': {
-    'ENGINE': 'theory.db.mongoengine', # Add 'mongoengine',
+    'ENGINE': 'theory.db.backends.mongoengine', # Add 'mongoengine',
     'NAME': join(PROJECT_PATH, 'db',),
     'USER': '',                      # Not used with sqlite3.
     'PASSWORD': '',                  # Not used with sqlite3.
