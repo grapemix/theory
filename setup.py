@@ -97,5 +97,6 @@ setup(
     install_requires=[
         'setuptools',
         'celery-with-mongodb',
+        'gevent',
     ],
 )
