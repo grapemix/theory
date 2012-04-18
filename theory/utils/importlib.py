@@ -34,3 +34,25 @@ def import_module(name, package=None):
     name = _resolve_name(name[level:], package, level)
   __import__(name)
   return sys.modules[name]
+
+
+def import_class(name, package=None):
+  """Import a class.
+
+  To import Module.Class directly instead of from Module import Class in programatically way
+
+  The 'package' argument is required when performing a relative import. It
+  specifies the package to use as the anchor point from which to resolve the
+  relative import to an absolute import.
+
+  """
+  chunk = name.split(".")
+  klassName = chunk[-1]
+  moduleName = ".".join(chunk[:-1])
+  if(sys.modules.has_key(moduleName)):
+    return getattr(sys.modules[moduleName], klassName)
+
+  module = import_module(moduleName, package)
+  del sys.modules[moduleName]
+
+  return getattr(module, klassName)
