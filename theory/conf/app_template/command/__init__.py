@@ -20,5 +20,13 @@ from .baseCommand import BaseCommand
 #  verboseName = "commandNameInHere"
 #  params = [,]
 #
+#  @property
+#  def commandProperty(self):
+#    return self._commandProperty
+#
+#  @commandProperty.setter
+#  def commandProperty(self, commandProperty):
+#    self._commandProperty = commandProperty
+#
 #  def run(self):
 #    pass
