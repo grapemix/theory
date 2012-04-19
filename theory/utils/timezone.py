@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 """Timezone helper functions.
 
 This module uses pytz when it's available and fallbacks when it isn't.

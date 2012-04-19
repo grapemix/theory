@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
+#!/usr/bin/env python
 ##### System wide lib #####
 
 ##### Theory lib #####
+from theory.command.baseCommand import BaseCommand
 
 ##### Theory third-party lib #####
 
 ##### Local app #####
-from .baseCommand import BaseCommand
 
 ##### Theory app #####
 
@@ -18,7 +19,7 @@ from .baseCommand import BaseCommand
 #  """
 #  name = "commandNameInHere"
 #  verboseName = "commandNameInHere"
-#  params = [,]
+#  params = []
 #
 #  @property
 #  def commandProperty(self):
@@ -29,4 +30,5 @@ from .baseCommand import BaseCommand
 #    self._commandProperty = commandProperty
 #
 #  def run(self):
+#    super(CommandNameInHere, self).run()
 #    pass

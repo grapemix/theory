@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 """
 Syndication feed generation library -- used for generating RSS, etc.
 

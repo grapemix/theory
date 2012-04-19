@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 """
 This module contains helper functions for controlling caching. It does so by
 managing the "Vary" header of responses. It includes functions to patch the

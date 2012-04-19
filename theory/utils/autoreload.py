@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 # Autoreloading launcher.
 # Borrowed from Peter Hunt and the CherryPy project (http://www.cherrypy.org).
 # Some taken from Ian Bicking's Paste (http://pythonpaste.org/).

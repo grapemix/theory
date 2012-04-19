@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 import unittest as real_unittest
 
 from theory.conf import settings

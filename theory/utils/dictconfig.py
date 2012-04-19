@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 # This is a copy of the Python logging.config.dictconfig module,
 # reproduced with permission. It is provided here for backwards
 # compatibility for Python versions prior to 2.7.

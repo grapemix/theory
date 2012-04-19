@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 """
 Theory Unit Test and Doctest framework.
 """

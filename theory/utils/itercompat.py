@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 """
 Providing iterator functions that are not in all version of Python we support.
 Where possible, we try to use the system-native version and only fall back to

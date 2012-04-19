@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 import os
 import stat
 from os.path import join, normcase, normpath, abspath, isabs, sep

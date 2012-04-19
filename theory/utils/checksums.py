@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 """
 Common checksum routines (used in multiple localflavor/ cases, for example).
 """

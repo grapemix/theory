@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 """Thread-local objects
 
 (Note that this module provides a Python version of thread

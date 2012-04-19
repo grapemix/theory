@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 """
 The md5 and sha modules are deprecated since Python 2.5, replaced by the
 hashlib module containing both hash algorithms. Here, we provide a common

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#!/usr/bin/env python
 ##### System wide lib #####
 import os
 from shutil import copytree

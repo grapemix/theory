@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 """
 Functions for working with "safe strings": strings that can be displayed safely
 without further escaping in HTML. Marking something as a "safe string" means

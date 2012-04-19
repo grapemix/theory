@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 # License for code in this file that was taken from Python 2.5.
 
 # PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2

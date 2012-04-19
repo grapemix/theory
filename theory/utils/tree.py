@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 """
 A class for storing a tree graph. Primarily used for filter constructs in the
 ORM.

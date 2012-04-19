@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 import logging
 import sys
 # TODO: to change another default way to send message
