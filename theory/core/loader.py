@@ -6,8 +6,8 @@ import sys
 
 ##### Theory lib #####
 from theory.command import fileSelector
-from theory.core.commandScan.commandScanManager import CommandScanManager
-import theory.db
+from theory.core.resourceScan import *
+from theory.core.reactor import Reactor
 from theory.model import Command
 from theory.utils.importlib import import_module
 
@@ -18,6 +18,10 @@ from theory.utils.importlib import import_module
 ##### Theory app #####
 
 ##### Misc #####
+
+FILE_MODULE = 1
+DIR_MODULE = 2
+
 
 def setup_environ(settings_mod, original_settings_path=None):
   """
@@ -62,7 +66,13 @@ def setup_environ(settings_mod, original_settings_path=None):
 
   return mood_directory
 
-def find_commands(app_name):
+def checkModuleType(path):
+  if(os.path.isfile(path)):
+    return FILE_MODULE
+  elif(os.path.isdir(path)):
+    return DIR_MODULE
+
+def findFilesInAppDir(app_name, dirName, isIncludeInit=False):
   """
   Determines the path to the management module for the given app_name,
   without actually importing the application or the management module.
@@ -70,7 +80,7 @@ def find_commands(app_name):
   Raises ImportError if the management module cannot be found for any reason.
   """
   parts = app_name.split('.')
-  parts.append('command')
+  parts.append(dirName)
   parts.reverse()
   part = parts.pop()
   path = None
@@ -91,11 +101,60 @@ def find_commands(app_name):
     part = parts.pop()
     f, path, descr = imp.find_module(part, path and [path] or None)
 
-  return (path, [i[:-3] for i in os.listdir(path) if(i.endswith(".py") and i!="__init__.py")])
+  if(isIncludeInit):
+    filterFxn = lambda i: i.endswith(".py")
+  else:
+    filterFxn = lambda i: i.endswith(".py") and i!="__init__.py"
+  #return (path, [i[:-3] for i in os.listdir(path) if(filterFxn(i))])
+  try:
+    r = (path, [i[:-3] for i in os.listdir(path) if(filterFxn(i))])
+  except OSError, e:
+    if(checkModuleType(path)==FILE_MODULE):
+      return ("/".join(path.split("/")[:-1]), ["__init__"])
+      #return (None, None)
+    else:
+      raise e
+  return r
+
 
 def wakeup(settings_mod, argv=None):
-  if(Command.objects.all().count()==0):
-    reprobeAllModule(settings_mod, argv)
+  #if(Command.objects.all().count()==0):
+  reprobeAllModule(settings_mod, argv)
+  #from theory.core import t
+  reactor = Reactor()
+  #reactor.test()
+
+class ModuleLoader(object):
+  _lstPackFxn = lambda x, y, z: x
+
+  @property
+  def lstPackFxn(self):
+    return self._lstPackFxn
+
+  @lstPackFxn.setter
+  def lstPackFxn(self, lstPackFxn):
+    self._lstPackFxn = lstPackFxn
+
+  def __init__(self, scanManager, dirName, apps):
+    self.scanManager = scanManager
+    self.dirName = dirName
+    self.apps = apps
+
+  def load(self):
+    (path, fileList) = findFilesInAppDir("theory", self.dirName, True)
+
+    if(path!=None):
+      scanManager = self.scanManager()
+      scanManager.paramList = self.lstPackFxn(fileList, "theory", path)
+
+      for app_name in self.apps:
+        try:
+          (path, fileList) = findFilesInAppDir(app_name, self.dirName, True)
+          scanManager.paramList.extend(self.lstPackFxn(fileList, app_name, path))
+        except ImportError:
+          pass # No module - ignore this app
+      scanManager.scan()
+
 
 def reprobeAllModule(settings_mod, argv=None):
   """
@@ -142,7 +201,30 @@ def reprobeAllModule(settings_mod, argv=None):
 
   # TODO: Find the mood directory
 
-  (path, cmdLst) = find_commands("theory")
+  moduleLoader = ModuleLoader(AdapterScanManager, "adapter", apps)
+  moduleLoader.lstPackFxn = lambda lst, app_name, path: [".".join([app_name, i]) for i in lst]
+  moduleLoader.load()
+
+  moduleLoader = ModuleLoader(CommandScanManager, "command", apps)
+  moduleLoader.lstPackFxn = lambda lst, app_name, path: [(app_name, i, os.path.join(path, i + ".py"), "norm") for i in lst]
+  moduleLoader.load()
+
+  """
+  # Might worth to refine
+  (path, adapterList) = findFilesInAppDir("theory", "adapter", True)
+
+  adapterManager = AdapterScanManager()
+  adapterManager.adapterList = ["theory." + i for i in adapterList]
+
+  for app_name in apps:
+    try:
+      (path, adapterList) = findFilesInAppDir(app_name, "adapter", True)
+      adapterManager.adapterList.extend([".".join(app_name, i) for i in adapterList])
+    except ImportError:
+      pass # No module - ignore this app
+  adapterManager.scan()
+
+  (path, cmdLst) = findFilesInAppDir("theory", "command")
   cmdManager = CommandScanManager()
   cmdManager.cmdList = [("theory", i, os.path.join(path, i + ".py"), "dev") for i in cmdLst]
   #probeModule("theory", cmdLst)
@@ -150,13 +232,11 @@ def reprobeAllModule(settings_mod, argv=None):
   # Find and load the command module for each installed app.
   for app_name in apps:
     try:
-      (path, cmdLst) = find_commands(app_name)
+      (path, cmdLst) = findFilesInAppDir(app_name, "command")
       cmdManager.cmdList.extend([(app_name, i, os.path.join(path, i + ".py"), app_name) for i in cmdLst])
-      #probeModule(app_name, cmdLst)
-      #_commands.update(dict([(name, app_name)
-      #                       for name in find_commands(path)]))
     except ImportError:
-      pass # No management module - ignore this app
+      pass # No module - ignore this app
   cmdManager.scan()
+  """
 
   return
