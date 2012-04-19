@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 ##### System wide lib #####
 from datetime import datetime
-from theory.db.models import *
 
 ##### Theory lib #####
+from theory.db.models import *
 from theory.utils.translation import ugettext_lazy as _
 
 ##### Theory third-party lib #####
