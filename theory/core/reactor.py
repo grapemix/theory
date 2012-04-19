@@ -268,7 +268,6 @@ class Reactor(object):
   def parse(self):
     self.parser.cmdInTxt = self.adapter.cmdInTxt
     self.parser.run()
-    print self.adapter.cmdInTxt
     # should change for chained command
     #if(self.parser.mode==self.parser.MODE_DONE):
     self.run()
@@ -284,18 +283,16 @@ class Reactor(object):
     cmdModel = Command.objects.get(name=cmdName, mood=self.mood)
     cmdKlass = import_class(".".join([cmdModel.app, "command", cmdModel.name, cmdModel.className]))
     cmd = cmdKlass()
-    print self.parser.args, self.parser.kwargs
+    #print self.parser.args, self.parser.kwargs
     if(self.parser.args!=[]):
       for i in range(len(cmdModel.param)):
         try:
-          print "args assign", cmd, cmdModel.param[i].name, self.parser.args[i]
           setattr(cmd, cmdModel.param[i].name, self.parser.args[i])
         except IndexError:
           # This means the number of param given unmatch the number of param register in *.command
           raise CommandSyntaxError
     if(self.parser.kwargs!={}):
       for k,v in self.parser.kwargs.iteritems():
-        print "kwargs assign", cmd, k, v
         setattr(cmd, k, v)
     cmd.run()
 
@@ -320,11 +317,10 @@ class Reactor(object):
             setattr(adapter, property, getattr(cmd, "_" + property))
           except AttributeError:
             pass
-        print property, getattr(adapter, property)
 
       if(hasattr(adapter, "stdOut")):
         self.adapter.printTxt(adapter.stdOut)
 
     self.parser.initVar()
-    History(command=self.parser.cmdInTxt, commandRef=self.cmdName,
+    History(command=self.parser.cmdInTxt, commandRef=cmdModel,
         mood=self.mood).save()
