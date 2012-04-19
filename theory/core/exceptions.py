@@ -25,6 +25,10 @@ class CommandDoesNotExist(Exception):
   "The requested command does not exist"
   pass
 
+class CommandSyntaxError(Exception):
+  "The syntax of requested command has error"
+  pass
+
 class UIDoesNotExist(Exception):
   "The requested UI does not exist"
   pass
