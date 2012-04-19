@@ -1,11 +1,25 @@
-"Utilities for loading models and the modules that contain them."
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
+##### System wide lib #####
+import sys
+import os
+
+##### Theory lib #####
 from theory.conf import settings
 from theory.core.exceptions import ImproperlyConfigured
 from theory.utils.datastructures import SortedDict
 from theory.utils.importlib import import_module
 from theory.utils.module_loading import module_has_submodule
-import sys
-import os
+
+##### Theory third-party lib #####
+
+##### Local app #####
+
+##### Theory app #####
+
+##### Misc #####
+
+"Utilities for loading models and the modules that contain them."
 
 __all__ = ('get_apps', 'get_app', 'get_models', 'get_model', 'register_models',
     'load_app', 'app_cache_ready')

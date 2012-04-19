@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#!/usr/bin/env python
 ##### System wide lib #####
 import re
 
@@ -28,7 +29,7 @@ class TxtCmdParser(object):
   MODE_DOUBLE_QUOTE = 6
   MODE_DONE = 7
 
-  MODE_CHOICE = (
+  MODE_CHOICES = (
       (MODE_EMPTY, "empty"),
       (MODE_ERROR, "error"),
       (MODE_COMMAND, "command"),

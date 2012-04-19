@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 from types import GeneratorType
 
 from theory.utils.copycompat import copy, deepcopy

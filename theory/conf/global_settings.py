@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 # Default Theory settings. Override these with settings in the module
 # pointed-to by the THEORY_SETTINGS_MODULE environment variable.
 

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 from theory.conf import settings
 from theory.db import connections
 from theory.dispatch import Signal

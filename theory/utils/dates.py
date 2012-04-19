@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 "Commonly-used date structures"
 
 from theory.utils.translation import ugettext_lazy as _, pgettext_lazy

@@ -1,5 +1,21 @@
-# Taken from Python 2.7 with permission from/by the original author.
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
+##### System wide lib #####
 import sys
+
+##### Theory lib #####
+
+##### Theory third-party lib #####
+
+##### Local app #####
+
+##### Theory app #####
+
+##### Misc #####
+
+"""
+Taken from Python 2.7 with permission from/by the original author.
+"""
 
 def _resolve_name(name, package, level):
   """Return the absolute name of the module to be imported."""

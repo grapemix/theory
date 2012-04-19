@@ -1,3 +1,20 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
+##### System wide lib #####
+
+##### Theory lib #####
+from theory.core.exceptions import ImproperlyConfigured
+from theory.db.backends import *
+from theory.db.backends.creation import BaseDatabaseCreation
+
+##### Theory third-party lib #####
+
+##### Local app #####
+
+##### Theory app #####
+
+##### Misc #####
+
 """
 Dummy database backend for Theory.
 
@@ -6,10 +23,6 @@ Theory uses this if the database ENGINE setting is empty (None or empty string).
 Each of these API functions, except connection.close(), raises
 ImproperlyConfigured.
 """
-
-from theory.core.exceptions import ImproperlyConfigured
-from theory.db.backends import *
-from theory.db.backends.creation import BaseDatabaseCreation
 
 def complain(*args, **kwargs):
   raise ImproperlyConfigured("settings.DATABASES is improperly configured. "

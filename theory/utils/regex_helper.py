@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 """
 Functions for reversing a regular expression (used in reverse URL resolving).
 Used internally by Theory and not intended for external use.

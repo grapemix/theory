@@ -1,10 +1,21 @@
-import os
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
+##### System wide lib #####
 from gevent.local import local
+import os
 
+##### Theory lib #####
 from theory.conf import settings
 from theory.core.exceptions import ImproperlyConfigured
 from theory.utils.importlib import import_module
 
+##### Theory third-party lib #####
+
+##### Local app #####
+
+##### Theory app #####
+
+##### Misc #####
 
 DEFAULT_DB_ALIAS = 'default'
 

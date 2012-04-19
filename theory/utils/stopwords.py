@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 # Performance note: I benchmarked this code using a set instead of
 # a list for the stopwords and was surprised to find that the list
 # performed /better/ than the set - maybe because it's only a small

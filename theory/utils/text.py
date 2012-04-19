@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 import re
 from theory.utils.encoding import force_unicode
 from theory.utils.functional import allow_lazy

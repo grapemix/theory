@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 "Implementation of tzinfo classes for use with datetime.datetime."
 
 import time

@@ -1,4 +1,6 @@
-from django.dispatch import Signal
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
+from theory.dispatch import Signal
 
 class_prepared = Signal(providing_args=["class"])
 

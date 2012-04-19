@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 "Functions that help with dynamically creating decorators for views."
 
 try:

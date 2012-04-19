@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 r"""Using simplejson from the shell to validate and
 pretty-print::
 

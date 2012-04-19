@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 """
 Fixes Python 2.4's failure to deepcopy unbound functions.
 """

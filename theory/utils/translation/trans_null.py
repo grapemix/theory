@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 # These are versions of the functions in theory.utils.translation.trans_real
 # that don't actually do anything. This is purely for performance, so that
 # settings.USE_I18N = False can use this module rather than trans_real.py.

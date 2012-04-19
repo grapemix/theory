@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 """
 PHP date() style date formatting
 See http://www.php.net/date for format strings
