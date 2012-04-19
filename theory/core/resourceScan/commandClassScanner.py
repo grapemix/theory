@@ -10,12 +10,13 @@ from theory.utils.importlib import import_module
 ##### Theory third-party lib #####
 
 ##### Local app #####
+from .baseClassScanner import BaseClassScanner
 
 ##### Theory app #####
 
 ##### Misc #####
 
-class ClassScanner(object):
+class CommandClassScanner(BaseClassScanner):
   @property
   def cmdModel(self):
     return self._cmdModel
@@ -24,46 +25,36 @@ class ClassScanner(object):
   def cmdModel(self, cmdModel):
     self._cmdModel = cmdModel
 
-  """
-  @property
-  def cmdProperties(self):
-    return self._cmdProperties
-
-  @property
-  def cmdOnlyProperties(self):
-    return self._cmdOnlyProperties
-  """
-
   def _loadCommandClass(self):
     """
     Given a command name and an application name, returns the Command
     class instance. All errors raised by the import process
     (ImportError, AttributeError) are allowed to propagate.
     """
-    module = import_module('%s.command.%s' % (self.cmdModel.app, self.cmdModel.name))
+    module = self._loadSubModuleCommandClass(self.cmdModel.app, "command", self.cmdModel.name)
     return module
-    #return module.Command()
-
 
   def scan(self):
     cmdFileClass = self._loadCommandClass()
     if(hasattr(cmdFileClass, "ABCMeta")):
       return
     cmdClass = getattr(cmdFileClass, self.cmdModel.name[0].upper() + self.cmdModel.name[1:])
+    # Should add debug flag checking and dump to log file instead
+
+    # To reserve the order of mandatory parameters
+    for paramName in getattr(cmdClass, "params"):
+      v = getattr(cmdClass, paramName)
+      if(isinstance(v, property)):
+        param = Parameter(name=paramName, isOptional = False)
+        self.cmdModel.param.append(param)
 
     for k,v in cmdClass.__dict__.iteritems():
       if(isinstance(v, property)):
         param = Parameter(name=k)
         if(getattr(getattr(cmdClass, k), "fset")==None):
           param.isReadOnly = True
+        if(k in getattr(cmdClass, "params")):
+          #param.isOptional = False
+          # To avoid duplicate
+          continue
         self.cmdModel.param.append(param)
-
-    #self._cmdReadOnlyProperties = [i for i in cmdProperties \
-
-    #self._cmdProperties = [k for k,v in cmdClass.__dict__.iteritems()\
-    #    if(isinstance(v, property))]
-    #self._cmdReadOnlyProperties = [i for i in cmdProperties \
-    #    if(getattr(getattr(cmdClass, i), "fset")==None)]
-
-    #print [i for i in vars(cmdClass).keys() if(isinstance(i, property))]
-    #print dir(cmdClass)
