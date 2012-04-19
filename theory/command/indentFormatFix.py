@@ -15,10 +15,12 @@ from .baseCommand import BaseCommand
 ##### Misc #####
 
 class IndentFormatFix(BaseCommand):
-  name = "IndentFormatFix"
-  verboseName = "Indent Format Fix"
-  description = "Fixing the indent of python source files, but this command"\
-      "can only convert the 4 space into 2 space or vice versa in this version"
+  """
+  Fixing the indent of python source files, but this command
+  can only convert the 4 space into 2 space or vice versa in this version
+  """
+  name = "indentFormatFix"
+  verboseName = "indent Format Fix"
   params = []
   _indentSpace = 2
   _files = []

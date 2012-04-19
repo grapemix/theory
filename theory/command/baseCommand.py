@@ -20,12 +20,13 @@ from abc import ABCMeta, abstractmethod
 # and description should also be reflected in the tooltip/autocomplete feature.
 #
 class BaseCommand(object):
+  """
+  All commands should directly/indirectly derive from this class.
+  Please try to design with the bridge pattern and test oriented pattern.
+  """
   __metaclass__ = ABCMeta
   name = None
   verboseName = None
-  description = \
-      "All commands should directly/indirectly derive from this class."\
-      "Please try to design with the bridge pattern and test oriented pattern."
   params = []
 
   # Make sure there has no attribute's name is the same as the notations
@@ -36,15 +37,23 @@ class BaseCommand(object):
 
   _progress = 0.0
   _status = ""
-  _stdout = ""
+  _stdOut = ""
+  _stdRowOut = []
+  _verbosity = 1
+  _gongs = []
+  _notations = []
   # stderr should be seen in lig file
 
   def __init__(self, *args, **kwargs):
     super(BaseCommand, self).__init__(*args, **kwargs)
 
   @property
-  def stdout(self):
-    return self._stdout
+  def stdOut(self):
+    return self._stdOut
+
+  @property
+  def stdRowOut(self):
+    return self._stdRowOut
 
   @property
   def status(self):
@@ -53,6 +62,14 @@ class BaseCommand(object):
   @property
   def progress(self):
     return self._progress
+
+  @property
+  def verbosity(self):
+    return self._verbosity
+
+  @verbosity.setter
+  def verbosity(self, verbosity):
+    self._verbosity = verbosity
 
   @property
   def notations(self):
@@ -77,7 +94,7 @@ class BaseCommand(object):
     self._gongs = gongs
 
   def validate(self, *args, **kwargs):
-    for i in ["name", "verboseName", "description"]:
+    for i in ["name", "verboseName",]:
       if(getattr(self, i)==None):
         return False
     return True

@@ -14,9 +14,11 @@ from .baseCommand import BaseCommand
 ##### Misc #####
 
 class FileSelector(BaseCommand):
-  name = "FileSelector"
-  verboseName = "FileSelector"
-  description = "Allowing user to select files"
+  """
+  Allowing user to select files
+  """
+  name = "fileSelector"
+  verboseName = "fileSelector"
   params = ["roots",]
   _roots = []
   _excludeDirs = []
@@ -32,22 +34,32 @@ class FileSelector(BaseCommand):
       lambda x: False,\
       ]
 
+  YIELD_MODE_ALL = 1
+  YIELD_MODE_FILE = 2
+  YIELD_MODE_LINE = 3
+  YIELD_MODE_CHUNK = 4
+
   # 0 means not recursive, -1 means recursive infinitely
   _depth = 0
   _files = []
-  _yieldMethod = "A"
+  _yieldMethod = YIELD_MODE_ALL
   _notations = ["Command",]
   _gongs = ["FilenameList", "FileObjectList", ]
 
   YIELD_METHOD_CHOICES = (
-      ('A', 'all'),
-      ('F', 'file'),
-      ('L', 'line'),
-      ('C', 'chunk'),
+      (YIELD_MODE_ALL, 'all'),
+      (YIELD_MODE_FILE, 'file'),
+      (YIELD_MODE_LINE, 'line'),
+      (YIELD_MODE_CHUNK, 'chunk'),
   )
 
   def __init__(self, *args, **kwargs):
     super(FileSelector, self).__init__(*args, **kwargs)
+
+  # Watch out when implementing YIELD_MODE_LINE and YIELD_MODE_CHUNK
+  @property
+  def stdout(self):
+    return "File Being Selected:\n" + "\n".join(self._files)
 
   def _filterFxns(self, fileFullPath):
     isAllow = True
@@ -68,7 +80,7 @@ class FileSelector(BaseCommand):
     for root in self.roots:
       for lvlRoot, dirs, files in self._walk(root):
         for file in files:
-          if(self.yieldMethod=="F" or self.yieldMethod=="A"):
+          if(self.yieldMethod==self.YIELD_MODE_FILE or self.yieldMethod==self.YIELD_MODE_ALL):
             fullPath = os.path.join(lvlRoot, file)
             if(self._filterFxns(fullPath)):
               yield fullPath
