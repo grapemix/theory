@@ -8,9 +8,10 @@ import sys
 ##### Theory lib #####
 from theory.command import fileSelector
 from theory.core.resourceScan import *
-from theory.core.reactor import Reactor
+from theory.core.reactor import *
 from theory.model import Command
 from theory.utils.importlib import import_module
+from theory.utils.mood import loadMoodData
 
 ##### Theory third-party lib #####
 
@@ -122,8 +123,10 @@ def wakeup(settings_mod, argv=None):
   #if(Command.objects.all().count()==0):
   reprobeAllModule(settings_mod, argv)
   #from theory.core import t
-  reactor = Reactor()
+  #reactor = Reactor()
   #reactor.test()
+
+  reactor.ui.drawAll()
 
 class ModuleLoader(object):
   _lstPackFxn = lambda x, y, z: x
@@ -141,21 +144,51 @@ class ModuleLoader(object):
     self.dirName = dirName
     self.apps = apps
 
+  def postPackFxn(self, o):
+    return o
+
+  # ok, that's ugly, should be rewrite it later
+  def postPackFxnForTheory(self, lst):
+    return lst
+
   def load(self):
     (path, fileList) = findFilesInAppDir("theory", self.dirName, True)
 
     if(path!=None):
       scanManager = self.scanManager()
-      scanManager.paramList = self.lstPackFxn(fileList, "theory", path)
+      scanManager.paramList = self.postPackFxnForTheory(self.lstPackFxn(fileList, "theory", path))
 
       for app_name in self.apps:
         try:
           (path, fileList) = findFilesInAppDir(app_name, self.dirName, True)
-          scanManager.paramList.extend(self.lstPackFxn(fileList, app_name, path))
+          scanManager.paramList.extend(self.postPackFxn(self.lstPackFxn(fileList, app_name, path)))
         except ImportError:
           pass # No module - ignore this app
       scanManager.scan()
 
+class CommandModuleLoader(ModuleLoader):
+  def postPackFxnForTheory(self, lst):
+    moodCommandRel = {
+      "test": "norm",
+      "loadDbData": "norm",
+      "listCommand": "norm",
+      "probeModule": "norm",
+      "switchMood": "norm",
+      "fileSelector": "norm",
+      "createApp": "dev",
+      "indentFormatFix": "dev",
+      "theoryFilesSurgeon": "dev",
+    }
+    for o in lst:
+      if(moodCommandRel.has_key(o[1])):
+        o[-1] = moodCommandRel[o[1]]
+    return lst
+
+  def postPackFxn(self, lst):
+    for o in lst:
+      if(self.moodAppRel.has_key(o[1])):
+        o[-1] = self.moodAppRel[o[1]]
+    return lst
 
 def reprobeAllModule(settings_mod, argv=None):
   """
@@ -200,44 +233,26 @@ def reprobeAllModule(settings_mod, argv=None):
   except (AttributeError, EnvironmentError, ImportError, KeyError):
     project_directory = None
 
-  # TODO: Find the mood directory
+  # Find all mood directory
+  moodAppRel = {}
+  for moodDirName in os.listdir(settings.MOODS_ROOT):
+    config = import_module("%s.config" % (moodDirName))
+    for appName in config.APPS:
+      if(moodAppRel.has_key(appName)):
+        moodAppRel[appName] += moodDirName
+      else:
+        moodAppRel[appName] = [moodDirName]
+
+  loadMoodData()
 
   moduleLoader = ModuleLoader(AdapterScanManager, "adapter", apps)
   moduleLoader.lstPackFxn = lambda lst, app_name, path: [".".join([app_name, i]) for i in lst]
   moduleLoader.load()
 
-  moduleLoader = ModuleLoader(CommandScanManager, "command", apps)
-  moduleLoader.lstPackFxn = lambda lst, app_name, path: [(app_name, i, os.path.join(path, i + ".py"), "norm") for i in lst]
+  moduleLoader = CommandModuleLoader(CommandScanManager, "command", apps)
+  moduleLoader.moodAppRel = moodAppRel
+  moduleLoader.lstPackFxn = lambda lst, app_name, path: [[app_name, i, os.path.join(path, i + ".py"), "lost"] for i in lst]
   moduleLoader.load()
-
-  """
-  # Might worth to refine
-  (path, adapterList) = findFilesInAppDir("theory", "adapter", True)
-
-  adapterManager = AdapterScanManager()
-  adapterManager.adapterList = ["theory." + i for i in adapterList]
-
-  for app_name in apps:
-    try:
-      (path, adapterList) = findFilesInAppDir(app_name, "adapter", True)
-      adapterManager.adapterList.extend([".".join(app_name, i) for i in adapterList])
-    except ImportError:
-      pass # No module - ignore this app
-  adapterManager.scan()
-
-  (path, cmdLst) = findFilesInAppDir("theory", "command")
-  cmdManager = CommandScanManager()
-  cmdManager.cmdList = [("theory", i, os.path.join(path, i + ".py"), "dev") for i in cmdLst]
-  #probeModule("theory", cmdLst)
-
-  # Find and load the command module for each installed app.
-  for app_name in apps:
-    try:
-      (path, cmdLst) = findFilesInAppDir(app_name, "command")
-      cmdManager.cmdList.extend([(app_name, i, os.path.join(path, i + ".py"), app_name) for i in cmdLst])
-    except ImportError:
-      pass # No module - ignore this app
-  cmdManager.scan()
-  """
+  print [(i.name, i.mood) for i in Command.objects.all()]
 
   return

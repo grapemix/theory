@@ -147,6 +147,9 @@ DATABASE_OPTIONS = {}          # Set to empty dictionary for default.
 DATABASES = {
 }
 
+# The default mood
+DEFAULT_MOOD = "norm"
+
 # Classes used to implement db routing behaviour
 DATABASE_ROUTERS = []
 
@@ -341,3 +344,5 @@ TEST_DATABASE_COLLATION = None
 
 # The list of directories to search for fixtures
 FIXTURE_DIRS = ()
+
+MOOD = {}
