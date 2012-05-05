@@ -64,7 +64,6 @@ class Reactor(object):
   def run(self):
     cmdName = self.parser.cmdName
     # should change for chained command
-    print cmdName, self.mood
     try:
       cmdModel = Command.objects.get(Q(name=cmdName) & (Q(mood=self.mood) | Q(mood="norm")))
     except Command.DoesNotExist:

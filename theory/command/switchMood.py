@@ -35,15 +35,12 @@ class SwitchMood(BaseCommand):
     self._moodName = moodName
 
   def run(self, *args, **kwargs):
-    print "1)", self.moodName
     config = loadMoodData(self.moodName)
     for i in dir(config):
       if(i==i.upper()):
         settings.MOOD[i] = getattr(config, i)
 
     reactor.mood = self.moodName
-
-    print "2)", reactor.mood
 
     self._stdOut += "Successfully switch to %s mood%s" % (self.moodName, "<br/>")
     self._stdOut += str([(k,v) for k,v in settings.MOOD.iteritems()])

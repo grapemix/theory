@@ -175,6 +175,7 @@ class CommandModuleLoader(ModuleLoader):
       "probeModule": "norm",
       "switchMood": "norm",
       "fileSelector": "norm",
+      "clipMonitor": "norm",
       "createApp": "dev",
       "indentFormatFix": "dev",
       "theoryFilesSurgeon": "dev",
