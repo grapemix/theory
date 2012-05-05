@@ -2,7 +2,7 @@
 ##### System wide lib #####
 
 ##### Theory lib #####
-from theory.core import reactor
+from theory.core.cmdParser.txtCmdParser import TxtCmdParser
 from theory.utils import unittest
 
 ##### Theory third-party lib #####
@@ -17,7 +17,7 @@ __all__ = ('CmdParserTestCase',)
 
 class CmdParserTestCase(unittest.TestCase):
   def setUp(self):
-    self.o = reactor.TxtCmdParser()
+    self.o = TxtCmdParser()
 
   def testGettCmdName(self):
     self.o.cmdInTxt = "probeModule()"
@@ -29,37 +29,44 @@ class CmdParserTestCase(unittest.TestCase):
     self.o.cmdInTxt = "probeModule()"
     self.o.run()
     self.assertEqual(self.o.cmdName, "probeModule")
-    self.assertEqual(self.o._args, [])
+    self.assertEqual(self.o.args, [])
     self.o.initVar()
+
+    self.o.cmdInTxt = "probeModule('a')"
+    self.o.run()
+    self.assertEqual(self.o.cmdName, "probeModule")
+    self.assertEqual(self.o.args, ['a'])
+    self.o.initVar()
+
 
     self.o.cmdInTxt = "probeModule(1,2,3)"
     self.o.run()
     self.assertEqual(self.o.cmdName, "probeModule")
-    self.assertEqual(self.o._args, ['1', '2', '3'])
+    self.assertEqual(self.o.args, ['1', '2', '3'])
     self.o.initVar()
 
     self.o.cmdInTxt = "probeModule( 1, 2 , 3 )"
     self.o.run()
     self.assertEqual(self.o.cmdName, "probeModule")
-    self.assertEqual(self.o._args, ['1', '2', '3'])
+    self.assertEqual(self.o.args, ['1', '2', '3'])
     self.o.initVar()
 
     self.o.cmdInTxt = "probeModule( 1 , '2' ,  3 )"
     self.o.run()
     self.assertEqual(self.o.cmdName, "probeModule")
-    self.assertEqual(self.o._args, ['1', '2', '3'])
+    self.assertEqual(self.o.args, ['1', '2', '3'])
     self.o.initVar()
 
     self.o.cmdInTxt = """probeModule('alpha', 'beta' , 'gamma' )"""
     self.o.run()
     self.assertEqual(self.o.cmdName, "probeModule")
-    self.assertEqual(self.o._args, ['alpha', 'beta', 'gamma'])
+    self.assertEqual(self.o.args, ['alpha', 'beta', 'gamma'])
     self.o.initVar()
 
     self.o.cmdInTxt = '''probeModule("alpha", "beta" , "gamma" )'''
     self.o.run()
     self.assertEqual(self.o.cmdName, "probeModule")
-    self.assertEqual(self.o._args, ['alpha', 'beta', 'gamma'])
+    self.assertEqual(self.o.args, ['alpha', 'beta', 'gamma'])
     self.o.initVar()
 
   def testGettCmdNameAndKwargs(self):

@@ -6,8 +6,7 @@
 ##### Theory third-party lib #####
 
 ##### Local app #####
-#from .reactor import Reactor
-from reactor import *
+from txtCmdParser import *
 
 ##### Theory app #####
 
