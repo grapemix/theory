@@ -10,7 +10,7 @@ from theory.core.cmdParser.txtCmdParser import TxtCmdParser
 from theory.core.exceptions import CommandSyntaxError
 from theory.conf import settings
 from theory.gui.terminal import Terminal
-from theory.utils.importlib import import_module, import_class
+from theory.utils.importlib import  import_class
 
 ##### Theory third-party lib #####
 
