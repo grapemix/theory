@@ -177,6 +177,7 @@ class CommandModuleLoader(ModuleLoader):
       "fileSelector": "norm",
       "clipMonitor": "norm",
       "createApp": "dev",
+      "createCmd": "dev",
       "indentFormatFix": "dev",
       "theoryFilesSurgeon": "dev",
     }
