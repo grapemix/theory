@@ -35,12 +35,21 @@ class CommandClassScanner(BaseClassScanner):
     module = self._loadSubModuleCommandClass(self.cmdModel.app, "command", self.cmdModel.name)
     return module
 
+  def saveModel(self):
+    if(self._cmdModel!=None):
+      self._cmdModel.save()
+
   def scan(self):
     cmdFileClass = self._loadCommandClass()
     if(hasattr(cmdFileClass, "ABCMeta")):
+      self._cmdModel = None
       return
-    cmdClass = getattr(cmdFileClass, self.cmdModel.name[0].upper() + self.cmdModel.name[1:])
-    # Should add debug flag checking and dump to log file instead
+    try:
+      cmdClass = getattr(cmdFileClass, self.cmdModel.name[0].upper() + self.cmdModel.name[1:])
+      # Should add debug flag checking and dump to log file instead
+    except AttributeError:
+      self._cmdModel = None
+      return
 
     # To reserve the order of mandatory parameters
     for paramName in getattr(cmdClass, "params"):
