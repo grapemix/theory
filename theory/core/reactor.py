@@ -56,10 +56,6 @@ class Reactor(object):
     #if(self.parser.mode==self.parser.MODE_DONE):
     self.run()
 
-  def test(self):
-    self.parser.cmdName = "listCommand"
-    self.run()
-
   # TODO: refactor this function, may be with bridge
   def run(self):
     cmdName = self.parser.cmdName
@@ -73,7 +69,6 @@ class Reactor(object):
 
     cmdKlass = import_class(".".join([cmdModel.app, "command", cmdModel.name, cmdModel.className]))
     cmd = cmdKlass()
-    #print self.parser.args, self.parser.kwargs
     if(self.parser.args!=[]):
       for i in range(len(cmdModel.param)):
         try:
