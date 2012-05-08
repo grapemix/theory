@@ -30,4 +30,4 @@ class CommandScanManager(BaseClassScanner):
       o.cmdModel = cmd
       o.scan()
       #o = SourceCodeScanner()
-      o.cmdModel.save()
+      o.saveModel()
