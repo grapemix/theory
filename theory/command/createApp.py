@@ -5,12 +5,12 @@ import os
 from shutil import copytree
 
 ##### Theory lib #####
+from theory.command.baseCommand import BaseCommand
 from theory.conf import settings
 
 ##### Theory third-party lib #####
 
 ##### Local app #####
-from .baseCommand import BaseCommand
 
 ##### Theory app #####
 
@@ -39,11 +39,14 @@ class CreateApp(BaseCommand):
         "conf", "app_template")
     toPath = os.path.join(settings.APPS_ROOT, self.name)
     self._stdOut += "Coping" + fromPath + " --> " + toPath + "<br/>"
-    copytree(fromPath, toPath)
-    self._stdOut += \
-        "Don't forget to add the app name into the INSTALLED_APP within "\
-        "your project's setting. To make your app recognized by theory, you "\
-        "will also need to restart theory or run the probeModule command"
+    try:
+      copytree(fromPath, toPath)
+      self._stdOut += \
+          "Don't forget to add the app name into the INSTALLED_APP within "\
+          "your project's setting. To make your app recognized by theory, you "\
+          "will also need to restart theory or run the probeModule command"
+    except (OSError,), e:
+      self._stdOut += str(e)
 
 
 
