@@ -169,17 +169,17 @@ class ModuleLoader(object):
 class CommandModuleLoader(ModuleLoader):
   def postPackFxnForTheory(self, lst):
     moodCommandRel = {
-      "test": "norm",
-      "loadDbData": "norm",
-      "listCommand": "norm",
-      "probeModule": "norm",
-      "switchMood": "norm",
-      "fileSelector": "norm",
-      "clipMonitor": "norm",
-      "createApp": "dev",
-      "createCmd": "dev",
-      "indentFormatFix": "dev",
-      "theoryFilesSurgeon": "dev",
+      "test": ["norm"],
+      "loadDbData": ["norm"],
+      "listCommand": ["norm"],
+      "probeModule": ["norm"],
+      "switchMood": ["norm"],
+      "fileSelector": ["norm"],
+      "clipMonitor": ["norm"],
+      "createApp": ["dev"],
+      "createCmd": ["dev"],
+      "indentFormatFix": ["dev"],
+      "theoryFilesSurgeon": ["dev"],
     }
     for o in lst:
       if(moodCommandRel.has_key(o[1])):
@@ -188,8 +188,8 @@ class CommandModuleLoader(ModuleLoader):
 
   def postPackFxn(self, lst):
     for o in lst:
-      if(self.moodAppRel.has_key(o[1])):
-        o[-1] = self.moodAppRel[o[1]]
+     if(self.moodAppRel.has_key(o[0])):
+        o[-1] = self.moodAppRel[o[0]]
     return lst
 
 def reprobeAllModule(settings_mod, argv=None):
@@ -253,7 +253,7 @@ def reprobeAllModule(settings_mod, argv=None):
 
   moduleLoader = CommandModuleLoader(CommandScanManager, "command", apps)
   moduleLoader.moodAppRel = moodAppRel
-  moduleLoader.lstPackFxn = lambda lst, app_name, path: [[app_name, i, os.path.join(path, i + ".py"), "lost"] for i in lst]
+  moduleLoader.lstPackFxn = lambda lst, app_name, path: [[app_name, i, os.path.join(path, i + ".py"), ["lost"]] for i in lst]
   moduleLoader.load()
   print [(i.name, i.mood) for i in Command.objects.all()]
 

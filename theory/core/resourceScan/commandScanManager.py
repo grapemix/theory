@@ -25,7 +25,7 @@ class CommandScanManager(BaseClassScanner):
       # TODO: supporting multiple mood
       if(cmdParam[2].endswith("__init__.py")):
         continue
-      cmd = Command(name=cmdParam[1], app=cmdParam[0], mood=[cmdParam[3]], sourceFile=cmdParam[2])
+      cmd = Command(name=cmdParam[1], app=cmdParam[0], mood=cmdParam[3], sourceFile=cmdParam[2])
       o = CommandClassScanner()
       o.cmdModel = cmd
       o.scan()
