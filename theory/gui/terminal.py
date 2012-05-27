@@ -37,7 +37,7 @@ def my_entry_anchor_test(obj, en, *args, **kwargs):
 
 class Terminal(object):
   lb = None
-  lastEntry = ""
+  crlf = "<br/>"
 
   @property
   def adapter(self):
@@ -47,6 +47,7 @@ class Terminal(object):
   def adapter(self, adapter):
     self._adapter = adapter
     self._adapter.printTxt = lambda x: self.lb.text_set(x)
+    self._adapter.crlf = self.crlf
 
   def __init__(self):
     elementary.init()
@@ -74,26 +75,33 @@ class Terminal(object):
 
   def _shellInputChangeHooker(self, object, entry, *args, **kwargs):
     curEntryTxt = object.entry_get()
-    if(curEntryTxt==self.lastEntry or curEntryTxt==""):
+    #print ".", curEntryTxt, "."
+    if(curEntryTxt==self.adapter.lastEntry or curEntryTxt==""):
       return
     if(curEntryTxt.endswith("<tab/>")):
-      object.entry_set(self.lastEntry)
-      print dir(object)
+      #object.entry_set(self.adapter.lastEntry)
+      #print dir(object)
+      #return
+      self.adapter.cmdInTxt = curEntryTxt[:-6]
+      self.adapter.autocompleteRequest(object.entry_set)
       #object.cursor_selection_begin()
       #object.cursor_selection_end()
-      return
-    elif(curEntryTxt.endswith("<br/>")):
+      object.cursor_line_end_set()
+      self.adapter.lastEntry = self.adapter.cmdInTxt
+    elif(curEntryTxt.endswith(self.crlf)):
       self.adapter.cmdInTxt = curEntryTxt[:-5]
       object.entry_set("")
       self.adapter.signalCmdInputSubmit()
+      self.adapter.lastEntry = self.adapter.cmdInTxt
     else:
       self.adapter.signalCmdInputChange()
-      # TODO: move autocomplete into adapter
       #self.lb.text_set(self.adapter.stdOut)
-    self.lastEntry = curEntryTxt
     #object.entry_set(curEntryTxt + "ss")
     #object.entry_insert("ss")
     #print entry.entry_get()
+
+  def key_down(data, e, obj, event_info):
+    print "You hit key: %s\n" % (event_info)
 
   def drawShellInput(self):
     win = self.win
@@ -104,11 +112,15 @@ class Terminal(object):
     bx2.size_hint_weight_set(evas.EVAS_HINT_EXPAND, 0.0)
     bx2.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
 
-    en = elementary.ScrolledEntry(win)
+    en = elementary.Entry(win)
+    en.line_wrap_set(True)
+    #en = elementary.ScrolledEntry(win)
     en.entry_set("")
-    en.callback_anchor_clicked_add(my_entry_anchor_test, en)
-    en.callback_changed_add(self._shellInputChangeHooker, en)
-    #en.callback_changed_user_add(self._shellInputChangeHooker, en)
+    #en.callback_anchor_clicked_add(my_entry_anchor_test, en)
+    #en.callback_changed_add(self._shellInputChangeHooker, en)
+    en.callback_changed_user_add(self._shellInputChangeHooker, en)
+    # test mulitple key-binding
+    #evas.event_callback_add(en, evas.EVAS_CALLBACK_KEY_DOWN, key_down, NULL)
     en.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
     #en.size_hint_weight_set(evas.EVAS_HINT_EXPAND, 0.0)
     en.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)

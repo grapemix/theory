@@ -51,6 +51,29 @@ class Command(Document):
       verbose_name=_("Next available command"),\
       help_text=_("The commands which are able to concatenate the result of this command"))
 
+  def getDetailAutocompleteHints(self, crlf):
+    comment = lambda x: x if(x) else "No comment"
+    hints = "%s -- %s%sParameters:" % (self.name, comment(self.comment), crlf)
+
+    for i in self.param:
+      if(i.isOptional):
+        hints += crlf + "(%s) [%s]: %s" % (i.type, i.name, comment(i.comment))
+      else:
+        hints += crlf + "(%s) %s: %s" % (i.type, i.name, comment(i.comment))
+    hints += crlf + '<a href="%s">Source File</a>' % (self.sourceFile)
+    return hints
+
+  def getAutocompleteHints(self):
+    comment = self.comment if(self.comment) else "No comment"
+    param = ",".join([i.name for i in self.param if(not i.isOptional)])
+    optionalParam = ",".join([i.name for i in self.param if(i.isOptional)])
+    if(optionalParam!=""):
+      if(param):
+        optionalParam = ", [%s]" % (optionalParam)
+      else:
+        optionalParam = "[%s]" % (optionalParam)
+    return "%s(%s%s) -- %s" % (self.name, param, optionalParam, comment)
+
   @property
   def className(self):
     return self.name[0].upper() + self.name[1:]

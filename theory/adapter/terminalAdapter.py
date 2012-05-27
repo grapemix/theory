@@ -21,7 +21,7 @@ from . import BaseAdapter
 class TerminalAdapter(BaseAdapter):
   _stdOut = ""
   _stdRowOut = []
-  _stdOutLineBreak = "<br>"
+  _stdOutLineBreak = "<br/>"
   isDisplayWidgetCompatable = True
 
   @property

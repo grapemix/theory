@@ -141,6 +141,7 @@ class TxtCmdParser(object):
       elif(c=="="):
         self._lastEqualSignIdx = i
 
+  # depreciated
   # TODO: adding more rules
   def _validateCmdByIdx(self, cmdInTxt):
     if(self.mode() == self.MODE_COMMAND):
