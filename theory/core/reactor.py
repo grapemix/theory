@@ -5,11 +5,11 @@ from mongoengine import Q
 
 ##### Theory lib #####
 from theory.adapter.reactorAdapter import ReactorAdapter
-from theory.model import Command, Adapter, History
 from theory.core.cmdParser.txtCmdParser import TxtCmdParser
 from theory.core.exceptions import CommandSyntaxError
 from theory.conf import settings
 from theory.gui.terminal import Terminal
+from theory.model import Command, Adapter, History
 from theory.utils.importlib import  import_class
 
 ##### Theory third-party lib #####
@@ -25,6 +25,9 @@ __all__ = ('reactor',)
 class Reactor(object):
   _mood = settings.DEFAULT_MOOD
   _avblCmd = None
+  autocompleteCounter = 0
+  lastAutocompleteSuggest = ""
+  originalQuest = ""
 
   @property
   def mood(self):
@@ -45,9 +48,53 @@ class Reactor(object):
   def __init__(self):
     self.parser = TxtCmdParser()
     self.ui = Terminal()
-    self.adapter = ReactorAdapter({"cmdSubmit": self.parse})
+    self.adapter = ReactorAdapter({"cmdSubmit": self.parse, "autocompleteRequest": self._autocompleteRequest})
+    # The ui will generate its supported output function
     self.ui.adapter = self.adapter
-    #self.ui.drawAll()
+
+  def _queryAutocomplete(self, frag):
+    # which means user keeps tabbing
+    if(self.lastAutocompleteSuggest==frag):
+      frag = self.originalQuest
+      self.autocompleteCounter += 1
+    else:
+      self.autocompleteCounter = 0
+      self.lastAutocompleteSuggest = ""
+      self.originalQuest = ""
+    cmdModelQuery = Command.objects.filter(Q(name__startswith=frag) & (Q(mood=self.mood) | Q(mood="norm")))
+    cmdModelQueryNum = cmdModelQuery.count()
+    if(cmdModelQueryNum==0):
+      return (self.parser.cmdInTxt, None)
+    elif(cmdModelQueryNum==1):
+      if(cmdModelQuery[0].name==frag):
+        crtOutput = cmdModelQuery[0].getDetailAutocompleteHints(self.adapter.crlf)
+      else:
+        crtOutput = None
+      return (cmdModelQuery[0].name, crtOutput)
+    elif(cmdModelQueryNum>1):
+      suggest = cmdModelQuery[self.autocompleteCounter % cmdModelQueryNum].name
+      if(self.autocompleteCounter==0):
+        self.originalQuest = frag
+      self.lastAutocompleteSuggest = suggest
+      crtOutput = self.adapter.crlf.join([i.getAutocompleteHints() for i in cmdModelQuery])
+      # e.x: having commands like blah, blah1, blah2
+      if(frag==suggest):
+        crtOutput += self.adapter.crlf + self.adapter.crlf + cmdModelQuery[self.autocompleteCounter % cmdModelQueryNum]\
+            .getDetailAutocompleteHints(self.adapter.crlf)
+      return (suggest, crtOutput)
+
+  def _autocompleteRequest(self, entrySetterFxn):
+    self.parser.cmdInTxt = self.adapter.cmdInTxt
+    self.parser.run()
+    (mode, frag) = self.parser.partialInput
+    if(mode==self.parser.MODE_COMMAND):
+      (entryOutput, crtOutput)= self._queryAutocomplete(frag)
+      entrySetterFxn(entryOutput)
+      if(crtOutput):
+        self.adapter.printTxt(crtOutput)
+    elif(mode==self.parser.MODE_ARGS):
+      pass
+    self.parser.initVar()
 
   def parse(self):
     self.parser.cmdInTxt = self.adapter.cmdInTxt

@@ -18,6 +18,8 @@ class ReactorAdapter(object):
   This class is a special adapter for internal theory usage only. No external
   app should call or derive anything from it.
   """
+  lastEntry = ""
+  crlf = ""
 
   def printTxt(self, *args, **kwargs):
     pass
@@ -40,3 +42,7 @@ class ReactorAdapter(object):
   def signalCmdInputChange(self, *args, **kwargs):
     if(self.signal.has_key("cmdChange")):
       self.signal["cmdChange"](*args, **kwargs)
+
+  def autocompleteRequest(self, entrySetterFxn, *args, **kwargs):
+    if(self.signal.has_key("autocompleteRequest")):
+      self.signal["autocompleteRequest"](entrySetterFxn, *args, **kwargs)
