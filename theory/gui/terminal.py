@@ -60,13 +60,19 @@ class Terminal(object):
     bg.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
     bg.show()
 
+    ly = elementary.Layout(self.win)
+    ly.file_set("gui/background.edj", "layout")
+    ly.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+    self.win.resize_object_add(ly)
+    ly.show()
+
     self.bx = elementary.Box(self.win)
     self.win.resize_object_add(self.bx)
     self.bx.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
     self.bx.show()
     self.drawShellInput()
     self.drawLabel("")
-    self.win.resize(640,100)
+    self.win.resize(640,30)
     self.win.show()
 
   def drawAll(self):
@@ -100,8 +106,12 @@ class Terminal(object):
     #object.entry_insert("ss")
     #print entry.entry_get()
 
-  def key_down(data, e, obj, event_info):
-    print "You hit key: %s\n" % (event_info)
+  def key_down(self, entry, event, *args, **kwargs):
+    # "Shift", "Control", "Alt", "Meta", "Hyper", "Super".
+    #print entry
+    #print event, event.modifier_is_set("Alt")
+    #print dir(entry.evas)
+    pass
 
   def drawShellInput(self):
     win = self.win
@@ -117,10 +127,9 @@ class Terminal(object):
     #en = elementary.ScrolledEntry(win)
     en.entry_set("")
     #en.callback_anchor_clicked_add(my_entry_anchor_test, en)
-    #en.callback_changed_add(self._shellInputChangeHooker, en)
-    en.callback_changed_user_add(self._shellInputChangeHooker, en)
+    en.callback_changed_add(self._shellInputChangeHooker, en)
     # test mulitple key-binding
-    #evas.event_callback_add(en, evas.EVAS_CALLBACK_KEY_DOWN, key_down, NULL)
+    en.on_key_down_add(self.key_down, en)
     en.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
     #en.size_hint_weight_set(evas.EVAS_HINT_EXPAND, 0.0)
     en.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
