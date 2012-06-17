@@ -22,22 +22,22 @@ class CreateApp(BaseCommand):
   """
   name = "createApp"
   verboseName = "createApp"
-  params = ["name",]
+  params = ["appName",]
   _notations = ["Command",]
   _gongs = ["Terminal", ]
 
   @property
-  def name(self):
-    return self._name
+  def appName(self):
+    return self._appName
 
-  @name.setter
-  def name(self, name):
-    self._name = name
+  @appName.setter
+  def appName(self, appName):
+    self._appName = appName
 
   def run(self, *args, **kwargs):
-    fromPath = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+    fromPath = os.path.join(os.path.dirappName(os.path.dirappName(__file__)),
         "conf", "app_template")
-    toPath = os.path.join(settings.APPS_ROOT, self.name)
+    toPath = os.path.join(settings.APPS_ROOT, self.appName)
     self._stdOut += "Coping" + fromPath + " --> " + toPath + "<br/>"
     try:
       copytree(fromPath, toPath)

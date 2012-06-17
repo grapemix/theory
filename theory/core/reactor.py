@@ -2,9 +2,11 @@
 #!/usr/bin/env python
 ##### System wide lib #####
 from mongoengine import Q
+import sys
 
 ##### Theory lib #####
 from theory.adapter.reactorAdapter import ReactorAdapter
+from theory.command.baseCommand import AsyncCommand
 from theory.core.cmdParser.txtCmdParser import TxtCmdParser
 from theory.core.exceptions import CommandSyntaxError
 from theory.conf import settings
@@ -114,8 +116,23 @@ class Reactor(object):
       self.parser.initVar()
       return
 
-    cmdKlass = import_class(".".join([cmdModel.app, "command", cmdModel.name, cmdModel.className]))
+    cmdKlass = import_class(cmdModel.classImportPath)
+    #cmdKlass = import_class(".".join([cmdModel.app, "command", cmdModel.name, cmdModel.className]))
+    #cmdKlass = getattr(sys.modules[cmdModel.moduleImportPath], cmdModel.className)
     cmd = cmdKlass()
+
+    try:
+      adapterName = cmd.gongs[0]
+    except IndexError:
+      adapterName = ""
+
+    try:
+      adapterModel = Adapter.objects.get(name=adapterName)
+      adapterProperty = adapterModel.property
+    except Adapter.DoesNotExist:
+      adapterModel = None
+      adapterProperty = []
+
     if(self.parser.args!=[]):
       for i in range(len(cmdModel.param)):
         try:
@@ -126,28 +143,20 @@ class Reactor(object):
     if(self.parser.kwargs!={}):
       for k,v in self.parser.kwargs.iteritems():
         setattr(cmd, k, v)
-    cmd.run()
 
-    try:
-      adapterName = cmd.gongs[0]
-    except IndexError:
-      adapterName = ""
-
-    try:
-      adapterModel = Adapter.objects.get(name=adapterName)
-    except Adapter.DoesNotExist:
-      adapterModel = None
+    asyncCommand = AsyncCommand()
+    result = asyncCommand.delay(cmd, adapterProperty).get()
 
     if(adapterModel!=None):
       adapterKlass = import_class(adapterModel.importPath)
       adapter = adapterKlass()
       for property in adapterModel.property:
         try:
-          setattr(adapter, property, getattr(cmd, property))
-        except AttributeError:
+          setattr(adapter, property, result[property])
+        except KeyError:
           try:
-            setattr(adapter, property, getattr(cmd, "_" + property))
-          except AttributeError:
+            setattr(adapter, property, result[cmd, "_" + property])
+          except KeyError:
             pass
 
       if(hasattr(adapter, "stdOut")):

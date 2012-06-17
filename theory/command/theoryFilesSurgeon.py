@@ -23,7 +23,7 @@ class TheoryFilesSurgeon(BaseCommand):
   An abstract class served as an wrapper file for commands which modify the
   files within the theory project.
   """
-  __metaclass__ = ABCMeta
+  #__metaclass__ = ABCMeta
   name = "theory Files Surgeon"
   verboseName = "theory Files' Surgeon"
   params = []
@@ -42,8 +42,8 @@ class TheoryFilesSurgeon(BaseCommand):
   )
   _writtenMode = WRITTEN_MODE_COPY
 
-  def __init__(self, *args, **kwargs):
-    super(TheoryFilesSurgeon, self).__init__(*args, **kwargs)
+  #def __init__(self, *args, **kwargs):
+  #  super(TheoryFilesSurgeon, self).__init__(*args, **kwargs)
 
   def preAction(self, filename, *args, **kwargs):
     return self._readFileLine(filename)

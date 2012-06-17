@@ -26,8 +26,8 @@ class IndentFormatFix(BaseCommand):
   _indentSpace = 2
   _files = []
 
-  def __init__(self, *args, **kwargs):
-    super(IndentFormatFix, self).__init__(*args, **kwargs)
+  #def __init__(self, *args, **kwargs):
+  #  super(IndentFormatFix, self).__init__(*args, **kwargs)
 
   def run(self, *args, **kwargs):
     for filename in self.files:
