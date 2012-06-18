@@ -54,8 +54,8 @@ class FileSelector(BaseCommand):
       (YIELD_MODE_CHUNK, 'chunk'),
   )
 
-  def __init__(self, *args, **kwargs):
-    super(FileSelector, self).__init__(*args, **kwargs)
+  #def __init__(self, *args, **kwargs):
+  #  super(FileSelector, self).__init__(*args, **kwargs)
 
   # Watch out when implementing YIELD_MODE_LINE and YIELD_MODE_CHUNK
   @property

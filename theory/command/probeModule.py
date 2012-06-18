@@ -4,7 +4,7 @@
 
 ##### Theory lib #####
 from theory.command.baseCommand import BaseCommand
-from theory.core.loader import reprobeAllModule
+from theory.core.loader.util import reprobeAllModule
 
 ##### Theory third-party lib #####
 

@@ -2,6 +2,7 @@
 #!/usr/bin/env python
 ##### System wide lib #####
 from abc import ABCMeta, abstractmethod
+from celery.task import Task
 
 ##### Theory lib #####
 
@@ -20,12 +21,14 @@ from abc import ABCMeta, abstractmethod
 # properties will be treated as mandatory parameters (*args) in order. The type
 # and description should also be reflected in the tooltip/autocomplete feature.
 #
+#class BaseCommand(Task):
 class BaseCommand(object):
   """
   All commands should directly/indirectly derive from this class.
   Please try to design with the bridge pattern and test oriented pattern.
   """
   __metaclass__ = ABCMeta
+  #abstract = True
   name = None
   verboseName = None
   params = []
@@ -46,7 +49,8 @@ class BaseCommand(object):
   # stderr should be seen in lig file
 
   def __init__(self, *args, **kwargs):
-    super(BaseCommand, self).__init__(*args, **kwargs)
+    pass
+  #  super(BaseCommand, self).__init__(*args, **kwargs)
 
   @property
   def stdOut(self):
@@ -100,6 +104,7 @@ class BaseCommand(object):
         return False
     return True
 
+
   def _run(self, *args, **kwargs):
     # TODO: integrate signal
     #signals.pre_run.send(instance=self)
@@ -112,3 +117,16 @@ class BaseCommand(object):
 
   def stop(self, *args, **kwargs):
     pass
+
+class AsyncCommand(Task):
+  # Warning: Try not to override this fxn
+  def extractResult(self, inst, adapterInput):
+    result = {}
+    for property in adapterInput:
+      print property,getattr(inst, property)
+      result[property] = getattr(inst, property)
+    return result
+
+  def run(self, inst, adapterInput):
+    inst.run()
+    return self.extractResult(inst, adapterInput)

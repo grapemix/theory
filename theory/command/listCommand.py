@@ -18,7 +18,7 @@ class ListCommand(BaseCommand):
   name = "listCommand"
   verboseName = "listCommand"
   params = []
-  _app = None
+  _appName = None
   _mood = None
   _query = None
   _notations = ["Command",]
@@ -29,12 +29,12 @@ class ListCommand(BaseCommand):
     return self._query
 
   @property
-  def app(self):
-    return self._app
+  def appName(self):
+    return self._appName
 
-  @app.setter
-  def app(self, app):
-    self._app = app
+  @appName.setter
+  def appName(self, appName):
+    self._appName = appName
 
   @property
   def mood(self):
@@ -45,9 +45,10 @@ class ListCommand(BaseCommand):
     self._mood = mood
 
   def run(self, *args, **kwargs):
+    self._stdRowOut = []
     param = {}
-    if(self._app!=None):
-      param["app"] = self._app
+    if(self._appName!=None):
+      param["appName"] = self._appName
     if(self._mood!=None):
       param["mood"] = self._mood
     self._query = Command.objects.all().select_related(1)

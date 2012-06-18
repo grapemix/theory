@@ -78,6 +78,14 @@ class Command(Document):
   def className(self):
     return self.name[0].upper() + self.name[1:]
 
+  @property
+  def moduleImportPath(self):
+    return "%s.command.%s" % (self.app, self.name)
+
+  @property
+  def classImportPath(self):
+    return "%s.command.%s.%s" % (self.app, self.name, self.className)
+
 class History(Document):
   command = StringField(required=True,\
       verbose_name=_("Command in Text"),\

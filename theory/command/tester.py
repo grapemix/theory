@@ -15,14 +15,14 @@ from theory.test.utils import get_runner
 
 ##### Misc #####
 
-class Test(BaseCommand):
+class Tester(BaseCommand):
   """
   Run the test case. In this version, only theory's testcase will be run.
   In the future, you can run a specific app's testcase as well as all apps'
   testcase.
   """
-  name = "test"
-  verboseName = "test"
+  name = "tester"
+  verboseName = "tester"
   params = []
   _app = None
   _testRunner = None

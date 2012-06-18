@@ -3,12 +3,14 @@
 ##### System wide lib #####
 import imp
 import os
+#from theory.conf import settings
+#os.environ["BROKER_URL"] = settings.CELERY_SETTINGS["BROKER_URL"]
+os.environ.setdefault("CELERY_LOADER", "theory.core.celeryLoader.CeleryLoader")
 import sys
 
 ##### Theory lib #####
-from theory.command import fileSelector
+#from theory.command import fileSelector
 from theory.core.resourceScan import *
-from theory.core.reactor import *
 from theory.model import Command
 from theory.utils.importlib import import_module
 from theory.utils.mood import loadMoodData
@@ -119,14 +121,39 @@ def findFilesInAppDir(app_name, dirName, isIncludeInit=False):
   return r
 
 
+def startCelery():
+  from celery.app import default_app as celeryApp
+  from celery.bin import celeryd
+  #from celery.registry import tasks
+  #from theory.conf import settings
+
+  #celeryApp.config_from_object(settings.CELERY_SETTINGS)
+  #print dir(celeryApp.loader)
+  #from theory.command.listCommand import *
+  #tasks.register(ListCommand)
+  worker = celeryd.WorkerCommand(app=celeryApp)
+  args=[]
+  kwargs={}
+  #kwargs["loader"] = "theory.core.celeryLoader.CeleryLoader"
+  kwargs["loglevel"] = "DEBUG"
+  #kwargs["loglevel"] = "INFO"
+  kwargs["autoreload"] = True
+  #kwargs["include"] = "theory.command.listCommand"
+  #kwargs["include"] = ",".join(["%s.commands.%s" % (i.app, i.className[0].lower() + i.className[1:]) for i in Command.objects.all()])
+  #celeryApp.loader.task_modules = set(["theory.command.listCommand"])
+  #print celeryApp.loader.task_modules
+  reprobeAllModule(None, {})
+  worker.run(*args, **kwargs)
+
 def wakeup(settings_mod, argv=None):
+  from theory.core.reactor import *
   #if(Command.objects.all().count()==0):
   reprobeAllModule(settings_mod, argv)
   #from theory.core import t
   #reactor = Reactor()
   #reactor.test()
-
   reactor.ui.drawAll()
+
 
 class ModuleLoader(object):
   _lstPackFxn = lambda x, y, z: x
@@ -255,6 +282,6 @@ def reprobeAllModule(settings_mod, argv=None):
   moduleLoader.moodAppRel = moodAppRel
   moduleLoader.lstPackFxn = lambda lst, app_name, path: [[app_name, i, os.path.join(path, i + ".py"), ["lost"]] for i in lst]
   moduleLoader.load()
-  print [(i.name, i.mood) for i in Command.objects.all()]
+  #print [(i.name, i.mood) for i in Command.objects.all()]
 
   return
