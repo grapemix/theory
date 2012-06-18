@@ -44,7 +44,7 @@ class Reactor(object):
     if(self._avblCmd!=None):
       return self._avblCmd
     else:
-      self._avblCmd = Commands.objects.filter(mood=self.mood,)
+      self._avblCmd = Command.objects.filter(mood=self.mood,)
     return self._avblCmd
 
   def __init__(self):
