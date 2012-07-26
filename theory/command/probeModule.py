@@ -3,7 +3,7 @@
 ##### System wide lib #####
 
 ##### Theory lib #####
-from theory.command.baseCommand import BaseCommand
+from theory.command.baseCommand import SimpleCommand
 from theory.core.loader.util import reprobeAllModule
 
 ##### Theory third-party lib #####
@@ -14,7 +14,7 @@ from theory.core.loader.util import reprobeAllModule
 
 ##### Misc #####
 
-class ProbeModule(BaseCommand):
+class ProbeModule(SimpleCommand):
   name = "probeModule"
   verboseName = "probeModule"
   params = []
@@ -26,6 +26,10 @@ class ProbeModule(BaseCommand):
 
   @settingMod.setter
   def settingMod(self, settingMod):
+    """
+    :param settingMod: The python module being used to setup environment during probing
+    :type settingMod: pythonModule
+    """
     self._settingMod = settingMod
 
   def run(self, *args, **kwargs):

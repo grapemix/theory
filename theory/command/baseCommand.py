@@ -14,20 +14,19 @@ from celery.task import Task
 
 ##### Misc #####
 
-##
-#
-# All property with setters will be treated as an optional keyword parameter
-# for the command(**kwargs). If the properties are set in params property, the
-# properties will be treated as mandatory parameters (*args) in order. The type
-# and description should also be reflected in the tooltip/autocomplete feature.
-#
-#class BaseCommand(Task):
-class BaseCommand(object):
+__all__ = ("SimpleCommand", "AsyncCommand", )
+
+class _BaseCommand(object):
   """
   All commands should directly/indirectly derive from this class.
   Please try to design with the bridge pattern and test oriented pattern.
+
+  All property with setters will be treated as an optional keyword parameter
+  for the command(**kwargs). If the properties are set in params property, the
+  properties will be treated as mandatory parameters (*args) in order. The type
+  and description should also be reflected in the tooltip/autocomplete feature.
+
   """
-  __metaclass__ = ABCMeta
   #abstract = True
   name = None
   verboseName = None
@@ -39,10 +38,6 @@ class BaseCommand(object):
   # case with the first lower char. e.x.: FilenameList -> filenameList;
   # FilefileObjectList -> fileObjectList
 
-  _progress = 0.0
-  _status = ""
-  _stdOut = ""
-  _stdRowOut = []
   _verbosity = 1
   _gongs = []
   _notations = []
@@ -50,23 +45,7 @@ class BaseCommand(object):
 
   def __init__(self, *args, **kwargs):
     pass
-  #  super(BaseCommand, self).__init__(*args, **kwargs)
-
-  @property
-  def stdOut(self):
-    return self._stdOut
-
-  @property
-  def stdRowOut(self):
-    return self._stdRowOut
-
-  @property
-  def status(self):
-    return self._status
-
-  @property
-  def progress(self):
-    return self._progress
+  #  super(_BaseCommand, self).__init__(*args, **kwargs)
 
   @property
   def verbosity(self):
@@ -80,22 +59,24 @@ class BaseCommand(object):
   def notations(self):
     return self._notations
 
-  ##
-  # @param notations List[type<Adapter>]
-  #
   @notations.setter
   def notations(self, notations):
+    """
+    :param notations: The choice order of input adapter
+    :type notations: List(Adapter)
+    """
     self._notations = notations
 
   @property
   def gongs(self):
     return self._gongs
 
-  ##
-  # @param gongs List[type<Adapter>]
-  #
   @gongs.setter
   def gongs(self, gongs):
+    """
+    :param notations: The choice order of output adapter
+    :type notations: List(Adapter)
+    """
     self._gongs = gongs
 
   def validate(self, *args, **kwargs):
@@ -104,26 +85,78 @@ class BaseCommand(object):
         return False
     return True
 
+class SimpleCommand(_BaseCommand):
+  __metaclass__ = ABCMeta
 
-  def _run(self, *args, **kwargs):
-    # TODO: integrate signal
-    #signals.pre_run.send(instance=self)
-    self.run(*args, **kwargs)
-    #signals.post_run.send(instance=self)
+  _status = ""
+  _stdOut = ""
+  _stdRowOut = []
+
+  @property
+  def stdOut(self):
+    return self._stdOut
+
+  @property
+  def stdRowOut(self):
+    return self._stdRowOut
+
+  @property
+  def status(self):
+    return self._status
 
   @abstractmethod
   def run(self, *args, **kwargs):
     pass
 
-  def stop(self, *args, **kwargs):
-    pass
+'''
+class SeqCommand(_BaseCommand):
+  _step = 0
 
-class AsyncCommand(Task):
+  @property
+  def formLst(self):
+    return self._formLst
+
+  @formLst.setter
+  def formLst(self, formLst):
+    """
+    :param notations: The list of form being called in sequence
+    :type notations: List(Form)
+    """
+    self._formLst = formLst
+
+  @property
+  def cmdLst(self):
+    return self._cmdLst
+
+  @cmdLst.setter
+  def cmdLst(self, cmdLst):
+    """
+    :param notations: The list of command being called in sequence
+    :type notations: List(Command)
+    """
+    self._cmdLst = cmdLst
+
+  def run(self, *args, **kwargs):
+    pass
+'''
+
+class AsyncCommand(Task, _BaseCommand):
+  """
+  We have to program differently. All input can be only retrieved from the
+  dictionary of **kwargs and all states have to store in DB. In other words,
+  no class variable should be read and written before and after the run().
+  """
+  abstract = True
+
+class AsyncContainer(Task):
+  """
+  Normal users should not used this class.
+  """
+
   # Warning: Try not to override this fxn
   def extractResult(self, inst, adapterInput):
     result = {}
     for property in adapterInput:
-      print property,getattr(inst, property)
       result[property] = getattr(inst, property)
     return result
 

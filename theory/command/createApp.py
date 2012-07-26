@@ -5,7 +5,7 @@ import os
 from shutil import copytree
 
 ##### Theory lib #####
-from theory.command.baseCommand import BaseCommand
+from theory.command.baseCommand import SimpleCommand
 from theory.conf import settings
 
 ##### Theory third-party lib #####
@@ -16,7 +16,7 @@ from theory.conf import settings
 
 ##### Misc #####
 
-class CreateApp(BaseCommand):
+class CreateApp(SimpleCommand):
   """
   Start an Theory app
   """
@@ -32,10 +32,14 @@ class CreateApp(BaseCommand):
 
   @appName.setter
   def appName(self, appName):
+    """
+    :param appName: The name of application being used
+    :type appName: string
+    """
     self._appName = appName
 
   def run(self, *args, **kwargs):
-    fromPath = os.path.join(os.path.dirappName(os.path.dirappName(__file__)),
+    fromPath = os.path.join(os.path.dirname(os.path.dirname(__file__)),
         "conf", "app_template")
     toPath = os.path.join(settings.APPS_ROOT, self.appName)
     self._stdOut += "Coping" + fromPath + " --> " + toPath + "<br/>"

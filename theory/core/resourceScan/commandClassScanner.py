@@ -4,6 +4,7 @@
 from mongoengine import *
 
 ##### Theory lib #####
+from theory.command.baseCommand import SimpleCommand, AsyncCommand
 from theory.conf import settings
 from theory.model import Command, Parameter
 from theory.utils.importlib import import_module
@@ -12,6 +13,7 @@ from theory.utils.importlib import import_module
 
 ##### Local app #####
 from .baseClassScanner import BaseClassScanner
+from .paramScanner import ParamScanner
 
 ##### Theory app #####
 
@@ -41,7 +43,7 @@ class CommandClassScanner(BaseClassScanner):
 
   def scan(self):
     cmdFileClass = self._loadCommandClass()
-    if(hasattr(cmdFileClass, "ABCMeta")):
+    if(hasattr(cmdFileClass, "ABCMeta") or hasattr(cmdFileClass, "abstract")):
       self._cmdModel = None
       return
     try:
@@ -50,6 +52,12 @@ class CommandClassScanner(BaseClassScanner):
     except AttributeError:
       self._cmdModel = None
       return
+
+    if(issubclass(cmdClass, AsyncCommand)):
+      self.cmdModel.runMode = self.cmdModel.RUN_MODE_ASYNC
+    elif(not issubclass(cmdClass, SimpleCommand)):
+      self.cmdModel.runMode = self.cmdModel.RUN_MODE_ASYNC_WRAPPER
+
 
     # To reserve the order of mandatory parameters
     for paramName in getattr(cmdClass, "params"):
@@ -68,3 +76,8 @@ class CommandClassScanner(BaseClassScanner):
           # To avoid duplicate
           continue
         self.cmdModel.param.append(param)
+
+    paramScanner = ParamScanner()
+    paramScanner.filePath = self.cmdModel.sourceFile
+    paramScanner.paramModelLst = self.cmdModel.param
+    paramScanner.scan()

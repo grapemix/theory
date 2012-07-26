@@ -9,32 +9,32 @@ from shutil import move
 ##### Theory third-party lib #####
 
 ##### Local app #####
-from .baseCommand import BaseCommand
+from .baseCommand import SimpleCommand
 
 ##### Theory app #####
 
 ##### Misc #####
 
-class IndentFormatFix(BaseCommand):
+class IndentFormatFix(SimpleCommand):
   """
-  Fixing the indent of python source files, but this command
+  Fixing the indent of python source fileLst, but this command
   can only convert the 4 space into 2 space or vice versa in this version
   """
   name = "indentFormatFix"
-  verboseName = "indent Format Fix"
-  params = []
+  verboseName = "Indent Format Fix"
+  params = ["fileLst", ]
   _indentSpace = 2
-  _files = []
+  _fileLst = []
 
   #def __init__(self, *args, **kwargs):
   #  super(IndentFormatFix, self).__init__(*args, **kwargs)
 
   def run(self, *args, **kwargs):
-    for filename in self.files:
+    for filename in self.fileLst:
       lines = self._readFileLine(filename)
-      newLines = self._forceHalfIndent(lines)
-      #newLines = self._convertDjango(lines)
-      self._writeToFile(newLines, filename)
+      lines = self._forceHalfIndent(lines)
+      lines = self._convertDjango(lines)
+      self._writeToFile(lines, filename)
 
   def _writeToFile(self, lines, oldFilename):
     move(oldFilename, oldFilename + ".orig")
@@ -80,12 +80,16 @@ class IndentFormatFix(BaseCommand):
     return newLines
 
   @property
-  def files(self):
-    return self._files
+  def fileLst(self):
+    return self._fileLst
 
-  @files.setter
-  def files(self, files):
-    self._files = files
+  @fileLst.setter
+  def fileLst(self, fileLst):
+    """
+    :param fileLst: The list of file
+    :type fileLst: List(file)
+    """
+    self._fileLst = fileLst
 
   @property
   def indentSpace(self):
@@ -93,5 +97,9 @@ class IndentFormatFix(BaseCommand):
 
   @indentSpace.setter
   def indentSpace(self, indentSpace):
+    """
+    :param indentSpace: The space of indent in front of every line.
+    :type indentSpace: integer
+    """
     self._indentSpace = indentSpace
 

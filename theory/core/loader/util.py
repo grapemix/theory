@@ -6,7 +6,7 @@ import os
 import sys
 
 ##### Theory lib #####
-#from theory.command import fileSelector
+#from theory.command import filenameScanner
 from theory.core.resourceScan import *
 from theory.utils.importlib import import_module
 from theory.utils.mood import loadMoodData
@@ -163,7 +163,7 @@ class CommandModuleLoader(ModuleLoader):
       "listCommand": ["norm"],
       "probeModule": ["norm"],
       "switchMood": ["norm"],
-      "fileSelector": ["norm"],
+      "filenameScanner": ["norm"],
       "clipMonitor": ["norm"],
       "createApp": ["dev"],
       "createCmd": ["dev"],
@@ -226,7 +226,10 @@ def reprobeAllModule(settings_mod, argv=None):
 
   # Find all mood directory
   moodAppRel = {}
-  for moodDirName in os.listdir(settings.MOODS_ROOT):
+  settings.INSTALLED_MOODS = list(settings.INSTALLED_MOODS)
+  settings.INSTALLED_MOODS.append("norm")
+  settings.INSTALLED_MOODS = tuple(settings.INSTALLED_MOODS)
+  for moodDirName in settings.INSTALLED_MOODS:
     config = import_module("%s.config" % (moodDirName))
     for appName in config.APPS:
       if(moodAppRel.has_key(appName)):

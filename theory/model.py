@@ -28,7 +28,17 @@ class Parameter(EmbeddedDocument):
       help_text=_("Is read-only flag"))
   comment = StringField(help_text=_("Parameter's comment"))
 
-class Command(Document):
+class Command(Model):
+  RUN_MODE_SIMPLE = 1
+  RUN_MODE_ASYNC = 2
+  RUN_MODE_ASYNC_WRAPPER = 3
+
+  RUN_MODE_CHOICES = (
+      (RUN_MODE_SIMPLE, 'Simple run-mode'),
+      (RUN_MODE_ASYNC, 'Async run-mode'),
+      (RUN_MODE_ASYNC_WRAPPER, 'Async wrapper run-mode'),
+  )
+
   name = StringField(required=True, max_length=256,\
       verbose_name=_("Command"),\
       help_text=_("Command name"))
@@ -50,6 +60,9 @@ class Command(Document):
   nextAvblCmd = ListField(ReferenceField("self"), \
       verbose_name=_("Next available command"),\
       help_text=_("The commands which are able to concatenate the result of this command"))
+  runMode = IntField(\
+      choices=RUN_MODE_CHOICES, default=RUN_MODE_SIMPLE,
+      help_text=_("The way how this command to be run. Most users should neglect this field."))
 
   def getDetailAutocompleteHints(self, crlf):
     comment = lambda x: x if(x) else "No comment"
@@ -86,7 +99,7 @@ class Command(Document):
   def classImportPath(self):
     return "%s.command.%s.%s" % (self.app, self.name, self.className)
 
-class History(Document):
+class History(Model):
   command = StringField(required=True,\
       verbose_name=_("Command in Text"),\
       help_text=_("Command in Text including paramter"))
@@ -99,7 +112,7 @@ class History(Document):
   touched = DateTimeField(required=True, default=datetime.utcnow())
   repeated = IntField(default=1)
 
-class Adapter(Document):
+class Adapter(Model):
   name = StringField(required=True, max_length=256,\
       verbose_name=_("Adapter name"),\
       help_text=_("Adapter name"))
@@ -111,5 +124,3 @@ class Adapter(Document):
   property = ListField(StringField(max_length=256,\
       verbose_name=_("Property"),\
       help_text=_("The properties which accepted by this adapter")))
-
-

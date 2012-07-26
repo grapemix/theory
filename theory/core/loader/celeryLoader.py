@@ -48,10 +48,9 @@ class CeleryLoader(BaseLoader):
     self.autodiscover()
 
   def autodiscover(self):
-    #cmdImportPath = [cmd.moduleImportPath for cmd in Command.objects.all()]
-    #import sys
-    #for path in cmdImportPath:
-    #  import_module(path)
+    cmdImportPath = [cmd.moduleImportPath for cmd in Command.objects.filter(runMode=Command.RUN_MODE_ASYNC)]
+    for path in cmdImportPath:
+      import_module(path)
 
     # TODO: should be support individual commands define themselves as
     # celery task instead using the default task wrapper. In that case,

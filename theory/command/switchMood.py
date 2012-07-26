@@ -10,13 +10,13 @@ from theory.utils.mood import loadMoodData
 ##### Theory third-party lib #####
 
 ##### Local app #####
-from .baseCommand import BaseCommand
+from .baseCommand import SimpleCommand
 
 ##### Theory app #####
 
 ##### Misc #####
 
-class SwitchMood(BaseCommand):
+class SwitchMood(SimpleCommand):
   """
   To switch Theory mood
   """
@@ -25,6 +25,7 @@ class SwitchMood(BaseCommand):
   params = ["moodName",]
   _notations = ["Command",]
   _gongs = ["Terminal", ]
+  _moodName = ""
 
   @property
   def moodName(self):
@@ -32,7 +33,15 @@ class SwitchMood(BaseCommand):
 
   @moodName.setter
   def moodName(self, moodName):
+    """
+    :param moodName: The name of mood being used
+    :type moodName: Choice(string)
+    """
     self._moodName = moodName
+
+  @property
+  def moodNameChoiceLst(self):
+    return settings.INSTALLED_MOODS
 
   def run(self, *args, **kwargs):
     config = loadMoodData(self.moodName)
