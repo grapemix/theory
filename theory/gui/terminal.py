@@ -19,6 +19,7 @@ import evas
 
 ##### Misc #####
 
+# TODO: refactor/rewrite this file
 #----- common -{{{-
 def my_entry_bt_2(bt, en):
   str = en.entry_get()
@@ -126,6 +127,7 @@ class Terminal(object):
     en.line_wrap_set(True)
     #en = elementary.ScrolledEntry(win)
     en.entry_set("")
+    en.scale_set(1.5)
     #en.callback_anchor_clicked_add(my_entry_anchor_test, en)
     en.callback_changed_add(self._shellInputChangeHooker, en)
     # test mulitple key-binding
@@ -135,7 +137,7 @@ class Terminal(object):
     en.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
     bx2.pack_end(en)
     en.show()
-    en.focus()
+    en.focus_set(1)
 
     bt = elementary.Button(win)
     bt.text_set("Clear")
@@ -176,11 +178,14 @@ class Terminal(object):
     self.bx.pack_end(sp)
     sp.show()
 
+    self.bxCrt = elementary.Box(self.win)
     self.lb = elementary.Label(self.win)
     self.lb.text_set(txt)
     #fr.content_set(lb)
     self.lb.show()
-    self.bx.pack_end(self.lb)
+    self.bxCrt.pack_end(self.lb)
+    self.bxCrt.show()
+    self.bx.pack_end(self.bxCrt)
 
   # e.x:
   #  items = [("Entry", entry_clicked),

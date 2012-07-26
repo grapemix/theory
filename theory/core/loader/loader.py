@@ -9,7 +9,7 @@ os.environ.setdefault("CELERY_LOADER", "theory.core.celeryLoader.CeleryLoader")
 import sys
 
 ##### Theory lib #####
-#from theory.command import fileSelector
+#from theory.command import filenameScanner
 from theory.core.resourceScan import *
 from theory.model import Command
 from theory.utils.importlib import import_module
@@ -201,7 +201,7 @@ class CommandModuleLoader(ModuleLoader):
       "listCommand": ["norm"],
       "probeModule": ["norm"],
       "switchMood": ["norm"],
-      "fileSelector": ["norm"],
+      "filenameScanner": ["norm"],
       "clipMonitor": ["norm"],
       "createApp": ["dev"],
       "createCmd": ["dev"],

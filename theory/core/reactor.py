@@ -6,7 +6,7 @@ import sys
 
 ##### Theory lib #####
 from theory.adapter.reactorAdapter import ReactorAdapter
-from theory.command.baseCommand import AsyncCommand
+from theory.command.baseCommand import AsyncContainer
 from theory.core.cmdParser.txtCmdParser import TxtCmdParser
 from theory.core.exceptions import CommandSyntaxError
 from theory.conf import settings
@@ -53,8 +53,10 @@ class Reactor(object):
     self.adapter = ReactorAdapter({"cmdSubmit": self.parse, "autocompleteRequest": self._autocompleteRequest})
     # The ui will generate its supported output function
     self.ui.adapter = self.adapter
+    settings.CRTWIN = self.ui.win
+    settings.CRT = self.ui.bxCrt
 
-  def _queryAutocomplete(self, frag):
+  def _queryCommandAutocomplete(self, frag):
     # which means user keeps tabbing
     if(self.lastAutocompleteSuggest==frag):
       frag = self.originalQuest
@@ -90,13 +92,24 @@ class Reactor(object):
     self.parser.run()
     (mode, frag) = self.parser.partialInput
     if(mode==self.parser.MODE_COMMAND):
-      (entryOutput, crtOutput)= self._queryAutocomplete(frag)
+      (entryOutput, crtOutput)= self._queryCommandAutocomplete(frag)
       entrySetterFxn(entryOutput)
       if(crtOutput):
         self.adapter.printTxt(crtOutput)
     elif(mode==self.parser.MODE_ARGS):
-      pass
+      self._queryArgsAutocomplete(frag)
     self.parser.initVar()
+
+  def _queryArgsAutocomplete(self, frag):
+    return
+    # TODO: complete this feature
+    #argIdx = len(self.parser.args)
+    #paramModel = Command.objects.get(name=self.parser.cmdName).param[argIdx]
+    #argType = paramModel.type
+    #classImportPathTempate = "theory.gui.field.%sField" % (argType)
+    #fieldClass = import_class(classImportPathTempate)
+    #print fieldClass
+
 
   def parse(self):
     self.parser.cmdInTxt = self.adapter.cmdInTxt
@@ -104,6 +117,13 @@ class Reactor(object):
     # should change for chained command
     #if(self.parser.mode==self.parser.MODE_DONE):
     self.run()
+
+  def _objAssign(self, o, k, v):
+    return setattr(o, k, v)
+
+  def _dictAssign(self, o, k, v):
+    o[k] = v
+    return o
 
   # TODO: refactor this function, may be with bridge
   def run(self):
@@ -133,19 +153,37 @@ class Reactor(object):
       adapterModel = None
       adapterProperty = []
 
+    if(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC):
+      #assignFxn = lambda o, k, v: o[k] = v
+      assignFxn = self._dictAssign
+      storage = {}
+    else:
+      #assignFxn = lambda o, k, v: setattr(o, k, v)
+      assignFxn = self._objAssign
+      storage = cmd
+
+    cmdArgs = [i for i in cmdModel.param if(not i.isOptional)]
     if(self.parser.args!=[]):
-      for i in range(len(cmdModel.param)):
+      for i in range(len(cmdArgs)):
         try:
-          setattr(cmd, cmdModel.param[i].name, self.parser.args[i])
+          assignFxn(storage, cmdArgs[i].name, self.parser.args[i])
+          #storage = assignFxn(storage, cmdModel.param[i].name, self.parser.args[i])
         except IndexError:
           # This means the number of param given unmatch the number of param register in *.command
           raise CommandSyntaxError
     if(self.parser.kwargs!={}):
       for k,v in self.parser.kwargs.iteritems():
-        setattr(cmd, k, v)
+        #setattr(cmd, k, v)
+        storage = assignFxn(storage, k, v)
 
-    asyncCommand = AsyncCommand()
-    result = asyncCommand.delay(cmd, adapterProperty).get()
+    if(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC_WRAPPER):
+      asyncContainer = AsyncContainer()
+      result = asyncContainer.delay(cmd, adapterProperty).get()
+    elif(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC):
+      result = cmd.delay(storage).get()
+    else:
+      asyncContainer = AsyncContainer()
+      result = asyncContainer.run(cmd, adapterProperty)
 
     if(adapterModel!=None):
       adapterKlass = import_class(adapterModel.importPath)

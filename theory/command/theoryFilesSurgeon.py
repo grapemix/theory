@@ -11,23 +11,23 @@ from shutil import move
 ##### Theory third-party lib #####
 
 ##### Local app #####
-from .baseCommand import BaseCommand
-from .fileSelector import FileSelector
+from .baseCommand import SimpleCommand
+from .filenameScanner import FilenameScanner
 
 ##### Theory app #####
 
 ##### Misc #####
 
-class TheoryFilesSurgeon(BaseCommand):
+class TheoryFilesSurgeon(SimpleCommand):
   """
   An abstract class served as an wrapper file for commands which modify the
-  files within the theory project.
+  fileLst within the theory project.
   """
-  #__metaclass__ = ABCMeta
+  __metaclass__ = ABCMeta
   name = "theory Files Surgeon"
   verboseName = "theory Files' Surgeon"
   params = []
-  _files = []
+  _fileLst = []
 
   WRITTEN_MODE_COPY = 1
   WRITTEN_MODE_REPLACE = 2
@@ -59,13 +59,13 @@ class TheoryFilesSurgeon(BaseCommand):
     pass
 
   def getFiles(self, *args, **kwargs):
-    self.fileSelector = FileSelector()
-    self.fileSelector.roots=[os.path.dirname(os.path.dirname(__file__)),]
-    self.fileSelector.includeFilesExt = ["py",]
-    self.fileSelector.excludeFxns = [lambda x: True,]
-    self.fileSelector.depth = -1
-    self.fileSelector.run()
-    self.files = self.fileSelector.files
+    self.filenameScanner = FilenameScanner()
+    self.filenameScanner.rootLst=[os.path.dirname(os.path.dirname(__file__)),]
+    self.filenameScanner.includeFileExtLst = [".py",]
+    self.filenameScanner.excludeFileFxnLst = [lambda x: True,]
+    self.filenameScanner.depth = -1
+    self.filenameScanner.run()
+    self.fileLst = self.filenameScanner.fileLst
 
   def postGetFiles(self, *args, **kwargs):
     pass
@@ -74,7 +74,7 @@ class TheoryFilesSurgeon(BaseCommand):
     self.preGetFiles()
     self.getFiles()
     self.postGetFiles()
-    for filename in self.files:
+    for filename in self.fileLst:
       lines = self.preAction(filename)
       newLines = self.action(lines)
       self.postAction(newLines, filename)
@@ -108,12 +108,12 @@ class TheoryFilesSurgeon(BaseCommand):
     return s
 
   @property
-  def files(self):
-    return self._files
+  def fileLst(self):
+    return self._fileLst
 
-  @files.setter
-  def files(self, files):
-    self._files = files
+  @fileLst.setter
+  def fileLst(self, fileLst):
+    self._fileLst = fileLst
 
   @property
   def writtenMode(self):

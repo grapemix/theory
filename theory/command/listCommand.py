@@ -3,7 +3,7 @@
 ##### System wide lib #####
 
 ##### Theory lib #####
-from theory.command.baseCommand import BaseCommand
+from theory.command.baseCommand import SimpleCommand
 from theory.model import Command
 
 ##### Theory third-party lib #####
@@ -14,7 +14,7 @@ from theory.model import Command
 
 ##### Misc #####
 
-class ListCommand(BaseCommand):
+class ListCommand(SimpleCommand):
   name = "listCommand"
   verboseName = "listCommand"
   params = []
@@ -26,6 +26,10 @@ class ListCommand(BaseCommand):
 
   @property
   def query(self):
+    """
+    :param query: The mongoengine QuerySet being pass to mongoengine
+    :type query: QuerySet
+    """
     return self._query
 
   @property
@@ -34,6 +38,10 @@ class ListCommand(BaseCommand):
 
   @appName.setter
   def appName(self, appName):
+    """
+    :param appName: The name of application being used
+    :type appName: string
+    """
     self._appName = appName
 
   @property
@@ -42,28 +50,34 @@ class ListCommand(BaseCommand):
 
   @mood.setter
   def mood(self, mood):
+    """
+    :param mood: The name of mood being used
+    :type mood: string
+    """
     self._mood = mood
 
   def run(self, *args, **kwargs):
     self._stdRowOut = []
-    param = {}
+    queryParam = {}
     if(self._appName!=None):
-      param["appName"] = self._appName
+      queryParam["appName"] = self._appName
     if(self._mood!=None):
-      param["mood"] = self._mood
+      queryParam["mood"] = self._mood
     self._query = Command.objects.all().select_related(1)
-    if(param!={}):
-      self._query = self._query.filter(**param)
+    if(queryParam!={}):
+      self._query = self._query.filter(**queryParam)
 
     for i in self._query:
-      param = ""
+      paramStr = ""
       hasOptional = False
-      for j in i.param:
+      paramLst = i.param
+      paramLst.sort(key=lambda x:x.isOptional)
+      for j in paramLst:
         if(not hasOptional and j.isOptional==True):
-          param += "["
+          paramStr += "["
           hasOptional = True
-        param += j.name + ","
-      param = param[:-1]
+        paramStr += "%s %s," % (j.type, j.name)
+      paramStr = paramStr[:-1]
       if(hasOptional):
-        param += "]"
-      self._stdRowOut.append("%s(%s)" % (i.name, param))
+        paramStr += "]"
+      self._stdRowOut.append("%s(%s)" % (i.name, paramStr))

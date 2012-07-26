@@ -5,7 +5,7 @@ import os
 from shutil import copy
 
 ##### Theory lib #####
-from theory.command.baseCommand import BaseCommand
+from theory.command.baseCommand import SimpleCommand
 from theory.conf import settings
 
 ##### Theory third-party lib #####
@@ -16,7 +16,7 @@ from theory.conf import settings
 
 ##### Misc #####
 
-class CreateCmd(BaseCommand):
+class CreateCmd(SimpleCommand):
   name = "createCmd"
   verboseName = "createCmd"
   params = ["appName", "cmdName"]
@@ -32,6 +32,10 @@ class CreateCmd(BaseCommand):
 
   @appName.setter
   def appName(self, appName):
+    """
+    :param appName: The name of application being used
+    :type appName: string
+    """
     self._appName = appName
 
   @property
@@ -40,6 +44,10 @@ class CreateCmd(BaseCommand):
 
   @cmdName.setter
   def cmdName(self, cmdName):
+    """
+    :param cmdName: The name of command being created
+    :type cmdName: string
+    """
     self._cmdName = cmdName
 
   def run(self, *args, **kwargs):
@@ -59,7 +67,3 @@ class CreateCmd(BaseCommand):
         "conf", "app_template", "command", "__init__.py")
     self._stdOut += "Coping" + fromPath + " --> " + toPath + "<br/>"
     copy(fromPath, toPath)
-    self._stdOut += \
-        "Don't forget to add the app name into the INSTALLED_APPS within "\
-        "your project's setting. To make your app recognized by theory, you "\
-        "will also need to restart theory or run the probeModule command"
