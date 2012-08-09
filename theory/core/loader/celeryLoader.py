@@ -4,10 +4,12 @@
 from celery.loaders.base import BaseLoader
 
 ##### Theory lib #####
-from theory.conf import settings
 from theory.model import Command
 from theory.utils import timezone
 from theory.utils.importlib import import_module
+from theory.utils.mood import loadMoodData
+loadMoodData()
+from theory.conf import settings
 
 ##### Theory third-party lib #####
 
