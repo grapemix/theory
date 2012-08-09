@@ -48,6 +48,7 @@ class FilenameScanner(SimpleCommand):
   # 0 means not recursive, -1 means recursive infinitely
   _depth = 0
   _fileLst = []
+  _dirLst = []
   _yieldMethod = YIELD_MODE_ALL
   _notations = ["Command",]
   _gongs = ["FilenameList", "FileObjectList", ]
@@ -110,7 +111,7 @@ class FilenameScanner(SimpleCommand):
 
     return newDirPath
 
-  def generate(self, *args, **kwargs):
+  def generateFileLst(self, *args, **kwargs):
     for root in self.rootLst:
       for lvlRoot, dirs, files in self._walk(root):
         for file in files:
@@ -121,9 +122,17 @@ class FilenameScanner(SimpleCommand):
           else:
             raise Error
 
+  def generateDirLst(self, *args, **kwargs):
+    for root in self.rootLst:
+      for lvlRoot, dirs, files in self._walk(root):
+        yield dirs
+
   def run(self, *args, **kwargs):
-    for i in self.generate(*args, **kwargs):
+    for i in self.generateFileLst(*args, **kwargs):
       self._fileLst.append(i)
+
+    for i in self.generateDirLst(*args, **kwargs):
+      self._dirLst.extend(i)
 
   def _walk(self, root, *args, **kwargs):
     root = root.rstrip(os.path.sep)
@@ -142,6 +151,13 @@ class FilenameScanner(SimpleCommand):
     :type: List(file)
     """
     return self._fileLst
+
+  @property
+  def dirLst(self):
+    """
+    :type: List(dir)
+    """
+    return self._dirLst
 
   @property
   def yieldMethod(self):
