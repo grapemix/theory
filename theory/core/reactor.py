@@ -180,7 +180,8 @@ class Reactor(object):
       asyncContainer = AsyncContainer()
       result = asyncContainer.delay(cmd, adapterProperty).get()
     elif(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC):
-      result = cmd.delay(storage).get()
+      #result = cmd.delay(storage).get()
+      cmd.delay(storage)
     else:
       asyncContainer = AsyncContainer()
       result = asyncContainer.run(cmd, adapterProperty)
