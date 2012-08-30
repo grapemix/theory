@@ -19,7 +19,11 @@ from theory.db.backends import *
 class DatabaseCreation(BaseDatabaseCreation):
   def _createTestDb(self, verbosity, autoclobber):
     testDatabaseName = self._getTestDbName()
-    self.connection.connection = connect(testDatabaseName, port=self.connection.settings_dict['PORT'])
+    self.connection.connection = connect(testDatabaseName,
+        port=self.connection.settings_dict['PORT'],
+        username=self.connection.settings_dict['USER'],
+        password=self.connection.settings_dict['PASSWORD'],
+        )
 
   def _destroyTestDb(self, testDatabaseName, verbosity):
     if(verbosity>1):
