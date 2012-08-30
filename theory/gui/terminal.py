@@ -8,7 +8,7 @@ import os
 ##### Theory third-party lib #####
 
 ##### Enlightenment lib #####
-import ecore
+#import ecore
 import edje
 import elementary
 import evas
