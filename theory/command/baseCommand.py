@@ -47,6 +47,17 @@ class _BaseCommand(object):
     pass
   #  super(_BaseCommand, self).__init__(*args, **kwargs)
 
+  # Objective of attribute:
+  # 1) Declare the input and the output of commands
+  # 2) Store the comment of the attribute
+  # 3) Get the type of attribute programatically
+  # 4) Allow the attribute inheritance through class inheritance
+  # 5) Declare the required field and the sequence of required field
+  # 6) Given the initial data even the data is generated dynamically
+  # 7) Work with celery
+  # 8) For static field, data of field don't have to being accessed when importing class.
+  # 9) Work with adapter
+
   @property
   def verbosity(self):
     return self._verbosity
