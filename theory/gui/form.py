@@ -7,10 +7,10 @@ import copy
 
 ##### Theory lib #####
 from theory.gui.field import *
-from theory.utils.datastructures import SortedDict
 from theory.gui.widget import *
 from theory.gui.widget import BasePacker
 from theory.gui.e17.widget import *
+from theory.utils.datastructures import SortedDict
 
 ##### Theory third-party lib #####
 
