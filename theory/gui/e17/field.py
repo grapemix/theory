@@ -34,6 +34,8 @@ __all__ = (
 
 class TextField(field.TextField):
   widget = TextInput
+  lineBreak = "<br/>"
+
   def widget_attrs(self, widget):
     attrs = super(TextField, self).widget_attrs(widget)
     attrs.update({"isScrollable": True})
