@@ -3,6 +3,8 @@
 ##### System wide lib #####
 
 ##### Theory lib #####
+from theory.gui import field
+from theory.gui.form import GuiForm
 
 ##### Theory third-party lib #####
 
@@ -21,8 +23,18 @@ class ReactorAdapter(object):
   lastEntry = ""
   crlf = ""
 
-  def printTxt(self, *args, **kwargs):
-    pass
+  class TerminalForm(GuiForm):
+    stdOut = field.TextField(label="Standard Output")
+
+  def printTxt(self, txt):
+    win = self.uiParam["win"]
+    bx = self.uiParam["bx"]
+    bx.clear()
+
+    o = self.TerminalForm(win, bx)
+    o.fields["stdOut"].initData = txt
+    o.generateForm()
+    self.terminalForm = o
 
   def __init__(self, signal):
     self.signal = signal
@@ -34,6 +46,19 @@ class ReactorAdapter(object):
   @cmdInTxt.setter
   def cmdInTxt(self, cmdInTxt):
     self._cmdInTxt = cmdInTxt
+
+  @property
+  def uiParam(self):
+    return self._uiParam
+
+  @uiParam.setter
+  def uiParam(self, uiParam):
+    """
+    :param uiParam: The dictionary parameter which will pass from the main gui
+                    window to command everytime.
+    :type uiParam: dictionary
+    """
+    self._uiParam = uiParam
 
   def signalCmdInputSubmit(self, *args, **kwargs):
     if(self.signal.has_key("cmdSubmit")):

@@ -15,17 +15,6 @@ from .terminalAdapter import TerminalAdapter
 
 
 class FilenameListAdapter(TerminalAdapter):
-  """
-  def stdOutPacker(self):
-    return self._files
-
-  def postStdOutPacker(self, files):
-    return self._stdOutLineBreak.join(files)
-  """
-
-  def stdRowOutPacker(self):
-    return self._files
-
   @property
   def files(self):
     return self._files

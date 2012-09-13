@@ -1,34 +1,39 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 ##### System wide lib #####
+from abc import ABCMeta, abstractmethod
 import re
 
 ##### Theory lib #####
-from theory.model import Command
 from theory.core.exceptions import CommandSyntaxError
-from theory.gui.terminal import Terminal
+from theory.model import Command
+from theory.gui import field
+from theory.gui.form import GuiForm
 from theory.utils.importlib import import_module
 
 ##### Theory third-party lib #####
 
 ##### Local app #####
-from . import BaseAdapter
+from . import BaseUIAdapter
 
 ##### Theory app #####
 
 ##### Misc #####
 
-class TerminalAdapter(BaseAdapter):
+class TerminalAdapter(BaseUIAdapter):
   _stdOut = ""
-  _stdRowOut = []
-  _stdOutLineBreak = "<br/>"
-  isDisplayWidgetCompatable = True
+  _stdErr = ""
+
+  class TerminalForm(GuiForm):
+    stdOut = field.TextField(label="Standard Output")
+    #stdErr = field.TextField(label="Standard Error")
 
   @property
   def stdOut(self):
-    self.preStdOutPacker()
-    r = self.stdOutPacker()
-    return self.postStdOutPacker(r)
+    return self._stdOut
+    #self.preStdOutPacker()
+    #r = self.stdOutPacker()
+    #return self.postStdOutPacker(r)
 
   def preStdOutPacker(self):
     if(self._stdOut=="" and self._stdRowOut!=[]):
@@ -45,23 +50,21 @@ class TerminalAdapter(BaseAdapter):
     self._stdOut = stdOut
 
   @property
-  def stdRowOut(self):
-    self.preStdRowOutPacker()
-    r = self.stdRowOutPacker()
-    return self.postStdRowOutPacker(r)
+  def stdErr(self):
+    return self._stdErr
 
-  def preStdRowOutPacker(self):
-    if(self._stdRowOut==[] and self._stdOut!=""):
-      self._stdRowOut = self._stdOut.split(self._stdOutLineBreak)
+  @stdErr.setter
+  def stdErr(self, stdErr):
+    self._stdErr = stdErr
 
-  def stdRowOutPacker(self):
-    return self._stdRowOut
+  def render(self, *args, **kwargs):
+    super(TerminalAdapter, self).render(*args, **kwargs)
+    win = kwargs["uiParam"]["win"]
+    bx = kwargs["uiParam"]["bx"]
+    bx.clear()
 
-  def postStdRowOutPacker(self, r):
-    return r
-
-  @stdRowOut.setter
-  def stdRowOut(self, stdRowOut):
-    self._stdRowOut = stdRowOut
-
-
+    o = self.TerminalForm(win, bx)
+    o.fields["stdOut"].initData = self.stdOut
+    #o.fields["stdErr"].initData = self.stdErr
+    o.generateForm()
+    self.terminalForm = o

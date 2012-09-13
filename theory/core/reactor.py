@@ -7,6 +7,7 @@ import sys
 ##### Theory lib #####
 from theory.adapter.reactorAdapter import ReactorAdapter
 from theory.command.baseCommand import AsyncContainer
+from theory.core.bridge import Bridge
 from theory.core.cmdParser.txtCmdParser import TxtCmdParser
 from theory.core.exceptions import CommandSyntaxError
 from theory.conf import settings
@@ -110,7 +111,6 @@ class Reactor(object):
     #fieldClass = import_class(classImportPathTempate)
     #print fieldClass
 
-
   def parse(self):
     self.parser.cmdInTxt = self.adapter.cmdInTxt
     self.parser.run()
@@ -118,12 +118,13 @@ class Reactor(object):
     #if(self.parser.mode==self.parser.MODE_DONE):
     self.run()
 
-  def _objAssign(self, o, k, v):
-    return setattr(o, k, v)
-
-  def _dictAssign(self, o, k, v):
-    o[k] = v
-    return o
+  def performDrums(self, cmd):
+    debugLvl = settings.DEBUG_LEVEL
+    bridge = Bridge()
+    for adapterName, leastDebugLvl in cmd._drums.iteritems():
+      if(leastDebugLvl<=debugLvl):
+        (adapterModel, drum) = bridge.adaptFromCmd(adapterName, cmd)
+        drum.render(uiParam=self.adapter.uiParam)
 
   # TODO: refactor this function, may be with bridge
   def run(self):
@@ -136,46 +137,12 @@ class Reactor(object):
       self.parser.initVar()
       return
 
-    cmdKlass = import_class(cmdModel.classImportPath)
-    #cmdKlass = import_class(".".join([cmdModel.app, "command", cmdModel.name, cmdModel.className]))
-    #cmdKlass = getattr(sys.modules[cmdModel.moduleImportPath], cmdModel.className)
-    cmd = cmdKlass()
+    bridge = Bridge()
+    (cmd, storage) = bridge.getCmdForReactor(cmdModel)
 
-    try:
-      adapterName = cmd.gongs[0]
-    except IndexError:
-      adapterName = ""
-
-    try:
-      adapterModel = Adapter.objects.get(name=adapterName)
-      adapterProperty = adapterModel.property
-    except Adapter.DoesNotExist:
-      adapterModel = None
-      adapterProperty = []
-
-    if(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC):
-      #assignFxn = lambda o, k, v: o[k] = v
-      assignFxn = self._dictAssign
-      storage = {}
-    else:
-      #assignFxn = lambda o, k, v: setattr(o, k, v)
-      assignFxn = self._objAssign
-      storage = cmd
-
-    cmdArgs = [i for i in cmdModel.param if(not i.isOptional)]
-    if(self.parser.args!=[]):
-      for i in range(len(cmdArgs)):
-        try:
-          assignFxn(storage, cmdArgs[i].name, self.parser.args[i])
-          #storage = assignFxn(storage, cmdModel.param[i].name, self.parser.args[i])
-        except IndexError:
-          # This means the number of param given unmatch the number of param register in *.command
-          raise CommandSyntaxError
-    if(self.parser.kwargs!={}):
-      for k,v in self.parser.kwargs.iteritems():
-        #setattr(cmd, k, v)
-        storage = assignFxn(storage, k, v)
-
+    # Since we only allow execute one command in a time thru terminal,
+    # the command doesn't have to return anything
+    adapterProperty = []
     if(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC_WRAPPER):
       asyncContainer = AsyncContainer()
       result = asyncContainer.delay(cmd, adapterProperty).get()
@@ -186,21 +153,7 @@ class Reactor(object):
       asyncContainer = AsyncContainer()
       result = asyncContainer.run(cmd, adapterProperty)
 
-    if(adapterModel!=None):
-      adapterKlass = import_class(adapterModel.importPath)
-      adapter = adapterKlass()
-      for property in adapterModel.property:
-        try:
-          setattr(adapter, property, result[property])
-        except KeyError:
-          try:
-            setattr(adapter, property, result[cmd, "_" + property])
-          except KeyError:
-            pass
-
-      if(hasattr(adapter, "stdOut")):
-        self.adapter.printTxt(adapter.stdOut)
-
+    self.performDrums(cmd)
     self.parser.initVar()
     History(command=self.parser.cmdInTxt, commandRef=cmdModel,
         mood=self.mood).save()
