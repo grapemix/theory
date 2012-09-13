@@ -57,7 +57,7 @@ class Bridge(object):
           pass
     return storage
 
-  def getCmdForReactor(self, cmdModel, *args, **kwargs):
+  def getCmdComplex(self, cmdModel, args, kwargs):
     (cmd, assignFxn, storage) = self._getCmdForAssignment(cmdModel)
     cmdArgs = [i for i in cmdModel.param if(not i.isOptional)]
     if(args!=[]):
