@@ -15,6 +15,7 @@ except ImportError:
   from StringIO import StringIO
 
 ##### Theory lib #####
+from theory.conf import settings
 from theory.core import validators
 from theory.core.exceptions import ValidationError
 
@@ -130,7 +131,8 @@ class Field(object):
       widget.attrs.update(extra_attrs)
 
     widget.attrs["initData"] = self.initData
-    print widget.attrs
+    if(settings.UI_DEBUG and settings.DEBUG_LEVEL>5):
+      print widget.attrs
     self.widget = widget
 
   def prepare_value(self, value):
@@ -201,6 +203,8 @@ class Field(object):
 
 class TextField(Field):
   widget = TextInput
+  lineBreak = "\n"
+
   def __init__(self, max_length=None, min_length=None, *args, **kwargs):
     self.max_length, self.min_length = max_length, min_length
     super(TextField, self).__init__(*args, **kwargs)
@@ -208,6 +212,17 @@ class TextField(Field):
       self.validators.append(validators.MinLengthValidator(min_length))
     if max_length is not None:
       self.validators.append(validators.MaxLengthValidator(max_length))
+
+  @property
+  def initData(self):
+    return self._initData
+
+  @initData.setter
+  def initData(self, initData=""):
+    if(self.lineBreak!="\n" and initData!=None):
+      self._initData = initData.replace("\n", self.lineBreak)
+    else:
+      self._initData = initData
 
   def to_python(self, value):
     "Returns a Unicode object."
