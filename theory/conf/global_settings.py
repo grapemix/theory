@@ -13,6 +13,8 @@ gettext_noop = lambda s: s
 
 DEBUG = False
 UI_DEBUG = False
+# level 1 is the least
+DEBUG_LEVEL = 1
 
 # Whether the framework should propagate raw exceptions rather than catching
 # them. This is useful under some testing siutations and should never be used
