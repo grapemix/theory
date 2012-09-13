@@ -22,7 +22,8 @@ class ListCommand(SimpleCommand):
   _mood = None
   _query = None
   _notations = ["Command",]
-  _gongs = ["Terminal", ]
+  #_gongs = ["Terminal", ]
+  _drums = {"Terminal": 1,}
 
   @property
   def query(self):
@@ -57,7 +58,7 @@ class ListCommand(SimpleCommand):
     self._mood = mood
 
   def run(self, *args, **kwargs):
-    self._stdRowOut = []
+    self._stdOut = ""
     queryParam = {}
     if(self._appName!=None):
       queryParam["appName"] = self._appName
@@ -80,4 +81,4 @@ class ListCommand(SimpleCommand):
       paramStr = paramStr[:-1]
       if(hasOptional):
         paramStr += "]"
-      self._stdRowOut.append("%s(%s)" % (i.name, paramStr))
+      self._stdOut += "%s(%s)\n" % (i.name, paramStr)

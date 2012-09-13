@@ -47,14 +47,15 @@ class Terminal(object):
   @adapter.setter
   def adapter(self, adapter):
     self._adapter = adapter
-    self._adapter.printTxt = lambda x: self.lb.text_set(x)
+    #self._adapter.printTxt = lambda x: self.lb.text_set(x)
     self._adapter.crlf = self.crlf
+    self._adapter.uiParam = {"win": self.win, "bx": self.bxCrt}
 
   def __init__(self):
     elementary.init()
     self.win = elementary.Window("theory", elementary.ELM_WIN_BASIC)
     self.win.title_set("Theory")
-    self.win.callback_destroy_add(lambda x: elementary.exit())
+    #self.win.callback_destroy_add(lambda x: elementary.exit())
     self.win.autodel_set(True)
     bg = elementary.Background(self.win)
     self.win.resize_object_add(bg)

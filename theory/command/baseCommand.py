@@ -41,6 +41,7 @@ class _BaseCommand(object):
   _verbosity = 1
   _gongs = []
   _notations = []
+  _drums = {}
   # stderr should be seen in lig file
 
   def __init__(self, *args, **kwargs):
@@ -85,10 +86,22 @@ class _BaseCommand(object):
   @gongs.setter
   def gongs(self, gongs):
     """
-    :param notations: The choice order of output adapter
-    :type notations: List(Adapter)
+    :param gongs: The choice order of output adapter
+    :type gongs: List(Adapter)
     """
     self._gongs = gongs
+
+  @property
+  def drums(self):
+    return self._drums
+
+  @drums.setter
+  def drums(self, drums):
+    """
+    :param drums: The group of UI being called in different debug level
+    :type drums: Dict(Adapter)
+    """
+    self._drums = drums
 
   def validate(self, *args, **kwargs):
     for i in ["name", "verboseName",]:
