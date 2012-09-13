@@ -51,7 +51,7 @@ class Reactor(object):
   def __init__(self):
     self.parser = TxtCmdParser()
     self.ui = Terminal()
-    self.adapter = ReactorAdapter({"cmdSubmit": self.parse, "autocompleteRequest": self._autocompleteRequest})
+    self.adapter = ReactorAdapter({"cmdSubmit": self._parse, "autocompleteRequest": self._autocompleteRequest})
     # The ui will generate its supported output function
     self.ui.adapter = self.adapter
     settings.CRTWIN = self.ui.win
@@ -111,14 +111,14 @@ class Reactor(object):
     #fieldClass = import_class(classImportPathTempate)
     #print fieldClass
 
-  def parse(self):
+  def _parse(self):
     self.parser.cmdInTxt = self.adapter.cmdInTxt
     self.parser.run()
     # should change for chained command
     #if(self.parser.mode==self.parser.MODE_DONE):
     self.run()
 
-  def performDrums(self, cmd):
+  def _performDrums(self, cmd):
     debugLvl = settings.DEBUG_LEVEL
     bridge = Bridge()
     for adapterName, leastDebugLvl in cmd._drums.iteritems():
@@ -138,7 +138,7 @@ class Reactor(object):
       return
 
     bridge = Bridge()
-    (cmd, storage) = bridge.getCmdForReactor(cmdModel)
+    (cmd, storage) = bridge.getCmdComplex(cmdModel, self.parser.args, self.parser.kwargs)
 
     # Since we only allow execute one command in a time thru terminal,
     # the command doesn't have to return anything
@@ -153,7 +153,7 @@ class Reactor(object):
       asyncContainer = AsyncContainer()
       result = asyncContainer.run(cmd, adapterProperty)
 
-    self.performDrums(cmd)
+    self._performDrums(cmd)
     self.parser.initVar()
     History(command=self.parser.cmdInTxt, commandRef=cmdModel,
         mood=self.mood).save()
