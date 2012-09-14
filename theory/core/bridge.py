@@ -4,6 +4,7 @@
 
 ##### Theory lib #####
 from theory.adapter import BaseUIAdapter
+from theory.core.exceptions import CommandSyntaxError
 from theory.model import Command, Adapter
 from theory.utils.importlib import  import_class
 

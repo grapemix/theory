@@ -9,7 +9,6 @@ from theory.adapter.reactorAdapter import ReactorAdapter
 from theory.command.baseCommand import AsyncContainer
 from theory.core.bridge import Bridge
 from theory.core.cmdParser.txtCmdParser import TxtCmdParser
-from theory.core.exceptions import CommandSyntaxError
 from theory.conf import settings
 from theory.gui.terminal import Terminal
 from theory.model import Command, Adapter, History
