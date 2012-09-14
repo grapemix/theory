@@ -24,7 +24,7 @@ class SwitchMood(SimpleCommand):
   verboseName = "switchMood"
   params = ["moodName",]
   _notations = ["Command",]
-  _gongs = ["Terminal", ]
+  _drums = {"Terminal": 1,}
   _moodName = ""
 
   @property
@@ -51,6 +51,7 @@ class SwitchMood(SimpleCommand):
 
     reactor.mood = self.moodName
 
-    self._stdOut += "Successfully switch to %s mood%s" % (self.moodName, "<br/>")
-    self._stdOut += str([(k,v) for k,v in settings.MOOD.iteritems()])
+    self._stdOut += "Successfully switch to %s mood\n\nThe following config is applied:\n" % (self.moodName)
+    for k,v in settings.MOOD.iteritems():
+      self._stdOut += "    %s: %s\n" % (k, unicode(v))
 
