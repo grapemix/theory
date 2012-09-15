@@ -25,7 +25,9 @@ class Bridge(object):
   """
 
   def _objAssign(self, o, k, v):
-    return setattr(o, k, v)
+    setattr(o, k, v)
+    return o
+    #return setattr(o, k, v)
 
   def _dictAssign(self, o, k, v):
     o[k] = v
@@ -45,15 +47,15 @@ class Bridge(object):
 
     return (cmd, assignFxn, storage)
 
-  def _propertiesAssign(self, adapter, assignFxn, storage, kwargs):
-    for k,v in kwargs.iteritems():
+  def _propertiesAssign(self, adapter, assignFxn, storage, propertyLst):
+    for property in propertyLst:
       try:
         v = getattr(adapter, property)
-        storage = assignFxn(storage, k, v)
+        storage = assignFxn(storage, property, v)
       except AttributeError:
         try:
           v = getattr(adapter, "_" + property)
-          storage = assignFxn(storage, k, v)
+          storage = assignFxn(storage, property, v)
         except AttributeError:
           pass
     return storage
@@ -82,16 +84,27 @@ class Bridge(object):
         return i
     return None
 
+  def _naivieAdapterPropertySelection(self, adapterModel, tailModel):
+    propertyLst = []
+    cmdParam = [i.name for i in tailModel.param]
+    for i in adapterModel.property:
+      if(i in cmdParam):
+        propertyLst.append(i)
+    return propertyLst
+
   def bridge(self, headClass, tailModel):
     (tailClass, assignFxn, storage) = self._getCmdForAssignment(tailModel)
     commonAdapterName = self._probeAdapter(headClass, tailClass)
 
     (adapterModel, adapter) = self.adaptFromCmd(commonAdapterName, headClass)
     #if(adapter.hasattr(isDisplayWidgetCompatable) and adapter.isDisplayWidgetCompatable):
-    if(issubclass(BaseUIAdapter, adapter)):
-      pass
+    #if(issubclass(BaseUIAdapter, adapter)):
+    #  pass
 
-    return (tailClass, self._propertiesAssign(adapter, assignFxn, storage, adapterModel))
+    propertyLst = self._naivieAdapterPropertySelection(adapterModel, tailModel)
+    adapter.run()
+
+    return (tailClass, self._propertiesAssign(adapter, self._dictAssign, {}, propertyLst))
 
   # TODO: to support fall back
   def _probeAdapter(self, headClass, tailClass):
