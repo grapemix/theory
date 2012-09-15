@@ -121,10 +121,6 @@ class SimpleCommand(_BaseCommand):
     return self._stdOut
 
   @property
-  def stdRowOut(self):
-    return self._stdRowOut
-
-  @property
   def status(self):
     return self._status
 
