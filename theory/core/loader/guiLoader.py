@@ -5,6 +5,7 @@ import os
 os.environ.setdefault("CELERY_LOADER", "theory.core.loader.celeryLoader.CeleryLoader")
 
 ##### Theory lib #####
+from theory.conf import settings
 from theory.core.reactor import *
 from theory.model import Command
 
@@ -17,7 +18,7 @@ from theory.model import Command
 ##### Misc #####
 
 def wakeup(settings_mod, argv=None):
-  if(Command.objects.count()==0):
+  if(settings.DEBUG or Command.objects.count()==0):
     from .util import reprobeAllModule
     reprobeAllModule(settings_mod, argv)
   else:
