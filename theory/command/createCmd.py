@@ -23,8 +23,7 @@ class CreateCmd(SimpleCommand):
   _appName = ""
   _cmdName = ""
   _notations = ["Command",]
-  _gongs = ["Terminal", ]
-
+  _drums = {"Terminal": 1, }
 
   @property
   def appName(self):

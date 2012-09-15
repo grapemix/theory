@@ -24,7 +24,7 @@ class CreateApp(SimpleCommand):
   verboseName = "createApp"
   params = ["appName",]
   _notations = ["Command",]
-  _gongs = ["Terminal", ]
+  _drums = {"Terminal": 1, }
 
   @property
   def appName(self):
