@@ -40,6 +40,7 @@ class Model(Document):
 
   #meta = { "abstract": False }
   #meta = { "abstract": True }
+  meta = {'allow_inheritance': True}
 
   '''
   meta = { "app_label": sys.modules[__module__].__name__.split('.')[-2] , "allow_inheritance": True}
