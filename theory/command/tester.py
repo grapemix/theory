@@ -4,7 +4,7 @@
 
 ##### Theory lib #####
 from theory.conf import settings
-from theory.command.baseCommand import AsyncCommand
+from theory.command.baseCommand import SimpleCommand
 from theory.test.utils import get_runner
 
 ##### Theory third-party lib #####
@@ -15,7 +15,7 @@ from theory.test.utils import get_runner
 
 ##### Misc #####
 
-class Tester(AsyncCommand):
+class Tester(SimpleCommand):
   """
   Run the test case. In this version, only theory's testcase will be run.
   In the future, you can run a specific app's testcase as well as all apps'
@@ -27,7 +27,7 @@ class Tester(AsyncCommand):
   _appName = None
   _testRunner = None
   _testLabel = ""
-  _testTheory = False
+  _testTheory = True
 
   @property
   def appName(self):
