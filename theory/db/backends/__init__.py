@@ -76,7 +76,7 @@ class BaseDatabaseCreation(object):
     or 'TEST_NAME' settings.
     """
     if self.connection.settings_dict['TEST_NAME']:
-        return self.connection.settings_dict['TEST_NAME']
+      return self.connection.settings_dict['TEST_NAME']
     return TEST_DATABASE_PREFIX + self.connection.settings_dict['NAME']
 
   def testDbSignature(self):
