@@ -19,17 +19,19 @@ from theory.utils.importlib import import_module
 ##### Misc #####
 
 
-RUNTESTS_DIR = "/opt/crystal/venv/panel/src/theory/tests"
-#RUNTESTS_DIR = os.path.realpath(__file__)
-#RUNTESTS_DIR = os.path.dirname(__file__)
+RUNTESTS_DIR = os.path.join(os.path.dirname(__file__), "tests")
 
 # ====================================================================
 # All test type dir should be declare in here
 UNIT_TESTS_DIR_NAME = 'unitTest'
 
 UNIT_TEST_DIR = os.path.join(RUNTESTS_DIR, UNIT_TESTS_DIR_NAME)
-print "eee->", RUNTESTS_DIR, UNIT_TESTS_DIR_NAME, UNIT_TEST_DIR
 
+INTEGRATION_TESTS_DIR_NAME = 'integrationTest'
+
+INTEGRATION_TEST_DIR = os.path.join(RUNTESTS_DIR, INTEGRATION_TESTS_DIR_NAME)
+
+# ====================================================================
 # ====================================================================
 TEMP_DIR = tempfile.mkdtemp(prefix='theory_')
 os.environ['THEORY_TEST_TEMP_DIR'] = TEMP_DIR
@@ -37,8 +39,9 @@ os.environ['THEORY_TEST_TEMP_DIR'] = TEMP_DIR
 def getTestModuleAbsPaths():
   modules = []
   for loc, dirpath in (
-    (UNIT_TESTS_DIR_NAME, UNIT_TEST_DIR),):
-    print "what", loc, dirpath
+    (UNIT_TESTS_DIR_NAME, UNIT_TEST_DIR),\
+    (INTEGRATION_TESTS_DIR_NAME, INTEGRATION_TEST_DIR),\
+    ):
     for f in os.listdir(dirpath):
       if (f.startswith('__init__') or
           f.startswith('.')):
