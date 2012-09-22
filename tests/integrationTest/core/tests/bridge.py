@@ -20,7 +20,6 @@ from theory.model import Adapter, Command, Parameter
 
 __all__ = ('BridgeTestCase',)
 
-
 class BaseChain1(object):
   params = []
   _gongs = ["StdPipe", ]
@@ -38,6 +37,20 @@ class AsyncChain1(BaseChain1, AsyncCommand):
   _stdOut = name
   def run(self, *args, **kwargs):
     self._stdOut = "asyncChain1"
+
+class AsyncCompositeChain1(AsyncChain1):
+  def _getMockCommandObject(self, cmd, classImportPath):
+    with Stub(proxy=cmd) as cmd:
+      cmd.classImportPath >> "%s.%s" % (self.__module__, classImportPath)
+    return cmd
+
+  def run(self, secondCmdModel, *args, **kwargs):
+    super(AsyncCompositeChain1, self).__init__(*args, **kwargs)
+    bridge = Bridge()
+    secondCmdModel = self._getMockCommandObject(secondCmdModel, "SimpleChain2")
+    (chain2Class, secondCmdStorage) = bridge.bridge(self, secondCmdModel)
+    (secondCmd, secondCmdStorage) = bridge.getCmdComplex(secondCmdModel, [], secondCmdStorage)
+    return secondCmd.run()
 
 class BaseChain2(object):
   params = []
@@ -147,3 +160,9 @@ class BridgeTestCase(unittest.TestCase):
     (cmd, storage) = self.bridge.getCmdComplex(secondCmdModel, [], storage)
     result = cmd.run()
     self.assertEqual(cmd.run(), "asyncChain1 received")
+
+
+  def testAsyncCompositeCommandToAsyncCommand(self):
+    firstCmd = AsyncCompositeChain1()
+    secondCmdModel = self.simpleChain2CommandModel
+    self.assertEqual(firstCmd.run(secondCmdModel), "asyncChain1 received")
