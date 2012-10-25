@@ -2,7 +2,7 @@
 #!/usr/bin/env python
 ##### System wide lib #####
 from abc import ABCMeta, abstractmethod
-from celery.task import Task
+from celery import Task
 
 ##### Theory lib #####
 
