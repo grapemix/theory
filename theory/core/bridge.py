@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 ##### System wide lib #####
+import json
 
 ##### Theory lib #####
 from theory.adapter import BaseUIAdapter
 from theory.core.exceptions import CommandSyntaxError
-from theory.model import Command, Adapter
-from theory.utils.importlib import  import_class
+from theory.model import Adapter
+from theory.utils.importlib import import_class
 
 ##### Theory third-party lib #####
 
@@ -93,6 +94,7 @@ class Bridge(object):
     return propertyLst
 
   def bridge(self, headClass, tailModel):
+    # TODO: tailClass should be not required
     (tailClass, assignFxn, storage) = self._getCmdForAssignment(tailModel)
     commonAdapterName = self._probeAdapter(headClass, tailClass)
 
@@ -104,13 +106,37 @@ class Bridge(object):
     propertyLst = self._naivieAdapterPropertySelection(adapterModel, tailModel)
     adapter.run()
 
-    return (tailClass, self._propertiesAssign(adapter, self._dictAssign, {}, propertyLst))
+    return (tailClass, self._propertiesAssign(adapter, \
+        self._dictAssign, \
+        {}, \
+        propertyLst))
+
+  def bridgeToDb(self, headClass, tailModel):
+    (tailClass, assignFxn, storage) = self._getCmdForAssignment(tailModel)
+
+    commonAdapterName = self._probeAdapter(headClass, tailClass)
+
+    (adapterModel, adapter) = self.adaptFromCmd(commonAdapterName, headClass)
+
+    propertyLst = self._naivieAdapterPropertySelection(adapterModel, tailModel)
+    adapter.run()
+
+    return json.dumps(self._propertiesAssign(adapter, \
+        self._dictAssign, \
+        {}, \
+        propertyLst))
+
+  def bridgeFromDb(self, adapterBufferModel):
+    (tailClass, assignFxn, storage) = \
+        self._getCmdForAssignment(adapterBufferModel.toCmd)
+    return (tailClass, json.loads(adapterBufferModel.data))
 
   # TODO: to support fall back
   def _probeAdapter(self, headClass, tailClass):
     return self._naivieAdapterMatching(headClass.gongs, tailClass.notations)
 
   def adaptFromCmd(self, adapterName, cmd):
+    """Most users should not need to use this fxn. Try bridge() first"""
     try:
       adapterModel = Adapter.objects.get(name=adapterName)
     except Adapter.DoesNotExist:
