@@ -1,15 +1,10 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 ##### System wide lib #####
-from abc import ABCMeta, abstractmethod
-import re
 
 ##### Theory lib #####
-from theory.core.exceptions import CommandSyntaxError
-from theory.model import Command
 from theory.gui import field
 from theory.gui.form import GuiForm
-from theory.utils.importlib import import_module
 
 ##### Theory third-party lib #####
 
