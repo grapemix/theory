@@ -72,6 +72,14 @@ class BasePacker(object):
     memo[id(self)] = obj
     return obj
 
+  def value_from_datadict(self, data, files, name):
+    """
+    Given a dictionary of data and this widget's name, returns the value
+    of this widget. Returns None if it's not provided. Not used in this
+    moment, will be used in the future.
+    """
+    return data.get(name, None)
+
 class BaseLabelInput(BasePacker):
   """This class is designed for a widget with a name label and some help text.
   The widget in here can be a container which contains other object. The
@@ -147,11 +155,12 @@ class BaseLabelInput(BasePacker):
       hBox.addWidget(widget)
     hBox.postGenerate()
 
-  def getInitData(self):
+  @property
+  def initData(self):
     return self.attrs["initData"]
 
   @abstractmethod
-  def getChangedData(self):
+  def finalData(self):
     pass
 
 class StringInput(BaseLabelInput):
@@ -168,13 +177,16 @@ class StringInput(BaseLabelInput):
   def _getData(self):
     return self.widgetLst[0].obj.entry_get()
 
-  def getInitData(self):
+  @property
+  def initData(self):
     return self.attrs["initData"]
 
-  def getChangedData(self):
+  @property
+  def changedData(self):
     return self._getData()
 
-  def getFinalData(self):
+  @property
+  def finalData(self):
     return self._getData()
 
 class TextInput(StringInput):
@@ -188,10 +200,12 @@ class NumericInput(StringInput):
     super(NumericInput, self).__init__(win, bx, attrs, *args, **kwargs)
 
 class SelectBoxInput(BaseLabelInput):
+  """Assuming labels are unique."""
   widgetClass = SelectBox
 
-  def getChangedData(self):
-    pass
+  @property
+  def finalData(self):
+    return self.widgetLst[0].selectedData
 
 # TODO: Fix the padding problem
 class CheckBoxInput(BaseLabelInput):
@@ -202,7 +216,7 @@ class CheckBoxInput(BaseLabelInput):
     hBox.bx = self.bx
     hBox.generate()
 
-    for v in self.attrs["initData"]:
+    for v in self.attrs["choices"]:
       (label, value) = v
       widget = self.widgetClass({"ignoreParentExpand": True, "initData": value, })
       widget.win = self.win
@@ -210,7 +224,8 @@ class CheckBoxInput(BaseLabelInput):
       hBox.addWidget(widget)
     return hBox
 
-  def getChangedData(self):
+  @property
+  def changedData(self):
     pass
 
 class Fileselector(BaseLabelInput):
@@ -224,8 +239,9 @@ class StringGroupFilterInput(BaseLabelInput):
     attrs = self._buildAttrs(attrs, initData=())
     super(StringGroupFilterInput, self).__init__(win, bx, attrs, *args, **kwargs)
 
-  def getChangedData(self):
-    return self.widgetLst[0].getChangedData()
+  @property
+  def changedData(self):
+    return self.widgetLst[0].changedData()
 
 
 class ModelValidateGroupInput(BaseLabelInput):
@@ -235,11 +251,14 @@ class ModelValidateGroupInput(BaseLabelInput):
     attrs = self._buildAttrs(attrs, initData=())
     super(ModelValidateGroupInput, self).__init__(win, bx, attrs, *args, **kwargs)
 
-  def getInitData(self):
-    return self.widgetLst[0].getInitData()
+  @property
+  def initData(self):
+    return self.widgetLst[0].initData()
 
-  def getChangedData(self):
-    return self.widgetLst[0].getChangedData()
+  @property
+  def changedData(self):
+    return self.widgetLst[0].changedData()
 
-  def getFinalData(self):
-    return self.widgetLst[0].getFinalData()
+  @property
+  def finalData(self):
+    return self.widgetLst[0].finalData()

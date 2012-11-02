@@ -301,7 +301,8 @@ class ListValidator(Genlist):
       parentCounter += 1
       self.checkboxRelMap[startIdx] = (startIdx, counter)
 
-  def getChangedData(self):
+  @property
+  def changedData(self):
     #return [cb.obj.state for cb in self.checkboxLst]
     return self.changedRow.keys()
 
@@ -373,10 +374,12 @@ class ListModelValidator(Genlist):
         self.grpAState[-1] = False
       counter += 1
 
-  def getInitData(self):
+  @property
+  def initData(self):
     return self.attrs["initData"]
 
-  def getChangedData(self):
+  @property
+  def changedData(self):
     item = self.obj.first_item
     isBeforeFirstChild = False
     r = []
@@ -389,7 +392,8 @@ class ListModelValidator(Genlist):
       item = item.next
     return r
 
-  def getFinalData(self):
+  @property
+  def finalData(self):
     item = self.obj.first_item
     isBeforeFirstChild = False
     r = []
@@ -508,7 +512,8 @@ class Entry(E17Widget):
   #def _anchorClick(self, obj, en, *args, **kwargs):
   #  pass
 
-  def getData(self):
+  @property
+  def finalData(self):
     return self.obj.entry_get()
 
 class Button(E17Widget):
@@ -582,9 +587,17 @@ class RadioBox(E17Widget):
 
 # TODO: to assign init data as pre-select item
 class SelectBox(E17Widget):
+  """If developer has to assign specific icons into choices, they should
+  assigned through the widget's attr["choices"] instead of fields.
+  """
   icon = None
   isDisable = False
   label = "Please select"
+  selectedData = (None, None)
+  choices = {}
+
+  def _selectionChanged(self, hoversel, hoverselItem):
+    self.selectedData = self.choices[hoverselItem.text]
 
   def generate(self, *args, **kwargs):
     bt = elementary.Hoversel(self.win)
@@ -596,8 +609,12 @@ class SelectBox(E17Widget):
     if(self.isDisable):
       bt.disabled_set(True)
     for item in self.attrs["choices"]:
-    #for item in self.attrs["initData"]:
-      (label, imgPath) = item
+      try:
+        (idx, label, imgPath) = item
+      except ValueError:
+        (idx, label) = item
+        imgPath = None
+      self.choices[label] = idx
       if(imgPath == None or imgPath==""):
         bt.item_add(label)
       else:
@@ -606,6 +623,7 @@ class SelectBox(E17Widget):
           bt.item_add(label, imgPath, elementary.ELM_ICON_FILE)
         else:
           bt.item_add(label, imgPath, elementary.ELM_ICON_STANDARD)
+    bt.callback_selected_add(self._selectionChanged)
     bt.size_hint_weight_set(0.0, 0.0)
     bt.size_hint_align_set(0.5, 0.5)
     self.obj = bt
