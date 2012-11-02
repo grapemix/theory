@@ -53,6 +53,8 @@ __all__ = (
 
 
 class Field(object):
+  """The function being provided by this class should include data validation,
+  valid/error message storage and multiple widget data union."""
   widget = StringInput # Default widget to use when rendering this type of Field.
   #hidden_widget = HiddenInput # Default widget to use when rendering this as "hidden".
   default_validators = [] # Default set of validators
@@ -104,6 +106,8 @@ class Field(object):
     self.error_messages = messages
 
     self.validators = self.default_validators + validators
+
+    self.isSingular = True # not interact with other fields
 
   def renderWidget(self, *args, **kwargs):
     # widget -- A Widget class, or instance of a Widget class, that should
@@ -200,6 +204,10 @@ class Field(object):
     result.widget = copy.deepcopy(self.widget, memo)
     result.validators = self.validators[:]
     return result
+
+  @property
+  def finalData(self):
+    return self.widget.finalData
 
 class TextField(Field):
   widget = TextInput
