@@ -6,6 +6,7 @@ from abc import ABCMeta, abstractmethod
 import copy
 
 ##### Theory lib #####
+from theory.core.exceptions import ValidationError
 from theory.gui.field import *
 from theory.gui.widget import *
 from theory.gui.widget import BasePacker
@@ -68,6 +69,8 @@ class DeclarativeFieldsMetaclass(type):
     return new_class
 
 class FormBase(object):
+  """This class should be stateful and picklable. The function being provided
+  by this class include the logic to decide which field should be shown."""
   def __init__(self, *args, **kwargs):
     super(FormBase, self).__init__(*args, **kwargs)
     # The base_fields class attribute is the *class-wide* definition of
@@ -75,7 +78,12 @@ class FormBase(object):
     # alter self.fields, we create self.fields here by copying base_fields.
     # Instances should always modify self.fields; they should not modify
     # self.base_fields.
+    self.is_bound = True # should be hash the initDate in the future
     self.fields = copy.deepcopy(self.base_fields)
+    self.data = {}       # only used if fields are not singular
+    self.files = {}      # might be removed in the future
+    self.error_class = {}
+    self._errors = None  # Stores the errors after clean() has been
 
   def __iter__(self):
     for name in self.fields:
@@ -88,6 +96,118 @@ class FormBase(object):
     except KeyError:
       raise KeyError('Key %r not found in Form' % name)
     return BoundField(self, field, name)
+  def _get_errors(self):
+    "Returns an ErrorDict for the data provided for the form"
+    if self._errors is None:
+      self.full_clean()
+    return self._errors
+  errors = property(_get_errors)
+
+  def is_valid(self):
+    """
+    Returns True if the form has no errors. Otherwise, False. If errors are
+    being ignored, returns False.
+    """
+    return self.is_bound and not bool(self.errors)
+
+  def full_clean(self):
+    """
+    Cleans all of self.data and populates self._errors and
+    self.cleaned_data.
+    """
+    self._errors = {}
+    #!!!!!!!! Do we want errors transparent or add one more layer
+    #self._errors = ErrorDict()
+    if not self.is_bound: # Stop further processing.
+      return
+    self.cleaned_data = {}
+    # If the form is permitted to be empty, and none of the form data has
+    # changed from the initial data, short circuit any validation.
+    #if self.empty_permitted and not self.has_changed():
+    #  return
+    self._clean_fields()
+    self._clean_form()
+    self._post_clean()
+    print self._errors
+    if self._errors:
+      del self.cleaned_data
+
+  # TODO: support fields required interactaction with other fields to get
+  # final data
+  def _clean_fields(self):
+    for name, field in self.fields.items():
+      # value_from_datadict() gets the data from the data dictionaries.
+      # Each widget type knows how to retrieve its own data, because some
+      # widgets split data over several HTML fields.
+      if(field.isSingular):
+        value = field.finalData
+      #value = field.widget.value_from_datadict(self.data, self.files, name)
+      try:
+        if isinstance(field, FileField):
+          initial = self.initial.get(name, field.initial)
+          value = field.clean(value, initial)
+        else:
+          value = field.clean(value)
+        self.cleaned_data[name] = value
+        if hasattr(self, 'clean_%s' % name):
+          value = getattr(self, 'clean_%s' % name)()
+          self.cleaned_data[name] = value
+      except ValidationError, e:
+        self._errors[name] = e.messages
+        if name in self.cleaned_data:
+          del self.cleaned_data[name]
+
+  def _clean_form(self):
+    try:
+      self.cleaned_data = self.clean()
+    except ValidationError, e:
+      self._errors[NON_FIELD_ERRORS] = self.error_class(e.messages)
+
+  def _post_clean(self):
+    """
+    An internal hook for performing additional cleaning after form cleaning
+    is complete. Used for model validation in model forms.
+    """
+    pass
+
+  def clean(self):
+    """
+    Hook for doing any extra form-wide cleaning after Field.clean() been
+    called on every field. Any ValidationError raised by this method will
+    not be associated with a particular field; it will have a special-case
+    association with the field named '__all__'.
+    """
+    return self.cleaned_data
+
+  def has_changed(self):
+    """
+    Returns True if data differs from initial.
+    """
+    return bool(self.changed_data)
+
+  def _get_changed_data(self):
+    if self._changed_data is None:
+      self._changed_data = []
+      # XXX: For now we're asking the individual widgets whether or not the
+      # data has changed. It would probably be more efficient to hash the
+      # initial data, store it in a hidden field, and compare a hash of the
+      # submitted data, but we'd need a way to easily get the string value
+      # for a given field. Right now, that logic is embedded in the render
+      # method of each widget.
+      for name, field in self.fields.items():
+        prefixed_name = self.add_prefix(name)
+        data_value = field.widget.value_from_datadict(self.data, self.files, prefixed_name)
+        if not field.show_hidden_initial:
+          initial_value = self.initial.get(name, field.initial)
+        else:
+          initial_prefixed_name = self.add_initial_prefix(name)
+          hidden_widget = field.hidden_widget()
+          initial_value = hidden_widget.value_from_datadict(
+            self.data, self.files, initial_prefixed_name)
+        if field.widget._has_changed(initial_value, data_value):
+          self._changed_data.append(name)
+    return self._changed_data
+  changed_data = property(_get_changed_data)
 
 class GuiFormBase(FormBase, BasePacker):
   def __init__(self, win, bx, *args, **kwargs):
