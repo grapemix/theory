@@ -25,6 +25,7 @@ __all__ = (
   #'DateField', 'TimeField', 'DateTimeField', 'TimeField',
   'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField',
   'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
+  'ListField',
   #'ComboField', 'MultiValueField', 'SplitDateTimeField',
   'FloatField', 'DecimalField', 'IPAddressField', 'GenericIPAddressField',
   'FilePathField', 'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField',
@@ -73,6 +74,9 @@ class BooleanField(field.BooleanField):
   pass
 
 class NullBooleanField(field.NullBooleanField):
+  pass
+
+class ListField(field.ListField):
   pass
 
 class ChoiceField(field.ChoiceField):

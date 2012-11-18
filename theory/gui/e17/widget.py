@@ -18,7 +18,7 @@ import evas
 ##### Misc #####
 
 __all__ = ("Label", "Frame", "ListValidator", "ListModelValidator", "Genlist", \
-    "Box", "Entry", "Button", "Icon", "CheckBox", "RadioBox", "SelectBox", \
+    "Box", "Entry", "Multibuttonentry", "Button", "Icon", "CheckBox", "RadioBox", "SelectBox", \
     "FileSelector")
 
 EXPAND_BOTH = (evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
@@ -106,14 +106,14 @@ class Frame(E17Widget):
 
   def generate(self, *args, **kwargs):
     fr = elementary.Frame(self.win)
-    if(self.content!=None):
-      fr.content_set(self.content)
     fr.text_set(self.title)
     self.obj = fr
 
   def postGenerate(self, *args, **kwargs):
-    super(Frame, self).postGenerate(*args, **kwargs)
+    if(self.content!=None):
+      self.obj.content_set(self.content.obj)
     self.bx.pack_end(self.obj)
+    super(Frame, self).postGenerate(*args, **kwargs)
 
 class List(E17Widget):
   def __init__(self, attrs=None, *args, **kwargs):
@@ -436,26 +436,44 @@ class Box(E17Widget):
     widget.bx = self.obj
     self.widgetChildrenLst.append(widget)
 
+  def insertAndGenerateWidget(self, startIdx, widgetLst):
+    """Must ran after generate. """
+    i = startIdx
+    for widget in widgetLst:
+      widget.bx = self.obj
+      self.widgetChildrenLst.insert(i, widget)
+      i += 1
+
+    self._postGenerateChildren(widgetLst)
+
+  def removeWidgetLst(self, startIdx, length):
+    """Must ran after generate"""
+    for child in self.widgetChildrenLst[startIdx: startIdx + length ]:
+      child.obj.delete()
+    for i in range(length):
+      del self.widgetChildrenLst[startIdx]
+
   def addInput(self, input):
     self.inputChildrenLst.append(input)
 
-  def _postGenerateInputLst(self, *args, **kwargs):
-    for input in self.inputChildrenLst:
+  def _postGenerateInputLst(self, inputChildrenLst):
+    for input in inputChildrenLst:
       input.generate()
       # Don't do pack_end in here. Too late.
 
-  def _postGenerateChildren(self, *args, **kwargs):
-    for child in self.widgetChildrenLst:
-      child.generate(*args, **kwargs)
+  def _postGenerateChildren(self, widgetChildrenLst):
+    for child in widgetChildrenLst:
+      child.generate()
       self.obj.pack_end(child.obj)
-    for child in self.widgetChildrenLst:
-      child.postGenerate(*args, **kwargs)
+    for child in widgetChildrenLst:
+      child.postGenerate()
 
   def postGenerate(self, *args, **kwargs):
     """Must ran after generate"""
-    self._postGenerateInputLst(*args, **kwargs)
-    self._postGenerateChildren(*args, **kwargs)
+    self._postGenerateInputLst(self.inputChildrenLst)
+    self._postGenerateChildren(self.widgetChildrenLst)
     super(Box, self).postGenerate(*args, **kwargs)
+
 
 class Entry(E17Widget):
   def __init__(self, attrs=None, *args, **kwargs):
@@ -662,3 +680,30 @@ class FileSelector(E17Widget):
       fs.callback_selected_add(self._selected, self.win)
 
     self.obj = fs
+
+
+class Multibuttonentry(E17Widget):
+  def cb_filter1(self, mbe, text):
+    return True
+
+  def __init__(self, attrs=None, *args, **kwargs):
+    defaultAttrs = {\
+        "isFillAlign": True, \
+        "isWeightExpand": True, \
+    }
+    if(attrs is not None):
+      defaultAttrs.update(attrs)
+    super(Multibuttonentry, self).__init__(defaultAttrs, *args, **kwargs)
+    self.counter = 0
+    self.item = None
+
+  def generate(self, *args, **kwargs):
+    vbox = self.bx
+
+    mbe = elementary.MultiButtonEntry(self.win)
+    #mbe.text = "To: "
+    mbe.part_text_set("guide", "Tap to add")
+    mbe.filter_append(self.cb_filter1)
+    vbox.pack_end(mbe)
+    self.obj = mbe
+
