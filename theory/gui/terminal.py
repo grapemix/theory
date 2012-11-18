@@ -179,6 +179,14 @@ class Terminal(object):
     self.bx.pack_end(sp)
     sp.show()
 
+    sc = elementary.Scroller(self.win)
+    sc.bounce = (False, True)
+    sc.policy = (elementary.ELM_SCROLLER_POLICY_OFF, elementary.ELM_SCROLLER_POLICY_AUTO)
+    sc.size_hint_align = (evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
+    sc.size_hint_weight = (evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+    self.bx.pack_end(sc)
+    sc.show()
+
     self.bxCrt = elementary.Box(self.win)
     self.lb = elementary.Label(self.win)
     self.lb.text_set(txt)
@@ -186,7 +194,8 @@ class Terminal(object):
     self.lb.show()
     self.bxCrt.pack_end(self.lb)
     self.bxCrt.show()
-    self.bx.pack_end(self.bxCrt)
+    sc.content = self.bxCrt
+    #self.bx.pack_end(self.bxCrt)
 
   # e.x:
   #  items = [("Entry", entry_clicked),
