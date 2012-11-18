@@ -96,6 +96,7 @@ class FormBase(object):
     except KeyError:
       raise KeyError('Key %r not found in Form' % name)
     return BoundField(self, field, name)
+
   def _get_errors(self):
     "Returns an ErrorDict for the data provided for the form"
     if self._errors is None:

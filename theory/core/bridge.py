@@ -127,9 +127,9 @@ class Bridge(object):
         propertyLst))
 
   def bridgeFromDb(self, adapterBufferModel):
-    (tailClass, assignFxn, storage) = \
+    (tailKlass, assignFxn, storage) = \
         self._getCmdForAssignment(adapterBufferModel.toCmd)
-    return (tailClass, json.loads(adapterBufferModel.data))
+    return (tailKlass, json.loads(adapterBufferModel.data))
 
   # TODO: to support fall back
   def _probeAdapter(self, headClass, tailClass):
