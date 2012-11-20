@@ -17,7 +17,7 @@ from e17.widget import *
 __all__ = (\
     "StringInput", "TextInput", "NumericInput", "SelectBoxInput",\
     "CheckBoxInput", "StringGroupFilterInput", "ModelValidateGroupInput",\
-    "Fileselector", "ListInput", \
+    "Fileselector", "ListInput", "FilterFormLayout", \
     )
 
 # Honestly, I am not satisfied with the code related to the GUI. So the code
@@ -40,7 +40,7 @@ class BasePacker(object):
     self.widgetLst = []
 
     self.attrs = self._buildAttrs(\
-        attrs, isContainerAFrame=True, isExpandMainContainer=False)
+        attrs, isContainerAFrame=True)
     #self.attrs = self._buildAttrs(attrs=attrs)
 
   def _createWidget(self, *args, **kwargs):
@@ -84,6 +84,8 @@ class BaseLabelInput(BasePacker):
 
   __metaclass__ = ABCMeta
   def __init__(self, win, bx, attrs=None, *args, **kwargs):
+    attrs = self._buildAttrs(\
+        attrs, isExpandMainContainer=False)
     super(BaseLabelInput, self).__init__(win, bx, attrs, *args, **kwargs)
     if(self.attrs["isContainerAFrame"]):
       self.initLabelMainContainerAsFrame(*args, **kwargs)
@@ -164,10 +166,10 @@ class BaseLabelInput(BasePacker):
 class StringInput(BaseLabelInput):
   widgetClass = Entry
 
-  def __init__(self, win, bx, attrs=None, *args, **kwargs):
-    defaultAttrs = self._buildAttrs(\
-        attrs, isExpandMainContainer=False if(attrs["isSingleLine"]) else True)
-    super(StringInput, self).__init__(win, bx, defaultAttrs, *args, **kwargs)
+  #def __init__(self, win, bx, attrs=None, *args, **kwargs):
+  #  defaultAttrs = self._buildAttrs(\
+  #      attrs, isExpandMainContainer=False)
+  #  super(StringInput, self).__init__(win, bx, defaultAttrs, *args, **kwargs)
 
   def _getData(self):
     return self.widgetLst[0].obj.entry_get()
@@ -186,7 +188,7 @@ class StringInput(BaseLabelInput):
 
 class TextInput(StringInput):
   def __init__(self, win, bx, attrs=None, *args, **kwargs):
-    attrs = self._buildAttrs(attrs, isScrollable=True, isSingleLine=False)
+    attrs = self._buildAttrs(attrs, isScrollable=True, isSingleLine=False, isExpandMainContainer=True)
     super(TextInput, self).__init__(win, bx, attrs, *args, **kwargs)
 
 class NumericInput(StringInput):
@@ -356,3 +358,47 @@ class ListInput(BaseLabelInput):
   def finalData(self):
     return [i.finalData() for i in self._dataWidgetLst]
 
+class FilterFormLayout(BasePacker):
+  def __init__(self, win, bxInput, attrs=None, *args, **kwargs):
+    attrs = self._buildAttrs(\
+        attrs, isContainerAFrame=False, isExpandMainContainer=True)
+    super(FilterFormLayout, self).__init__(win, bxInput.obj, attrs)
+    self.labelTitle = "Param Filter:"
+    self.inputLst = []
+    self.bxInput = bxInput
+
+  def addInput(self, input):
+    self.inputLst.append(input)
+
+  def generate(self, *args, **kwargs):
+    filterEntryBox = self._createContainer(
+        {\
+            "isHorizontal": True, \
+            "isWeightExpand": False, \
+            "isFillAlign": False, \
+            "ignoreParentExpand": True,\
+            "isContainerAFrame": False,\
+        })
+    filterEntryBox.generate()
+
+    lb = Label({"isFillAlign": False, "isWeightExpand": False, "ignoreParentExpand": False})
+    lb.win = self.win
+    lb.attrs["initData"] = self.labelTitle
+    filterEntryBox.addWidget(lb)
+
+    en = Entry({"isFillAlign": False, "isWeightExpand": False, "ignoreParentExpand": False})
+    en.win = self.win
+    filterEntryBox.addWidget(en)
+
+    self.inputContainer = self._createContainer({"isFillAlign": True, "isWeightExpand": True})
+    self.inputContainer.generate()
+    self.obj = self.inputContainer.obj
+    self.filterEntryBox = filterEntryBox
+
+  def postGenerate(self):
+    for input in self.inputLst:
+      self.inputContainer.addInput(input)
+    self.bxInput.addInput(self.filterEntryBox)
+    self.bxInput.addInput(self.inputContainer)
+    self.filterEntryBox.postGenerate()
+    self.inputContainer.postGenerate()

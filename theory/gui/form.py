@@ -213,7 +213,6 @@ class FormBase(object):
 class GuiFormBase(FormBase, BasePacker):
   def __init__(self, win, bx, *args, **kwargs):
     super(GuiFormBase, self).__init__(win, bx,*args, **kwargs)
-    self.isContainerAFrame = False
     self.formBx = self._createContainer()
     self.formBx.bx = bx
     self.formBx.generate()
@@ -224,6 +223,22 @@ class GuiFormBase(FormBase, BasePacker):
       self.formBx.addInput(field.widget)
 
     self.formBx.postGenerate()
+
+  def generateFilterForm(self, *args, **kwargs):
+    optionalMenu = FilterFormLayout(self.win, self.formBx)
+    for name, field in self.fields.items():
+      if(field.required):
+        field.renderWidget(self.win, self.formBx.obj)
+        self.formBx.addInput(field.widget)
+      else:
+        field.renderWidget(self.win, self.formBx.obj)
+        optionalMenu.addInput(field.widget)
+
+    self.formBx.postGenerate()
+    optionalMenu.generate()
+
+    optionalMenu.postGenerate()
+
 
 class StepFormBase(GuiFormBase):
   def _nextBtnClick(self):
