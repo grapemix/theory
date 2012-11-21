@@ -421,6 +421,9 @@ class Box(E17Widget):
     self.inputChildrenLst = [] # input inside this box
 
   def generate(self, *args, **kwargs):
+    if(self.obj!=None):
+      return
+
     bx = elementary.Box(self.win)
 
     if(self.attrs["isHorizontal"]):
@@ -448,7 +451,7 @@ class Box(E17Widget):
 
   def removeWidgetLst(self, startIdx, length):
     """Must ran after generate"""
-    for child in self.widgetChildrenLst[startIdx: startIdx + length ]:
+    for child in self.widgetChildrenLst[startIdx: startIdx + length]:
       child.obj.delete()
     for i in range(length):
       del self.widgetChildrenLst[startIdx]
