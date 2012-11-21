@@ -56,7 +56,7 @@ __all__ = (
 class Field(object):
   """The function being provided by this class should include data validation,
   valid/error message storage and multiple widget data union."""
-  widget = StringInput # Default widget to use when rendering this type of Field.
+  widget = StringInput
   #hidden_widget = HiddenInput # Default widget to use when rendering this as "hidden".
   default_validators = [] # Default set of validators
   default_error_messages = {
@@ -69,7 +69,7 @@ class Field(object):
 
   def __init__(self, required=True, label=None, initData=None,
          help_text=None, error_messages=None, show_hidden_initial=False,
-         validators=[], localize=False):
+         validators=[], localize=False, widget=None):
     # required -- Boolean that specifies whether the field is required.
     #             True by default.
     # label -- A verbose name for this field, for use in displaying this
@@ -85,6 +85,7 @@ class Field(object):
     #                        hidden widget with initial value after widget.
     # validators -- List of addtional validators to use
     # localize -- Boolean that specifies if the field should be localized.
+    # widget -- Default widget to use when rendering this type of Field.
     if label is not None:
       label = smart_unicode(label)
     self.required, self.label, self.initData = required, label, initData
@@ -109,6 +110,9 @@ class Field(object):
     self.validators = self.default_validators + validators
 
     self.isSingular = True # not interact with other fields
+
+    if widget!=None:
+      self.widget = widget
 
   def renderWidget(self, *args, **kwargs):
     # widget -- A Widget class, or instance of a Widget class, that should
