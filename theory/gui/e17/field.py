@@ -41,7 +41,7 @@ class IntegerField(field.IntegerField):
   widget = NumericInput
   def widget_attrs(self, widget):
     attrs = super(IntegerField, self).widget_attrs(widget)
-    attrs.update({"ignoreParentExpand": True, "isWeightExpand": False, "isFillAlign": False})
+    attrs.update({"isWeightExpand": False, "isFillAlign": False})
     return attrs
 
 class FloatField(field.FloatField):

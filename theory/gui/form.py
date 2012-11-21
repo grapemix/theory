@@ -236,7 +236,6 @@ class GuiFormBase(FormBase, BasePacker):
 
     self.formBx.postGenerate()
     optionalMenu.generate()
-
     optionalMenu.postGenerate()
 
 
