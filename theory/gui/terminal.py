@@ -188,6 +188,8 @@ class Terminal(object):
     sc.show()
 
     self.bxCrt = elementary.Box(self.win)
+    self.bxCrt.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+    self.bxCrt.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
     self.lb = elementary.Label(self.win)
     self.lb.text_set(txt)
     #fr.content_set(lb)

@@ -38,7 +38,6 @@ class E17Widget(object):
     self.attrs = {\
         "isFillAlign": False, \
         "isFocus": False,\
-        "ignoreParentExpand": False,\
         "isWeightExpand": False,\
         "initData": None,\
     }
@@ -67,9 +66,9 @@ class E17Widget(object):
     pass
 
   def postGenerate(self, *args, **kwargs):
-    if(self.bx and not self.attrs["ignoreParentExpand"]):
-      self.bx.size_hint_weight = EXPAND_BOTH
-      self.bx.size_hint_align = FILL_BOTH
+    #if(self.bx and not self.attrs["ignoreParentExpand"]):
+    #  self.bx.size_hint_weight = EXPAND_BOTH
+    #  self.bx.size_hint_align = FILL_BOTH
 
     if(self.attrs["isWeightExpand"]):
       self.obj.size_hint_weight = EXPAND_BOTH
@@ -81,6 +80,8 @@ class E17Widget(object):
     else:
       self.obj.size_hint_align = FILL_HORIZ
 
+    if(isinstance(self.obj, elementary.Box) and self.attrs.has_key("layout")):
+      self.obj.layout_set(self.attrs["layout"])
     self.obj.show()
     if(self.attrs["isFocus"]):
       self.obj.focus_set(True)
@@ -617,6 +618,12 @@ class SelectBox(E17Widget):
   selectedData = (None, None)
   choices = {}
 
+  def __init__(self, attrs=None, *args, **kwargs):
+    defaultAttrs = {"choices": []}
+    if(attrs is not None):
+      defaultAttrs.update(attrs)
+    super(SelectBox, self).__init__(defaultAttrs, *args, **kwargs)
+
   def _selectionChanged(self, hoversel, hoverselItem):
     self.selectedData = self.choices[hoverselItem.text]
 
@@ -701,12 +708,10 @@ class Multibuttonentry(E17Widget):
     self.item = None
 
   def generate(self, *args, **kwargs):
-    vbox = self.bx
-
     mbe = elementary.MultiButtonEntry(self.win)
-    #mbe.text = "To: "
+    if(self.attrs.has_key("helperLabel")):
+      mbe.text = self.attrs["helperLabel"]
     mbe.part_text_set("guide", "Tap to add")
     mbe.filter_append(self.cb_filter1)
-    vbox.pack_end(mbe)
     self.obj = mbe
 

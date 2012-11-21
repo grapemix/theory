@@ -56,7 +56,7 @@ class BasePacker(object):
     return hBox
 
   def _buildAttrs(self, extraAttrs=None, **kwargs):
-    "Helper function for building an attribute dictionary."
+    """Helper function for building an attribute dictionary."""
     attrs = dict(self.attrs, **kwargs)
     if extraAttrs:
       attrs.update(extraAttrs)
@@ -124,7 +124,7 @@ class BaseLabelInput(BasePacker):
       self.packAsTbl(self.title, self.help, *args, **kwargs)
 
   def packAsFrame(self, title, help, *args, **kwargs):
-    hBox = self._createContainer()
+    hBox = self._createContainer(attrs={"isFillAlign": True, "isWeightExpand": True})
     hBox.generate()
     self.mainContainer.content = hBox
     self.mainContainer.title = title
@@ -209,13 +209,13 @@ class CheckBoxInput(BaseLabelInput):
   widgetClass = CheckBox
 
   def _createWidget(self, *args, **kwargs):
-    hBox = self._createContainer({"isFillAlign": False, "isWeightExpand": False, "isHorizontal": True, "ignoreParentExpand": True, })
+    hBox = self._createContainer({"isFillAlign": False, "isWeightExpand": False, "isHorizontal": True, })
     hBox.bx = self.bx
     hBox.generate()
 
     for v in self.attrs["choices"]:
       (label, value) = v
-      widget = self.widgetClass({"ignoreParentExpand": True, "initData": value, })
+      widget = self.widgetClass({"initData": value, })
       widget.win = self.win
       widget.label = label
       hBox.addWidget(widget)
@@ -300,22 +300,22 @@ class ListInput(BaseLabelInput):
     pass
 
   def _createStringWidget(self, *args, **kwargs):
-    widget = self.widgetClass({"isWeightExpand": True, "isFillAlign": True, "ignoreParentExpand": False })
+    widget = self.widgetClass({"isWeightExpand": True, "isFillAlign": True })
     widget.win = self.win
     self._dataWidgetLst.append(widget)
     return (widget,)
 
     """
-    buttonControlBox = self._createContainer({"isHorizontal": True, "isWeightExpand": False, "isFillAlign": False, "ignoreParentExpand": True,})
+    buttonControlBox = self._createContainer({"isHorizontal": True, "isWeightExpand": False, "isFillAlign": False})
     buttonControlBox.generate()
 
-    btn = Button({"isWeightExpand": True, "isFillAlign": False, "ignoreParentExpand": True,})
+    btn = Button({"isWeightExpand": True, "isFillAlign": False, })
     btn.win = self.win
     btn.label = "Toggle Expand"
     btn._clicked = lambda btn: mbe.expanded_set(not mbe.expanded_get())
     buttonControlBox.addWidget(btn)
 
-    btn = Button({"isWeightExpand": True, "isFillAlign": False, "ignoreParentExpand": True,})
+    btn = Button({"isWeightExpand": True, "isFillAlign": False, })
     btn.win = self.win
     btn.label = "Clear"
     btn._clicked = lambda bt: widget.obj.clear()
@@ -325,21 +325,21 @@ class ListInput(BaseLabelInput):
 
 
   def _createGenericWidget(self, *args, **kwargs):
-    widget = self.widgetClass({"isWeightExpand": True, "isFillAlign": False, "ignoreParentExpand": True })
+    widget = self.widgetClass({"isWeightExpand": True, "isFillAlign": False })
     widget.win = self.win
     self._dataWidgetLst.append(widget)
 
 
-    buttonControlBox = self._createContainer({"isHorizontal": True, "isWeightExpand": False, "isFillAlign": False, "ignoreParentExpand": True,})
+    buttonControlBox = self._createContainer({"isHorizontal": True, "isWeightExpand": False, "isFillAlign": False})
     buttonControlBox.generate()
 
-    btn = Button({"isWeightExpand": True, "isFillAlign": False, "ignoreParentExpand": True,})
+    btn = Button({"isWeightExpand": True, "isFillAlign": False})
     btn.win = self.win
     btn.label = "Add"
     btn._clicked = self._addDataWidget
     buttonControlBox.addWidget(btn)
 
-    btn = Button({"isWeightExpand": True, "isFillAlign": False, "ignoreParentExpand": True,})
+    btn = Button({"isWeightExpand": True, "isFillAlign": False,})
     btn.win = self.win
     btn.label = "Remove"
     btn._clicked = self._rmDataWidget
@@ -376,21 +376,19 @@ class FilterFormLayout(BasePacker):
             "isHorizontal": True, \
             "isWeightExpand": False, \
             "isFillAlign": False, \
-            "ignoreParentExpand": True,\
-            "isContainerAFrame": False,\
         })
     filterEntryBox.generate()
 
-    lb = Label({"isFillAlign": False, "isWeightExpand": False, "ignoreParentExpand": False})
+    lb = Label({"isFillAlign": False, "isWeightExpand": False})
     lb.win = self.win
     lb.attrs["initData"] = self.labelTitle
     filterEntryBox.addWidget(lb)
 
-    en = Entry({"isFillAlign": False, "isWeightExpand": False, "ignoreParentExpand": False})
+    en = Entry({"isFillAlign": False, "isWeightExpand": False})
     en.win = self.win
     filterEntryBox.addWidget(en)
 
-    self.inputContainer = self._createContainer({"isFillAlign": True, "isWeightExpand": True})
+    self.inputContainer = self._createContainer({"isFillAlign": True, "isWeightExpand": False})
     self.inputContainer.generate()
     self.obj = self.inputContainer.obj
     self.filterEntryBox = filterEntryBox
