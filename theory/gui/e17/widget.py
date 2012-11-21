@@ -116,6 +116,14 @@ class Frame(E17Widget):
     self.bx.pack_end(self.obj)
     super(Frame, self).postGenerate(*args, **kwargs)
 
+  def hide(self):
+    if(self.obj!=None):
+      self.obj.hide()
+
+  def show(self):
+    if(self.obj!=None):
+      self.obj.show()
+
 class List(E17Widget):
   def __init__(self, attrs=None, *args, **kwargs):
     super(List, self).__init__(attrs, *args, **kwargs)
@@ -467,7 +475,8 @@ class Box(E17Widget):
 
   def _postGenerateChildren(self, widgetChildrenLst):
     for child in widgetChildrenLst:
-      child.generate()
+      if(child.obj==None):
+        child.generate()
       self.obj.pack_end(child.obj)
     for child in widgetChildrenLst:
       child.postGenerate()
@@ -478,6 +487,13 @@ class Box(E17Widget):
     self._postGenerateChildren(self.widgetChildrenLst)
     super(Box, self).postGenerate(*args, **kwargs)
 
+  def hide(self):
+    if(self.obj!=None):
+      self.obj.hide()
+
+  def show(self):
+    if(self.obj!=None):
+      self.obj.show()
 
 class Entry(E17Widget):
   def __init__(self, attrs=None, *args, **kwargs):
@@ -503,11 +519,11 @@ class Entry(E17Widget):
     if(self.attrs["initData"]!=None):
       en.entry_set(self.attrs["initData"])
     if(hasattr(self, "_anchorClick")):
-      en.callback_anchor_clicked_add(self._anchorClick, en)
+      en.callback_anchor_clicked_add(self._anchorClick)
     if(hasattr(self, "_keyDownAdd")):
-      en.on_key_down_add(self._keyDownAdd, en)
+      en.on_key_down_add(self._keyDownAdd)
     if(hasattr(self, "_contentChanged")):
-      en.callback_changed_add(self._contentChanged, en)
+      en.callback_changed_add(self._contentChanged)
     if(self.attrs["autoFocus"]):
       en.focus_set(1)
 
