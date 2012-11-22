@@ -46,6 +46,7 @@ __all__ = (
   #'DateField', 'TimeField', 'DateTimeField', 'TimeField',
   'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField',
   'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
+  'ListField',
   #'ComboField', 'MultiValueField', 'SplitDateTimeField',
   'FloatField', 'DecimalField', 'IPAddressField', 'GenericIPAddressField',
   'FilePathField', 'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField',
@@ -53,7 +54,9 @@ __all__ = (
 
 
 class Field(object):
-  widget = StringInput # Default widget to use when rendering this type of Field.
+  """The function being provided by this class should include data validation,
+  valid/error message storage and multiple widget data union."""
+  widget = StringInput
   #hidden_widget = HiddenInput # Default widget to use when rendering this as "hidden".
   default_validators = [] # Default set of validators
   default_error_messages = {
@@ -66,7 +69,7 @@ class Field(object):
 
   def __init__(self, required=True, label=None, initData=None,
          help_text=None, error_messages=None, show_hidden_initial=False,
-         validators=[], localize=False):
+         validators=[], localize=False, widget=None):
     # required -- Boolean that specifies whether the field is required.
     #             True by default.
     # label -- A verbose name for this field, for use in displaying this
@@ -82,6 +85,7 @@ class Field(object):
     #                        hidden widget with initial value after widget.
     # validators -- List of addtional validators to use
     # localize -- Boolean that specifies if the field should be localized.
+    # widget -- Default widget to use when rendering this type of Field.
     if label is not None:
       label = smart_unicode(label)
     self.required, self.label, self.initData = required, label, initData
@@ -104,6 +108,11 @@ class Field(object):
     self.error_messages = messages
 
     self.validators = self.default_validators + validators
+
+    self.isSingular = True # not interact with other fields
+
+    if widget!=None:
+      self.widget = widget
 
   def renderWidget(self, *args, **kwargs):
     # widget -- A Widget class, or instance of a Widget class, that should
@@ -200,6 +209,10 @@ class Field(object):
     result.widget = copy.deepcopy(self.widget, memo)
     result.validators = self.validators[:]
     return result
+
+  @property
+  def finalData(self):
+    return self.widget.finalData
 
 class TextField(Field):
   widget = TextInput
@@ -883,6 +896,70 @@ class ComboField(Field):
     for field in self.fields:
       value = field.clean(value)
     return value
+
+class ListField(Field):
+  """
+  A Field that aggregates the logic of multiple Fields.
+  You'll probably want to use this with MultiWidget.
+  """
+  widget = ListInput
+  default_error_messages = {
+    'invalid': _(u'Enter a list of values.'),
+  }
+
+  def __init__(self, field, *args, **kwargs):
+    # Set 'required' to False on the individual fields, because the
+    # required validation will be handled by ListField, not by those
+    # individual fields.
+    field.required = False
+    self.fields = (field,)
+    super(ListField, self).__init__(*args, **kwargs)
+
+  def renderWidget(self, *args, **kwargs):
+    # widget -- A Widget class, or instance of a Widget class, that should
+    #           be used for this Field when displaying it. Each Field has a
+    #           default Widget that it'll use if you don't specify this. In
+    #           most cases, the default widget is TextInput.
+    #widget = widget or self.widget
+    widget = self.widget
+    if isinstance(widget, type):
+      self.widget = widget(widgetClass=self.fields[0].widget.widgetClass, *args, **kwargs)
+    super(ListField, self).renderWidget(*args, **kwargs)
+
+  def validate(self, value):
+    pass
+
+  def clean(self, value):
+    """
+    Validates every value in the given list. A value is validated against
+    the corresponding Field in self.fields.
+
+    For example, if this MultiValueField was instantiated with
+    fields=(DateField(), TimeField()), clean() would call
+    DateField.clean(value[0]) and TimeField.clean(value[1]).
+    """
+    clean_data = []
+    errors = ErrorList()
+    for i, field in enumerate(self.fields):
+      try:
+        field_value = value[i]
+      except IndexError:
+        field_value = None
+      if self.required and field_value in validators.EMPTY_VALUES:
+        raise ValidationError(self.error_messages['required'])
+      try:
+        clean_data.append(field.clean(field_value))
+      except ValidationError, e:
+        # Collect all validation errors in a single list, which we'll
+        # raise at the end of clean(), rather than raising a single
+        # exception for the first error we encounter.
+        errors.extend(e.messages)
+    if errors:
+      raise ValidationError(errors)
+
+    self.validate(clean_data)
+    self.run_validators(clean_data)
+    return clean_data
 
 '''
 class MultiValueField(Field):

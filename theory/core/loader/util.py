@@ -165,6 +165,7 @@ class CommandModuleLoader(ModuleLoader):
       "switchMood": ["norm"],
       "filenameScanner": ["norm"],
       "clipMonitor": ["norm"],
+      "nextStep": ["norm"],
       "createApp": ["dev"],
       "createCmd": ["dev"],
       "indentFormatFix": ["dev"],

@@ -6,8 +6,7 @@
 ##### Theory third-party lib #####
 
 ##### Local app #####
-from core import *
-from command import *
+from .core.tests import *
 
 ##### Theory app #####
 

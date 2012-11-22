@@ -8,7 +8,7 @@ import sys
 from theory.command.baseCommand import SimpleCommand, AsyncCommand, AsyncContainer
 from theory.core.bridge import Bridge
 from theory.utils import unittest
-from theory.model import Adapter, Command, Parameter
+from theory.model import *
 
 ##### Theory third-party lib #####
 
@@ -19,71 +19,8 @@ from theory.model import Adapter, Command, Parameter
 ##### Misc #####
 
 __all__ = ('BridgeTestCase',)
-
-class BaseChain1(object):
-  params = []
-  _gongs = ["StdPipe", ]
-
-class SimpleChain1(BaseChain1, SimpleCommand):
-  name = "simpleChain1"
-  verboseName = "simpleChain1"
-
-  def run(self, *args, **kwargs):
-    self._stdOut = "simpleChain1"
-
-class AsyncChain1(BaseChain1, AsyncCommand):
-  name = "asyncChain1"
-  verboseName = "asyncChain1"
-  _stdOut = name
-  def run(self, *args, **kwargs):
-    self._stdOut = "asyncChain1"
-
-class AsyncCompositeChain1(AsyncChain1):
-  def _getMockCommandObject(self, cmd, classImportPath):
-    with Stub(proxy=cmd) as cmd:
-      cmd.classImportPath >> "%s.%s" % (self.__module__, classImportPath)
-    return cmd
-
-  def run(self, secondCmdModel, *args, **kwargs):
-    super(AsyncCompositeChain1, self).__init__(*args, **kwargs)
-    bridge = Bridge()
-    secondCmdModel = self._getMockCommandObject(secondCmdModel, "SimpleChain2")
-    (chain2Class, secondCmdStorage) = bridge.bridge(self, secondCmdModel)
-    (secondCmd, secondCmdStorage) = bridge.getCmdComplex(secondCmdModel, [], secondCmdStorage)
-    return secondCmd.run()
-
-class BaseChain2(object):
-  params = []
-  _notations = ["StdPipe", ]
-  _stdIn = ""
-
-  @property
-  def stdIn(self):
-    return self._stdIn
-
-  @stdIn.setter
-  def stdIn(self, stdIn):
-    """
-    :param stdIn: stdIn comment
-    :type stdIn: stdIn type
-    """
-    self._stdIn = stdIn
-
-class SimpleChain2(BaseChain2, SimpleCommand):
-  name = "simpleChain2"
-  verboseName = "simpleChain2"
-  def run(self, *args, **kwargs):
-    #print "????"
-    return self.stdIn + " received"
-
-
-class AsyncChain2(BaseChain2, AsyncCommand):
-  name = "asyncChain2"
-  verboseName = "asyncChain2"
-  def run(self, *args, **kwargs):
-    #print "???!"
-    return self.stdIn + " received"
-
+from tests.unitTest.core.tests import \
+    SimpleChain1, SimpleChain2, AsyncChain1, AsyncChain2, AsyncCompositeChain1
 
 class BridgeTestCase(unittest.TestCase):
   def setUp(self):
@@ -92,12 +29,20 @@ class BridgeTestCase(unittest.TestCase):
     if(self.__module__ not in sys.path):
       sys.path.append(self.__module__)
 
-    # should move to setup if test db bug is fixed
-    self.simpleChain1CommandModel = Command(name="SimpleChain1", app="test", mood=["test",])
-    self.simpleChain2CommandModel = Command(name="SimpleChain2", app="test", mood=["test",], param=[Parameter(name="stdIn",type="String")])
+    # TODO: should move to setup if test db bug is fixed
+    self.simpleChain1CommandModel = \
+        Command(name="SimpleChain1", app="test", mood=["test",])
+    self.simpleChain2CommandModel = \
+        Command(name="SimpleChain2", app="test", mood=["test",], \
+        param=[Parameter(name="stdIn",type="String")])
 
-    self.asyncChain1CommandModel = Command(name="AsyncChain1", app="test", mood=["test",])
-    self.asyncChain2CommandModel = Command(name="AsyncChain2", app="test", mood=["test",], param=[Parameter(name="stdIn",type="String")])
+    self.asyncChain1CommandModel = \
+        Command(name="AsyncChain1", app="test", mood=["test",])
+    self.asyncChain2CommandModel = \
+        Command(name="AsyncChain2", app="test", mood=["test",], \
+        param=[Parameter(name="stdIn",type="String")])
+
+    self.adapterBufferModel = AdapterBuffer()
 
     #Adapter(name="StdPipe", importPath=u"theory.adapter.stdPipeAdapter.StdPipeAdapter", property=[u'stdErr', u'stdIn', u'stdOut']).save()
 
