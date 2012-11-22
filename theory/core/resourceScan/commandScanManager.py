@@ -11,13 +11,13 @@ from theory.model import Command
 ##### Theory third-party lib #####
 
 ##### Local app #####
-from .baseClassScanner import BaseClassScanner
+from .baseScanManager import BaseScanManager
 
 ##### Theory app #####
 
 ##### Misc #####
 
-class CommandScanManager(BaseClassScanner):
+class CommandScanManager(BaseScanManager):
 
   def scan(self):
     Command.objects.all().delete()
