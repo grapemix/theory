@@ -238,7 +238,6 @@ class GuiFormBase(FormBase, BasePacker):
     optionalMenu.generate()
     optionalMenu.postGenerate()
 
-
 class StepFormBase(GuiFormBase):
   def _nextBtnClick(self):
     pass
@@ -286,4 +285,7 @@ class GuiForm(GuiFormBase):
   __metaclass__ = DeclarativeFieldsMetaclass
 
 class StepForm(StepFormBase):
+  __metaclass__ = DeclarativeFieldsMetaclass
+
+class CommandForm(StepFormBase):
   __metaclass__ = DeclarativeFieldsMetaclass
