@@ -46,7 +46,7 @@ __all__ = (
   #'DateField', 'TimeField', 'DateTimeField', 'TimeField',
   'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField',
   'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
-  'ListField',
+  'ListField', 'DictField', 'AdapterField',
   #'ComboField', 'MultiValueField', 'SplitDateTimeField',
   'FloatField', 'DecimalField', 'IPAddressField', 'GenericIPAddressField',
   'FilePathField', 'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField',
@@ -960,6 +960,12 @@ class ListField(Field):
     self.validate(clean_data)
     self.run_validators(clean_data)
     return clean_data
+
+class DictField(ListField):
+  widget = DictInput
+
+class AdapterField(TextField):
+  pass
 
 '''
 class MultiValueField(Field):
