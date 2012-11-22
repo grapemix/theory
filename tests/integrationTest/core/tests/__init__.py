@@ -6,7 +6,7 @@
 ##### Theory third-party lib #####
 
 ##### Local app #####
-from bridge import *
+from .bridge import *
 
 ##### Theory app #####
 

@@ -25,6 +25,7 @@ __all__ = (
   #'DateField', 'TimeField', 'DateTimeField', 'TimeField',
   'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField',
   'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
+  'ListField',
   #'ComboField', 'MultiValueField', 'SplitDateTimeField',
   'FloatField', 'DecimalField', 'IPAddressField', 'GenericIPAddressField',
   'FilePathField', 'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField',
@@ -36,16 +37,11 @@ class TextField(field.TextField):
   widget = TextInput
   lineBreak = "<br/>"
 
-  def widget_attrs(self, widget):
-    attrs = super(TextField, self).widget_attrs(widget)
-    attrs.update({"isScrollable": True})
-    return attrs
-
 class IntegerField(field.IntegerField):
   widget = NumericInput
   def widget_attrs(self, widget):
     attrs = super(IntegerField, self).widget_attrs(widget)
-    attrs.update({"ignoreParentExpand": True, "isWeightExpand": False, "isFillAlign": False})
+    attrs.update({"isWeightExpand": False, "isFillAlign": False})
     return attrs
 
 class FloatField(field.FloatField):
@@ -73,6 +69,9 @@ class BooleanField(field.BooleanField):
   pass
 
 class NullBooleanField(field.NullBooleanField):
+  pass
+
+class ListField(field.ListField):
   pass
 
 class ChoiceField(field.ChoiceField):

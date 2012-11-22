@@ -18,7 +18,7 @@ import evas
 ##### Misc #####
 
 __all__ = ("Label", "Frame", "ListValidator", "ListModelValidator", "Genlist", \
-    "Box", "Entry", "Button", "Icon", "CheckBox", "RadioBox", "SelectBox", \
+    "Box", "Entry", "Multibuttonentry", "Button", "Icon", "CheckBox", "RadioBox", "SelectBox", \
     "FileSelector")
 
 EXPAND_BOTH = (evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
@@ -38,7 +38,6 @@ class E17Widget(object):
     self.attrs = {\
         "isFillAlign": False, \
         "isFocus": False,\
-        "ignoreParentExpand": False,\
         "isWeightExpand": False,\
         "initData": None,\
     }
@@ -67,9 +66,9 @@ class E17Widget(object):
     pass
 
   def postGenerate(self, *args, **kwargs):
-    if(self.bx and not self.attrs["ignoreParentExpand"]):
-      self.bx.size_hint_weight = EXPAND_BOTH
-      self.bx.size_hint_align = FILL_BOTH
+    #if(self.bx and not self.attrs["ignoreParentExpand"]):
+    #  self.bx.size_hint_weight = EXPAND_BOTH
+    #  self.bx.size_hint_align = FILL_BOTH
 
     if(self.attrs["isWeightExpand"]):
       self.obj.size_hint_weight = EXPAND_BOTH
@@ -81,6 +80,8 @@ class E17Widget(object):
     else:
       self.obj.size_hint_align = FILL_HORIZ
 
+    if(isinstance(self.obj, elementary.Box) and self.attrs.has_key("layout")):
+      self.obj.layout_set(self.attrs["layout"])
     self.obj.show()
     if(self.attrs["isFocus"]):
       self.obj.focus_set(True)
@@ -106,14 +107,22 @@ class Frame(E17Widget):
 
   def generate(self, *args, **kwargs):
     fr = elementary.Frame(self.win)
-    if(self.content!=None):
-      fr.content_set(self.content)
     fr.text_set(self.title)
     self.obj = fr
 
   def postGenerate(self, *args, **kwargs):
-    super(Frame, self).postGenerate(*args, **kwargs)
+    if(self.content!=None):
+      self.obj.content_set(self.content.obj)
     self.bx.pack_end(self.obj)
+    super(Frame, self).postGenerate(*args, **kwargs)
+
+  def hide(self):
+    if(self.obj!=None):
+      self.obj.hide()
+
+  def show(self):
+    if(self.obj!=None):
+      self.obj.show()
 
 class List(E17Widget):
   def __init__(self, attrs=None, *args, **kwargs):
@@ -301,7 +310,8 @@ class ListValidator(Genlist):
       parentCounter += 1
       self.checkboxRelMap[startIdx] = (startIdx, counter)
 
-  def getChangedData(self):
+  @property
+  def changedData(self):
     #return [cb.obj.state for cb in self.checkboxLst]
     return self.changedRow.keys()
 
@@ -373,10 +383,12 @@ class ListModelValidator(Genlist):
         self.grpAState[-1] = False
       counter += 1
 
-  def getInitData(self):
+  @property
+  def initData(self):
     return self.attrs["initData"]
 
-  def getChangedData(self):
+  @property
+  def changedData(self):
     item = self.obj.first_item
     isBeforeFirstChild = False
     r = []
@@ -389,7 +401,8 @@ class ListModelValidator(Genlist):
       item = item.next
     return r
 
-  def getFinalData(self):
+  @property
+  def finalData(self):
     item = self.obj.first_item
     isBeforeFirstChild = False
     r = []
@@ -417,6 +430,9 @@ class Box(E17Widget):
     self.inputChildrenLst = [] # input inside this box
 
   def generate(self, *args, **kwargs):
+    if(self.obj!=None):
+      return
+
     bx = elementary.Box(self.win)
 
     if(self.attrs["isHorizontal"]):
@@ -432,26 +448,52 @@ class Box(E17Widget):
     widget.bx = self.obj
     self.widgetChildrenLst.append(widget)
 
+  def insertAndGenerateWidget(self, startIdx, widgetLst):
+    """Must ran after generate. """
+    i = startIdx
+    for widget in widgetLst:
+      widget.bx = self.obj
+      self.widgetChildrenLst.insert(i, widget)
+      i += 1
+
+    self._postGenerateChildren(widgetLst)
+
+  def removeWidgetLst(self, startIdx, length):
+    """Must ran after generate"""
+    for child in self.widgetChildrenLst[startIdx: startIdx + length]:
+      child.obj.delete()
+    for i in range(length):
+      del self.widgetChildrenLst[startIdx]
+
   def addInput(self, input):
     self.inputChildrenLst.append(input)
 
-  def _postGenerateInputLst(self, *args, **kwargs):
-    for input in self.inputChildrenLst:
+  def _postGenerateInputLst(self, inputChildrenLst):
+    for input in inputChildrenLst:
       input.generate()
       # Don't do pack_end in here. Too late.
 
-  def _postGenerateChildren(self, *args, **kwargs):
-    for child in self.widgetChildrenLst:
-      child.generate(*args, **kwargs)
+  def _postGenerateChildren(self, widgetChildrenLst):
+    for child in widgetChildrenLst:
+      if(child.obj==None):
+        child.generate()
       self.obj.pack_end(child.obj)
-    for child in self.widgetChildrenLst:
-      child.postGenerate(*args, **kwargs)
+    for child in widgetChildrenLst:
+      child.postGenerate()
 
   def postGenerate(self, *args, **kwargs):
     """Must ran after generate"""
-    self._postGenerateInputLst(*args, **kwargs)
-    self._postGenerateChildren(*args, **kwargs)
+    self._postGenerateInputLst(self.inputChildrenLst)
+    self._postGenerateChildren(self.widgetChildrenLst)
     super(Box, self).postGenerate(*args, **kwargs)
+
+  def hide(self):
+    if(self.obj!=None):
+      self.obj.hide()
+
+  def show(self):
+    if(self.obj!=None):
+      self.obj.show()
 
 class Entry(E17Widget):
   def __init__(self, attrs=None, *args, **kwargs):
@@ -477,11 +519,11 @@ class Entry(E17Widget):
     if(self.attrs["initData"]!=None):
       en.entry_set(self.attrs["initData"])
     if(hasattr(self, "_anchorClick")):
-      en.callback_anchor_clicked_add(self._anchorClick, en)
+      en.callback_anchor_clicked_add(self._anchorClick)
     if(hasattr(self, "_keyDownAdd")):
-      en.on_key_down_add(self._keyDownAdd, en)
+      en.on_key_down_add(self._keyDownAdd)
     if(hasattr(self, "_contentChanged")):
-      en.callback_changed_add(self._contentChanged, en)
+      en.callback_changed_add(self._contentChanged)
     if(self.attrs["autoFocus"]):
       en.focus_set(1)
 
@@ -508,7 +550,8 @@ class Entry(E17Widget):
   #def _anchorClick(self, obj, en, *args, **kwargs):
   #  pass
 
-  def getData(self):
+  @property
+  def finalData(self):
     return self.obj.entry_get()
 
 class Button(E17Widget):
@@ -582,9 +625,23 @@ class RadioBox(E17Widget):
 
 # TODO: to assign init data as pre-select item
 class SelectBox(E17Widget):
+  """If developer has to assign specific icons into choices, they should
+  assigned through the widget's attr["choices"] instead of fields.
+  """
   icon = None
   isDisable = False
   label = "Please select"
+  selectedData = (None, None)
+  choices = {}
+
+  def __init__(self, attrs=None, *args, **kwargs):
+    defaultAttrs = {"choices": []}
+    if(attrs is not None):
+      defaultAttrs.update(attrs)
+    super(SelectBox, self).__init__(defaultAttrs, *args, **kwargs)
+
+  def _selectionChanged(self, hoversel, hoverselItem):
+    self.selectedData = self.choices[hoverselItem.text]
 
   def generate(self, *args, **kwargs):
     bt = elementary.Hoversel(self.win)
@@ -596,8 +653,12 @@ class SelectBox(E17Widget):
     if(self.isDisable):
       bt.disabled_set(True)
     for item in self.attrs["choices"]:
-    #for item in self.attrs["initData"]:
-      (label, imgPath) = item
+      try:
+        (idx, label, imgPath) = item
+      except ValueError:
+        (idx, label) = item
+        imgPath = None
+      self.choices[label] = idx
       if(imgPath == None or imgPath==""):
         bt.item_add(label)
       else:
@@ -606,6 +667,7 @@ class SelectBox(E17Widget):
           bt.item_add(label, imgPath, elementary.ELM_ICON_FILE)
         else:
           bt.item_add(label, imgPath, elementary.ELM_ICON_STANDARD)
+    bt.callback_selected_add(self._selectionChanged)
     bt.size_hint_weight_set(0.0, 0.0)
     bt.size_hint_align_set(0.5, 0.5)
     self.obj = bt
@@ -644,3 +706,28 @@ class FileSelector(E17Widget):
       fs.callback_selected_add(self._selected, self.win)
 
     self.obj = fs
+
+
+class Multibuttonentry(E17Widget):
+  def cb_filter1(self, mbe, text):
+    return True
+
+  def __init__(self, attrs=None, *args, **kwargs):
+    defaultAttrs = {\
+        "isFillAlign": True, \
+        "isWeightExpand": True, \
+    }
+    if(attrs is not None):
+      defaultAttrs.update(attrs)
+    super(Multibuttonentry, self).__init__(defaultAttrs, *args, **kwargs)
+    self.counter = 0
+    self.item = None
+
+  def generate(self, *args, **kwargs):
+    mbe = elementary.MultiButtonEntry(self.win)
+    if(self.attrs.has_key("helperLabel")):
+      mbe.text = self.attrs["helperLabel"]
+    mbe.part_text_set("guide", "Tap to add")
+    mbe.filter_append(self.cb_filter1)
+    self.obj = mbe
+

@@ -124,3 +124,22 @@ class Adapter(Model):
   property = ListField(StringField(max_length=256,\
       verbose_name=_("Property"),\
       help_text=_("The properties which accepted by this adapter")))
+
+class AdapterBuffer(Model):
+  """This model is designed as a buffer for adapters between async commands"""
+  fromCmd = ReferenceField("Command", \
+      required=True, \
+      verbose_name=_("From command"),\
+      help_text=_("The input command of the adapter"))
+  toCmd = ReferenceField("Command", \
+      verbose_name=_("To command"),\
+      required=True, \
+      help_text=_("The output command of the adapter"))
+  #adapter = ReferenceField("Adapter", \
+  #    verbose_name=_("adapter"),\
+  #    required=True, \
+  #    help_text=_("The adapter being used"))
+  data = StringField(required=True, \
+      verbose_name=_("data"), \
+      help_text=_("The data adapted to next command and stored in JSON format"))
+  created = DateTimeField(required=True, default=datetime.utcnow())

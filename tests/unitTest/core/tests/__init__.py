@@ -6,7 +6,8 @@
 ##### Theory third-party lib #####
 
 ##### Local app #####
-from txtCmdParser import *
+from .txtCmdParser import *
+from .bridge import *
 
 ##### Theory app #####
 
