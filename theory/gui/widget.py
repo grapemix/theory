@@ -17,7 +17,7 @@ from e17.widget import *
 __all__ = (\
     "StringInput", "TextInput", "NumericInput", "SelectBoxInput",\
     "CheckBoxInput", "StringGroupFilterInput", "ModelValidateGroupInput",\
-    "Fileselector", "ListInput", "FilterFormLayout", \
+    "Fileselector", "ListInput", "DictInput", "FilterFormLayout", \
     )
 
 # Honestly, I am not satisfied with the code related to the GUI. So the code
@@ -267,6 +267,7 @@ class ModelValidateGroupInput(BaseLabelInput):
     return self.widgetLst[0].finalData()
 
 class ListInput(BaseLabelInput):
+  numOfNewWidget = 2
 
   def __init__(self, win, bx, widgetClass, attrs=None, *args, **kwargs):
     attrs = self._buildAttrs(\
@@ -283,24 +284,25 @@ class ListInput(BaseLabelInput):
     super(ListInput, self).__init__(win, bx, attrs, *args, **kwargs)
 
   def _addDataWidget(self, *args, **kwargs):
-    (widget, buttonControlBox,) = self._createWidget()
+    widgetLst = self._createWidget()
     startIdx = len(self.widgetLst) - 1
-    self.widgetLst.insert(len(self.widgetLst) - 1 , widget)
-    self.widgetLst.insert(len(self.widgetLst) - 1 , buttonControlBox)
-    self.mainContainer.content.insertAndGenerateWidget(startIdx , (widget, buttonControlBox))
+    for widget in widgetLst:
+      self.widgetLst.insert(len(self.widgetLst) - 1 , widget)
+    self.mainContainer.content.insertAndGenerateWidget(startIdx , widgetLst)
 
-  def _rmDataWidget(self, *args, **kwargs):
+  def _rmDataWidget(self, btn, *args, **kwargs):
     idx = None
     for i in range(len(self.widgetLst)):
-      if(self.widgetLst[i].obj == args[0].parent_widget):
+      if(self.widgetLst[i].obj == btn.parent_widget):
         idx = i
         break
-    if idx == None:
+    if(idx == None):
       raise
-    del self.widgetLst[idx - 1]
-    del self.widgetLst[idx - 1]
-    self.mainContainer.content.removeWidgetLst(idx - 1, 2)
-    del self._dataWidgetLst[(idx - 1)/2]
+    numToShiftFirstElement = idx - (self.numOfNewWidget - 1)
+    for i in range(self.numOfNewWidget):
+      del self.widgetLst[numToShiftFirstElement]
+    self.mainContainer.content.removeWidgetLst(numToShiftFirstElement, self.numOfNewWidget)
+    del self._dataWidgetLst[numToShiftFirstElement/self.numOfNewWidget]
 
   def _createWidget(self, *args, **kwargs):
     pass
@@ -309,9 +311,7 @@ class ListInput(BaseLabelInput):
     widget = self.widgetClass({"isWeightExpand": True, "isFillAlign": True })
     widget.win = self.win
     self._dataWidgetLst.append(widget)
-    return (widget,)
 
-    """
     buttonControlBox = self._createContainer({"isHorizontal": True, "isWeightExpand": False, "isFillAlign": False})
     buttonControlBox.generate()
 
@@ -327,14 +327,11 @@ class ListInput(BaseLabelInput):
     btn._clicked = lambda bt: widget.obj.clear()
     buttonControlBox.addWidget(btn)
     return (widget, buttonControlBox,)
-    """
-
 
   def _createGenericWidget(self, *args, **kwargs):
     widget = self.widgetClass({"isWeightExpand": True, "isFillAlign": False })
     widget.win = self.win
     self._dataWidgetLst.append(widget)
-
 
     buttonControlBox = self._createContainer({"isHorizontal": True, "isWeightExpand": False, "isFillAlign": False})
     buttonControlBox.generate()
@@ -363,6 +360,64 @@ class ListInput(BaseLabelInput):
   @property
   def finalData(self):
     return [i.finalData() for i in self._dataWidgetLst]
+
+class DictInput(ListInput):
+  numOfNewWidget = 3
+  def __init__(self, win, bx, widgetClass, attrs=None, *args, **kwargs):
+    attrs = self._buildAttrs(\
+        attrs, isExpandMainContainer=True, initData=())
+    self.widgetClass = widgetClass
+    self._dataWidgetLst = []
+    # We should call the __init__() of ListInput's parent because
+    # widgetClass should not be changed even StringInput is used.
+    super(ListInput, self).__init__(win, bx, attrs, *args, **kwargs)
+
+  def _createWidget(self, *args, **kwargs):
+    keyInputBox = self._createContainer(
+        {\
+            "isHorizontal": True, \
+            "isWeightExpand": False, \
+            "isFillAlign": False, \
+        })
+    keyInputBox.generate()
+
+    lb = Label({"isFillAlign": False, "isWeightExpand": False})
+    lb.win = self.win
+    lb.attrs["initData"] = "Key:"
+    keyInputBox.addWidget(lb)
+
+    en = Entry({"isFillAlign": False, "isWeightExpand": False})
+    en.win = self.win
+    keyInputBox.addWidget(en)
+
+    valueInputBox = self._createContainer({"isWeightExpand": True, "isFillAlign": True})
+    valueInputBox.generate()
+
+    lb = Label({"isFillAlign": False, "isWeightExpand": False})
+    lb.win = self.win
+    lb.attrs["initData"] = "Value:"
+    valueInputBox.addWidget(lb)
+
+    widget = self.widgetClass({"isWeightExpand": True, "isFillAlign": False })
+    widget.win = self.win
+    valueInputBox.addWidget(widget)
+    self._dataWidgetLst.append(widget)
+
+    buttonControlBox = self._createContainer({"isHorizontal": True, "isWeightExpand": False, "isFillAlign": False})
+    buttonControlBox.generate()
+
+    btn = Button({"isWeightExpand": True, "isFillAlign": False})
+    btn.win = self.win
+    btn.label = "Add"
+    btn._clicked = self._addDataWidget
+    buttonControlBox.addWidget(btn)
+
+    btn = Button({"isWeightExpand": True, "isFillAlign": False,})
+    btn.win = self.win
+    btn.label = "Remove"
+    btn._clicked = self._rmDataWidget
+    buttonControlBox.addWidget(btn)
+    return (keyInputBox, valueInputBox, buttonControlBox,)
 
 class FilterFormLayout(BasePacker):
   def __init__(self, win, bxInput, attrs=None, *args, **kwargs):
