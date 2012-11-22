@@ -232,7 +232,7 @@ class GuiFormBase(FormBase, BasePacker):
         self.formBx.addInput(field.widget)
       else:
         field.renderWidget(self.win, self.formBx.obj)
-        optionalMenu.addInput(field.widget)
+        optionalMenu.addInput(name, field.widget)
 
     self.formBx.postGenerate()
     optionalMenu.generate()

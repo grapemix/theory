@@ -163,6 +163,12 @@ class BaseLabelInput(BasePacker):
   def finalData(self):
     pass
 
+  def hide(self):
+    self.mainContainer.hide()
+
+  def show(self):
+    self.mainContainer.show()
+
 class StringInput(BaseLabelInput):
   widgetClass = Entry
 
@@ -366,9 +372,23 @@ class FilterFormLayout(BasePacker):
     self.labelTitle = "Param Filter:"
     self.inputLst = []
     self.bxInput = bxInput
+    self.isJustStart = True
 
-  def addInput(self, input):
-    self.inputLst.append(input)
+  def addInput(self, fieldName, input):
+    self.inputLst.append((fieldName.lower(), input))
+
+  def _filterField(self, en):
+    if(self.isJustStart):
+      self.isJustStart = False
+      return
+
+    requestFieldNamePrefix = en.entry_get()
+    # Trie should be applied, but it is overkilled in this case.
+    for (name, input) in self.inputLst:
+      input.mainContainer.hide()
+    for (name, input) in self.inputLst:
+      if(name.startswith(requestFieldNamePrefix.lower())):
+        input.mainContainer.show()
 
   def generate(self, *args, **kwargs):
     filterEntryBox = self._createContainer(
@@ -386,6 +406,7 @@ class FilterFormLayout(BasePacker):
 
     en = Entry({"isFillAlign": False, "isWeightExpand": False})
     en.win = self.win
+    en._contentChanged = self._filterField
     filterEntryBox.addWidget(en)
 
     self.inputContainer = self._createContainer({"isFillAlign": True, "isWeightExpand": False})
@@ -394,8 +415,16 @@ class FilterFormLayout(BasePacker):
     self.filterEntryBox = filterEntryBox
 
   def postGenerate(self):
-    for input in self.inputLst:
+    # The reason to have another inputLst is because that when a input is
+    # appended into self.inputLst, the mainContainer.obj was not generated.
+    # Since the behaviour of copying complex object into a list in python is
+    # copy by reference, the mainContainer.obj will remain None unless we
+    # copy the input again.
+    newInputLst = []
+    for (name, input) in self.inputLst:
       self.inputContainer.addInput(input)
+      newInputLst.append((name, input))
+    self.inputLst = newInputLst
     self.bxInput.addInput(self.filterEntryBox)
     self.bxInput.addInput(self.inputContainer)
     self.filterEntryBox.postGenerate()
