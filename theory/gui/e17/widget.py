@@ -643,6 +643,10 @@ class SelectBox(E17Widget):
   def _selectionChanged(self, hoversel, hoverselItem):
     self.selectedData = self.choices[hoverselItem.text]
 
+  @property
+  def finalData(self):
+    return self.selectedData
+
   def generate(self, *args, **kwargs):
     bt = elementary.Hoversel(self.win)
     bt.hover_parent_set(self.win)
@@ -731,3 +735,6 @@ class Multibuttonentry(E17Widget):
     mbe.filter_append(self.cb_filter1)
     self.obj = mbe
 
+  @property
+  def finalData(self):
+    return self.obj.items
