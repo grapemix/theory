@@ -212,7 +212,7 @@ class FormBase(object):
 
 class GuiFormBase(FormBase, BasePacker):
   def __init__(self, win, bx, *args, **kwargs):
-    super(GuiFormBase, self).__init__(win, bx,*args, **kwargs)
+    super(GuiFormBase, self).__init__(win, bx, *args, **kwargs)
     self.formBx = self._createContainer()
     self.formBx.bx = bx
     self.formBx.generate()

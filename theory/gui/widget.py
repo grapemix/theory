@@ -76,17 +76,27 @@ class BasePacker(object):
     """
     return data.get(name, None)
 
-class BaseLabelInput(BasePacker):
+  @abstractmethod
+  def updateField(self):
+    pass
+
+class BaseFieldInput(BasePacker):
+  def __init__(self, fieldSetter, fieldGetter, win, bx, attrs=None, *args, **kwargs):
+    self.fieldSetter = fieldSetter
+    self.fieldGetter = fieldGetter
+    super(BaseFieldInput, self).__init__(win, bx, attrs, *args, **kwargs)
+
+class BaseLabelInput(BaseFieldInput):
   """This class is designed for a widget with a name label and some help text.
   The widget in here can be a container which contains other object. The
   widget should be warp by a main container. The parent should not have
   much control on the main container and all attr simply pass to the widget."""
 
   __metaclass__ = ABCMeta
-  def __init__(self, win, bx, attrs=None, *args, **kwargs):
+  def __init__(self, fieldSetter, fieldGetter, win, bx, attrs=None, *args, **kwargs):
     attrs = self._buildAttrs(\
         attrs, isExpandMainContainer=False)
-    super(BaseLabelInput, self).__init__(win, bx, attrs, *args, **kwargs)
+    super(BaseLabelInput, self).__init__(fieldSetter, fieldGetter, win, bx, attrs, *args, **kwargs)
     if(self.attrs["isContainerAFrame"]):
       self.initLabelMainContainerAsFrame(*args, **kwargs)
     else:
@@ -159,10 +169,6 @@ class BaseLabelInput(BasePacker):
   def initData(self):
     return self.attrs["initData"]
 
-  @abstractmethod
-  def finalData(self):
-    pass
-
   def hide(self):
     self.mainContainer.hide()
 
@@ -172,11 +178,6 @@ class BaseLabelInput(BasePacker):
 class StringInput(BaseLabelInput):
   widgetClass = Entry
 
-  #def __init__(self, win, bx, attrs=None, *args, **kwargs):
-  #  defaultAttrs = self._buildAttrs(\
-  #      attrs, isExpandMainContainer=False)
-  #  super(StringInput, self).__init__(win, bx, defaultAttrs, *args, **kwargs)
-
   def _getData(self):
     return self.widgetLst[0].obj.entry_get()
 
@@ -184,31 +185,25 @@ class StringInput(BaseLabelInput):
   def initData(self):
     return self.attrs["initData"]
 
-  @property
-  def changedData(self):
-    return self._getData()
-
-  @property
-  def finalData(self):
-    return self._getData()
+  def updateField(self):
+    self.fieldSetter({"finalData": self._getData()})
 
 class TextInput(StringInput):
-  def __init__(self, win, bx, attrs=None, *args, **kwargs):
+  def __init__(self, fieldSetter, fieldGetter, win, bx, attrs=None, *args, **kwargs):
     attrs = self._buildAttrs(attrs, isScrollable=True, isSingleLine=False, isExpandMainContainer=True)
-    super(TextInput, self).__init__(win, bx, attrs, *args, **kwargs)
+    super(TextInput, self).__init__(fieldSetter, fieldGetter, win, bx, attrs, *args, **kwargs)
 
 class NumericInput(StringInput):
-  def __init__(self, win, bx, attrs=None, *args, **kwargs):
+  def __init__(self, fieldSetter, fieldGetter, win, bx, attrs=None, *args, **kwargs):
     attrs = self._buildAttrs(attrs, isExpandMainContainer=False)
-    super(NumericInput, self).__init__(win, bx, attrs, *args, **kwargs)
+    super(NumericInput, self).__init__(fieldSetter, fieldGetter, win, bx, attrs, *args, **kwargs)
 
 class SelectBoxInput(BaseLabelInput):
   """Assuming labels are unique."""
   widgetClass = SelectBox
 
-  @property
-  def finalData(self):
-    return self.widgetLst[0].selectedData
+  def updateField(self):
+    self.fieldSetter({"finalData": self.widgetLst[0].finalData})
 
 # TODO: Fix the padding problem
 class CheckBoxInput(BaseLabelInput):
@@ -238,9 +233,9 @@ class StringGroupFilterInput(BaseLabelInput):
   widgetClass = ListModelValidator
   #widgetClass = ListValidator
 
-  def __init__(self, win, bx, attrs=None, *args, **kwargs):
+  def __init__(self, fieldSetter, fieldGetter, win, bx, attrs=None, *args, **kwargs):
     attrs = self._buildAttrs(attrs, initData=())
-    super(StringGroupFilterInput, self).__init__(win, bx, attrs, *args, **kwargs)
+    super(StringGroupFilterInput, self).__init__(fieldSetter, fieldGetter, win, bx, attrs, *args, **kwargs)
 
   @property
   def changedData(self):
@@ -250,9 +245,9 @@ class StringGroupFilterInput(BaseLabelInput):
 class ModelValidateGroupInput(BaseLabelInput):
   widgetClass = ListModelValidator
 
-  def __init__(self, win, bx, attrs=None, *args, **kwargs):
+  def __init__(self, fieldSetter, fieldGetter, win, bx, attrs=None, *args, **kwargs):
     attrs = self._buildAttrs(attrs, initData=())
-    super(ModelValidateGroupInput, self).__init__(win, bx, attrs, *args, **kwargs)
+    super(ModelValidateGroupInput, self).__init__(fieldSetter, fieldGetter, win, bx, attrs, *args, **kwargs)
 
   @property
   def initData(self):
@@ -262,14 +257,17 @@ class ModelValidateGroupInput(BaseLabelInput):
   def changedData(self):
     return self.widgetLst[0].changedData()
 
-  @property
-  def finalData(self):
-    return self.widgetLst[0].finalData()
+  def updateField(self):
+    self.fieldSetter({\
+        "finalData": self.widgetLst[0].finalData(),
+        "changedData":  self.changedData,
+        })
 
 class ListInput(BaseLabelInput):
   numOfNewWidget = 2
 
-  def __init__(self, win, bx, widgetClass, attrs=None, *args, **kwargs):
+  def __init__(self, fieldSetter, fieldGetter, win, bx, widgetClass, \
+      attrs=None, childWidgetDefaultParam={}, *args, **kwargs):
     attrs = self._buildAttrs(\
         attrs, isExpandMainContainer=True, initData=())
     # TODO: this is e17 specific, add one more layer instead
@@ -281,7 +279,8 @@ class ListInput(BaseLabelInput):
     self.widgetClass = widgetClass
 
     self._dataWidgetLst = []
-    super(ListInput, self).__init__(win, bx, attrs, *args, **kwargs)
+    self.childWidgetDefaultParam = childWidgetDefaultParam
+    super(ListInput, self).__init__(fieldSetter, fieldGetter, win, bx, attrs, *args, **kwargs)
 
   def _addDataWidget(self, *args, **kwargs):
     widgetLst = self._createWidget()
@@ -308,7 +307,10 @@ class ListInput(BaseLabelInput):
     pass
 
   def _createStringWidget(self, *args, **kwargs):
-    widget = self.widgetClass({"isWeightExpand": True, "isFillAlign": True })
+    defaultParam = {"isWeightExpand": True, "isFillAlign": True }
+    defaultParam.update(self.childWidgetDefaultParam)
+    widget = self.widgetClass(defaultParam)
+    childWidgetDefaultParam
     widget.win = self.win
     self._dataWidgetLst.append(widget)
 
@@ -329,7 +331,9 @@ class ListInput(BaseLabelInput):
     return (widget, buttonControlBox,)
 
   def _createGenericWidget(self, *args, **kwargs):
-    widget = self.widgetClass({"isWeightExpand": True, "isFillAlign": False })
+    defaultParam = {"isWeightExpand": True, "isFillAlign": False }
+    defaultParam.update(self.childWidgetDefaultParam)
+    widget = self.widgetClass(defaultParam)
     widget.win = self.win
     self._dataWidgetLst.append(widget)
 
@@ -349,28 +353,42 @@ class ListInput(BaseLabelInput):
     buttonControlBox.addWidget(btn)
     return (widget, buttonControlBox,)
 
+  """
   @property
   def initData(self):
     return [i.initData() for i in self._dataWidgetLst]
 
+  def updateField(self):
+    for idx in range(len(self._dataWidgetLst)):
+      self.fieldSetter({"widgetUpdateIdx": idx})
+      self._dataWidgetLst[idx].updateField()
+  """
   @property
   def changedData(self):
-    return [i.changedData() for i in self._dataWidgetLst]
+    try:
+      return [i.changedData() for i in self._dataWidgetLst]
+    except AttributeError:
+      return []
 
-  @property
-  def finalData(self):
-    return [i.finalData() for i in self._dataWidgetLst]
+  def updateField(self):
+    print self._dataWidgetLst
+    #for idx in range(len(self._dataWidgetLst)):
+    self.fieldSetter({\
+        "finalData": [i.finalData for i in self._dataWidgetLst],
+        "changedData": self.changedData,
+        })
+    print [i.finalData for i in self._dataWidgetLst], self.changedData
 
 class DictInput(ListInput):
   numOfNewWidget = 3
-  def __init__(self, win, bx, widgetClass, attrs=None, *args, **kwargs):
+  def __init__(self, fieldSetter, fieldGetter, win, bx, widgetClass, attrs=None, *args, **kwargs):
     attrs = self._buildAttrs(\
         attrs, isExpandMainContainer=True, initData=())
     self.widgetClass = widgetClass
     self._dataWidgetLst = []
     # We should call the __init__() of ListInput's parent because
     # widgetClass should not be changed even StringInput is used.
-    super(ListInput, self).__init__(win, bx, attrs, *args, **kwargs)
+    super(ListInput, self).__init__(fieldSetter, fieldGetter, win, bx, attrs, *args, **kwargs)
 
   def _createWidget(self, *args, **kwargs):
     keyInputBox = self._createContainer(
@@ -423,7 +441,7 @@ class FilterFormLayout(BasePacker):
   def __init__(self, win, bxInput, attrs=None, *args, **kwargs):
     attrs = self._buildAttrs(\
         attrs, isContainerAFrame=False, isExpandMainContainer=True)
-    super(FilterFormLayout, self).__init__(win, bxInput.obj, attrs)
+    super(FilterFormLayout, self).__init__(fieldSetter, fieldGetter, win, bxInput.obj, attrs)
     self.labelTitle = "Param Filter:"
     self.inputLst = []
     self.bxInput = bxInput

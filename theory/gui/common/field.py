@@ -89,6 +89,8 @@ class Field(object):
     if label is not None:
       label = smart_unicode(label)
     self.required, self.label, self.initData = required, label, initData
+    #self.finalData = self.initData
+    self._changedData = self._finalData = None
     self.show_hidden_initial = show_hidden_initial
     if help_text is None:
       self.help_text = u''
@@ -122,7 +124,7 @@ class Field(object):
     #widget = widget or self.widget
     widget = self.widget
     if isinstance(widget, type):
-      widget = widget(*args, **kwargs)
+      widget = widget(self.widgetSetter, self.widgetGetter, *args, **kwargs)
 
     # Trigger the localization machinery if needed.
     if self.localize:
@@ -211,8 +213,50 @@ class Field(object):
     return result
 
   @property
+  def initData(self):
+    return self._initData
+
+  @initData.setter
+  def initData(self, initData):
+    self._initData = initData
+
+  @property
+  def changedData(self):
+    return self._changedData
+
+  @changedData.setter
+  def changedData(self, changedData):
+    self._changedData = changedData
+
+  @property
   def finalData(self):
-    return self.widget.finalData
+    """It is used to store data directly from widget before validation and
+    cleaning."""
+    # TODO: allow lazy update
+    if(self._finalData == None or self._finalData == []):
+      # force update
+      self.widget.updateField()
+    return self._finalData
+
+  @finalData.setter
+  def finalData(self, finalData):
+    self._finalData = finalData
+
+  def widgetSetter(self, data):
+    try:
+      self.changedData = data["changedData"]
+    except KeyError:
+      pass
+    try:
+      self.finalData = data["finalData"]
+    except KeyError:
+      pass
+
+  def widgetGetter(self, name):
+    if(not name.endswith("Data")):
+      # Avoid accidently access other attribute
+      raise
+    return self.__getattribute__(name)
 
 class TextField(Field):
   widget = TextInput
@@ -913,7 +957,9 @@ class ListField(Field):
     # individual fields.
     field.required = False
     self.fields = (field,)
+    self._widgetUpdateIdx = 0 # This idx should be only modified by the widget
     super(ListField, self).__init__(*args, **kwargs)
+    self._changedData = self._finalData = []
 
   def renderWidget(self, *args, **kwargs):
     # widget -- A Widget class, or instance of a Widget class, that should
@@ -923,8 +969,12 @@ class ListField(Field):
     #widget = widget or self.widget
     widget = self.widget
     if isinstance(widget, type):
-      self.widget = widget(widgetClass=self.fields[0].widget.widgetClass, *args, **kwargs)
-    super(ListField, self).renderWidget(*args, **kwargs)
+      self.fields[0].renderWidget(*args, **kwargs)
+      childWidgetDefaultParam = self.fields[0].widget.attrs
+      self.widget = widget(self.widgetSetter, self.widgetGetter, \
+          widgetClass=self.fields[0].widget.widgetClass, \
+          childWidgetDefaultParam=childWidgetDefaultParam, *args, **kwargs)
+      super(ListField, self).renderWidget(*args, **kwargs)
 
   def validate(self, value):
     pass
@@ -938,6 +988,7 @@ class ListField(Field):
     fields=(DateField(), TimeField()), clean() would call
     DateField.clean(value[0]) and TimeField.clean(value[1]).
     """
+    print value
     clean_data = []
     errors = ErrorList()
     for i, field in enumerate(self.fields):
@@ -960,6 +1011,26 @@ class ListField(Field):
     self.validate(clean_data)
     self.run_validators(clean_data)
     return clean_data
+
+  """
+  def widgetSetter(self, data):
+    if(data.has_key("widgetUpdateIdx")):
+      self._widgetUpdateIdx = data["widgetUpdateIdx"]
+    try:
+      self.changedData[self._widgetUpdateIdx] = data["changedData"]
+    except KeyError:
+      pass
+    try:
+      self.finalData[self._widgetUpdateIdx] = data["finalData"]
+    except KeyError:
+      pass
+
+  def widgetGetter(self, name):
+    if(not name.endswith("Data")):
+      # Avoid accidently access other attribute
+      raise
+    return self.__getattribute__(name)[self._widgetUpdateIdx]
+  """
 
 class DictField(ListField):
   widget = DictInput
