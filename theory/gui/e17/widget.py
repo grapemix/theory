@@ -733,6 +733,9 @@ class Multibuttonentry(E17Widget):
       mbe.text = self.attrs["helperLabel"]
     mbe.part_text_set("guide", "Tap to add")
     mbe.filter_append(self.cb_filter1)
+    if(self.attrs["initData"]!=None):
+      for s in self.attrs["initData"]:
+        mbe.item_append(s)
     self.obj = mbe
 
   @property
