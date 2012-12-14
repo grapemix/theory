@@ -123,11 +123,16 @@ class Field(object):
     #           most cases, the default widget is TextInput.
     #widget = widget or self.widget
     widget = self.widget
-    if isinstance(widget, type):
-      widget = widget(self.widgetSetter, self.widgetGetter, *args, **kwargs)
+    if(isinstance(widget, type)):
+      widget = self.widget(self.widgetSetter, self.widgetGetter, *args, **kwargs)
+      # In some case, ListInput for example, their children input only want the
+      # core part instead of the whole part including the instruction
+      if(not kwargs.has_key("isSkipInstruction") \
+          or not kwargs["isSkipInstruction"]):
+        widget.setupInstructionComponent()
 
     # Trigger the localization machinery if needed.
-    if self.localize:
+    if(self.localize):
       widget.is_localized = True
 
     widget.title = self.label
@@ -956,9 +961,13 @@ class ListField(Field):
     # required validation will be handled by ListField, not by those
     # individual fields.
     field.required = False
-    self.fields = (field,)
+    self.fields = [field,]
+    self.childFieldTemplate = copy.deepcopy(field)
     self._widgetUpdateIdx = 0 # This idx should be only modified by the widget
     super(ListField, self).__init__(*args, **kwargs)
+    if(self.initData!=None):
+      for i in self.initData:
+        self.addChildField(i)
     self._changedData = self._finalData = []
 
   def renderWidget(self, *args, **kwargs):
@@ -969,12 +978,23 @@ class ListField(Field):
     #widget = widget or self.widget
     widget = self.widget
     if isinstance(widget, type):
+      # in order to check widget.widgetClass
       self.fields[0].renderWidget(*args, **kwargs)
-      childWidgetDefaultParam = self.fields[0].widget.attrs
       self.widget = widget(self.widgetSetter, self.widgetGetter, \
-          widgetClass=self.fields[0].widget.widgetClass, \
-          childWidgetDefaultParam=childWidgetDefaultParam, *args, **kwargs)
+          childFieldLst=self.fields, addChildFieldFxn=self.addChildField, \
+          removeChildFieldFxn=self.removeChildField, *args, **kwargs)
+      self.widget.setupInstructionComponent()
       super(ListField, self).renderWidget(*args, **kwargs)
+
+  def addChildField(self, initData=None):
+    field = copy.deepcopy(self.childFieldTemplate)
+    if(initData!=None):
+      field.initData = initData
+    self.fields.append(field)
+    return field
+
+  def removeChildField(self, idx):
+    del self.fields[idx]
 
   def validate(self, value):
     pass
@@ -988,7 +1008,6 @@ class ListField(Field):
     fields=(DateField(), TimeField()), clean() would call
     DateField.clean(value[0]) and TimeField.clean(value[1]).
     """
-    print value
     clean_data = []
     errors = ErrorList()
     for i, field in enumerate(self.fields):
@@ -1012,25 +1031,24 @@ class ListField(Field):
     self.run_validators(clean_data)
     return clean_data
 
-  """
-  def widgetSetter(self, data):
-    if(data.has_key("widgetUpdateIdx")):
-      self._widgetUpdateIdx = data["widgetUpdateIdx"]
-    try:
-      self.changedData[self._widgetUpdateIdx] = data["changedData"]
-    except KeyError:
-      pass
-    try:
-      self.finalData[self._widgetUpdateIdx] = data["finalData"]
-    except KeyError:
-      pass
+  @property
+  def changedData(self):
+    return [i.changedData for i in self.fields]
 
-  def widgetGetter(self, name):
-    if(not name.endswith("Data")):
-      # Avoid accidently access other attribute
-      raise
-    return self.__getattribute__(name)[self._widgetUpdateIdx]
-  """
+  @changedData.setter
+  def changedData(self, changedData):
+    raise NotImplementedError
+
+  @property
+  def finalData(self):
+    """It is used to store data directly from widget before validation and
+    cleaning."""
+    # TODO: allow lazy update
+    return [i.finalData for i in self.fields]
+
+  @finalData.setter
+  def finalData(self, finalData):
+    raise NotImplementedError
 
 class DictField(ListField):
   widget = DictInput
