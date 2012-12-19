@@ -143,3 +143,8 @@ class AdapterBuffer(Model):
       verbose_name=_("data"), \
       help_text=_("The data adapted to next command and stored in JSON format"))
   created = DateTimeField(required=True, default=datetime.utcnow())
+
+class BinaryClassifierHistory(Model):
+  ref = GenericReferenceField()
+  initState = SortedListField(BooleanField())
+  finalState = SortedListField(BooleanField())
