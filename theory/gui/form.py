@@ -129,7 +129,6 @@ class FormBase(object):
     self._clean_fields()
     self._clean_form()
     self._post_clean()
-    print self._errors
     if self._errors:
       del self.cleaned_data
 
