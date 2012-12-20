@@ -1145,11 +1145,11 @@ class MultiValueField(Field):
 
 class FilePathField(ChoiceField):
   def __init__(self, path, match=None, recursive=False, required=True,
-         widget=None, label=None, initial=None, help_text=None,
+         widget=None, label=None, initData=None, help_text=None,
          *args, **kwargs):
     self.path, self.match, self.recursive = path, match, recursive
     super(FilePathField, self).__init__(choices=(), required=required,
-      widget=widget, label=label, initial=initial, help_text=help_text,
+      widget=widget, label=label, initData=initData, help_text=help_text,
       *args, **kwargs)
 
     if self.required:
