@@ -736,8 +736,14 @@ class Multibuttonentry(E17Widget):
     if(self.attrs["initData"]!=None):
       for s in self.attrs["initData"]:
         mbe.item_append(s)
+
+    # TODO: fix this super ugly hack
+      size = self.win.size
+      if(size[0]<640 or size[1]<300):
+        self.win.resize(640,300)
+
     self.obj = mbe
 
   @property
   def finalData(self):
-    return self.obj.items
+    return [i.text for i in self.obj.items]

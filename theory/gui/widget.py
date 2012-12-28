@@ -282,9 +282,11 @@ class ListInput(BaseLabelInput):
       self._createWidget = self._createStringWidget
       self.fieldSetter = fieldSetter
       self.fieldGetter = fieldGetter
+      self.isOverridedData = True
     else:
       widgetClass = childFieldLst[0].widget.widgetClass
       self._createWidget = self._initGenericWidget
+      self.isOverridedData = False
     self.widgetClass = widgetClass
 
     self._inputLst = []
@@ -380,10 +382,9 @@ class ListInput(BaseLabelInput):
     return result
 
   def updateField(self):
-    if(widgetClass == Multibuttonentry):
+    if(self.widgetClass == Multibuttonentry):
       self.fieldSetter({\
           "finalData": self._inputLst[0].finalData,\
-          "changedData": self._inputLst[0].changedData,\
           })
     else:
       for idx in range(len(self._inputLst)):
