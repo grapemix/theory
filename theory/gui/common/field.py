@@ -966,8 +966,10 @@ class ListField(Field):
     self._widgetUpdateIdx = 0 # This idx should be only modified by the widget
     super(ListField, self).__init__(*args, **kwargs)
     if(self.initData!=None):
-      for i in self.initData:
-        self.addChildField(i)
+      self.fields[0].initData = self.initData[0]
+      if(len(self.initData)>1):
+        for i in self.initData[1:]:
+          self.addChildField(i)
     self._changedData = self._finalData = []
 
   def renderWidget(self, *args, **kwargs):
@@ -1044,11 +1046,17 @@ class ListField(Field):
     """It is used to store data directly from widget before validation and
     cleaning."""
     # TODO: allow lazy update
-    return [i.finalData for i in self.fields]
+    if(not isinstance(self.widget, type) and self.widget.isOverridedData):
+      return super(ListField, self).finalData
+    else:
+      return [i.finalData for i in self.fields]
 
-  @finalData.setter
+  @Field.finalData.setter
   def finalData(self, finalData):
-    raise NotImplementedError
+    if(not isinstance(self.widget, type) and self.widget.isOverridedData):
+      Field.finalData.fset(self, finalData)
+    else:
+      raise NotImplementedError
 
 class DictField(ListField):
   widget = DictInput
