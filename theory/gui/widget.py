@@ -169,7 +169,6 @@ class BaseLabelInput(BaseFieldInput):
 
   def packInMainContainer(self):
     self.widgetLst = self._createWidget()
-    print self.widgetLst
     #for widget in self.widgetLst:
     #  self.addWidget(widget)
 
@@ -452,7 +451,7 @@ class FilterFormLayout(BasePacker):
   def __init__(self, win, bxInput, attrs=None, *args, **kwargs):
     attrs = self._buildAttrs(\
         attrs, isContainerAFrame=False, isExpandMainContainer=True)
-    super(FilterFormLayout, self).__init__(fieldSetter, fieldGetter, win, bxInput.obj, attrs)
+    super(FilterFormLayout, self).__init__(win, bxInput.obj, attrs)
     self.labelTitle = "Param Filter:"
     self.inputLst = []
     self.bxInput = bxInput
