@@ -29,7 +29,6 @@ class ReactorAdapter(object):
   def printTxt(self, txt):
     win = self.uiParam["win"]
     bx = self.uiParam["bx"]
-    bx.clear()
 
     o = self.TerminalForm(win, bx)
     o.fields["stdOut"].initData = txt
@@ -38,6 +37,10 @@ class ReactorAdapter(object):
 
   def __init__(self, signal):
     self.signal = signal
+
+  def cleanUpCrt(self):
+    bx = self.uiParam["bx"]
+    bx.clear()
 
   @property
   def cmdInTxt(self):
