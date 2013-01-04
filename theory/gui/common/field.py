@@ -1061,6 +1061,22 @@ class ListField(Field):
 class DictField(ListField):
   widget = DictInput
 
+  def renderWidget(self, *args, **kwargs):
+    # widget -- A Widget class, or instance of a Widget class, that should
+    #           be used for this Field when displaying it. Each Field has a
+    #           default Widget that it'll use if you don't specify this. In
+    #           most cases, the default widget is TextInput.
+    #widget = widget or self.widget
+    widget = self.widget
+    if isinstance(widget, type):
+      # in order to check widget.widgetClass
+      self.fields[0].renderWidget(*args, **kwargs)
+      self.widget = widget(self.widgetSetter, self.widgetGetter, \
+          widgetClass=self.fields[0].widget.widgetClass, *args, **kwargs)
+      self.widget.setupInstructionComponent()
+      super(ListField, self).renderWidget(*args, **kwargs)
+
+
 class AdapterField(TextField):
   pass
 
