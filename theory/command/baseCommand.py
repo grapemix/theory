@@ -3,6 +3,8 @@
 ##### System wide lib #####
 from abc import ABCMeta, abstractmethod
 from celery import Task
+from theory.gui import field
+from theory.gui.form import CommandForm, Form
 
 ##### Theory lib #####
 
@@ -58,6 +60,19 @@ class _BaseCommand(object):
   # 7) Work with celery
   # 8) For static field, data of field don't have to being accessed when importing class.
   # 9) Work with adapter
+
+  class ParamForm(CommandForm):
+    verbosity = field.TextField(label="verbosity", required=False)
+    notations = field.ListField(field.AdapterField(), label="notations", required=False)
+    gongs = field.ListField(field.AdapterField(), label="gongs", required=False)
+    drums = field.DictField(field.AdapterField(), label="drums", required=False)
+    concatCommand = field.TextField(label="Concatenated command", required=False, help_text="another command being concatenated to this command")
+
+  class AdapterForm(CommandForm):
+    verbosity = field.TextField(label="verbosity", required=False)
+    notations = field.ListField(field.AdapterField(), label="notations", required=False)
+    gongs = field.ListField(field.AdapterField(), label="gongs", required=False)
+    drums = field.DictField(field.AdapterField(), label="drums", required=False)
 
   @property
   def verbosity(self):
@@ -127,6 +142,13 @@ class SimpleCommand(_BaseCommand):
   @abstractmethod
   def run(self, *args, **kwargs):
     pass
+
+  class ParamForm(_BaseCommand.ParamForm):
+    pass
+
+  class AdapterForm(_BaseCommand.AdapterForm):
+    status = field.TextField(label="status")
+    stdOut = field.TextField(label="stdOut")
 
 '''
 class SeqCommand(_BaseCommand):
