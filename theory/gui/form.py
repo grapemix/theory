@@ -219,12 +219,22 @@ class GuiFormBase(FormBase, BasePacker):
     self.formBx.bx = bx
     self.formBx.generate()
 
+  def _changeFormWindowHeight(self, maxHeight):
+    # TODO: fix this super ugly hack
+    size = self.win.size
+    fieldHeight = len(self.fields) * 200
+    preferHeight = fieldHeight if(fieldHeight<maxHeight) else maxHeight
+
+    if(size[0]<640 or size[1]<preferHeight):
+      self.win.resize(640, preferHeight)
+
   def generateForm(self, *args, **kwargs):
     for name, field in self.fields.items():
       field.renderWidget(self.win, self.formBx.obj)
       self.formBx.addInput(field.widget)
 
     self.formBx.postGenerate()
+    self._changeFormWindowHeight(720)
 
   def generateFilterForm(self, *args, **kwargs):
     optionalMenu = FilterFormLayout(self.win, self.formBx)
@@ -239,6 +249,7 @@ class GuiFormBase(FormBase, BasePacker):
     self.formBx.postGenerate()
     optionalMenu.generate()
     optionalMenu.postGenerate()
+    self._changeFormWindowHeight(960)
 
 class StepFormBase(GuiFormBase):
   def _nextBtnClick(self):
@@ -247,8 +258,6 @@ class StepFormBase(GuiFormBase):
   def generateStepControl(self, *args, **kwargs):
     self.stepControlBox = self._createContainer({"isHorizontal": True, "isWeightExpand": False})
     self.stepControlBox.bx = self.bx
-    #self.stepControlBox.attrs["isHorizontal"] = True
-    #self.stepControlBox.attrs["isWeightExpand"] = False
     self.stepControlBox.generate()
 
     btn = Button()
