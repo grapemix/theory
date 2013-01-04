@@ -72,7 +72,6 @@ class FormBase(object):
   """This class should be stateful and picklable. The function being provided
   by this class include the logic to decide which field should be shown."""
   def __init__(self, *args, **kwargs):
-    super(FormBase, self).__init__(*args, **kwargs)
     # The base_fields class attribute is the *class-wide* definition of
     # fields. Because a particular *instance* of the class might want to
     # alter self.fields, we create self.fields here by copying base_fields.
@@ -212,6 +211,10 @@ class FormBase(object):
 class GuiFormBase(FormBase, BasePacker):
   def __init__(self, win, bx, *args, **kwargs):
     super(GuiFormBase, self).__init__(win, bx, *args, **kwargs)
+    # We have to call the initialize fxn explicitly because the
+    # BasePacker initialize fxn won't be executed if we only called
+    # super().__init__().
+    BasePacker.__init__(self, win, bx, *args, **kwargs)
     self.formBx = self._createContainer()
     self.formBx.bx = bx
     self.formBx.generate()
