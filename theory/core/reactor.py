@@ -91,6 +91,7 @@ class Reactor(object):
     self.parser.cmdInTxt = self.adapter.cmdInTxt
     self.parser.run()
     (mode, frag) = self.parser.partialInput
+    self.adapter.cleanUpCrt()
     if(mode==self.parser.MODE_COMMAND):
       (entryOutput, crtOutput)= self._queryCommandAutocomplete(frag)
       entrySetterFxn(entryOutput)
