@@ -102,14 +102,13 @@ class Reactor(object):
     self.parser.initVar()
 
   def _queryArgsAutocomplete(self, frag):
+    cmdModel = Command.objects.get(name=self.parser.cmdName)
+    cmdParamForm = import_class(cmdModel.classImportPath).ParamForm
+
+    paramForm = cmdParamForm(self.ui.win, self.ui.bxCrt)
+    paramForm.generateFilterForm()
+    paramForm.generateStepControl()
     return
-    # TODO: complete this feature
-    #argIdx = len(self.parser.args)
-    #paramModel = Command.objects.get(name=self.parser.cmdName).param[argIdx]
-    #argType = paramModel.type
-    #classImportPathTempate = "theory.gui.field.%sField" % (argType)
-    #fieldClass = import_class(classImportPathTempate)
-    #print fieldClass
 
   def _parse(self):
     self.parser.cmdInTxt = self.adapter.cmdInTxt
