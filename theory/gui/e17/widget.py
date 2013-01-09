@@ -623,7 +623,7 @@ class RadioBox(E17Widget):
 
     self.obj = rd
 
-# TODO: to assign init data as pre-select item
+# TODO: to show init data as pre-select item
 class SelectBox(E17Widget):
   """If developer has to assign specific icons into choices, they should
   assigned through the widget's attr["choices"] instead of fields.
@@ -638,6 +638,8 @@ class SelectBox(E17Widget):
     defaultAttrs = {"choices": []}
     if(attrs is not None):
       defaultAttrs.update(attrs)
+    if(attrs["initData"] is not None):
+      self.selectedData = attrs["initData"]
     super(SelectBox, self).__init__(defaultAttrs, *args, **kwargs)
 
   def _selectionChanged(self, hoversel, hoverselItem):
