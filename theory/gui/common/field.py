@@ -264,7 +264,7 @@ class Field(object):
     return self.__getattribute__(name)
 
 class TextField(Field):
-  widget = TextInput
+  widget = StringInput
   lineBreak = "\n"
 
   def __init__(self, max_length=None, min_length=None, *args, **kwargs):
@@ -274,6 +274,8 @@ class TextField(Field):
       self.validators.append(validators.MinLengthValidator(min_length))
     if max_length is not None:
       self.validators.append(validators.MaxLengthValidator(max_length))
+      if(max_length>128):
+        self.widget = TextInput
 
   @property
   def initData(self):
@@ -291,14 +293,6 @@ class TextField(Field):
     if value in validators.EMPTY_VALUES:
       return u''
     return smart_unicode(value)
-
-  def widget_attrs(self, widget):
-    attrs = super(TextField, self).widget_attrs(widget)
-    #if self.max_length is not None and isinstance(widget, (TextInput, PasswordInput)):
-    if self.max_length is not None and isinstance(widget, (Entry)):
-      # The HTML attribute is maxlength, not max_length.
-      attrs.update({'maxlength': str(self.max_length)})
-    return attrs
 
 class IntegerField(Field):
   default_error_messages = {
