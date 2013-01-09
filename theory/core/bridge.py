@@ -94,7 +94,6 @@ class Bridge(object):
     return propertyLst
 
   def bridge(self, headClass, tailModel):
-    # TODO: tailClass should be not required
     (tailClass, assignFxn, storage) = self._getCmdForAssignment(tailModel)
     commonAdapterName = self._probeAdapter(headClass, tailClass)
 
