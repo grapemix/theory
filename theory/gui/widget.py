@@ -390,7 +390,6 @@ class ListInput(BaseLabelInput):
         self._inputLst[idx].updateField()
 
 class DictInput(ListInput):
-  numOfNewWidget = 3
   def __init__(self, fieldSetter, fieldGetter, win, bx, widgetClass, attrs=None, *args, **kwargs):
     attrs = self._buildAttrs(\
         attrs, isExpandMainContainer=True, initData=())
@@ -399,6 +398,13 @@ class DictInput(ListInput):
     # We should call the __init__() of ListInput's parent because
     # widgetClass should not be changed even StringInput is used.
     super(ListInput, self).__init__(fieldSetter, fieldGetter, win, bx, attrs, *args, **kwargs)
+
+  def updateField(self):
+    # !!! TODO: Fix me
+    # Since DictInput has no _inputLst
+    # ListInput used input as base child, DictInput used widget as base child
+    pass
+
 
   def _createWidget(self, *args, **kwargs):
     keyInputBox = self._createContainer(
