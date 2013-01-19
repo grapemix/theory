@@ -810,6 +810,10 @@ class ChoiceField(Field):
 
   choices = property(_get_choices, _set_choices)
 
+  @property
+  def finalChoiceLabel(self):
+    return dict(self._choices)[self.finalData]
+
   def to_python(self, value):
     "Returns a Unicode object."
     if value in validators.EMPTY_VALUES:
