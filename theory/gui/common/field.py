@@ -239,8 +239,12 @@ class Field(object):
     cleaning."""
     # TODO: allow lazy update
     if(self._finalData == None or self._finalData == []):
-      # force update
-      self.widget.updateField()
+      if(isinstance(self.widget, type)):
+        # return initial data if widget has not been rendered
+        return self.initData
+      else:
+        # force update
+        self.widget.updateField()
     return self._finalData
 
   @finalData.setter
@@ -999,10 +1003,14 @@ class ListField(Field):
     clean_data = []
     errors = ErrorList()
     for i, field in enumerate(self.fields):
-      try:
-        field_value = value[i]
-      except IndexError:
+      if(value==None):
+        # field_value will be None when child widget has not been rendered
         field_value = None
+      else:
+        try:
+          field_value = value[i]
+        except IndexError:
+          field_value = None
       if self.required and field_value in validators.EMPTY_VALUES:
         raise ValidationError(self.error_messages['required'])
       try:
