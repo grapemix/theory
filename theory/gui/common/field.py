@@ -782,14 +782,6 @@ class ChoiceField(Field):
     'invalid_choice': _(u'Select a valid choice. %(value)s is not one of the available choices.'),
   }
 
-  """
-  def __init__(self, choices=(), required=True, widget=None, label=None,
-         initial=None, help_text=None, *args, **kwargs):
-    super(ChoiceField, self).__init__(required=required, widget=widget, label=label,
-                    initial=initial, help_text=help_text, *args, **kwargs)
-    self.choices = choices
-  """
-
   def renderWidget(self, *args, **kwargs):
     super(ChoiceField, self).renderWidget(*args, **kwargs)
     self.widget.attrs["choices"] = self.choices
