@@ -209,15 +209,13 @@ class FormBase(object):
   changed_data = property(_get_changed_data)
 
 class GuiFormBase(FormBase, BasePacker):
-  def __init__(self, win, bx, *args, **kwargs):
-    super(GuiFormBase, self).__init__(win, bx, *args, **kwargs)
+  def __init__(self, *args, **kwargs):
+    super(GuiFormBase, self).__init__(*args, **kwargs)
     # We have to call the initialize fxn explicitly because the
     # BasePacker initialize fxn won't be executed if we only called
-    # super().__init__().
-    BasePacker.__init__(self, win, bx, *args, **kwargs)
-    self.formBx = self._createContainer()
-    self.formBx.bx = bx
-    self.formBx.generate()
+    # super().__init__(). We temporary set win and bx as None because
+    # form in a Command does not always need to render.
+    BasePacker.__init__(self, None, None, *args, **kwargs)
 
   def _changeFormWindowHeight(self, maxHeight):
     # TODO: fix this super ugly hack
@@ -228,7 +226,15 @@ class GuiFormBase(FormBase, BasePacker):
     if(size[0]<640 or size[1]<preferHeight):
       self.win.resize(640, preferHeight)
 
-  def generateForm(self, *args, **kwargs):
+  def _createFormSkeleton(self, win, bx):
+    self.win = win
+    self.bx = bx
+    self.formBx = self._createContainer()
+    self.formBx.bx = self.bx
+    self.formBx.generate()
+
+  def generateForm(self, win, bx):
+    self._createFormSkeleton(win, bx)
     for name, field in self.fields.items():
       field.renderWidget(self.win, self.formBx.obj)
       self.formBx.addInput(field.widget)
@@ -236,7 +242,8 @@ class GuiFormBase(FormBase, BasePacker):
     self.formBx.postGenerate()
     self._changeFormWindowHeight(720)
 
-  def generateFilterForm(self, *args, **kwargs):
+  def generateFilterForm(self, win, bx):
+    self._createFormSkeleton(win, bx)
     optionalMenu = FilterFormLayout(self.win, self.formBx)
     for name, field in self.fields.items():
       if(field.required):
