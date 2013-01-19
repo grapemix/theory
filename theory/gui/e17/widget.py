@@ -631,10 +631,10 @@ class SelectBox(E17Widget):
   icon = None
   isDisable = False
   label = "Please select"
-  selectedData = (None, None)
-  choices = {}
 
   def __init__(self, attrs=None, *args, **kwargs):
+    self.selectedData = (None, None)
+    self.choices = {}
     defaultAttrs = {"choices": []}
     if(attrs is not None):
       defaultAttrs.update(attrs)
