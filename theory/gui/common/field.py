@@ -50,8 +50,10 @@ __all__ = (
   #'ComboField', 'MultiValueField', 'SplitDateTimeField',
   'FloatField', 'DecimalField', 'IPAddressField', 'GenericIPAddressField',
   'FilePathField', 'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField',
+  'PythonModuleField', 'PythonClassField',
 )
 
+FILE_INPUT_CONTRADICTION = object()
 
 class Field(object):
   """The function being provided by this class should include data validation,
@@ -280,6 +282,10 @@ class TextField(Field):
       self.validators.append(validators.MaxLengthValidator(max_length))
       if(max_length>128):
         self.widget = TextInput
+
+  def widget_attrs(self, widget):
+    if(self.max_length<64):
+      return {"isSingleLine": True}
 
   @property
   def initData(self):
@@ -577,6 +583,7 @@ class EmailField(TextField):
     return super(EmailField, self).clean(value)
 
 class FileField(Field):
+  # TODO: Not working, fix me
   widget = Fileselector
   default_error_messages = {
     'invalid': _(u"No file was submitted. Check the encoding type on the form."),
