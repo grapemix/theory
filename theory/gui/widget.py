@@ -403,8 +403,9 @@ class DictInput(ListInput):
     # !!! TODO: Fix me
     # Since DictInput has no _inputLst
     # ListInput used input as base child, DictInput used widget as base child
+    # Fix this and test it in tests/integrationTest/gui/tests/field.py:DictFieldTestCase.testMultipleElementInitValue
+    print "DictInput updateField unimplemented"
     pass
-
 
   def _createWidget(self, *args, **kwargs):
     keyInputBox = self._createContainer(
