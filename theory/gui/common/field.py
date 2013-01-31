@@ -748,6 +748,10 @@ class URLField(TextField):
 class BooleanField(Field):
   widget = SelectBoxInput
 
+  def renderWidget(self, *args, **kwargs):
+    super(BooleanField, self).renderWidget(*args, **kwargs)
+    self.widget.attrs["choices"] = ((0, "False"), (1, "True"))
+
   def to_python(self, value):
     """Returns a Python boolean object."""
     # Explicitly check for the string 'False', which is what a hidden field
@@ -836,7 +840,7 @@ class ChoiceField(Field):
       raise ValidationError(self.error_messages['invalid_choice'] % {'value': value})
 
   def valid_value(self, value):
-    "Check to see if the provided value is a valid choice"
+    """Check to see if the provided value is a valid choice"""
     for k, v in self.choices:
       if isinstance(v, (list, tuple)):
         # This is an optgroup, so look inside the group for options
