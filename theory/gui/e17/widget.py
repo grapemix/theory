@@ -98,7 +98,7 @@ class Label(E17Widget):
 
   def generate(self, *args, **kwargs):
     lb = elementary.Label(self.win)
-    lb.text_set(self.attrs["initData"])
+    lb.text_set(self.attrs["initData"].replace("\n", "<br>"))
     self.obj = lb
 
 class Frame(E17Widget):
