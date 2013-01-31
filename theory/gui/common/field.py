@@ -240,7 +240,7 @@ class Field(object):
     """It is used to store data directly from widget before validation and
     cleaning."""
     # TODO: allow lazy update
-    if(self._finalData == None or self._finalData == []):
+    if(self._finalData in validators.EMPTY_VALUES):
       if(isinstance(self.widget, type)):
         # return initial data if widget has not been rendered
         return self.initData
@@ -961,16 +961,23 @@ class ListField(Field):
     'invalid': _(u'Enter a list of values.'),
   }
 
-  def __init__(self, field, *args, **kwargs):
+  def __init__(self, field, initData=[], min_len=1, *args, **kwargs):
     # Set 'required' to False on the individual fields, because the
     # required validation will be handled by ListField, not by those
     # individual fields.
     field.required = False
     self.fields = [field,]
     self.childFieldTemplate = copy.deepcopy(field)
+    # It stores the minium number of elements is required in this field
+    self.min_len = min_len
     self._widgetUpdateIdx = 0 # This idx should be only modified by the widget
+    if(not kwargs.has_key("initData")):
+      kwargs["initData"] = initData
     super(ListField, self).__init__(*args, **kwargs)
-    if(self.initData!=None):
+    self._setupInitData()
+
+  def _setupInitData(self):
+    if(self.initData!=[]):
       self.fields[0].initData = self.initData[0]
       if(len(self.initData)>1):
         for i in self.initData[1:]:
@@ -1003,33 +1010,26 @@ class ListField(Field):
   def removeChildField(self, idx):
     del self.fields[idx]
 
-  def validate(self, value):
-    pass
+  def validate(self, valueList):
+    if self.required and len(valueList)<self.min_len:
+      raise ValidationError(self.error_messages['required'])
 
-  def clean(self, value):
+  def clean(self, valueList):
     """
     Validates every value in the given list. A value is validated against
     the corresponding Field in self.fields.
-
-    For example, if this MultiValueField was instantiated with
-    fields=(DateField(), TimeField()), clean() would call
-    DateField.clean(value[0]) and TimeField.clean(value[1]).
     """
     clean_data = []
     errors = ErrorList()
+    if self.required and len(valueList)<self.min_len:
+      raise ValidationError(self.error_messages['required'])
+
     for i, field in enumerate(self.fields):
-      if(value==None):
-        # field_value will be None when child widget has not been rendered
-        field_value = None
-      else:
-        try:
-          field_value = value[i]
-        except IndexError:
-          field_value = None
-      if self.required and field_value in validators.EMPTY_VALUES:
-        raise ValidationError(self.error_messages['required'])
       try:
-        clean_data.append(field.clean(field_value))
+        value = valueList[i]
+        clean_data.append(field.clean(value))
+      except IndexError:
+        pass
       except ValidationError, e:
         # Collect all validation errors in a single list, which we'll
         # raise at the end of clean(), rather than raising a single
@@ -1056,6 +1056,8 @@ class ListField(Field):
     cleaning."""
     # TODO: allow lazy update
     if(not isinstance(self.widget, type) and self.widget.isOverridedData):
+      # some widget like Multibuttonentry from the e17 need special treatment
+      # on retriving data
       return super(ListField, self).finalData
     else:
       return [i.finalData for i in self.fields]
@@ -1069,6 +1071,63 @@ class ListField(Field):
 
 class DictField(ListField):
   widget = DictInput
+
+  def __init__(self, field, initData={}, min_len=1, *args, **kwargs):
+    super(DictField, self).__init__(field, initData, min_len, *args, **kwargs)
+
+  def _setupInitData(self):
+    # TODO: Fix me
+    pass
+
+  @property
+  def finalData(self):
+    return {}
+
+  def validate(self, valueDict):
+    if self.required and len(valueDict)<self.min_len:
+      raise ValidationError(self.error_messages['required'])
+
+  def clean(self, valueDict):
+    cleanDict = {}
+    errors = ErrorList()
+
+    if self.required and len(valueDict)<self.min_len:
+      raise ValidationError(self.error_messages['required'])
+
+    for k,v in valueDict.iteritems():
+      try:
+        cleanDict[k] = self.fields[0].clean(v)
+      except ValidationError, e:
+        # Collect all validation errors in a single list, which we'll
+        # raise at the end of clean(), rather than raising a single
+        # exception for the first error we encounter.
+        errors.extend(e.messages)
+    if errors:
+      raise ValidationError(errors)
+
+    self.validate(cleanDict)
+    self.run_validators(cleanDict)
+    return cleanDict
+    #return super(DictField, self).clean(value)
+
+  def run_validators(self, valueDict):
+    if valueDict in validators.EMPTY_VALUES:
+      return
+    errors = []
+    for value in valueDict:
+      for v in self.validators:
+        try:
+          v(value)
+        except ValidationError, e:
+          if hasattr(e, 'code') and e.code in self.error_messages:
+            message = self.error_messages[e.code]
+            if e.params:
+              message = message % e.params
+            errors.append(message)
+          else:
+            errors.extend(e.messages)
+    if errors:
+      raise ValidationError(errors)
 
   def renderWidget(self, *args, **kwargs):
     # widget -- A Widget class, or instance of a Widget class, that should
