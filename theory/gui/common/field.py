@@ -26,6 +26,7 @@ from theory.gui.util import ErrorList, from_current_timezone, to_current_timezon
 from theory.gui.widget import *
 from theory.utils import formats
 from theory.utils.encoding import smart_unicode, smart_str, force_unicode
+from theory.utils.importlib import import_class
 from theory.utils.ipv6 import clean_ipv6_address
 from theory.utils.translation import ugettext_lazy as _
 
@@ -1340,3 +1341,72 @@ class SlugField(TextField):
   }
   default_validators = [validators.validate_slug]
 
+
+class PythonModuleField(Field):
+  default_error_messages = {
+    'invalid': _('Unable to import the given module'),
+  }
+
+  def __init__(self, max_length=None, min_length=None, auto_import=False, *args, **kwargs):
+    super(PythonModuleField, self).__init__(*args, **kwargs)
+    self.widget = StringInput
+    self.auto_import = auto_import
+
+  def widget_attrs(self, widget):
+    return {"isSingleLine": True}
+
+  def validate(self, value):
+    """
+    Validates if the input is able to import
+    """
+    super(PythonModuleField, self).validate(value)
+    if(not self.auto_import):
+      return value
+
+    try:
+      inspectModule = import_class(value)
+      if(type(inspectModule).__name__!="module"):
+        raise ValidationError(self.error_messages['invalid'] % {'value': value})
+    except (ImportError, AttributeError) as e:
+      if(value=="" and not self.required):
+        pass
+      else:
+        raise ValidationError(self.error_messages['invalid'] % {'value': value})
+    return inspectModule
+
+class PythonClassField(Field):
+  default_error_messages = {
+    'invalid': _('Unable to import the given class'),
+    'wrong_classtype': _('The given class is not matched'),
+  }
+
+  def __init__(self, max_length=None, min_length=None, auto_import=False, klass_type=None, *args, **kwargs):
+    super(PythonClassField, self).__init__(*args, **kwargs)
+    self.widget = StringInput
+    self.auto_import = auto_import
+    self.klass_type = klass_type
+
+  def widget_attrs(self, widget):
+    return {"isSingleLine": True}
+
+  def validate(self, value):
+    """
+    Validates if the input is able to import
+    """
+    super(PythonClassField, self).validate(value)
+    if(not self.auto_import):
+      return value
+
+    if(value!="" and value!=None):
+      try:
+        inspectKlass = import_class(value)
+      except (ImportError, AttributeError) as e:
+        inspectKlass = None
+      if(inspectKlass==None):
+          raise ValidationError(self.error_messages['invalid'] % {'value': value})
+      if(self.klass_type !=None and not issubclass(inspectKlass, import_class(self.klass_type))):
+        raise ValidationError(self.error_messages['wrong_classtype'] % {'value': value})
+      return inspectKlass
+    elif(self.required):
+      raise ValidationError(self.error_messages['invalid'] % {'value': value})
+    # else (value is empty and it is not required, suppress error)

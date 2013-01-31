@@ -29,7 +29,8 @@ __all__ = (
   #'ComboField', 'MultiValueField', 'SplitDateTimeField',
   'FloatField', 'DecimalField', 'IPAddressField', 'GenericIPAddressField',
   'FilePathField', 'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField',
-  'StringGroupFilterField', 'ModelValidateGroupField',
+  'StringGroupFilterField', 'ModelValidateGroupField', 'PythonModuleField',
+  'PythonClassField',
 )
 
 
@@ -109,3 +110,9 @@ class StringGroupFilterField(Field):
 
 class ModelValidateGroupField(Field):
   widget = ModelValidateGroupInput
+
+class PythonModuleField(field.PythonModuleField):
+  pass
+
+class PythonClassField(field.PythonClassField):
+  pass
