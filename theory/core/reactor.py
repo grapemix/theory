@@ -6,13 +6,12 @@ import sys
 
 ##### Theory lib #####
 from theory.adapter.reactorAdapter import ReactorAdapter
-from theory.command.baseCommand import AsyncContainer
 from theory.core.bridge import Bridge
 from theory.core.cmdParser.txtCmdParser import TxtCmdParser
 from theory.conf import settings
 from theory.gui.terminal import Terminal
 from theory.model import Command, Adapter, History
-from theory.utils.importlib import  import_class
+from theory.utils.importlib import import_class
 
 ##### Theory third-party lib #####
 
@@ -30,6 +29,7 @@ class Reactor(object):
   autocompleteCounter = 0
   lastAutocompleteSuggest = ""
   originalQuest = ""
+  paramForm = None
 
   @property
   def mood(self):
@@ -101,20 +101,34 @@ class Reactor(object):
       self._queryArgsAutocomplete(frag)
     self.parser.initVar()
 
-  def _queryArgsAutocomplete(self, frag):
-    cmdModel = Command.objects.get(name=self.parser.cmdName)
-    cmdParamForm = import_class(cmdModel.classImportPath).ParamForm
+  def cleanParamForm(self, btn):
+    if(self.paramForm.is_valid()):
+      print self.paramForm.clean()
+      self.run()
+    else:
+      # TODO: integrate with std reactor error system
+      print self.paramForm.errors
 
-    paramForm = cmdParamForm(self.ui.win, self.ui.bxCrt)
-    paramForm.generateFilterForm()
-    paramForm.generateStepControl()
-    return
+  def _queryArgsAutocomplete(self, frag):
+    if(not self._loadCmdModel()):
+      return
+
+    cmdParamFormKlass = import_class(self.cmdModel.classImportPath).ParamForm
+
+    self.paramForm = cmdParamFormKlass()
+    self.paramForm._nextBtnClick = self.cleanParamForm
+    self.paramForm.generateFilterForm(self.ui.win, self.ui.bxCrt)
+    self.paramForm.generateStepControl()
 
   def _parse(self):
     self.parser.cmdInTxt = self.adapter.cmdInTxt
     self.parser.run()
     # should change for chained command
     #if(self.parser.mode==self.parser.MODE_DONE):
+
+    if(not self._loadCmdModel()):
+      return
+
     self.run()
 
   def _performDrums(self, cmd):
@@ -125,36 +139,43 @@ class Reactor(object):
         (adapterModel, drum) = bridge.adaptFromCmd(adapterName, cmd)
         drum.render(uiParam=self.adapter.uiParam)
 
-  # TODO: refactor this function, may be with bridge
-  def run(self):
+  def reset(self):
+    self.parser.initVar()
+    self.cmdModel = None
+    self.paramForm = None
+
+  def _fillParamForm(self, cmdModel):
+    bridge = Bridge()
+    return bridge.getCmdComplex(cmdModel, self.parser.args, self.parser.kwargs)
+
+  def _loadCmdModel(self):
+    """Error should be handle within this fxn, return False in case not found"""
     cmdName = self.parser.cmdName
     # should change for chained command
     try:
-      cmdModel = Command.objects.get(Q(name=cmdName) & (Q(mood=self.mood) | Q(mood="norm")))
+      self.cmdModel = Command.objects.get(Q(name=cmdName) & (Q(mood=self.mood) | Q(mood="norm")))
     except Command.DoesNotExist:
+      # TODO: integrate with std reactor error system
       self.adapter.printTxt("Command not found")
-      self.parser.initVar()
-      return
+      self.reset()
+      return False
+    return True
+
+  # TODO: refactor this function, may be with bridge
+  def run(self):
+    if(self.paramForm==None):
+      cmd = self._fillParamForm(self.cmdModel)
+    else:
+      cmdKlass = import_class(self.cmdModel.classImportPath)
+      cmd = cmdKlass()
+      cmd.paramForm = self.paramForm
 
     bridge = Bridge()
-    (cmd, storage) = bridge.getCmdComplex(cmdModel, self.parser.args, self.parser.kwargs)
-
-    # Since we only allow execute one command in a time thru terminal,
-    # the command doesn't have to return anything
-    adapterProperty = []
-    if(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC_WRAPPER):
-      asyncContainer = AsyncContainer()
-      result = asyncContainer.delay(cmd, adapterProperty).get()
-    elif(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC):
-      #result = cmd.delay(storage).get()
-      cmd.delay(storage)
-    else:
-      asyncContainer = AsyncContainer()
-      result = asyncContainer.run(cmd, adapterProperty)
+    bridge._execeuteCommand(cmd, self.cmdModel)
 
     self._performDrums(cmd)
-    self.parser.initVar()
-    History(command=self.parser.cmdInTxt, commandRef=cmdModel,
+    History(command=self.parser.cmdInTxt, commandRef=self.cmdModel,
         mood=self.mood).save()
+    self.reset()
 
 reactor = Reactor()
