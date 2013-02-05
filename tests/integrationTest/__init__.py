@@ -7,6 +7,8 @@
 
 ##### Local app #####
 from .core.tests import *
+from .gui.tests import *
+from .command.tests import *
 
 ##### Theory app #####
 

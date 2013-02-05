@@ -6,9 +6,7 @@
 ##### Theory third-party lib #####
 
 ##### Local app #####
-from .core.tests import *
-from .db.tests import *
-from .gui.tests import *
+from .form import *
 
 ##### Theory app #####
 

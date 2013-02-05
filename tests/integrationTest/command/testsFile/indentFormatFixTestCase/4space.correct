@@ -1,0 +1,7 @@
+class DummyPythonClass(object):
+  def dummyPythonFunction(self):
+    for i in range(10):
+      pass
+
+  def dummyPythonFunction2(self):
+    pass
