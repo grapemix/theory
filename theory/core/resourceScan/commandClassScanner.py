@@ -58,14 +58,17 @@ class CommandClassScanner(BaseClassScanner):
     elif(not issubclass(cmdClass, SimpleCommand)):
       self.cmdModel.runMode = self.cmdModel.RUN_MODE_ASYNC_WRAPPER
 
+    # Get the fields in the paramForm first. All fields in the paramForm
+    # are able to pass to adapter. Only the order of the required fields
+    # are important.
+    for paramName, param in cmdClass.ParamForm.base_fields.iteritems():
+      if(param.required):
+        parameter = Parameter(name=paramName, isOptional = False)
+      else:
+        parameter = Parameter(name=paramName)
+      self.cmdModel.param.append(parameter)
 
-    # To reserve the order of mandatory parameters
-    for paramName in getattr(cmdClass, "params"):
-      v = getattr(cmdClass, paramName)
-      if(isinstance(v, property)):
-        param = Parameter(name=paramName, isOptional = False)
-        self.cmdModel.param.append(param)
-
+    # Class properties will be able to be captured and passed to adapter
     for k,v in cmdClass.__dict__.iteritems():
       if(isinstance(v, property)):
         param = Parameter(name=k)
