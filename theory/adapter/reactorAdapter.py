@@ -30,9 +30,9 @@ class ReactorAdapter(object):
     win = self.uiParam["win"]
     bx = self.uiParam["bx"]
 
-    o = self.TerminalForm(win, bx)
+    o = self.TerminalForm()
     o.fields["stdOut"].initData = txt
-    o.generateForm()
+    o.generateForm(win, bx)
     self.terminalForm = o
 
   def __init__(self, signal):
