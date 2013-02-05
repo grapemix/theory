@@ -4,6 +4,7 @@
 import os
 
 ##### Theory lib #####
+from theory.gui import field
 
 ##### Theory third-party lib #####
 
@@ -21,44 +22,111 @@ class FilenameScanner(SimpleCommand):
   """
   name = "filenameScanner"
   verboseName = "filenameScanner"
-  params = ["rootLst",]
-  _rootLst = []
-  _excludeDirLst = []
-  _excludeFileExtLst = []
-  _excludeFileFxnLst = [\
-      lambda x: False,\
-  ]
-  _excludeDirFxnLst = [\
-      lambda x: False,\
-      ]
-  _includeDirLst = []
-  _includeFileExtLst = []
-  _includeFileFxnLst = [\
-      lambda x: False,\
-      ]
-  _includeDirFxnLst = [\
-      lambda x: False,\
-      ]
 
-  YIELD_MODE_ALL = 1
-  YIELD_MODE_FILE = 2
-  YIELD_MODE_LINE = 3
-  YIELD_MODE_CHUNK = 4
-
-  # 0 means not recursive, -1 means recursive infinitely
-  _depth = 0
-  _fileLst = []
-  _dirLst = []
-  _yieldMethod = YIELD_MODE_ALL
+  _filenameLst = []
+  _dirnameLst = []
   _notations = ["Command",]
   _gongs = ["FilenameList", "FileObjectList", ]
+  _drums = {"Terminal": 1, }
 
-  YIELD_METHOD_CHOICES = (
-      (YIELD_MODE_ALL, 'all'),
-      (YIELD_MODE_FILE, 'file'),
-      (YIELD_MODE_LINE, 'line'),
-      (YIELD_MODE_CHUNK, 'chunk'),
-  )
+  class ParamForm(SimpleCommand.ParamForm):
+    YIELD_MODE_ALL = 1
+    YIELD_MODE_FILE = 2
+    YIELD_MODE_LINE = 3
+    YIELD_MODE_CHUNK = 4
+
+    YIELD_METHOD_CHOICES = (
+        (YIELD_MODE_ALL, 'All'),
+        (YIELD_MODE_FILE, 'File'),
+        (YIELD_MODE_LINE, 'Line'),
+        (YIELD_MODE_CHUNK, 'Chunk'),
+    )
+
+    rootLst = field.ListField(field.TextField(max_length=512), label="Root Directory List")
+    yieldMethod = field.ChoiceField(label="Yield Method", \
+        help_text="how to send the filename in each iteration", \
+        choices=YIELD_METHOD_CHOICES, \
+        initData=YIELD_MODE_ALL, required=False)
+    depth = field.IntegerField(label="Depth", initData=0, required=False, \
+        help_text="The recursion level. (0 = not recursive, -1 = recursive infinitely)")
+    includeFileExtLst = field.ListField(field.TextField(max_length=10), \
+        label="The list of file extension being included", \
+        help_text="File extenstion being included", required=False)
+    excludeFileExtLst = field.ListField(field.TextField(max_length=10), \
+        label="The list of file extension being excluded", \
+        help_text="File extenstion being excluded", required=False)
+    includeDirLst = field.ListField(field.TextField(max_length=512), \
+        label="The list of directory being included", \
+        help_text="Directory being included", required=False)
+    excludeDirLst = field.ListField(field.TextField(max_length=512), \
+        label="The list of directory being excluded", \
+        help_text="Directory being excluded", required=False)
+
+    _excludeFileFxnLst = [lambda x: False, ]
+    _excludeDirFxnLst = [lambda x: False, ]
+    _includeFileFxnLst = [ lambda x: False, ]
+    _includeDirFxnLst = [lambda x: False, ]
+
+    @property
+    def includeFileFxnLst(self):
+      return self._includeFileFxnLst
+
+    @includeFileFxnLst.setter
+    def includeFileFxnLst(self, includeFileFxnLst):
+      self._includeFileFxnLst = self._includeFileFxnLst[:1]
+      self._includeFileFxnLst.extend(includeFileFxnLst)
+
+    @property
+    def includeDirFxnLst(self):
+      return self._includeDirFxnLst
+
+    @includeDirFxnLst.setter
+    def includeDirFxnLst(self, includeDirFxnLst):
+      self._includeDirFxnLst = self.includeDirFxnLst[:1]
+      self._includeDirFxnLst.extend(includeDirFxnLst)
+
+    @property
+    def excludeFileFxnLst(self):
+      return self._excludeFileFxnLst
+
+    @excludeFileFxnLst.setter
+    def excludeFileFxnLst(self, excludeFileFxnLst):
+      self._excludeFileFxnLst = self._excludeFileFxnLst[:1]
+      self._excludeFileFxnLst.extend(excludeFileFxnLst)
+
+    @property
+    def excludeDirFxnLst(self):
+      return self._excludeDirFxnLst
+
+    @excludeDirFxnLst.setter
+    def excludeDirFxnLst(self, excludeDirFxnLst):
+      self._excludeDirFxnLst = self._excludeDirFxnLst[:1]
+      self._excludeDirFxnLst.extend(excludeDirFxnLst)
+
+  def full_clean(self):
+    super(ParamForm, self).full_clean()
+    if(not self._errors):
+      if(self.cleaned_data["includeFileExtLst"]!=[]):
+        self._includeFileFxnLst[0] = lambda x: os.path.splitext(x)[1] in self.includeFileExtLst
+      else:
+        self._includeFileFxnLst[0] = lambda x: True
+
+      if(self.cleaned_data["includeDirLst"]!=[]):
+        self._includeDirFxnLst[0] = lambda x: x in self.includeDirLst
+        #self._includeDirFxnLst[0] = lambda x: os.path.split(x)[0] in self.includeDirLst
+      else:
+        self._includeDirFxnLst[0] = lambda x: True
+
+      if(self.cleaned_data["excludeFileExtLst"]!=[]):
+        self._excludeFileFxnLst[0] = lambda x: os.path.splitext(x)[1] in self.excludeFileExtLst
+      else:
+        self._excludeFileFxnLst[0] = lambda x: False
+
+      if(self.cleaned_data["excludeDirLst"]!=[]):
+        self._excludeDirFxnLst[0] = lambda x: x in self.excludeDirLst
+        #self._excludeDirFxnLst[0] = lambda x: os.path.split(x)[0] in self.excludeDirLst
+      else:
+        self._excludeDirFxnLst[0] = lambda x: False
 
   #def __init__(self, *args, **kwargs):
   #  super(FilenameScanner, self).__init__(*args, **kwargs)
@@ -66,7 +134,7 @@ class FilenameScanner(SimpleCommand):
   # Watch out when implementing YIELD_MODE_LINE and YIELD_MODE_CHUNK
   @property
   def stdout(self):
-    return "File Being Selected:\n" + "\n".join(self._fileLst)
+    return "File Being Selected:\n" + "\n".join(self._filenameLst)
 
   def _filterByFileFxns(self, fileFullPath):
     """
@@ -75,12 +143,12 @@ class FilenameScanner(SimpleCommand):
     """
     isAllow = True
 
-    for fxn in self.excludeFileFxnLst:
+    for fxn in self.paramForm.excludeFileFxnLst:
       if(fxn(fileFullPath)):
         isAllow=False
         break
 
-    for fxn in self.includeFileFxnLst:
+    for fxn in self.paramForm.includeFileFxnLst:
       if(fxn(fileFullPath)):
         isAllow = True
         break
@@ -96,12 +164,12 @@ class FilenameScanner(SimpleCommand):
     for dirPath in dirPathLst:
       isAllow = True
       dirFullPath = os.path.join(lvlRoot, dirPath)
-      for fxn in self.excludeDirFxnLst:
+      for fxn in self.paramForm.excludeDirFxnLst:
         if(fxn(dirFullPath)):
           isAllow=False
           break
 
-      for fxn in self.includeDirFxnLst:
+      for fxn in self.paramForm.includeDirFxnLst:
         if(fxn(dirFullPath)):
           isAllow = True
           break
@@ -112,10 +180,12 @@ class FilenameScanner(SimpleCommand):
     return newDirPath
 
   def generateFileLst(self, *args, **kwargs):
-    for root in self.rootLst:
+    yieldMethod = int(self.paramForm.cleaned_data["yieldMethod"])
+    for root in self.paramForm.cleaned_data["rootLst"]:
       for lvlRoot, dirs, files in self._walk(root):
         for file in files:
-          if(self.yieldMethod==self.YIELD_MODE_FILE or self.yieldMethod==self.YIELD_MODE_ALL):
+          if(yieldMethod==self.paramForm.YIELD_MODE_FILE \
+              or yieldMethod==self.paramForm.YIELD_MODE_ALL):
             fullPath = os.path.join(lvlRoot, file)
             if(self._filterByFileFxns(fullPath)):
               yield fullPath
@@ -123,16 +193,16 @@ class FilenameScanner(SimpleCommand):
             raise Error
 
   def generateDirLst(self, *args, **kwargs):
-    for root in self.rootLst:
+    for root in self.paramForm.cleaned_data["rootLst"]:
       for lvlRoot, dirs, files in self._walk(root):
         yield dirs
 
   def run(self, *args, **kwargs):
     for i in self.generateFileLst(*args, **kwargs):
-      self._fileLst.append(i)
+      self._filenameLst.append(i)
 
     for i in self.generateDirLst(*args, **kwargs):
-      self._dirLst.extend(i)
+      self._dirnameLst.extend(i)
 
   def _walk(self, root, *args, **kwargs):
     root = root.rstrip(os.path.sep)
@@ -142,181 +212,14 @@ class FilenameScanner(SimpleCommand):
       dirs[:] = self._filterByDirFxns(lvlRoot, dirs)
       yield lvlRoot, dirs, files
       thisLvl = lvlRoot.count(os.path.sep)
-      if(self.depth!=-1 and numSep + self.depth <= thisLvl):
+      if(self.paramForm.cleaned_data["depth"]!=-1 \
+          and numSep + self.paramForm.cleaned_data["depth"] <= thisLvl):
         del dirs[:]
 
   @property
-  def fileLst(self):
-    """
-    :type: List(file)
-    """
-    return self._fileLst
+  def filenameLst(self):
+    return self._filenameLst
 
   @property
-  def dirLst(self):
-    """
-    :type: List(dir)
-    """
-    return self._dirLst
-
-  @property
-  def yieldMethod(self):
-    return self._yieldMethod
-
-  @yieldMethod.setter
-  def yieldMethod(self, yieldMethod):
-    self._yieldMethod = yieldMethod
-
-  @property
-  def depth(self):
-    return self._depth
-
-  @depth.setter
-  def depth(self, depth):
-    """
-    :param depth: The recursion level. (0 = not recursive, -1 = recursive infinitely)
-    :type depth: integer
-    """
-    self._depth = depth
-
-  @property
-  def includeFileFxnLst(self):
-    return self._includeFileFxnLst
-
-  @includeFileFxnLst.setter
-  def includeFileFxnLst(self, includeFileFxnLst):
-    self._includeFileFxnLst = self._includeFileFxnLst[:1]
-    self._includeFileFxnLst.extend(includeFileFxnLst)
-
-  @property
-  def includeDirFxnLst(self):
-    return self._includeDirFxnLst
-
-  @includeDirFxnLst.setter
-  def includeDirFxnLst(self, includeDirFxnLst):
-    self._includeDirFxnLst = self.includeDirFxnLst[:1]
-    self._includeDirFxnLst.extend(includeDirFxnLst)
-
-  #def _updateFxns(self):
-  #    self._includeFxnLst[0] = lambda x: x in self.includeFileExtLst
-
-  @property
-  def includeFileExtLst(self):
-    return self._includeFileExtLst
-
-  @includeFileExtLst.setter
-  def includeFileExtLst(self, includeFileExtLst):
-    """
-    :param includeFileExtLst: The list of file extension being included
-    :type includeFileExtLst: List(string)
-    """
-    self._includeFileExtLst = includeFileExtLst
-    if(includeFileExtLst!=[]):
-      self._includeFileFxnLst[0] = lambda x: os.path.splitext(x)[1] in self.includeFileExtLst
-    else:
-      self._includeFileFxnLst[0] = lambda x: True
-
-  @property
-  def includeDirLst(self):
-    return self._includeDirLst
-
-  @includeDirLst.setter
-  def includeDirLst(self, includeDirLst):
-    """
-    :param includeDirLst: The list of directory being included
-    :type includeDirLst: List(string)
-    """
-    self._includeDirLst = includeDirLst
-    if(includeDirLst!=[]):
-      self._includeDirFxnLst[0] = lambda x: x in self.includeDirLst
-      #self._includeDirFxnLst[0] = lambda x: os.path.split(x)[0] in self.includeDirLst
-    else:
-      self._includeDirFxnLst[0] = lambda x: True
-
-  @property
-  def excludeFileFxnLst(self):
-    return self._excludeFileFxnLst
-
-  @excludeFileFxnLst.setter
-  def excludeFileFxnLst(self, excludeFileFxnLst):
-    self._excludeFileFxnLst = self._excludeFileFxnLst[:1]
-    self._excludeFileFxnLst.extend(excludeFileFxnLst)
-
-  @property
-  def excludeDirFxnLst(self):
-    return self._excludeDirFxnLst
-
-  @excludeDirFxnLst.setter
-  def excludeDirFxnLst(self, excludeDirFxnLst):
-    self._excludeDirFxnLst = self._excludeDirFxnLst[:1]
-    self._excludeDirFxnLst.extend(excludeDirFxnLst)
-
-  @property
-  def excludeFileExtLst(self):
-    return self._excludeFileExtLst
-
-  @excludeFileExtLst.setter
-  def excludeFileExtLst(self, excludeFileExtLst):
-    """
-    :param excludeFileExtLst: The list of file extension being excluded
-    :type excludeFileExtLst: List(string)
-    """
-    self._excludeFileExtLst = excludeFileExtLst
-    if(excludeFileExtLst!=[]):
-      self._excludeFileFxnLst[0] = lambda x: os.path.splitext(x)[1] in self.excludeFileExtLst
-    else:
-      self._excludeFileFxnLst[0] = lambda x: False
-
-  @property
-  def excludeDirLst(self):
-    return self._excludeDirLst
-
-  @excludeDirLst.setter
-  def excludeDirLst(self, excludeDirLst):
-    """
-    :param excludeDirLst: The list of directory being excluded
-    :type excludeDirLst: List(string)
-    """
-    self._excludeDirLst = excludeDirLst
-    if(excludeDirLst!=[]):
-      self._excludeDirFxnLst[0] = lambda x: x in self.excludeDirLst
-      #self._excludeDirFxnLst[0] = lambda x: os.path.split(x)[0] in self.excludeDirLst
-    else:
-      self._excludeDirFxnLst[0] = lambda x: False
-
-  @property
-  def rootLst(self):
-    return self._rootLst
-
-  @rootLst.setter
-  def rootLst(self, rootLst):
-    """
-    :param rootLst: The list of directory being scaned
-    :type rootLst: List(string)
-    """
-    self._rootLst = rootLst
-
-#  @property
-#  def notations(self):
-#    return self._notations
-#
-#  @notations.setter
-#  def notations(self, notations):
-#    self._notations = notations
-#
-#  @property
-#  def gongs(self):
-#    return self._gongs
-#
-#  @gongs.setter
-#  def gongs(self, gongs):
-#    self._gongs = gongs
-#
-#  def validate(self, *args, **kwargs):
-#    for i in ["name", "verboseName", "description"]:
-#      if(getattr(self, i)==None):
-#        return False
-#    return True
-#
-#  def stop(self, *args, **kwargs):
-#    pass
+  def dirnameLst(self):
+    return self._dirnameLst

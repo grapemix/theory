@@ -5,6 +5,7 @@
 ##### Theory lib #####
 from theory.conf import settings
 from theory.command.baseCommand import SimpleCommand
+from theory.gui import field
 from theory.test.utils import get_runner
 
 ##### Theory third-party lib #####
@@ -24,83 +25,37 @@ class Tester(SimpleCommand):
   name = "tester"
   verboseName = "tester"
   params = []
-  _appName = None
-  _testRunner = None
-  _testLabel = ""
-  _testTheory = True
 
-  @property
-  def appName(self):
-    return self._appName
-
-  @appName.setter
-  def appName(self, appName):
-    """
-    :param appName: The name of application being used
-    :type appName: string
-    """
-    self._appName = appName
-
-  @property
-  def testSuite(self):
-    return self._testSuite
-
-  @testSuite.setter
-  def testSuite(self, testSuite):
-    """
-    :param testSuite: The python module of testcase suite being used
-    :type testSuite: pythonModule
-    """
-    self._testSuite = testSuite
-
-  @property
-  def testTheory(self):
-    return self._testTheory
-
-  @testTheory.setter
-  def testTheory(self, testTheory):
-    """
-    :param testTheory: Toogle if theory testcase is inclueded
-    :type testTheory: boolean
-    """
-    self._testTheory = testTheory
-
-  @property
-  def testRunner(self):
-    return self._testRunner
-
-  @testRunner.setter
-  def testRunner(self, testRunner):
-    """
-    :param testRunner: The python module of testcase runner being used
-    :type testRunner: pythonModule
-    """
-    self._testRunner = testRunner
-
-  @property
-  def testLabel(self):
-    return self._testLabel
-
-  @testLabel.setter
-  def testLabel(self, testLabel):
-    """
-    Labels must be of the form:
+  class ParamForm(SimpleCommand.ParamForm):
+    #appName = field.TextField(label="Application Name", \
+    #    help_text="The name of application being tested", max_length=32, \
+    #    required=False)
+    #testSuite = field.PythonClassField(label="Test Suite", \
+    #    help_text="The python class of testcase suite being used", \
+    #    required=False)
+    isTestTheory = field.BooleanField(label="Is test Theory", \
+        help_text="The testcase of Theory is being runned or not", \
+        initData='1')
+    testRunner = field.PythonClassField(label="Test Runner", \
+        help_text="The python class of testcase runner being used", \
+        initData="", auto_import=True, required=False)
+    testLabel = field.TextField(label="Test Label", \
+        help_text="""Labels must be of the form:
      - app.TestClass.test_method
-      Run a single specific test method
+         Run a single specific test method
      - app.TestClass
-      Run all the test methods in a given class
+         Run all the test methods in a given class
      - app
-      Search for doctests and unittests in the named application.
-
-    :param testLabel: The python module path of testcase being used
-    :type testLabel: string
-    """
-    self._testLabel = testLabel
-
+         Search for doctests and unittests in the named application.""", \
+        max_length=128, initData="", required=False)
+    testRunnerClassParam = field.DictField(field.TextField(), \
+        label="Test Runner Class Parameter", \
+        help_text="The parameter passed to the test runner class constructor", \
+        required=False)
 
   def run(self, *args, **kwargs):
-    options = {}
-    if(self.testTheory):
+    formData = self.paramForm.clean()
+    if(formData["isTestTheory"]=='1' or formData["isTestTheory"]):
       import imp
       import os
       theoryTestRoot = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "tests")
@@ -108,6 +63,10 @@ class Tester(SimpleCommand):
       thoeryTestCaseClass = imp.load_module("runtests", file, theoryTestRoot, data)
       thoeryTestCaseClass.registerTestApp()
 
-    testRunnerClass = get_runner(settings, self.testRunner)
-    testRunner = testRunnerClass(**options)
-    testRunner.run_tests(self.testLabel)
+    #testRunnerClass = get_runner(settings, formData["testRunner"])
+    #testRunner = testRunnerClass(formData["testRunnerClassParam"])
+    #testRunner.run_tests(formData["testLabel"])
+
+    testRunnerClass = get_runner(settings, "")
+    testRunner = testRunnerClass(verbosity=0)
+    testRunner.run_tests("")

@@ -4,6 +4,8 @@
 
 ##### Theory lib #####
 from theory.command.baseCommand import SimpleCommand
+from theory.conf import settings
+from theory.gui import field
 from theory.model import Command
 
 ##### Theory third-party lib #####
@@ -17,13 +19,24 @@ from theory.model import Command
 class ListCommand(SimpleCommand):
   name = "listCommand"
   verboseName = "listCommand"
-  params = []
   _appName = None
   _mood = None
   _query = None
   _notations = ["Command",]
-  #_gongs = ["Terminal", ]
+  _gongs = ["StdPipe", ]
   _drums = {"Terminal": 1,}
+
+  class ParamForm(SimpleCommand.ParamForm):
+    appName = field.ChoiceField(label="Application Name", \
+        help_text="Commands provided by this application", \
+        choices=(set([(i, settings.INSTALLED_APPS[i]) for i in range(len(settings.INSTALLED_APPS))])), \
+        initData="", \
+        required=False)
+    mood = field.ChoiceField(label="Mood", \
+        help_text="Commands provided by this mood", \
+        choices=(set([(i, settings.INSTALLED_MOODS[i]) for i in range(len(settings.INSTALLED_MOODS))])), \
+        initData="", \
+        required=False)
 
   @property
   def query(self):
@@ -34,39 +47,23 @@ class ListCommand(SimpleCommand):
     return self._query
 
   @property
-  def appName(self):
-    return self._appName
+  def stdOut(self):
+    return self._stdOut
 
-  @appName.setter
-  def appName(self, appName):
-    """
-    :param appName: The name of application being used
-    :type appName: string
-    """
-    self._appName = appName
-
-  @property
-  def mood(self):
-    return self._mood
-
-  @mood.setter
-  def mood(self, mood):
-    """
-    :param mood: The name of mood being used
-    :type mood: string
-    """
-    self._mood = mood
-
-  def run(self, *args, **kwargs):
+  def run(self):
     self._stdOut = ""
     queryParam = {}
-    if(self._appName!=None):
-      queryParam["appName"] = self._appName
-    if(self._mood!=None):
-      queryParam["mood"] = self._mood
-    self._query = Command.objects.all().select_related(1)
+    formData = self.paramForm.clean()
+
+    if(formData["appName"]!=""):
+      queryParam["app"] = self.paramForm.fields["appName"].finalChoiceLabel
+    if(formData["mood"]!=""):
+      queryParam["mood"] = self.paramForm.fields["mood"].finalChoiceLabel
+
+    self._query = Command.objects.all()
     if(queryParam!={}):
       self._query = self._query.filter(**queryParam)
+    self._query = self._query.select_related(1)
 
     for i in self._query:
       paramStr = ""

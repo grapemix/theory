@@ -32,7 +32,8 @@ class _BaseCommand(object):
   #abstract = True
   name = None
   verboseName = None
-  params = []
+  params = [] # TODO: del me
+  paramForm = None
 
   # Make sure there has no attribute's name is the same as the notations
   # and gongs' class because theory will initialize the class and assign
@@ -62,17 +63,11 @@ class _BaseCommand(object):
   # 9) Work with adapter
 
   class ParamForm(CommandForm):
-    verbosity = field.TextField(label="verbosity", required=False)
+    verbosity = field.IntegerField(label="verbosity", required=False)
     notations = field.ListField(field.AdapterField(), label="notations", required=False)
     gongs = field.ListField(field.AdapterField(), label="gongs", required=False)
     drums = field.DictField(field.AdapterField(), label="drums", required=False)
     concatCommand = field.TextField(label="Concatenated command", required=False, help_text="another command being concatenated to this command")
-
-  class AdapterForm(CommandForm):
-    verbosity = field.TextField(label="verbosity", required=False)
-    notations = field.ListField(field.AdapterField(), label="notations", required=False)
-    gongs = field.ListField(field.AdapterField(), label="gongs", required=False)
-    drums = field.DictField(field.AdapterField(), label="drums", required=False)
 
   @property
   def verbosity(self):
@@ -140,47 +135,11 @@ class SimpleCommand(_BaseCommand):
     return self._status
 
   @abstractmethod
-  def run(self, *args, **kwargs):
+  def run(self):
     pass
 
   class ParamForm(_BaseCommand.ParamForm):
     pass
-
-  class AdapterForm(_BaseCommand.AdapterForm):
-    status = field.TextField(label="status")
-    stdOut = field.TextField(label="stdOut")
-
-'''
-class SeqCommand(_BaseCommand):
-  _step = 0
-
-  @property
-  def formLst(self):
-    return self._formLst
-
-  @formLst.setter
-  def formLst(self, formLst):
-    """
-    :param notations: The list of form being called in sequence
-    :type notations: List(Form)
-    """
-    self._formLst = formLst
-
-  @property
-  def cmdLst(self):
-    return self._cmdLst
-
-  @cmdLst.setter
-  def cmdLst(self, cmdLst):
-    """
-    :param notations: The list of command being called in sequence
-    :type notations: List(Command)
-    """
-    self._cmdLst = cmdLst
-
-  def run(self, *args, **kwargs):
-    pass
-'''
 
 class AsyncCommand(Task, _BaseCommand):
   """
@@ -189,6 +148,10 @@ class AsyncCommand(Task, _BaseCommand):
   no class variable should be read and written before and after the run().
   """
   abstract = True
+
+  @abstractmethod
+  def run(self):
+    pass
 
 class AsyncContainer(Task):
   """
@@ -202,6 +165,6 @@ class AsyncContainer(Task):
       result[property] = getattr(inst, property)
     return result
 
-  def run(self, inst, adapterInput):
-    inst.run()
-    return self.extractResult(inst, adapterInput)
+  def run(self, cmdObj, adapterInput):
+    cmdObj.run()
+    return self.extractResult(cmdObj, adapterInput)

@@ -5,6 +5,7 @@
 ##### Theory lib #####
 from theory.command.baseCommand import SimpleCommand
 from theory.core.loader.util import reprobeAllModule
+from theory.gui import field
 
 ##### Theory third-party lib #####
 
@@ -17,21 +18,11 @@ from theory.core.loader.util import reprobeAllModule
 class ProbeModule(SimpleCommand):
   name = "probeModule"
   verboseName = "probeModule"
-  params = []
-  _settingMod = None
 
-  @property
-  def settingMod(self):
-    return self._settingMod
-
-  @settingMod.setter
-  def settingMod(self, settingMod):
-    """
-    :param settingMod: The python module being used to setup environment during probing
-    :type settingMod: pythonModule
-    """
-    self._settingMod = settingMod
+  class ParamForm(SimpleCommand.ParamForm):
+    settingMod = field.TextField(label="Setting Module", \
+        help_text=" The python module being used to setup environment during probing", max_length=64)
 
   def run(self, *args, **kwargs):
-    print self._settingMod
-    reprobeAllModule(self._settingMod)
+    self._stdOut = "Probing module: %s" %  (self._settingMod,)
+    reprobeAllModule(self.paramForm.clean()["settingMod"])

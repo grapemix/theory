@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 ##### System wide lib #####
-import os
-from shutil import copytree
 
 ##### Theory lib #####
 from theory.command.baseCommand import SimpleCommand
-from theory.conf import settings
+from theory.core.bridge import Bridge
 from theory.gui import field
-from theory.gui.form import StepForm
-from theory.model import AdapterBuffer
+from theory.model import AdapterBuffer, Command
 
 ##### Theory third-party lib #####
 
@@ -19,40 +16,49 @@ from theory.model import AdapterBuffer
 
 ##### Misc #####
 
+__all__ = ("NextStep", )
+
+class ParamForm(SimpleCommand.ParamForm):
+  # This form can move to somewhere else if we like
+  commandReady = field.ChoiceField(choices=(),\
+      label="Command Ready", help_text="Select a command ready to be continued")
+
+  def __init__(self, *args, **kwargs):
+    super(ParamForm, self).__init__(*args, **kwargs)
+    self.fields["commandReady"].choices = self.getCommandChoiceLst()
+
+  def getCommandChoiceLst(self):
+    # example return value:  ((1, "command1"), (2, "command2"))
+    return [(i.pk, "%s -> %s (%s)" % \
+        (Command.objects.get(id=i.fromCmd.id).name, \
+        Command.objects.get(id=i.toCmd.id).name, \
+        i.created)) \
+        for i in AdapterBuffer.objects.all()]
+
 class NextStep(SimpleCommand):
   """
-  List all command which is ready for next step and execute the chosen command
+  List all command which is ready for next step. In the first version,
+  users are not allowed to pipe up command which has been just executed.
   """
   name = "nextStep"
   verboseName = "nextStep"
   _notations = ["Command",]
+  ParamForm = ParamForm
 
-  class OptionForm(StepForm):
-    command = field.ChoiceField(label="Command", help_text="Select a command to be executed")
-
-
-  def _getCommandLst(self):
-    print AdapterBuffer.objects.all()
-    return [(i.pk, "%s -> %s (%s)" % (i.fromCmd, i.toCmd, i.created)) \
-        for i in AdapterBuffer.objects.all()]
-
-  def _execute(self, btn):
-    if(self.optionForm.is_valid()):
-      print self.optionForm.clean()
-
-  def _renderForm(self, *args, **kwargs):
-    win = kwargs["uiParam"]["win"]
-    bx = kwargs["uiParam"]["bx"]
-    bx.clear()
-
-    o = self.OptionForm(win, bx)
-    o._nextBtnClick = self._execute
-    #o.fields["command"].choices = self._getCommandLst()
-    o.fields["command"].choices = ((1, "a"), (2, "b"))
-    o.generateForm()
-    o.generateStepControl()
-    return o
-
+  def __init__(self, *args, **kwargs):
+    super(NextStep, self).__init__(*args, **kwargs)
+    self.bridge = Bridge()
 
   def run(self, *args, **kwargs):
-    self.optionForm = self._renderForm(uiParam={"win": settings.CRTWIN, "bx": settings.CRT})
+    if(self.paramForm.is_valid()):
+      if(self.bridge == None):
+        self.bridge = Bridge()
+      cmdId = self.paramForm.clean()["commandReady"]
+      adapterBufferModel = AdapterBuffer.objects.get(id=cmdId)
+
+      cmd = self.bridge.bridgeFromDb(adapterBufferModel)
+      cmdModel = adapterBufferModel.toCmd
+      self.bridge._execeuteCommand(cmd, cmdModel)
+    else:
+      # TODO: integrate with std reactor error system
+      print self.paramForm.errors

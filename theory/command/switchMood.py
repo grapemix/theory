@@ -5,6 +5,7 @@
 ##### Theory lib #####
 from theory.conf import settings
 from theory.core.reactor import *
+from theory.gui import field
 from theory.utils.mood import loadMoodData
 
 ##### Theory third-party lib #####
@@ -22,36 +23,25 @@ class SwitchMood(SimpleCommand):
   """
   name = "switchMood"
   verboseName = "switchMood"
-  params = ["moodName",]
   _notations = ["Command",]
   _drums = {"Terminal": 1,}
-  _moodName = ""
 
-  @property
-  def moodName(self):
-    return self._moodName
+  class ParamForm(SimpleCommand.ParamForm):
+    moodName = field.ChoiceField(label="Mood Name", \
+        help_text="The name of mood being used", \
+        choices=(set([(i, settings.INSTALLED_MOODS[i]) for i in range(len(settings.INSTALLED_MOODS))])), \
+        )
 
-  @moodName.setter
-  def moodName(self, moodName):
-    """
-    :param moodName: The name of mood being used
-    :type moodName: Choice(string)
-    """
-    self._moodName = moodName
-
-  @property
-  def moodNameChoiceLst(self):
-    return settings.INSTALLED_MOODS
-
-  def run(self, *args, **kwargs):
-    config = loadMoodData(self.moodName)
+  def run(self):
+    moodName = self.paramForm.fields["moodName"].finalChoiceLabel
+    config = loadMoodData(moodName)
     for i in dir(config):
       if(i==i.upper()):
         settings.MOOD[i] = getattr(config, i)
 
-    reactor.mood = self.moodName
+    reactor.mood = moodName
 
-    self._stdOut += "Successfully switch to %s mood\n\nThe following config is applied:\n" % (self.moodName)
+    self._stdOut += "Successfully switch to %s mood\n\nThe following config is applied:\n" % (moodName)
     for k,v in settings.MOOD.iteritems():
       self._stdOut += "    %s: %s\n" % (k, unicode(v))
 
