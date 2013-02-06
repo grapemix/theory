@@ -20,15 +20,17 @@ class DatabaseCreation(BaseDatabaseCreation):
   def _createTestDb(self, verbosity, autoclobber):
     testDatabaseName = self._getTestDbName()
     self.connection.connection = connect(testDatabaseName,
-        port=self.connection.settings_dict['PORT'],
+        port=int(self.connection.settings_dict['PORT']),
         username=self.connection.settings_dict['USER'],
         password=self.connection.settings_dict['PASSWORD'],
+        alias="testDb"
         )
 
   def _destroyTestDb(self, testDatabaseName, verbosity):
     if(verbosity>1):
       print "Dropping database %s" % (testDatabaseName)
     self.connection.connection.drop_database(testDatabaseName)
+    self.connection.close()
 
 class DatabaseWrapper(BaseDatabaseWrapper):
   vendor = 'mongoengine'
@@ -47,7 +49,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     if(self.connection is None):
       self.connection = connect(self.settings_dict["NAME"],
           port=int(self.settings_dict["PORT"]))
-
 
 class DatabaseClient(BaseDatabaseClient):
   executable_name = 'mongo'
