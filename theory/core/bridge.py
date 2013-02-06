@@ -5,6 +5,7 @@ import json
 
 ##### Theory lib #####
 from theory.adapter import BaseUIAdapter
+from theory.command.baseCommand import AsyncContainer
 from theory.core.exceptions import CommandSyntaxError
 from theory.model import Adapter
 from theory.utils.importlib import import_class
@@ -62,20 +63,13 @@ class Bridge(object):
     return storage
 
   def getCmdComplex(self, cmdModel, args, kwargs):
-    (cmd, assignFxn, storage) = self._getCmdForAssignment(cmdModel)
-    cmdArgs = [i for i in cmdModel.param if(not i.isOptional)]
-    if(args!=[]):
-      for i in range(len(cmdArgs)):
-        try:
-          assignFxn(storage, cmdArgs[i].name, args[i])
-        except IndexError:
-          # This means the number of param given unmatch the number of param register in *.command
-          raise CommandSyntaxError
-    if(kwargs!={}):
-      for k,v in kwargs.iteritems():
-        storage = assignFxn(storage, k, v)
-
-    return (cmd, storage)
+    cmdKlass = import_class(cmdModel.classImportPath)
+    cmd = cmdKlass()
+    cmdParamForm = import_class(cmdModel.classImportPath).ParamForm
+    cmd.paramForm = cmdParamForm()
+    cmd.paramForm.fillFields(cmdModel, args, kwargs)
+    cmd.paramForm.is_valid()
+    return cmd
 
   # TODO: should be replaced later on. At least inheritance case should be
   # considered
@@ -93,11 +87,11 @@ class Bridge(object):
         propertyLst.append(i)
     return propertyLst
 
-  def bridge(self, headClass, tailModel):
-    (tailClass, assignFxn, storage) = self._getCmdForAssignment(tailModel)
-    commonAdapterName = self._probeAdapter(headClass, tailClass)
+  def bridge(self, headInst, tailModel):
+    (tailInst, assignFxn, storage) = self._getCmdForAssignment(tailModel)
+    commonAdapterName = self._probeAdapter(headInst, tailInst)
 
-    (adapterModel, adapter) = self.adaptFromCmd(commonAdapterName, headClass)
+    (adapterModel, adapter) = self.adaptFromCmd(commonAdapterName, headInst)
     #if(adapter.hasattr(isDisplayWidgetCompatable) and adapter.isDisplayWidgetCompatable):
     #if(issubclass(BaseUIAdapter, adapter)):
     #  pass
@@ -105,17 +99,17 @@ class Bridge(object):
     propertyLst = self._naivieAdapterPropertySelection(adapterModel, tailModel)
     adapter.run()
 
-    return (tailClass, self._propertiesAssign(adapter, \
+    return (tailInst, self._propertiesAssign(adapter, \
         self._dictAssign, \
         {}, \
         propertyLst))
 
-  def bridgeToDb(self, headClass, tailModel):
-    (tailClass, assignFxn, storage) = self._getCmdForAssignment(tailModel)
+  def bridgeToDb(self, headInst, tailModel):
+    (tailInst, assignFxn, storage) = self._getCmdForAssignment(tailModel)
 
-    commonAdapterName = self._probeAdapter(headClass, tailClass)
+    commonAdapterName = self._probeAdapter(headInst, tailInst)
 
-    (adapterModel, adapter) = self.adaptFromCmd(commonAdapterName, headClass)
+    (adapterModel, adapter) = self.adaptFromCmd(commonAdapterName, headInst)
 
     propertyLst = self._naivieAdapterPropertySelection(adapterModel, tailModel)
     adapter.run()
@@ -126,9 +120,10 @@ class Bridge(object):
         propertyLst))
 
   def bridgeFromDb(self, adapterBufferModel):
-    (tailKlass, assignFxn, storage) = \
-        self._getCmdForAssignment(adapterBufferModel.toCmd)
-    return (tailKlass, json.loads(adapterBufferModel.data))
+    #(tailInst, assignFxn, storage) = \
+    #    self._getCmdForAssignment(adapterBufferModel.toCmd)
+    #return (tailInst, json.loads(adapterBufferModel.data))
+    return self.getCmdComplex(adapterBufferModel.toCmd, [], json.loads(adapterBufferModel.data))
 
   # TODO: to support fall back
   def _probeAdapter(self, headClass, tailClass):
@@ -145,7 +140,8 @@ class Bridge(object):
     if(adapterModel!=None):
       adapterKlass = import_class(adapterModel.importPath)
       adapter = adapterKlass()
-      adapter = self._assignAdapterProperties(adapterModel.property, adapter, cmd)
+      #adapter = self._assignAdapterProperties(adapterModel.property, adapter, cmd)
+      adapter = self._assignAdapterPropertiesFromCmd(adapterModel.property, adapter, cmd)
     return (adapterModel, adapter)
 
   def _adaptToCmd(self, adapterModel, adapter, cmd):
@@ -163,4 +159,39 @@ class Bridge(object):
         except AttributeError:
           pass
     return o1
+
+  def _assignAdapterPropertiesFromCmd(self, properties, adapter, cmd):
+    """This fxn """
+    form = cmd.paramForm
+    if(form.is_valid()):
+      formData = form.clean()
+      for property in properties:
+        try:
+          setattr(adapter, property, cmd.paramForm.clean_data[property])
+        except AttributeError:
+          try:
+            setattr(adapter, property, getattr(cmd, property))
+          except AttributeError:
+            try:
+              setattr(adapter, property, getattr(cmd, "_" + property))
+            except AttributeError:
+              pass
+    else:
+      # TODO: somehow show/log/raise errors
+      print form.errors
+    return adapter
+
+  def _execeuteCommand(self, cmd, cmdModel, adapterProperty=[]):
+    # Since we only allow execute one command in a time thru terminal,
+    # the command doesn't have to return anything
+    if(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC_WRAPPER):
+      asyncContainer = AsyncContainer()
+      result = asyncContainer.delay(cmd, adapterProperty).get()
+    elif(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC):
+      #result = cmd.delay(storage).get()
+      cmd.delay(paramForm=paramForm)
+    else:
+      asyncContainer = AsyncContainer()
+      result = asyncContainer.run(cmd, adapterProperty)
+
 
