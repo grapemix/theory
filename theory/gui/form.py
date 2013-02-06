@@ -290,6 +290,25 @@ class StepFormBase(GuiFormBase):
 
     self.stepControlBox.postGenerate()
 
+class CommandFormBase(StepFormBase):
+  def _nextBtnClick(self):
+    self._run()
+
+  def _run(self):
+    pass
+
+  def fillFields(self, cmdModel, args, kwargs):
+    cmdArgs = [i for i in cmdModel.param if(not i.isOptional)]
+    if(args!=[]):
+      for i in range(len(cmdArgs)):
+        try:
+          self.fields[cmdArgs[i].name].initData = args[i]
+        except IndexError:
+          # This means the number of param given unmatch the number of param register in *.command
+          raise CommandSyntaxError
+    for k,v in kwargs.iteritems():
+      self.fields[k].initData = v
+
 class Form(FormBase):
   "A collection of Fields, plus their associated data."
   # This is a separate class from BaseForm in order to abstract the way
@@ -305,5 +324,5 @@ class GuiForm(GuiFormBase):
 class StepForm(StepFormBase):
   __metaclass__ = DeclarativeFieldsMetaclass
 
-class CommandForm(StepFormBase):
+class CommandForm(CommandFormBase):
   __metaclass__ = DeclarativeFieldsMetaclass
