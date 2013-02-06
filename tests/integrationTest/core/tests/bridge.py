@@ -17,10 +17,10 @@ from theory.model import *
 ##### Theory app #####
 
 ##### Misc #####
-
-__all__ = ('BridgeTestCase',)
 from tests.unitTest.core.tests import \
     SimpleChain1, SimpleChain2, AsyncChain1, AsyncChain2, AsyncCompositeChain1
+
+__all__ = ('BridgeTestCase',)
 
 class BridgeTestCase(unittest.TestCase):
   def setUp(self):
@@ -44,8 +44,6 @@ class BridgeTestCase(unittest.TestCase):
 
     self.adapterBufferModel = AdapterBuffer()
 
-    #Adapter(name="StdPipe", importPath=u"theory.adapter.stdPipeAdapter.StdPipeAdapter", property=[u'stdErr', u'stdIn', u'stdOut']).save()
-
   def _getMockCommandObject(self, cmd, classImportPath):
     with Stub(proxy=cmd) as cmd:
       cmd.classImportPath >> "%s.%s" % (self.__module__, classImportPath)
@@ -53,61 +51,60 @@ class BridgeTestCase(unittest.TestCase):
 
   def testSimpleCommandToSimpleCommand(self):
     firstCmd = SimpleChain1()
+    firstCmd.paramForm = firstCmd.ParamForm()
 
-    #(firstCmd, firstCmdStorage) = self.bridge.getCmdComplex(self.simpleChain1CommandModel, [], {})
-    #firstCmd.run()
+    self.assertTrue(firstCmd.paramForm.is_valid())
     firstCmd.run()
 
     secondCmdModel = self.simpleChain2CommandModel
     secondCmdModel = self._getMockCommandObject(secondCmdModel, "SimpleChain2")
     (chain2Class, secondCmdStorage) = self.bridge.bridge(firstCmd, secondCmdModel)
-    #print chain2Class, secondCmdStorage
-    (secondCmd, secondCmdStorage) = self.bridge.getCmdComplex(secondCmdModel, [], secondCmdStorage)
-    #print secondCmd, secondCmdStorage, secondCmdStorage._stdIn, secondCmd._stdIn
-    #cmd.delay(storage)
-    #asyncContainer = AsyncContainer()
-    #result = asyncContainer.run(cmd, [])
+    secondCmd = self.bridge.getCmdComplex(secondCmdModel, [], secondCmdStorage)
     result = secondCmd.run()
-    #return result
-    #cmd.run()
 
     self.assertEqual(secondCmd.run(), "simpleChain1 received")
+    self.assertTrue(secondCmd.paramForm.is_valid())
+    self.assertEqual(secondCmd.paramForm.clean()["stdIn"], 'simpleChain1')
 
   def testAsyncCommandToSimpleCommand(self):
     firstCmd = AsyncChain1()
+    firstCmd.paramForm = firstCmd.ParamForm()
     firstCmd.run()
 
     secondCmdModel = self.simpleChain2CommandModel
     secondCmdModel = self._getMockCommandObject(secondCmdModel, "SimpleChain2")
     (chain2Class, storage) = self.bridge.bridge(firstCmd, secondCmdModel)
-    (secondCmd, secondCmdStorage) = self.bridge.getCmdComplex(secondCmdModel, [], storage)
+    secondCmd = self.bridge.getCmdComplex(secondCmdModel, [], storage)
 
     self.assertEqual(secondCmd.run(), "asyncChain1 received")
 
   def testSimpleCommandToAsyncCommand(self):
     firstCmd = SimpleChain1()
+    firstCmd.paramForm = firstCmd.ParamForm()
     firstCmd.run()
 
     secondCmdModel = self.asyncChain2CommandModel
     secondCmdModel = self._getMockCommandObject(secondCmdModel, "AsyncChain2")
     (chain2Class, storage) = self.bridge.bridge(firstCmd, secondCmdModel)
-    (cmd, storage) = self.bridge.getCmdComplex(secondCmdModel, [], storage)
+    cmd = self.bridge.getCmdComplex(secondCmdModel, [], storage)
     self.assertEqual(cmd.run(), "simpleChain1 received")
 
 
   def testAsyncCommandToAsyncCommand(self):
     firstCmd = AsyncChain1()
+    firstCmd.paramForm = firstCmd.ParamForm()
     firstCmd.run()
 
     secondCmdModel = self.asyncChain2CommandModel
     secondCmdModel = self._getMockCommandObject(secondCmdModel, "AsyncChain2")
     (chain2Class, storage) = self.bridge.bridge(firstCmd, secondCmdModel)
-    (cmd, storage) = self.bridge.getCmdComplex(secondCmdModel, [], storage)
+    cmd = self.bridge.getCmdComplex(secondCmdModel, [], storage)
     result = cmd.run()
     self.assertEqual(cmd.run(), "asyncChain1 received")
 
 
   def testAsyncCompositeCommandToAsyncCommand(self):
     firstCmd = AsyncCompositeChain1()
+    firstCmd.paramForm = firstCmd.ParamForm()
     secondCmdModel = self.simpleChain2CommandModel
     self.assertEqual(firstCmd.run(secondCmdModel), "asyncChain1 received")

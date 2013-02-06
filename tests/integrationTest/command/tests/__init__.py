@@ -6,7 +6,9 @@
 ##### Theory third-party lib #####
 
 ##### Local app #####
-from fileSelector import *
+from filenameScanner import *
+from indentFormatFix import *
+from nextStep import *
 
 ##### Theory app #####
 
