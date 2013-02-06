@@ -7,6 +7,7 @@ import os
 from shutil import move
 
 ##### Theory lib #####
+from theory.gui import field
 
 ##### Theory third-party lib #####
 
@@ -21,26 +22,32 @@ from .filenameScanner import FilenameScanner
 class TheoryFilesSurgeon(SimpleCommand):
   """
   An abstract class served as an wrapper file for commands which modify the
-  fileLst within the theory project.
+  filenameLst within the theory project.
   """
   __metaclass__ = ABCMeta
   name = "theory Files Surgeon"
   verboseName = "theory Files' Surgeon"
   params = []
-  _fileLst = []
+  _filenameLst = []
 
-  WRITTEN_MODE_COPY = 1
-  WRITTEN_MODE_REPLACE = 2
-  WRITTEN_MODE_DRY_RUN = 3
-  WRITTEN_MODE_DRY_RUN_PRINT = 4
+  class ParamForm(SimpleCommand.ParamForm):
+    WRITTEN_MODE_COPY = 1
+    WRITTEN_MODE_REPLACE = 2
+    WRITTEN_MODE_DRY_RUN = 3
+    WRITTEN_MODE_DRY_RUN_PRINT = 4
 
-  WRITTEN_MODE_CHOICES = (
-      (WRITTEN_MODE_COPY, "Copy"),
-      (WRITTEN_MODE_REPLACE, "Replace"),
-      (WRITTEN_MODE_DRY_RUN, "Dry run"),
-      (WRITTEN_MODE_DRY_RUN_PRINT, "Dry run and print"),
-  )
-  _writtenMode = WRITTEN_MODE_COPY
+    WRITTEN_MODE_CHOICES = (
+        (WRITTEN_MODE_COPY, "Copy"),
+        (WRITTEN_MODE_REPLACE, "Replace"),
+        (WRITTEN_MODE_DRY_RUN, "Dry run"),
+        (WRITTEN_MODE_DRY_RUN_PRINT, "Dry run and print"),
+    )
+
+    writtenMode = field.ChoiceField(label="Written Mood", \
+        help_text="The way to write the changes", \
+        choices=WRITTEN_MODE_CHOICES, \
+        initData=WRITTEN_MODE_COPY,\
+        )
 
   #def __init__(self, *args, **kwargs):
   #  super(TheoryFilesSurgeon, self).__init__(*args, **kwargs)
@@ -65,7 +72,7 @@ class TheoryFilesSurgeon(SimpleCommand):
     self.filenameScanner.excludeFileFxnLst = [lambda x: True,]
     self.filenameScanner.depth = -1
     self.filenameScanner.run()
-    self.fileLst = self.filenameScanner.fileLst
+    self.filenameLst = self.filenameScanner.filenameLst
 
   def postGetFiles(self, *args, **kwargs):
     pass
@@ -74,17 +81,18 @@ class TheoryFilesSurgeon(SimpleCommand):
     self.preGetFiles()
     self.getFiles()
     self.postGetFiles()
-    for filename in self.fileLst:
+    for filename in self.filenameLst:
       lines = self.preAction(filename)
       newLines = self.action(lines)
       self.postAction(newLines, filename)
 
   def _writeToFile(self, lines, oldFilename):
-    if(self.writtenMode==self.WRITTEN_MODE_COPY):
+    writtenMode = int(self.paramForm.clean_data["writtenMode"])
+    if(writtenMode==self.paramForm.WRITTEN_MODE_COPY):
       move(oldFilename, oldFilename + ".orig")
-    elif(self.writtenMode==self.WRITTEN_MODE_DRY_RUN):
+    elif(writtenMode==self.paramForm.WRITTEN_MODE_DRY_RUN):
       return
-    elif(self.writtenMode==self.WRITTEN_MODE_DRY_RUN_PRINT):
+    elif(writtenMode==self.paramForm.WRITTEN_MODE_DRY_RUN_PRINT):
       self._stdOut += lines + "<br/>"
       return
     fileObj = open(oldFilename,"w")
@@ -108,18 +116,9 @@ class TheoryFilesSurgeon(SimpleCommand):
     return s
 
   @property
-  def fileLst(self):
-    return self._fileLst
+  def filenameLst(self):
+    return self._filenameLst
 
-  @fileLst.setter
-  def fileLst(self, fileLst):
-    self._fileLst = fileLst
-
-  @property
-  def writtenMode(self):
-    return self._writtenMode
-
-  @writtenMode.setter
-  def writtenMode(self, writtenMode):
-    self._writtenMode = writtenMode
-
+  @filenameLst.setter
+  def filenameLst(self, filenameLst):
+    self._filenameLst = filenameLst

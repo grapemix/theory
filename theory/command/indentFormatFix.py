@@ -5,6 +5,7 @@ import codecs
 from shutil import move
 
 ##### Theory lib #####
+from theory.gui import field
 
 ##### Theory third-party lib #####
 
@@ -22,15 +23,17 @@ class IndentFormatFix(SimpleCommand):
   """
   name = "indentFormatFix"
   verboseName = "Indent Format Fix"
-  params = ["fileLst", ]
   _indentSpace = 2
-  _fileLst = []
+
+  class ParamForm(SimpleCommand.ParamForm):
+    filenameLst = field.ListField(field.TextField(), label="The list of filenames being fixed")
+    #fileLst = field.ListField(field.FileField(), label="The list of files being fixed")
 
   #def __init__(self, *args, **kwargs):
   #  super(IndentFormatFix, self).__init__(*args, **kwargs)
 
   def run(self, *args, **kwargs):
-    for filename in self.fileLst:
+    for filename in self.paramForm.cleaned_data["filenameLst"]:
       lines = self._readFileLine(filename)
       lines = self._forceHalfIndent(lines)
       lines = self._convertDjango(lines)
@@ -78,18 +81,6 @@ class IndentFormatFix(SimpleCommand):
           break
       newLines.append(line[j/2:])
     return newLines
-
-  @property
-  def fileLst(self):
-    return self._fileLst
-
-  @fileLst.setter
-  def fileLst(self, fileLst):
-    """
-    :param fileLst: The list of file
-    :type fileLst: List(file)
-    """
-    self._fileLst = fileLst
 
   @property
   def indentSpace(self):

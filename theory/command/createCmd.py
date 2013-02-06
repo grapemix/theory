@@ -7,6 +7,7 @@ from shutil import copy
 ##### Theory lib #####
 from theory.command.baseCommand import SimpleCommand
 from theory.conf import settings
+from theory.gui import field
 
 ##### Theory third-party lib #####
 
@@ -19,50 +20,32 @@ from theory.conf import settings
 class CreateCmd(SimpleCommand):
   name = "createCmd"
   verboseName = "createCmd"
-  params = ["appName", "cmdName"]
-  _appName = ""
-  _cmdName = ""
   _notations = ["Command",]
   _drums = {"Terminal": 1, }
 
-  @property
-  def appName(self):
-    return self._appName
+  class ParamForm(SimpleCommand.ParamForm):
+    appName = field.ChoiceField(label="Application Name", \
+        help_text="The name of application being used", \
+        choices=(set([(len(settings.INSTALLED_APPS)+1, "theory")] + [(i, settings.INSTALLED_APPS[i]) for i in range(len(settings.INSTALLED_APPS))])))
+    cmdName = field.TextField(label="Command Name", \
+        help_text=" The name of command being created", max_length=32)
 
-  @appName.setter
-  def appName(self, appName):
-    """
-    :param appName: The name of application being used
-    :type appName: string
-    """
-    self._appName = appName
-
-  @property
-  def cmdName(self):
-    return self._cmdName
-
-  @cmdName.setter
-  def cmdName(self, cmdName):
-    """
-    :param cmdName: The name of command being created
-    :type cmdName: string
-    """
-    self._cmdName = cmdName
-
-  def run(self, *args, **kwargs):
-    if(self.appName!="theory"):
+  def run(self):
+    appName = self.paramForm.fields["appName"].finalChoiceLabel
+    cmdName = self.paramForm.clean()["cmdName"]
+    if(appName!="theory"):
       foundApp = False
       for i in settings.INSTALLED_APPS:
-        if(i==self.appName):
+        if(i==appName):
           foundApp = True
       if(not foundApp):
         self._stdOut = "You must create the app AND put it into INSTALLED_APPS first!"
         return
-      toPath = os.path.join(settings.APPS_ROOT, self.appName, "command", self.cmdName + ".py")
+      toPath = os.path.join(settings.APPS_ROOT, appName, "command", cmdName + ".py")
     else:
-      toPath = os.path.dirname(__file__)
+      toPath = os.path.join(os.path.dirname(__file__), cmdName + ".py")
 
     fromPath = os.path.join(os.path.dirname(os.path.dirname(__file__)),
         "conf", "app_template", "command", "__init__.py")
-    self._stdOut += "Coping" + fromPath + " --> " + toPath + "<br/>"
+    self._stdOut += "Coping %s --> %s\n" % (fromPath, toPath)
     copy(fromPath, toPath)

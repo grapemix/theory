@@ -7,6 +7,7 @@ from shutil import copytree
 ##### Theory lib #####
 from theory.command.baseCommand import SimpleCommand
 from theory.conf import settings
+from theory.gui import field
 
 ##### Theory third-party lib #####
 
@@ -22,26 +23,17 @@ class CreateApp(SimpleCommand):
   """
   name = "createApp"
   verboseName = "createApp"
-  params = ["appName",]
   _notations = ["Command",]
   _drums = {"Terminal": 1, }
 
-  @property
-  def appName(self):
-    return self._appName
+  class ParamForm(SimpleCommand.ParamForm):
+    appName = field.TextField(label="Application Name", \
+        help_text=" The name of application being created", max_length=32)
 
-  @appName.setter
-  def appName(self, appName):
-    """
-    :param appName: The name of application being used
-    :type appName: string
-    """
-    self._appName = appName
-
-  def run(self, *args, **kwargs):
+  def run(self):
     fromPath = os.path.join(os.path.dirname(os.path.dirname(__file__)),
         "conf", "app_template")
-    toPath = os.path.join(settings.APPS_ROOT, self.appName)
+    toPath = os.path.join(settings.APPS_ROOT, self.paramForm.clean()["appName"])
     self._stdOut += "Coping" + fromPath + " --> " + toPath + "<br/>"
     try:
       copytree(fromPath, toPath)
