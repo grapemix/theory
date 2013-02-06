@@ -4,6 +4,7 @@
 import os
 import sys
 from mongoengine import connect
+from mongoengine.connection import get_connection, disconnect
 
 ##### Theory lib #####
 from theory.db.backends import *
@@ -19,18 +20,30 @@ from theory.db.backends import *
 class DatabaseCreation(BaseDatabaseCreation):
   def _createTestDb(self, verbosity, autoclobber):
     testDatabaseName = self._getTestDbName()
-    self.connection.connection = connect(testDatabaseName,
+    connect(db=testDatabaseName,
         port=int(self.connection.settings_dict['PORT']),
         username=self.connection.settings_dict['USER'],
         password=self.connection.settings_dict['PASSWORD'],
-        alias="testDb"
         )
+    self.connection.connection = get_connection()
+    self.connection.settings_dict["ORIGINAL_NAME"] = self.connection.settings_dict["NAME"]
 
   def _destroyTestDb(self, testDatabaseName, verbosity):
     if(verbosity>1):
       print "Dropping database %s" % (testDatabaseName)
     self.connection.connection.drop_database(testDatabaseName)
-    self.connection.close()
+
+  def _closeConnection(self):
+    disconnect()
+
+  def _resumeOriginalConnection(self):
+    connect(self.connection.settings_dict["ORIGINAL_NAME"],
+        port=int(self.connection.settings_dict['PORT']),
+        username=self.connection.settings_dict['USER'],
+        password=self.connection.settings_dict['PASSWORD'],
+        )
+
+
 
 class DatabaseWrapper(BaseDatabaseWrapper):
   vendor = 'mongoengine'

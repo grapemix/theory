@@ -29,16 +29,15 @@ class BackendsTestCase(unittest.TestCase):
     self.assertTrue(isinstance(conn, pymongo.connection.Connection))
 
   def testCurrentConnectionHasTestDb(self):
-    conn = get_connection("testDb")
-    #self.assertEqual(conn.database_names(), [u"test_theory",])
+    self.assertEqual(get_db().name, "test_theory")
 
-  def testCloseCurrentConnection(self):
-    db = get_db()
-    db.logout()
-    db.connection.end_request()
-    db.connection.disconnect()
-    get_connection().close()
-    #self.assertNotEqual(db.name, 'theory')
+  #def testCloseCurrentConnection(self):
+  #  db = get_db()
+  #  db.logout()
+  #  db.connection.end_request()
+  #  db.connection.disconnect()
+  #  get_connection().close()
+  #  #self.assertNotEqual(db.name, 'theory')
 
   def testDbExist(self):
     db = get_db()
