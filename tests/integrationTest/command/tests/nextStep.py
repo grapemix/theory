@@ -54,7 +54,7 @@ class NextStepTestCase(BaseCommandTestCase):
     self._createAdapterBuffer()
     super(NextStepTestCase, self).setUp(*args, **kwargs)
 
-  def testRunByArgs(self):
+  def stopTestRunByArgs(self):
     cmd = self._getCmd(self.cmdModel, [AdapterBuffer.objects.all()[0].id,])
     self._validateParamForm(cmd)
     cmd.bridge = self.bridge
@@ -66,7 +66,7 @@ class NextStepTestCase(BaseCommandTestCase):
     # of the command being executed and tested the result
     #self.assertEqual(cmd.run(), "simpleChain1 received")
 
-  def testRunByKwargs(self):
+  def stopTestRunByKwargs(self):
     cmd = self._getCmd(self.cmdModel, kwargs={"commandReady": AdapterBuffer.objects.all()[0].id})
     self._validateParamForm(cmd)
     cmd.bridge = self.bridge
