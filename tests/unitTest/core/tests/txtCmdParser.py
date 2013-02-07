@@ -103,6 +103,11 @@ class CmdParserTestCase(unittest.TestCase):
     self.assertEqual(self.o.cmdName, "probeModule")
     self.assertEqual(self.o._kwargs, {'a': 'alpha', 'c': 'gamma', 'b': 'beta'})
 
+  def testSingleChar(self):
+    self.o.cmdInTxt = "a"
+    self.o.run()
+    self.assertEqual(self.o.mode, self.o.MODE_COMMAND)
+
   def testEmptyMode(self):
     self.o.cmdInTxt = ""
     self.o.run()

@@ -97,12 +97,11 @@ class TxtCmdParser(object):
         return (mode, self._cmdInTxt[self._openParenIdx[-1]:])
 
   def __init__(self):
-    self.legitCmdNameRePattern = re.compile("^[A-z]+\w+$")
+    self.legitCmdNameRePattern = re.compile("^[A-z]*\w*$")
     self.initVar()
 
   def initVar(self):
     self._cmdName = ""
-    #self._param = OrderedDict()
     self._args = []
     self._kwargs = {}
     self._singleQuoteIdx = []
