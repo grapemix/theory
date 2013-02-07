@@ -65,7 +65,10 @@ class Reactor(object):
       self.autocompleteCounter = 0
       self.lastAutocompleteSuggest = ""
       self.originalQuest = ""
-    cmdModelQuery = Command.objects.filter(Q(name__startswith=frag) & (Q(mood=self.mood) | Q(mood="norm")))
+
+    # Temp disable using mood as reference during the autocomplete process because of a bug of mongoengine. This feature should be restored when mongoengine is updated.
+    cmdModelQuery = Command.objects.filter(name__startswith=frag)
+    #cmdModelQuery = Command.objects.filter(Q(name__startswith=frag) & (Q(mood=self.mood) | Q(mood="norm")))
     cmdModelQueryNum = cmdModelQuery.count()
     if(cmdModelQueryNum==0):
       return (self.parser.cmdInTxt, None)
