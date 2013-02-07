@@ -101,7 +101,11 @@ class Reactor(object):
       if(crtOutput):
         self.adapter.printTxt(crtOutput)
     elif(mode==self.parser.MODE_ARGS):
-      self._queryArgsAutocomplete(frag)
+      if(not self._queryArgsAutocompleteAsForm(frag)):
+        self.adapter.cleanUpCrt()
+        self.adapter.printTxt("Cannot load command")
+      # Cut the last tab out
+      entrySetterFxn(self.parser.cmdInTxt)
     self.parser.initVar()
 
   def cleanParamForm(self, btn):
@@ -112,9 +116,9 @@ class Reactor(object):
       # TODO: integrate with std reactor error system
       print self.paramForm.errors
 
-  def _queryArgsAutocomplete(self, frag):
+  def _queryArgsAutocompleteAsForm(self, frag):
     if(not self._loadCmdModel()):
-      return
+      return False
 
     cmdParamFormKlass = import_class(self.cmdModel.classImportPath).ParamForm
 
@@ -122,6 +126,7 @@ class Reactor(object):
     self.paramForm._nextBtnClick = self.cleanParamForm
     self.paramForm.generateFilterForm(self.ui.win, self.ui.bxCrt)
     self.paramForm.generateStepControl()
+    return True
 
   def _parse(self):
     self.parser.cmdInTxt = self.adapter.cmdInTxt
