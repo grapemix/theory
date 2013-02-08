@@ -105,12 +105,11 @@ class Reactor(object):
         self.adapter.cleanUpCrt()
         self.adapter.printTxt("Cannot load command")
       # Cut the last tab out
-      entrySetterFxn(self.parser.cmdInTxt)
+      self.adapter.restoreCmdLine()
     self.parser.initVar()
 
   def cleanParamForm(self, btn):
     if(self.paramForm.is_valid()):
-      print self.paramForm.clean()
       self.run()
     else:
       # TODO: integrate with std reactor error system

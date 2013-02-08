@@ -50,6 +50,7 @@ class Terminal(object):
     #self._adapter.printTxt = lambda x: self.lb.text_set(x)
     self._adapter.crlf = self.crlf
     self._adapter.uiParam = {"win": self.win, "bx": self.bxCrt}
+    self._adapter.registerEntrySetterFxn(self._cmdLineEntry.entry_set)
 
   def __init__(self):
     elementary.init()
@@ -91,7 +92,7 @@ class Terminal(object):
       #print dir(object)
       #return
       self.adapter.cmdInTxt = curEntryTxt[:-6]
-      self.adapter.autocompleteRequest(object.entry_set)
+      self.adapter.autocompleteRequest()
       #object.cursor_selection_begin()
       #object.cursor_selection_end()
       object.cursor_line_end_set()
@@ -139,6 +140,8 @@ class Terminal(object):
     bx2.pack_end(en)
     en.show()
     en.focus_set(1)
+
+    self._cmdLineEntry = en
 
     bt = elementary.Button(win)
     bt.text_set("Clear")

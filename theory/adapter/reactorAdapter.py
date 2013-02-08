@@ -22,6 +22,7 @@ class ReactorAdapter(object):
   """
   lastEntry = ""
   crlf = ""
+  entrySetterFxn = None
 
   class TerminalForm(GuiForm):
     stdOut = field.TextField(label="Standard Output")
@@ -37,6 +38,13 @@ class ReactorAdapter(object):
 
   def __init__(self, signal):
     self.signal = signal
+
+  def registerEntrySetterFxn(self, entrySetterFxn):
+    self.entrySetterFxn = entrySetterFxn
+
+  def restoreCmdLine(self):
+    self.entrySetterFxn(self.cmdInTxt)
+    self.cmdInTxt = ""
 
   def cleanUpCrt(self):
     bx = self.uiParam["bx"]
@@ -71,6 +79,6 @@ class ReactorAdapter(object):
     if(self.signal.has_key("cmdChange")):
       self.signal["cmdChange"](*args, **kwargs)
 
-  def autocompleteRequest(self, entrySetterFxn, *args, **kwargs):
+  def autocompleteRequest(self, *args, **kwargs):
     if(self.signal.has_key("autocompleteRequest")):
-      self.signal["autocompleteRequest"](entrySetterFxn, *args, **kwargs)
+      self.signal["autocompleteRequest"](self.entrySetterFxn, *args, **kwargs)
