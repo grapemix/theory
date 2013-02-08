@@ -100,6 +100,7 @@ class Reactor(object):
       entrySetterFxn(entryOutput)
       if(crtOutput):
         self.adapter.printTxt(crtOutput)
+      self.paramForm = None
     elif(mode==self.parser.MODE_ARGS):
       if(not self._queryArgsAutocompleteAsForm(frag)):
         self.adapter.cleanUpCrt()
@@ -176,6 +177,12 @@ class Reactor(object):
       cmdKlass = import_class(self.cmdModel.classImportPath)
       cmd = cmdKlass()
       cmd.paramForm = self.paramForm
+
+    if(not cmd.paramForm.is_valid()):
+      # TODO: integrate with std reactor error system
+      print cmd.paramForm.errors
+      self.adapter.restoreCmdLine()
+      return
 
     bridge = Bridge()
     bridge._execeuteCommand(cmd, self.cmdModel)
