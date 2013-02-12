@@ -95,7 +95,11 @@ class Reactor(object):
     self.parser.run()
     (mode, frag) = self.parser.partialInput
     self.adapter.cleanUpCrt()
-    if(mode==self.parser.MODE_COMMAND):
+    if(mode==self.parser.MODE_ERROR):
+      # Not doing anything in here, but the cleanUpCrt() and initVar() will
+      # still be run
+      pass
+    elif(mode==self.parser.MODE_COMMAND):
       (entryOutput, crtOutput)= self._queryCommandAutocomplete(frag)
       entrySetterFxn(entryOutput)
       if(crtOutput):
