@@ -95,6 +95,8 @@ class TxtCmdParser(object):
         return (mode, self._cmdInTxt[self._commaIdx[-1]:])
       except IndexError:
         return (mode, self._cmdInTxt[self._openParenIdx[-1]:])
+    else:
+      return (self.MODE_EMPTY, "")
 
   def __init__(self):
     self.legitCmdNameRePattern = re.compile("^[A-z]*\w*$")
