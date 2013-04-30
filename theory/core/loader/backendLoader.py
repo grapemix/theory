@@ -7,7 +7,7 @@ import os
 os.environ.setdefault("CELERY_LOADER", "theory.core.loader.celeryLoader.CeleryLoader")
 
 # Order is important in here
-from celery.app import default_app as celeryApp
+from celery import current_app
 from celery.bin import celeryd
 ##### Theory lib #####
 
@@ -20,7 +20,7 @@ from celery.bin import celeryd
 ##### Misc #####
 
 def startCelery():
-  worker = celeryd.WorkerCommand(app=celeryApp)
+  worker = celeryd.WorkerCommand(app=current_app._get_current_object())
   args=[]
   kwargs={}
   kwargs["loglevel"] = "DEBUG"
