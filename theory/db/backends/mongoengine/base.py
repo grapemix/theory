@@ -61,7 +61,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
   def _mongoengineConnect(self):
     if(self.connection is None):
       self.connection = connect(self.settings_dict["NAME"],
-          port=int(self.settings_dict["PORT"]))
+          port=int(self.settings_dict["PORT"]),
+          username=self.settings_dict['USER'],
+          password=self.settings_dict['PASSWORD'],
+          )
 
 class DatabaseClient(BaseDatabaseClient):
   executable_name = 'mongo'
