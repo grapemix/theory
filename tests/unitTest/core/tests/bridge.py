@@ -16,104 +16,14 @@ from theory.utils import unittest
 ##### Theory app #####
 
 ##### Misc #####
+from tests.base.command import *
 
-__all__ = ('BridgeTestCase', 'SimpleChain1', \
-    'SimpleChain2', 'AsyncChain1', \
-    'AsyncChain2', 'AsyncCompositeChain1', )
+__all__ = ('BridgeTestCase', )
 
-class BaseChain(object):
-  name = ""
+class ThirdpartyClass(object):
 
-  @classmethod
-  def getCmdModel(self):
-    className = self.name[0].upper() + self.name[1:]
-    cmdModel = Command(name=className, app="test", mood=["test",])
-    with Stub(proxy=cmdModel) as cmdModel:
-      cmdModel.classImportPath >> "tests.unitTest.core.tests.%s" % className
-    return cmdModel
-
-class BaseChain1(BaseChain):
-  _gongs = ["StdPipe", ]
-
-  class ParamForm(SimpleCommand.ParamForm):
-    customField = field.TextField(required=False)
-
-class SimpleChain1(BaseChain1, SimpleCommand):
-  name = "simpleChain1"
-  verboseName = "simpleChain1"
-
-  def run(self):
-    self._stdOut = "simpleChain1"
-
-class AsyncChain1(BaseChain1, AsyncCommand):
-  name = "asyncChain1"
-  verboseName = "asyncChain1"
-  _stdOut = name
-
-  def run(self):
-    self._stdOut = "asyncChain1"
-
-class AsyncCompositeChain1(AsyncChain1):
-  def _getMockCommandObject(self, cmd, classImportPath):
-    with Stub(proxy=cmd) as cmd:
-      cmd.classImportPath >> "%s.%s" % (self.__module__, classImportPath)
-    return cmd
-
-  def run(self, secondCmdModel, *args, **kwargs):
-    super(AsyncCompositeChain1, self).__init__(*args, **kwargs)
-    bridge = Bridge()
-    secondCmdModel = self._getMockCommandObject(secondCmdModel, "SimpleChain2")
-    (chain2Class, secondCmdStorage) = bridge.bridge(self, secondCmdModel)
-    secondCmd = \
-        bridge.getCmdComplex(secondCmdModel, [], secondCmdStorage)
-    return secondCmd.run()
-
-class BaseChain2(BaseChain):
-  _notations = ["StdPipe", ]
-  _stdIn = ""
-  _propertyForTesting = ""
-
-  class ParamForm(SimpleCommand.ParamForm):
-    customField = field.TextField(required=False)
-    stdIn = field.TextField()
-
-  @classmethod
-  def getCmdModel(self):
-    cmdModel = super(BaseChain2, self).getCmdModel()
-    cmdModel.param = [Parameter(name="stdIn",type="String")]
-    return cmdModel
-
-  @property
-  def stdIn(self):
-    return self._stdIn
-
-  @stdIn.setter
-  def stdIn(self, stdIn):
-    """
-    :param stdIn: stdIn comment
-    :type stdIn: stdIn type
-    """
-    self._stdIn = stdIn
-
-  @property
-  def propertyForTesting(self):
-    return self._propertyForTesting
-
-  @propertyForTesting.setter
-  def propertyForTesting(self, propertyForTesting):
-    self._propertyForTesting = propertyForTesting
-
-  def run(self):
-    self.propertyForTesting = "propertyForTesting generated"
-    return self.paramForm.clean()["stdIn"] + " received"
-
-class SimpleChain2(BaseChain2, SimpleCommand):
-  name = "simpleChain2"
-  verboseName = "simpleChain2"
-
-class AsyncChain2(BaseChain2, AsyncCommand):
-  name = "asyncChain2"
-  verboseName = "asyncChain2"
+  def saveCmdForTest(self, cmd):
+    self.cmd = cmd
 
 class BridgeTestCase(unittest.TestCase):
   def setUp(self):
@@ -121,11 +31,6 @@ class BridgeTestCase(unittest.TestCase):
     self.asyncChain1CommandModel = AsyncChain1.getCmdModel()
     self.asyncChain2CommandModel = AsyncChain2.getCmdModel()
     self.adapterBufferModel = AdapterBuffer()
-
-  def _getMockCommandObject(self, cmd, classImportPath):
-    with Stub(proxy=cmd) as cmd:
-      cmd.classImportPath >> "%s.%s" % (self.__module__, classImportPath)
-    return cmd
 
   def testParamFormAssignment(self):
     firstCmd = AsyncChain1()
@@ -154,27 +59,45 @@ class BridgeTestCase(unittest.TestCase):
 
   def testBridgeToDb(self):
     secondCmdModel = self.asyncChain2CommandModel
-    secondCmdModel = self._getMockCommandObject(secondCmdModel, "AsyncChain2")
 
     firstCmd = AsyncChain1()
     firstCmd.paramForm = firstCmd.ParamForm()
     firstCmd.run()
 
+    Command(name=firstCmd.name, app="", mood=[""]).save()
+    secondCmdModel.save()
     data = self.bridge.bridgeToDb(firstCmd, secondCmdModel)
 
     self.assertEqual(data, '{"stdIn": "asyncChain1"}')
-    self.adapterBufferModel.fromCmd = self.asyncChain1CommandModel
-    self.adapterBufferModel.toCmd = self.asyncChain2CommandModel
-    self.adapterBufferModel.data = data
+    self.assertEqual(AdapterBuffer.objects.count(), 1)
+    savedAdapterBufferModel = AdapterBuffer.objects.all()[0]
+    self.assertEqual(savedAdapterBufferModel.toCmd.id, secondCmdModel.id)
+    self.assertEqual(savedAdapterBufferModel.data, data)
 
   def testBridgeFromDb(self):
     self.adapterBufferModel.fromCmd = self.asyncChain1CommandModel
     secondCmdModel = self.asyncChain2CommandModel
-    secondCmdModel = self._getMockCommandObject(secondCmdModel, "AsyncChain2")
+
+    # thirdparty is nextStep command so far
+    thirdpartyObj = ThirdpartyClass()
+
     self.adapterBufferModel.toCmd = secondCmdModel
     self.adapterBufferModel.data = '{"stdIn": "asyncChain1"}'
-    tailInst = self.bridge.bridgeFromDb(self.adapterBufferModel)
-    self.assertTrue(isinstance(tailInst, AsyncChain2))
-    self.assertEqual(tailInst.paramForm.fields['stdIn'].finalData, u'asyncChain1')
-    self.assertEqual(tailInst.paramForm.fields['stdIn'].finalData, u'asyncChain1')
-    self.assertEqual(tailInst.paramForm.cleaned_data['stdIn'], u'asyncChain1')
+    self.adapterBufferModel.adapter = Adapter.objects.get(name="StdPipe")
+    self.assertEqual(self.adapterBufferModel.fromCmd.classImportPath,
+        "tests.base.command.asyncChain1.AsyncChain1")
+    self.assertEqual(self.adapterBufferModel.toCmd.classImportPath,
+        "tests.base.command.asyncChain2.AsyncChain2")
+    self.bridge.bridgeFromDb(
+        self.adapterBufferModel,
+        thirdpartyObj.saveCmdForTest)
+    self.assertTrue(isinstance(thirdpartyObj.cmd, AsyncChain2))
+    self.assertEqual(
+        thirdpartyObj.cmd.paramForm.fields['stdIn'].finalData,
+        u'asyncChain1')
+    self.assertEqual(
+        thirdpartyObj.cmd.paramForm.fields['stdIn'].finalData,
+        u'asyncChain1')
+    self.assertEqual(
+        thirdpartyObj.cmd.paramForm.cleaned_data['stdIn'],
+        u'asyncChain1')

@@ -189,7 +189,7 @@ class Reactor(object):
       return
 
     bridge = Bridge()
-    bridge._execeuteCommand(cmd, self.cmdModel)
+    bridge._execeuteCommand(cmd, self.cmdModel, self.adapter.uiParam)
 
     self._performDrums(cmd)
     History(command=self.parser.cmdInTxt, commandRef=self.cmdModel,

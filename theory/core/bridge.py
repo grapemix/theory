@@ -7,7 +7,7 @@ import json
 from theory.adapter import BaseUIAdapter
 from theory.command.baseCommand import AsyncContainer
 from theory.core.exceptions import CommandSyntaxError
-from theory.model import Adapter
+from theory.model import Adapter, AdapterBuffer, Command
 from theory.utils.importlib import import_class
 
 ##### Theory third-party lib #####
@@ -79,6 +79,13 @@ class Bridge(object):
         return i
     return None
 
+  def _serializeAdapterPropertySelection(self, adapterModel, adapter, tailModel):
+    """ This fxn will treat adapter's choice as highest priority. """
+    propertyLst = self._naivieAdapterPropertySelection(adapterModel, tailModel)
+    if(hasattr(adapter, "serializableProperty")):
+      return adapter.serializableProperty(propertyLst)
+    return propertyLst
+
   def _naivieAdapterPropertySelection(self, adapterModel, tailModel):
     propertyLst = []
     cmdParam = [i.name for i in tailModel.param]
@@ -92,9 +99,6 @@ class Bridge(object):
     commonAdapterName = self._probeAdapter(headInst, tailInst)
 
     (adapterModel, adapter) = self.adaptFromCmd(commonAdapterName, headInst)
-    #if(adapter.hasattr(isDisplayWidgetCompatable) and adapter.isDisplayWidgetCompatable):
-    #if(issubclass(BaseUIAdapter, adapter)):
-    #  pass
 
     propertyLst = self._naivieAdapterPropertySelection(adapterModel, tailModel)
     adapter.run()
@@ -111,19 +115,53 @@ class Bridge(object):
 
     (adapterModel, adapter) = self.adaptFromCmd(commonAdapterName, headInst)
 
-    propertyLst = self._naivieAdapterPropertySelection(adapterModel, tailModel)
-    adapter.run()
+    propertyLst = self._serializeAdapterPropertySelection(adapterModel, adapter, tailModel)
+    adapter.toDb()
 
-    return json.dumps(self._propertiesAssign(adapter, \
+    jsonData = json.dumps(self._propertiesAssign(adapter, \
         self._dictAssign, \
         {}, \
         propertyLst))
 
-  def bridgeFromDb(self, adapterBufferModel):
-    #(tailInst, assignFxn, storage) = \
-    #    self._getCmdForAssignment(adapterBufferModel.toCmd)
-    #return (tailInst, json.loads(adapterBufferModel.data))
-    return self.getCmdComplex(adapterBufferModel.toCmd, [], json.loads(adapterBufferModel.data))
+    firstCmdModel = Command.objects.get(name=headInst.name)
+    abm = AdapterBuffer(fromCmd=firstCmdModel, toCmd=tailModel, adapter=adapterModel, data=jsonData)
+    abm.save()
+
+    return jsonData
+
+  def bridgeFromDb(self, adapterBufferModel, callbackFxn, uiParam={}):
+    jsonData = json.loads(adapterBufferModel.data)
+    adapterModel = adapterBufferModel.adapter
+    adapterKlass = import_class(adapterModel.importPath)
+    adapter = adapterKlass()
+    for k,v in jsonData.iteritems():
+      setattr(adapter, k, v)
+
+    adapter.fromDb()
+
+    propertyLst = self._naivieAdapterPropertySelection(adapterModel, adapterBufferModel.toCmd)
+    if(hasattr(adapter, "render")):
+      adapter.render(uiParam=uiParam)
+      adapter.bridge = self
+      self.propertyLst = propertyLst
+      self.adapterBufferModel = adapterBufferModel
+      self.callbackFxn = callbackFxn
+    else:
+      dataDict = self._propertiesAssign(adapter, \
+          self._dictAssign, \
+          {}, \
+          propertyLst)
+
+      callbackFxn(self.getCmdComplex(adapterBufferModel.toCmd, [], dataDict))
+
+  def bridgeFromUIAdapter(self, adapter):
+    dataDict = self._propertiesAssign(adapter, \
+        self._dictAssign, \
+        {}, \
+        self.propertyLst)
+
+    cmd = self.getCmdComplex(self.adapterBufferModel.toCmd, [], dataDict)
+    self.callbackFxn(cmd)
 
   # TODO: to support fall back
   def _probeAdapter(self, headClass, tailClass):
@@ -181,17 +219,18 @@ class Bridge(object):
       print form.errors
     return adapter
 
-  def _execeuteCommand(self, cmd, cmdModel, adapterProperty=[]):
+  def _execeuteCommand(self, cmd, cmdModel, uiParam={}):
     # Since we only allow execute one command in a time thru terminal,
     # the command doesn't have to return anything
     if(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC_WRAPPER):
       asyncContainer = AsyncContainer()
-      result = asyncContainer.delay(cmd, adapterProperty).get()
+      result = asyncContainer.delay(cmd, uiParam).get()
     elif(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC):
       #result = cmd.delay(storage).get()
-      cmd.delay(paramForm=paramForm)
+      cmd.delay()
     else:
+      cmd._uiParam = uiParam
       asyncContainer = AsyncContainer()
-      result = asyncContainer.run(cmd, adapterProperty)
+      result = asyncContainer.run(cmd, uiParam)
 
 

@@ -135,10 +135,10 @@ class AdapterBuffer(Model):
       verbose_name=_("To command"),\
       required=True, \
       help_text=_("The output command of the adapter"))
-  #adapter = ReferenceField("Adapter", \
-  #    verbose_name=_("adapter"),\
-  #    required=True, \
-  #    help_text=_("The adapter being used"))
+  adapter = ReferenceField("Adapter", \
+      verbose_name=_("adapter"),\
+      required=True, \
+      help_text=_("The adapter being used"))
   data = StringField(required=True, \
       verbose_name=_("data"), \
       help_text=_("The data adapted to next command and stored in JSON format"))

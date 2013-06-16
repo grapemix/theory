@@ -17,8 +17,7 @@ from theory.model import *
 ##### Theory app #####
 
 ##### Misc #####
-from tests.unitTest.core.tests import \
-    SimpleChain1, SimpleChain2, AsyncChain1, AsyncChain2, AsyncCompositeChain1
+from tests.base.command import *
 
 __all__ = ('BridgeTestCase',)
 

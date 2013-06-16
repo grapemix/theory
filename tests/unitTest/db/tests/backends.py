@@ -45,11 +45,10 @@ class BackendsTestCase(unittest.TestCase):
 
   def testDbIsTestDb(self):
     db = get_db()
-    #self.assertEqual(db.name, 'test_theory')
+    self.assertEqual(db.name, 'test_theory')
 
   def testTestDbExist(self):
-    pass
-    #self.assertRaises(ConnectionError, connect, 'test_theory', alias='testDb')
+    self.assertRaises(ConnectionError, connect, 'test_theory', alias='testDb')
     """
     connect('test_theory', alias='testdb')
     conn = get_connection('testdb')

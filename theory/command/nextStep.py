@@ -4,6 +4,7 @@
 
 ##### Theory lib #####
 from theory.command.baseCommand import SimpleCommand
+from theory.conf import settings
 from theory.core.bridge import Bridge
 from theory.gui import field
 from theory.model import AdapterBuffer, Command
@@ -49,16 +50,35 @@ class NextStep(SimpleCommand):
     super(NextStep, self).__init__(*args, **kwargs)
     self.bridge = Bridge()
 
+  def _execeuteCommand(self, cmd):
+    cmdModel = self.adapterBufferModel.toCmd
+
+    # Copied from core/reactor.py, should update this part if the original is
+    # modified.
+    if(not cmd.paramForm.is_valid()):
+      # TODO: integrate with std reactor error system
+      print cmd.paramForm.errors
+      return
+
+    # Copied from reactor, should be refactor to bridge in the futher
+    self.bridge._execeuteCommand(cmd, cmdModel)
+
+    debugLvl = settings.DEBUG_LEVEL
+    bridge = Bridge()
+    for adapterName, leastDebugLvl in cmd._drums.iteritems():
+      if(leastDebugLvl<=debugLvl):
+        (adapterModel, drum) = bridge.adaptFromCmd(adapterName, cmd)
+        drum.render(uiParam=self._uiParam)
+
+
   def run(self, *args, **kwargs):
     if(self.paramForm.is_valid()):
       if(self.bridge == None):
         self.bridge = Bridge()
       cmdId = self.paramForm.clean()["commandReady"]
-      adapterBufferModel = AdapterBuffer.objects.get(id=cmdId)
+      self.adapterBufferModel = AdapterBuffer.objects.get(id=cmdId)
 
-      cmd = self.bridge.bridgeFromDb(adapterBufferModel)
-      cmdModel = adapterBufferModel.toCmd
-      self.bridge._execeuteCommand(cmd, cmdModel)
+      self.bridge.bridgeFromDb(self.adapterBufferModel, self._execeuteCommand, self.uiParam)
     else:
       # TODO: integrate with std reactor error system
       print self.paramForm.errors
