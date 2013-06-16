@@ -246,27 +246,27 @@ class StringGroupFilterInput(BaseLabelInput):
 
   @property
   def changedData(self):
-    return self.widgetLst[0].changedData()
+    return self.widgetLst[0].changedData
 
 
 class ModelValidateGroupInput(BaseLabelInput):
   widgetClass = ListModelValidator
 
   def __init__(self, fieldSetter, fieldGetter, win, bx, attrs=None, *args, **kwargs):
-    attrs = self._buildAttrs(attrs, initData=())
+    attrs = self._buildAttrs(attrs, initData=(), isExpandMainContainer=True)
     super(ModelValidateGroupInput, self).__init__(fieldSetter, fieldGetter, win, bx, attrs, *args, **kwargs)
 
   @property
   def initData(self):
-    return self.widgetLst[0].initData()
+    return self.widgetLst[0].initData
 
   @property
   def changedData(self):
-    return self.widgetLst[0].changedData()
+    return self.widgetLst[0].changedData
 
   def updateField(self):
     self.fieldSetter({\
-        "finalData": self.widgetLst[0].finalData(),
+        "finalData": self.widgetLst[0].finalData,
         "changedData":  self.changedData,
         })
 
