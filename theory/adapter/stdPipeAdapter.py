@@ -47,6 +47,7 @@ class StdPipeAdapter(BaseAdapter):
   def stdIn(self, stdIn):
     self._stdIn = stdIn
 
-  def run(self):
+  def toDb(self):
     self.stdIn = self.stdOut
     self.stdIn += self.stdErr
+    return True

@@ -125,6 +125,11 @@ class SimpleCommand(_BaseCommand):
   _status = ""
   _stdOut = ""
   _stdRowOut = []
+  _uiParam = {}
+
+  @property
+  def uiParam(self):
+    return self._uiParam
 
   @property
   def stdOut(self):
@@ -158,7 +163,7 @@ class AsyncContainer(Task):
   Normal users should not used this class.
   """
 
-  # Warning: Try not to override this fxn
+  # deprecated
   def extractResult(self, inst, adapterInput):
     result = {}
     for property in adapterInput:
@@ -167,4 +172,3 @@ class AsyncContainer(Task):
 
   def run(self, cmdObj, adapterInput):
     cmdObj.run()
-    return self.extractResult(cmdObj, adapterInput)

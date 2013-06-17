@@ -15,10 +15,25 @@ from abc import ABCMeta, abstractmethod
 
 class BaseAdapter(object):
   abstract = True
-  def run(self):
-    """This function should be called after all properties were being assigned.
+
+  def toDb(self):
+    """This function is being used when the conversion needs to be
+    separated and should be called after all properties were being assigned
+    and before serialization.
     """
     return True
+
+  def fromDb(self):
+    """This function is being used when the conversion needs to be
+    separated and should be called after serialization.
+    """
+    return True
+
+  def run(self):
+    """This function is being used when the conversion does not need to be
+    separated and should be called after all properties were being assigned.
+    """
+    return self.toDb() and self.fromDb()
 
 class BaseUIAdapter(BaseAdapter):
   abstract = True
