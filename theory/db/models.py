@@ -2,7 +2,7 @@
 #!/usr/bin/env python
 ##### System wide lib #####
 from mongoengine import *
-from mongoengine.base import TopLevelDocumentMetaclass
+from .base import ModelMetaClass
 import sys
 
 ##### Theory lib #####
@@ -16,12 +16,11 @@ import sys
 ##### Misc #####
 
 class Model(Document):
-  __metaclass__ = TopLevelDocumentMetaclass
+  __metaclass__ = ModelMetaClass
 
   meta = { "abstract": True }
 
   def __init__(self, *args, **kwargs):
     self.meta = {}
-    self.meta["collection"] = "%s_%s" % (sys.modules[self.__module__].__name__.split('.')[-2], self._get_collection_name())
     super(Model, self).__init__(*args, **kwargs)
 
