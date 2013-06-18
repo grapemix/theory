@@ -25,7 +25,10 @@ class ModelMetaClass(TopLevelDocumentMetaclass):
     model_module = sys.modules[new_class.__module__]
     app_label = model_module.__name__.split('.')[-2]
 
-    new_class._meta["collection"] = app_label + new_class._meta["collection"]
+    try:
+      new_class._meta["collection"] = "%s_%s" % (app_label, new_class._meta["collection"])
+    except KeyError:
+      pass
     new_class._meta["app_label"] = app_label
 
     return new_class
