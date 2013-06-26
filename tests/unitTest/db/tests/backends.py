@@ -50,17 +50,27 @@ class BackendsTestCase(unittest.TestCase):
     db = get_db()
     self.assertEqual(db.name, 'test_theory')
 
-  def testTestDbExist(self):
-    self.assertRaises(ConnectionError, connect, 'test_theory', alias='testDb')
-    """
-    connect('test_theory', alias='testdb')
-    conn = get_connection('testdb')
+# This should be used for testing switch db in the future
+#
+#
+#  def testTestDbExist(self):
+#    self.assertRaises(ConnectionError, connect, 'test_theory', alias='testDb')
+#
+#
+#    connect('test_theory', alias='testdb')
+#    conn = get_connection('testdb')
+#
+#    db = get_db()
+#    self.assertTrue(isinstance(db, pymongo.database.Database))
+#    self.assertEqual(db.name, 'test_theory')
+#
+#    conn = get_connection()
+#    dbCreator = DatabaseCreation(conn)
+#    dbCreator._createTestDb(1, None)
 
-    db = get_db()
-    self.assertTrue(isinstance(db, pymongo.database.Database))
-    self.assertEqual(db.name, 'test_theory')
+  def testCollectionNameDuringQuery(self):
+    self.assertEqual(Command._get_collection_name(), "theory_command")
 
-    conn = get_connection()
-    dbCreator = DatabaseCreation(conn)
-    dbCreator._createTestDb(1, None)
-    """
+  def testCollectionNameDuringCreation(self):
+    cmd = Command(name="testCmd", app="testApp", mood="testMood")
+    self.assertEqual(cmd._get_collection_name(), "theory_command")
