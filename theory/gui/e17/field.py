@@ -30,7 +30,7 @@ __all__ = (
   'FloatField', 'DecimalField', 'IPAddressField', 'GenericIPAddressField',
   'FilePathField', 'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField',
   'StringGroupFilterField', 'ModelValidateGroupField', 'PythonModuleField',
-  'PythonClassField',
+  'PythonClassField', 'QuerysetField',
 )
 
 
@@ -115,4 +115,7 @@ class PythonModuleField(field.PythonModuleField):
   pass
 
 class PythonClassField(field.PythonClassField):
+  pass
+
+class QuerysetField(field.QuerysetField):
   pass

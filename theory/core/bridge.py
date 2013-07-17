@@ -35,6 +35,10 @@ class Bridge(object):
     o[k] = v
     return o
 
+  def _formAssign(self, o, k, v):
+    o.fields[k].finalData = v
+    return o
+
   def _getCmdForAssignment(self, cmdModel):
     cmdKlass = import_class(cmdModel.classImportPath)
     cmd = cmdKlass()
@@ -107,6 +111,25 @@ class Bridge(object):
         self._dictAssign, \
         {}, \
         propertyLst))
+
+  def bridgeToSelf(self, headInst):
+    cmd = headInst.__class__()
+    commonAdapterName = headInst._gongs[0]
+
+    (adapterModel, adapter) = self.adaptFromCmd(commonAdapterName, headInst)
+    adapter.run()
+    if(hasattr(adapter, "render")):
+      adapter.render()
+
+    return (
+        headInst,
+        self._propertiesAssign(
+          adapter,
+          self._formAssign,
+          headInst.paramForm,
+          headInst.paramForm.fields.keys()
+          )
+        )
 
   def bridgeToDb(self, headInst, tailModel):
     (tailInst, assignFxn, storage) = self._getCmdForAssignment(tailModel)
