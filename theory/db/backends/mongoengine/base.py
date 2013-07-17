@@ -25,25 +25,19 @@ class DatabaseCreation(BaseDatabaseCreation):
         username=self.connection.settings_dict['USER'],
         password=self.connection.settings_dict['PASSWORD'],
         )
-    self.connection.connection = get_connection()
-    self.connection.settings_dict["ORIGINAL_NAME"] = self.connection.settings_dict["NAME"]
+    self.connection.settings_dict["ORIGINAL_NAME"] = \
+        self.connection.settings_dict["NAME"]
 
   def _destroyTestDb(self, testDatabaseName, verbosity):
     if(verbosity>1):
       print "Dropping database %s" % (testDatabaseName)
-    self.connection.connection.drop_database(testDatabaseName)
+    connection = get_connection()
+    connection.drop_database(testDatabaseName)
+    self.connection.settings_dict["NAME"] = \
+        self.connection.settings_dict["ORIGINAL_NAME"]
 
   def _closeConnection(self):
     disconnect()
-
-  def _resumeOriginalConnection(self):
-    connect(self.connection.settings_dict["ORIGINAL_NAME"],
-        port=int(self.connection.settings_dict['PORT']),
-        username=self.connection.settings_dict['USER'],
-        password=self.connection.settings_dict['PASSWORD'],
-        )
-
-
 
 class DatabaseWrapper(BaseDatabaseWrapper):
   vendor = 'mongoengine'
