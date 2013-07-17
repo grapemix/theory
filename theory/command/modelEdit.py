@@ -26,6 +26,7 @@ class ModelEdit(SimpleCommand):
   name = "modelEdit"
   verboseName = "model edit"
   _gongs = ["QuerysetAsSpreadsheet", ]
+  _drums = {"Terminal": 1,}
 
   class ParamForm(SimpleCommand.ParamForm):
     appName = field.ChoiceField(label="Application Name",
@@ -56,8 +57,11 @@ class ModelEdit(SimpleCommand):
   def _saveEditChanges(self):
     for model in self.paramForm.clean()["queryset"]:
       model.save()
+    self._stdOut += "{0} model has been saved."\
+        .format(len(self.paramForm.clean()["queryset"]))
 
   def run(self, *args, **kwargs):
+    self._stdOut = ""
     isQuerysetNonEmpty = self._fetchQueryset()
     if(isQuerysetNonEmpty):
       bridge = Bridge()
@@ -65,12 +69,15 @@ class ModelEdit(SimpleCommand):
       self.paramForm = newParamForm
       self.paramForm.full_clean()
       self._saveEditChanges()
+    else:
+      self._stdOut += "No data found."
 
   def _fetchQueryset(self):
     formData = self.paramForm.clean()
 
     if(len(formData["queryset"]) > 0):
       self.queryset = formData["queryset"]
+      return True
     else:
       modelName = formData["modelName"]
       modelName = modelName[0].upper() + modelName[1:]
@@ -78,4 +85,6 @@ class ModelEdit(SimpleCommand):
           "%s.model.%s" % (formData["appName"], modelName)
       )
       self.queryset = self.modelKlass.objects.all()
-    return True
+      if(len(self.queryset)>0):
+        return True
+    return False
