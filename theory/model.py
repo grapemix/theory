@@ -148,3 +148,32 @@ class BinaryClassifierHistory(Model):
   ref = GenericReferenceField()
   initState = SortedListField(BooleanField())
   finalState = SortedListField(BooleanField())
+
+class AppModel(Model):
+  name = StringField(
+      required=True,
+      max_length=256,
+      verbose_name=_("App model name"),
+      help_text=_("Application model name")
+      )
+  app = StringField(
+      required=True,
+      max_length=256,
+      verbose_name=_("Application name"),
+      help_text=_("Application name")
+      )
+  paramName = SortedListField(
+      StringField(
+        max_length=256,
+        verbose_name=_("Parameter name"),
+        help_text=_("The moods of the app")
+        ),
+      required=True,
+      )
+  importPath = StringField(
+      max_length=256,
+      required=True,
+      verbose_name=_("Import Path"),
+      unique=True,
+      help_text=_("The path to import the adapter")
+      )
