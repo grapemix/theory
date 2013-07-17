@@ -42,25 +42,47 @@ class FilenameScanner(SimpleCommand):
         (YIELD_MODE_CHUNK, 'Chunk'),
     )
 
-    rootLst = field.ListField(field.TextField(max_length=512), label="Root Directory List")
-    yieldMethod = field.ChoiceField(label="Yield Method", \
-        help_text="how to send the filename in each iteration", \
-        choices=YIELD_METHOD_CHOICES, \
-        initData=YIELD_MODE_ALL, required=False)
-    depth = field.IntegerField(label="Depth", initData=0, required=False, \
-        help_text="The recursion level. (0 = not recursive, -1 = recursive infinitely)")
-    includeFileExtLst = field.ListField(field.TextField(max_length=10), \
-        label="The list of file extension being included", \
-        help_text="File extenstion being included", required=False)
-    excludeFileExtLst = field.ListField(field.TextField(max_length=10), \
-        label="The list of file extension being excluded", \
-        help_text="File extenstion being excluded", required=False)
-    includeDirLst = field.ListField(field.TextField(max_length=512), \
-        label="The list of directory being included", \
-        help_text="Directory being included", required=False)
-    excludeDirLst = field.ListField(field.TextField(max_length=512), \
-        label="The list of directory being excluded", \
-        help_text="Directory being excluded", required=False)
+    rootLst = field.ListField(
+        field.TextField(max_length=512),
+        label="Root Directory List"
+    )
+    yieldMethod = field.ChoiceField(
+        label="Yield Method",
+        help_text="how to send the filename in each iteration",
+        choices=YIELD_METHOD_CHOICES,
+        initData=YIELD_MODE_ALL,
+        required=False
+    )
+    depth = field.IntegerField(
+        label="Depth",
+        initData=0,
+        required=False,
+        help_text="The recursion level. (0 = not recursive, -1 = recursive infinitely)"
+    )
+    includeFileExtLst = field.ListField(
+        field.TextField(max_length=10),
+        label="The list of file extension being included",
+        help_text="File extenstion being included",
+        required=False
+    )
+    excludeFileExtLst = field.ListField(
+        field.TextField(max_length=10),
+        label="The list of file extension being excluded",
+        help_text="File extenstion being excluded",
+        required=False
+    )
+    includeDirLst = field.ListField(
+        field.TextField(max_length=512),
+        label="The list of directory being included",
+        help_text="Directory being included",
+        required=False
+    )
+    excludeDirLst = field.ListField(
+        field.TextField(max_length=512),
+        label="The list of directory being excluded",
+        help_text="Directory being excluded",
+        required=False
+    )
 
     _excludeFileFxnLst = [lambda x: False, ]
     _excludeDirFxnLst = [lambda x: False, ]
