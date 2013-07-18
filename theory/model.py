@@ -154,7 +154,8 @@ class AppModel(Model):
       required=True,
       max_length=256,
       verbose_name=_("App model name"),
-      help_text=_("Application model name")
+      help_text=_("Application model name"),
+      unique_with="app",
       )
   app = StringField(
       required=True,
