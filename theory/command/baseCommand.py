@@ -64,10 +64,19 @@ class _BaseCommand(object):
 
   class ParamForm(CommandForm):
     verbosity = field.IntegerField(label="verbosity", required=False)
-    notations = field.ListField(field.AdapterField(), label="notations", required=False)
-    gongs = field.ListField(field.AdapterField(), label="gongs", required=False)
-    drums = field.DictField(field.AdapterField(), label="drums", required=False)
-    concatCommand = field.TextField(label="Concatenated command", required=False, help_text="another command being concatenated to this command")
+    # Not being implemented in this version
+    #notations = field.ListField(
+    #    field.AdapterField(),
+    #    label="notations",
+    #    required=False
+    #)
+    #gongs = field.ListField(field.AdapterField(), label="gongs", required=False)
+    #drums = field.DictField(field.AdapterField(), label="drums", required=False)
+    #concatCommand = field.TextField(
+    #    label="Concatenated command",
+    #    required=False,
+    #    help_text="another command being concatenated to this command
+    #)
 
   @property
   def verbosity(self):
