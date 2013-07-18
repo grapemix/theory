@@ -451,10 +451,13 @@ class ListInput(BaseLabelInput):
     return result
 
   def updateField(self):
-    if(self.widgetClass == Multibuttonentry):
-      self.fieldSetter({\
-          "finalData": self._inputLst[0].finalData,\
-          })
+    if(self.widgetClass == Multibuttonentry
+        or self.widgetClass == TextInput.widgetClass):
+      self.fieldSetter(
+          {
+            "finalData": self._inputLst[0].finalData,
+          }
+      )
     else:
       for idx in range(len(self._inputLst)):
         self._inputLst[idx].updateField()
