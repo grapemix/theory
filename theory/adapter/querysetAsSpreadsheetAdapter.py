@@ -57,7 +57,10 @@ class QuerysetAsSpreadsheetAdapter(BaseUIAdapter):
         newQueryset.append(self.queryset[i])
         newDataRow.append(dataRow[i])
 
-      columnHandlerLabel = spreadsheet.getColumnHandlerLabel()
-      handler = GtkSpreadsheetModelBSONDataHandler()
-      #handler = GtkSpreadsheetModelDataHandler()
-      self.queryset = handler.run(newDataRow, newQueryset, columnHandlerLabel)
+      if(len(newQueryset)!=0):
+        columnHandlerLabel = spreadsheet.getColumnHandlerLabel()
+        handler = GtkSpreadsheetModelBSONDataHandler()
+        #handler = GtkSpreadsheetModelDataHandler()
+        self.queryset = handler.run(newDataRow, newQueryset, columnHandlerLabel)
+      else:
+        self.queryset = []
