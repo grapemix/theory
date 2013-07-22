@@ -2,8 +2,10 @@
 #!/usr/bin/env python
 ##### System wide lib #####
 import inspect
+from collections import OrderedDict
 from copy import deepcopy
-from mongoengine import *
+from mongoengine import fields as MongoEngineField
+from mongoengine.base import ObjectIdField as MongoEngineObjectId
 
 ##### Theory lib #####
 from theory.model import Model
@@ -60,6 +62,58 @@ class ModelClassScanner(BaseClassScanner):
             classLst.append((_property, property))
     return classLst
 
+  def _getMongoTypeDict(self):
+    fieldnameLst = [
+        "BinaryField", "FileField", "ImageField", "BooleanField",
+        "DateTimeField","ComplexDateTimeField", "UUIDField", "SequenceField",
+        "GeoPointField", "DecimalField", "FloatField", "IntField",
+        "EmailField", "URLField", "DynamicField", "ReferenceField",
+        "GenericReferenceField", "EmbeddedDocumentField",
+        "GenericEmbeddedDocumentField", "ListField", "SortedListField",
+        "MapField", "DictField", "StringField",
+    ]
+
+    # The reason we needed OrderedDict in here instead of Dict is because
+    # some fields like ComplexDateTimeField will return true for
+    # isinstance(StringField) and hence we have to test those fields which
+    # can be automatically casted as StringField first.
+    r = OrderedDict()
+    for fieldname in fieldnameLst:
+      try:
+        r[fieldname] = getattr(MongoEngineField, fieldname)
+      except AttributeError:
+        # for backword mongoengine compatability
+        pass
+    return r
+
+  def _matchFieldType(self, modelFieldTypeDict):
+    mongoTypeDict = self._getMongoTypeDict()
+    r = {}
+    for fieldName, fieldType in modelFieldTypeDict.iteritems():
+      label = self._getKlassLabel(fieldType, mongoTypeDict)
+      if(not label is None):
+        r[fieldName] = label
+    return r
+
+  def _getKlassLabel(self, fieldType, mongoTypeDict, prefix=""):
+    for typeName, typeKlass in mongoTypeDict.iteritems():
+      if(isinstance(fieldType, typeKlass)):
+        if(typeName in [
+            "ListField",
+            "SortedListField",
+            "MapField",
+            #"ReferenceField"
+          ]):
+          return self._getKlassLabel(
+              fieldType.field,
+              mongoTypeDict,
+              typeName
+              )
+        elif(prefix!=""):
+          return "{0}.{1}".format(prefix, typeName)
+        else:
+          return typeName
+    return None
 
   def scan(self):
     modelClassLst = self._loadModelClass(self.modelTemplate.importPath)
@@ -97,6 +151,7 @@ class ModelClassScanner(BaseClassScanner):
 
       model.app = token[0]
       model.name = modelClassName
-      model.paramName = modelClass._fields.keys()
+      model.fieldNameTypeMap = self._matchFieldType(modelClass._fields)
+      model.tblField = model.formField = modelClass._fields.keys()
 
       self._modelLst.append(model)

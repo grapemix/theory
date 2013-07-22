@@ -163,18 +163,32 @@ class AppModel(Model):
       verbose_name=_("Application name"),
       help_text=_("Application name")
       )
-  paramName = SortedListField(
+  tblField = SortedListField(
       StringField(
         max_length=256,
-        verbose_name=_("Parameter name"),
-        help_text=_("The moods of the app")
+        verbose_name=_("Table field"),
+        help_text=_("The fields being showed in a table")
         ),
+      required=True,
+      )
+  formField = SortedListField(
+      StringField(
+        max_length=256,
+        verbose_name=_("Form field"),
+        help_text=_("The fields being showed in a form")
+        ),
+      required=True,
+      )
+  fieldNameTypeMap = MapField(
+      field=StringField(max_length=256,),
+      verbose_name=_("Field name and type map"),
+      help_text=_("All fields' name and their type"),
       required=True,
       )
   importPath = StringField(
       max_length=256,
       required=True,
-      verbose_name=_("Import Path"),
+      verbose_name=_("Import path"),
       unique=True,
       help_text=_("The path to import the adapter")
       )

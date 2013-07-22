@@ -3,14 +3,13 @@
 ##### System wide lib #####
 from collections import OrderedDict
 from bson.json_util import loads as jsonLoads
-from bson.dbref import DBRef
 ##### Theory lib #####
-from theory.db.models import EmbeddedDocument as TheoryEmbeddedModel
 from theory.gui import field
 from theory.gui.transformer import (
     MongoModelDataHandler,
     MongoModelBSONDataHandler
     )
+from theory.model import AppModel
 
 ##### Theory third-party lib #####
 
@@ -380,15 +379,18 @@ class SpreadsheetBuilder(MongoModelBSONDataHandler):
   def run(self, queryset, isEditable=False, isMainSpreadsheet=True):
     self.modelKlass = queryset[0].__class__
 
-    if(isinstance(queryset[0], TheoryEmbeddedModel)):
-      self.fieldDict = queryset[0]._fields
-    elif(isinstance(queryset[0], DBRef)):
-      raise NotImplementedError
+    if(self.modelKlass._is_document):
+      (appName, modelName) = self.modelKlass._get_collection_name().split("_")
+      modelName = modelName.title()
+      appModelmodel = AppModel.objects.get(name=modelName, app=appName)
     else:
-      self.fieldDict = self.modelKlass._fields
+      # embedded document. There has not enough info to get app name.
+      # In this way, it will cause a bug if there exists two models with the
+      # same name in different apps.
+      appModelmodel = AppModel.objects.get(name=self.modelKlass._class_name)
 
     self.isEditable = isEditable
-    super(SpreadsheetBuilder, self).run(queryset, self.fieldDict)
+    super(SpreadsheetBuilder, self).run(queryset, appModelmodel.fieldNameTypeMap)
 
     listStoreDataType = self._buildListStoreDataType()
     gtkDataModel = self._buildGtkDataModel()
@@ -466,7 +468,7 @@ class SpreadsheetBuilder(MongoModelBSONDataHandler):
   def _buildRenderKwargsSet(self):
     kwargsSet = []
     for fieldName, fieldHandlerFxn in self.fieldType.iteritems():
-      kwargs = fieldHandlerFxn["renderHandler"](self.fieldDict[fieldName])
+      kwargs = fieldHandlerFxn["renderHandler"](self.fieldsDict[fieldName])
       if(kwargs is not None):
         kwargs.update({"title": fieldName})
         kwargsSet.append(kwargs)
