@@ -38,20 +38,34 @@ class MongoModelDetectorBase(object):
 
   def run(self, queryset, fieldsDict):
     self.queryset = queryset
-    self._buildKlsTemplate()
+
+    self._buildTypeCatMap()
     self.fieldsDict = fieldsDict
-    for fieldName, fieldType in fieldsDict.iteritems():
-      self.fieldType[fieldName] = \
-          self._matchFieldType(fieldType, self._typeHandlerMap)
+    for fieldName, fieldTypeLabel in fieldsDict.iteritems():
+      fieldTypeLabelTokenLst = fieldTypeLabel.split(".")
+      handlerFxnName = ""
+      for fieldTypeLabelToken in fieldTypeLabelTokenLst:
+        if(handlerFxnName==""):
+          # When it is in top level, we treated it as normal
+          handlerFxnName += self._typeCatMap[fieldTypeLabelToken][0]
+        else:
+          # When it is NOT in top level, we treated it as child
+          handlerFxnName += self._typeCatMap[fieldTypeLabelToken][1]
+      self.fieldType[fieldName] = self._fillUpTypeHandler(handlerFxnName, "")
+
 
   @abstractmethod
   def _fillUpTypeHandler(self, klassLabel, prefix=""):
     pass
 
-  def _matchFieldType(self, fieldType, typeHandlerMap, prefix=""):
-    for dbKlassLabel, klassLst in typeHandlerMap.iteritems():
-      for klass in klassLst:
-        internalKlassLabel = self._getKlassLabel(fieldType, dbKlassLabel, klass)
+  def _matchFieldType(self, unknownFieldTypeLabel, typeHandlerCatMap, prefix=""):
+    for catLabel, dbFieldTypeLabelLst in typeHandlerCatMap.iteritems():
+      for dbFieldTypeLabel in dbFieldTypeLabelLst:
+        internalKlassLabel = self._getKlassLabel(
+            unknownFieldTypeLabel,
+            catLabel,
+            dbFieldTypeLabel
+            )
         if(internalKlassLabel!=None):
           return self._fillUpTypeHandler(internalKlassLabel, prefix)
 
@@ -60,87 +74,46 @@ class MongoModelDetectorBase(object):
       if(klassLabel=="listField"):
         return self._matchFieldType(
             fieldType.field,
-            self._childTypeHandlerMap,
+            self._childTypeHandlerCatMap,
             "listField"
             )["klassLabel"]
       elif(klassLabel=="mapField"):
         return self._matchFieldType(
             fieldType.field,
-            self._childTypeHandlerMap,
+            self._childTypeHandlerCatMap,
             "listField"
             )["klassLabel"]
       else:
         return klassLabel
     return None
 
-  def _getKlassFromMongoEngine(self, klassLst):
-    return [getattr(MongoEngineField, i) for i in klassLst]
-
-  def _buildKlsTemplate(self):
-    neglectedFieldKlass = self._getKlassFromMongoEngine(
-        ["BinaryField", "DynamicField", "FileField", "ImageField"])
-    nonEditableForceStrFieldKlass = self._getKlassFromMongoEngine([
-      "ComplexDateTimeField",
-      "DateTimeField",
-      "UUIDField",
-      "SequenceField",
-      "DictField",
-    ])
-    nonEditableForceStrFieldKlass.append(MongoEngineObjectId)
-    editableForceStrFieldKlass = self._getKlassFromMongoEngine(
-        ["EmailField", "URLField", "GeoPointField"])
-
-    boolFieldKlass = self._getKlassFromMongoEngine(["BooleanField",])
-    floatFieldKlass = self._getKlassFromMongoEngine([
-      "DecimalField",
-      "FloatField"
-    ])
-    intFieldKlass = self._getKlassFromMongoEngine(["IntField",])
-    strFieldKlass = self._getKlassFromMongoEngine(["StringField",])
-
-    # The reason we needed OrderedDict in here instead of Dict is because
-    # some fields like ComplexDateTimeField will return true for
-    # isinstance(StringField) and hence we have to test those fields which
-    # can be automatically casted as StringField first.
-    self._typeHandlerMap = OrderedDict()
-    self._typeHandlerMap["neglectField"] = neglectedFieldKlass
-    self._typeHandlerMap["mapField"] = self._getKlassFromMongoEngine([
-      "MapField",
-    ])
-    self._typeHandlerMap["nonEditableForceStrField"] = \
-        nonEditableForceStrFieldKlass
-    self._typeHandlerMap["editableForceStrField"] = \
-        editableForceStrFieldKlass
-    self._typeHandlerMap["modelField"] = self._getKlassFromMongoEngine(
-        [
-            "GenericReferenceField",
-            "ReferenceField",
-        ])
-    self._typeHandlerMap["embeddedField"] = self._getKlassFromMongoEngine(
-        [
-            "GenericEmbeddedDocumentField",
-            "EmbeddedDocumentField",
-        ])
-    self._typeHandlerMap["listField"] = self._getKlassFromMongoEngine([
-      "SortedListField",
-      "ListField"
-    ])
-    self._typeHandlerMap["boolField"] = boolFieldKlass
-    self._typeHandlerMap["floatField"] = floatFieldKlass
-    self._typeHandlerMap["intField"] = intFieldKlass
-    self._typeHandlerMap["strField"] = strFieldKlass
-
-    self._childTypeHandlerMap = deepcopy(self._typeHandlerMap)
-    for i in ["boolField", "floatField", "intField", "strField"]:
-      del self._childTypeHandlerMap[i]
-    self._childTypeHandlerMap["editableForceStrField"] = \
-        [klass for klassLst in [
-          editableForceStrFieldKlass,
-          boolFieldKlass,
-          floatFieldKlass,
-          intFieldKlass,
-          strFieldKlass
-        ] for klass in klassLst]
+  def _buildTypeCatMap(self):
+    self._typeCatMap = {
+        "BinaryField": ("neglectField", "neglectField"),
+        "DynamicField": ("neglectField", "neglectField"),
+        "FileField": ("neglectField", "neglectField"),
+        "ImageField": ("neglectField", "neglectField"),
+        "ComplexDateTimeField": ("nonEditableForceStrField", "nonEditableForceStrField"),
+        "DateTimeField": ("nonEditableForceStrField", "nonEditableForceStrField"),
+        "UUIDField": ("nonEditableForceStrField", "nonEditableForceStrField"),
+        "SequenceField": ("nonEditableForceStrField", "nonEditableForceStrField"),
+        "DictField": ("nonEditableForceStrField", "nonEditableForceStrField"),
+        "EmailField": ("editableForceStrField", "editableForceStrField"),
+        "URLField": ("editableForceStrField", "editableForceStrField"),
+        "GeoPointField": ("editableForceStrField", "editableForceStrField"),
+        "BooleanField": ("boolField", "editableForceStrField"),
+        "DecimalField": ("floatField", "editableForceStrField"),
+        "FloatField": ("floatField", "floatField"),
+        "IntField": ("intField", "editableForceStrField"),
+        "StringField": ("strField", "editableForceStrField"),
+        "MapField": ("mapField", "mapField"),
+        "ReferenceField": ("modelField", "modelField"),
+        "GenericReferenceField": ("modelField", "modelField"),
+        "EmbeddedDocumentField": ("embeddedField", "embeddedField"),
+        "GenericEmbeddedDocumentField": ("embeddedField", "embeddedField"),
+        "ListField": ("listField", "listField"),
+        "SortedListField": ("listField", "listField"),
+    }
 
 class MongoModelBSONDataHandler(MongoModelDetectorBase):
   """This class handle the data conversion from MongoDB in BSON, which means
@@ -243,7 +216,7 @@ class GtkSpreadsheetModelBSONDataHandler(MongoModelDetectorBase):
     """
     self.dataRow = dataRow
     self.queryLst = queryLst
-    self._buildKlsTemplate()
+    self._buildTypeCatMap()
 
     for columnLabel, handlerLabel in columnHandlerLabelZip.iteritems():
       if(handlerLabel!=None):
