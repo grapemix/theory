@@ -43,19 +43,19 @@ class DummyGtkSpreadsheetBuilder(SpreadsheetBuilder):
     return self.gtkDataModel
 
 class GtkSpreadsheetModelDataHandlerTestCaseBase(unittest.TestCase):
-  def test_getKlasslabel(self):
-
+  def setUp(self):
     modelFactory = DummyModelFactory()
-    model = modelFactory.getDummyModelWithDefaultValue()
-    query = modelFactory.getDummyQuerySet([model])
-    fieldDict = query[0]._fields
+    self.model = modelFactory.getModelWithDefaultValue()
+    self.queryLst = modelFactory.getQuerySet()
+
+  def test_getKlasslabel(self):
+    fieldDict = self.queryLst[0]._fields
     spreadsheetBuilder = DummyGtkSpreadsheetBuilder()
-    spreadsheetBuilder.run(query, True)
+    spreadsheetBuilder.run(self.queryLst, True)
 
     dataRow = spreadsheetBuilder.getDataModel()
     columnHandlerLabel = spreadsheetBuilder.getColumnHandlerLabel()
-    queryLst = [model]
-    convertedQueryLst = self.handler.run(dataRow, queryLst, columnHandlerLabel)
+    convertedQueryLst = self.handler.run(dataRow, self.queryLst, columnHandlerLabel)
 
     correctFieldType = {\
         'binaryField': {'klassLabel': 'const', },
@@ -146,15 +146,12 @@ class GtkSpreadsheetModelDataHandlerTestCaseBase(unittest.TestCase):
     for fieldName, fieldProperty in self.handler.fieldType.iteritems():
       correctFieldProperty = correctFieldType[fieldName]
       for k,correctValue in correctFieldProperty.iteritems():
-        self.assertEqual(fieldProperty[k], correctValue)
+        self.assertEqual(fieldProperty[k], correctValue, fieldName)
 
   def test_emptyRowSelected(self):
-    modelFactory = DummyModelFactory()
-    model = modelFactory.getDummyModelWithDefaultValue()
-    query = modelFactory.getDummyQuerySet([model])
-    fieldDict = query[0]._fields
+    fieldDict = self.queryLst[0]._fields
     spreadsheetBuilder = DummyGtkSpreadsheetBuilder()
-    spreadsheetBuilder.run(query, True)
+    spreadsheetBuilder.run(self.queryLst, True)
 
     dataRow = []
     columnHandlerLabel = spreadsheetBuilder.getColumnHandlerLabel()
@@ -162,27 +159,26 @@ class GtkSpreadsheetModelDataHandlerTestCaseBase(unittest.TestCase):
     convertedQueryLst = self.handler.run(dataRow, queryLst, columnHandlerLabel)
 
   def test_getValueConversion(self):
-    modelFactory = DummyModelFactory()
-    model = modelFactory.getDummyModelWithDefaultValue()
-    queryLst = modelFactory.getDummyQuerySet([model])
-    fieldDict = model._fields
+    fieldDict = self.model._fields
     spreadsheetBuilder = DummyGtkSpreadsheetBuilder()
-    spreadsheetBuilder.run(queryLst, True)
+    spreadsheetBuilder.run(self.queryLst, True)
 
     dataRow = spreadsheetBuilder.getDataModel()
     columnHandlerLabel = spreadsheetBuilder.getColumnHandlerLabel()
 
-    convertedQueryLst = self.handler.run(dataRow, queryLst, columnHandlerLabel)
+    convertedQueryLst = self.handler.run(dataRow, self.queryLst, columnHandlerLabel)
 
     for fieldName in fieldDict.keys():
-      self.assertEqual(queryLst[0][fieldName], convertedQueryLst[0][fieldName])
+      self.assertEqual(self.queryLst[0][fieldName], convertedQueryLst[0][fieldName])
 
 class GtkSpreadsheetModelDataHandlerTestCase(GtkSpreadsheetModelDataHandlerTestCaseBase):
   def setUp(self):
+    super(GtkSpreadsheetModelDataHandlerTestCase, self).setUp()
     self.handler = GtkSpreadsheetModelDataHandler()
 
 class GtkSpreadsheetModelBSONDataHandlerTestCase(GtkSpreadsheetModelDataHandlerTestCaseBase):
   def setUp(self):
+    super(GtkSpreadsheetModelBSONDataHandlerTestCase, self).setUp()
     self.handler = GtkSpreadsheetModelBSONDataHandler()
 
 

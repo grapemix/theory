@@ -6,7 +6,9 @@ import os
 from uuid import uuid4
 
 ##### Theory lib #####
+from theory.core.resourceScan.modelClassScanner import ModelClassScanner
 from theory.db import models
+from theory.model import AppModel
 
 ##### Theory third-party lib #####
 
@@ -287,5 +289,28 @@ class DummyModelFactory(object):
   def getDummyModelWithDefaultValue(self):
     return DummyModelWithDefaultValue()
 
+  def getQuerySet(self):
+    return DummyModelWithDefaultValue.objects.all()
+
+  def getModelWithDefaultValue(self):
+    m = DummyModelWithDefaultValue()
+    m.save()
+    o = DummyAppModelManager()
+    o.registerModel("tests", "DummyModelWithDefaultValue", m)
+    return m
+
   def getModelDefaultValue(self):
     print getattr
+
+class DummyAppModelManager(object):
+  def registerModel(self, appName, modelKlassName, modelKlass):
+    if(AppModel.objects.filter(name=modelKlassName, app=appName).count()==1):
+      return
+    modelTemplate = AppModel(importPath="{0}.model.{1}".format(
+      appName,
+      modelKlassName[0].lower() + modelKlassName[1:]
+      ))
+    o = ModelClassScanner()
+    o.modelTemplate = modelTemplate
+    model = o._probeModelField(modelKlassName, modelKlass)
+    model.save()
