@@ -418,10 +418,10 @@ class ListModelValidator(Genlist):
 class Box(E17Widget):
 
   def __init__(self, attrs=None, *args, **kwargs):
-    defaultAttrs = {\
-        "isFillAlign": True, \
-        "isWeightExpand": True, \
-        "isHorizontal": False, \
+    defaultAttrs = {
+        "isFillAlign": True,
+        "isWeightExpand": True,
+        "isHorizontal": False,
     }
     if(attrs is not None):
       defaultAttrs.update(attrs)
@@ -497,14 +497,14 @@ class Box(E17Widget):
 
 class Entry(E17Widget):
   def __init__(self, attrs=None, *args, **kwargs):
-    defaultAttrs = {\
-      "initData": "",\
-      "autoFocus": False,\
-      "isFillAlign": True,\
-      "isWeightExpand": True,\
-      "isLineWrap": True,\
-      "isScrollable": False,\
-      "isSingleLine": True,\
+    defaultAttrs = {
+      "initData": "",
+      "autoFocus": False,
+      "isFillAlign": True,
+      "isWeightExpand": True,
+      "isLineWrap": True,
+      "isScrollable": False,
+      "isSingleLine": True,
     }
     if(attrs is not None):
       defaultAttrs.update(attrs)
@@ -529,18 +529,10 @@ class Entry(E17Widget):
 
     if(self.attrs["isSingleLine"]):
       en.single_line_set(True)
-    else:
-      # TODO: retest if the scrollable is set-able
-      if(self.attrs["isScrollable"]):
-        en.scrollable_set(True)
-        # TODO: fix this super ugly hack
-        size = self.win.size
-        if(size[0]<640 or size[1]<300):
-          self.win.resize(640,300)
+
       if(self.attrs["isLineWrap"]):
         en.line_wrap_set(True)
-    #  en.size_hint_min_set(120,120)
-    #  print en.size_hint_min_get()
+
     self.obj = en
 
   #def _keyDownAdd(self, entry, event, *args, **kwargs):

@@ -235,6 +235,7 @@ class GuiFormBase(FormBase, BasePacker):
 
   def generateForm(self, win, bx):
     self._createFormSkeleton(win, bx)
+
     for name, field in self.fields.items():
       field.renderWidget(self.win, self.formBx.obj)
       self.formBx.addInput(field.widget)
