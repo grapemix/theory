@@ -26,11 +26,10 @@ class IndentFormatFix(SimpleCommand):
   _indentSpace = 2
 
   class ParamForm(SimpleCommand.ParamForm):
-    filenameLst = field.ListField(field.TextField(), label="The list of filenames being fixed")
-    #fileLst = field.ListField(field.FileField(), label="The list of files being fixed")
-
-  #def __init__(self, *args, **kwargs):
-  #  super(IndentFormatFix, self).__init__(*args, **kwargs)
+    filenameLst = field.ListField(
+        field.TextField(max_length=512),
+        label="The list of filenames being fixed"
+    )
 
   def run(self, *args, **kwargs):
     for filename in self.paramForm.cleaned_data["filenameLst"]:

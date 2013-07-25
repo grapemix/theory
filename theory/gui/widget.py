@@ -196,9 +196,23 @@ class StringInput(BaseLabelInput):
     self.fieldSetter({"finalData": self._getData()})
 
 class TextInput(StringInput):
-  def __init__(self, fieldSetter, fieldGetter, win, bx, attrs=None, *args, **kwargs):
-    attrs = self._buildAttrs(attrs, isScrollable=True, isSingleLine=False, isExpandMainContainer=True)
-    super(TextInput, self).__init__(fieldSetter, fieldGetter, win, bx, attrs, *args, **kwargs)
+  def __init__(self, fieldSetter, fieldGetter, win, bx,
+      attrs=None, *args, **kwargs):
+    attrs = self._buildAttrs(
+        attrs,
+        isScrollable=True,
+        isSingleLine=False,
+        isExpandMainContainer=True
+    )
+    super(TextInput, self).__init__(
+        fieldSetter,
+        fieldGetter,
+        win,
+        bx,
+        attrs,
+        *args,
+        **kwargs
+    )
 
 class NumericInput(StringInput):
   def __init__(self, fieldSetter, fieldGetter, win, bx, attrs=None, *args, **kwargs):
@@ -273,12 +287,19 @@ class ModelValidateGroupInput(BaseLabelInput):
 class ListInput(BaseLabelInput):
   def __init__(self, fieldSetter, fieldGetter, win, bx, childFieldLst, \
       addChildFieldFxn, removeChildFieldFxn, attrs=None, *args, **kwargs):
-    attrs = self._buildAttrs(\
-        attrs, isExpandMainContainer=True, initData=())
+    attrs = self._buildAttrs(
+        attrs,
+        isExpandMainContainer=True,
+        initData=()
+    )
     # TODO: this is e17 specific, add one more layer instead
     if(childFieldLst[0].widget.widgetClass==StringInput.widgetClass):
-      widgetClass = Multibuttonentry
-      self._createWidget = self._createStringWidget
+      if(childFieldLst[0].max_length>20):
+        widgetClass = TextInput.widgetClass
+        self._createWidget = self._createLongStringWidget
+      else:
+        widgetClass = Multibuttonentry
+        self._createWidget = self._createShortStringWidget
       self.fieldSetter = fieldSetter
       self.fieldGetter = fieldGetter
       self.isOverridedData = True
@@ -292,7 +313,10 @@ class ListInput(BaseLabelInput):
     self.addChildField = addChildFieldFxn
     self.removeChildField = removeChildFieldFxn
     self.childFieldLst = childFieldLst
-    super(ListInput, self).__init__(fieldSetter, fieldGetter, win, bx, attrs, *args, **kwargs)
+    super(ListInput, self).__init__(
+        fieldSetter, fieldGetter,
+        win, bx, attrs, *args, **kwargs
+    )
 
   def _addDataWidget(self, *args, **kwargs):
     widgetLst = self._createWidget()
@@ -312,26 +336,40 @@ class ListInput(BaseLabelInput):
     numToShiftFirstElement = idx - (self.numOfNewWidget - 1)
     for i in range(self.numOfNewWidget):
       del self.widgetLst[numToShiftFirstElement]
-    self.mainContainer.content.removeWidgetLst(numToShiftFirstElement, self.numOfNewWidget)
+    self.mainContainer.content.removeWidgetLst(
+        numToShiftFirstElement, self.numOfNewWidget)
     del self._inputLst[numToShiftFirstElement/self.numOfNewWidget]
     self.removeChildField(numToShiftFirstElement/self.numOfNewWidget)
 
   def _createWidget(self):
     pass
 
-  def _createStringWidget(self):
+  def _createShortStringWidget(self):
     initDataLst = []
     for field in self.childFieldLst:
       if(field.initData!="" or field.initData!=None):
         initDataLst.append(field.initData)
-    defaultParam = {"isWeightExpand": True, "isFillAlign": True, "isSkipInstruction": True}
+
+    defaultParam = {
+        "isWeightExpand": True,
+        "isFillAlign": True,
+        "isSkipInstruction": True
+    }
+
     if(len(initDataLst)>0):
       defaultParam["initData"] = initDataLst
+
     widget = self.widgetClass(defaultParam)
     widget.win = self.win
     self._inputLst.append(widget)
 
-    buttonControlBox = self._createContainer({"isHorizontal": True, "isWeightExpand": False, "isFillAlign": False})
+    buttonControlBox = self._createContainer(
+        {
+          "isHorizontal": True,
+          "isWeightExpand": False,
+          "isFillAlign": False
+        }
+    )
     buttonControlBox.generate()
 
     btn = Button({"isWeightExpand": True, "isFillAlign": False, })
@@ -347,6 +385,30 @@ class ListInput(BaseLabelInput):
     buttonControlBox.addWidget(btn)
     return (widget, buttonControlBox,)
 
+  def _createLongStringWidget(self):
+    initDataLst = []
+    for field in self.childFieldLst:
+      if(field.initData!="" or field.initData!=None):
+        initDataLst.append(field.initData)
+
+    defaultParam = {
+        "isScrollable": True,
+        "isSingleLine": False,
+        "isExpandMainContainer": True,
+        "isWeightExpand": True,
+        "isFillAlign": True,
+        "isSkipInstruction": True
+    }
+
+    if(len(initDataLst)>0):
+      defaultParam["initData"] = initDataLst
+
+    widget = self.widgetClass(defaultParam)
+    widget.win = self.win
+    self._inputLst.append(widget)
+
+    return (widget,)
+
   def _initGenericWidget(self):
     widgetLst = []
     for field in self.childFieldLst:
@@ -356,13 +418,21 @@ class ListInput(BaseLabelInput):
   def _createGenericWidget(self, newChildField=None):
     if(newChildField==None):
       newChildField = self.addChildField()
-    defaultParam = {"isWeightExpand": True, "isFillAlign": False, "isSkipInstruction": True}
+    defaultParam = {
+        "isWeightExpand": True,
+        "isFillAlign": False,
+        "isSkipInstruction": True
+    }
     newChildField.renderWidget(self.win, None, defaultParam)
     input = newChildField.widget
     input.packInMainContainer()
     self._inputLst.append(input)
 
-    buttonControlBox = self._createContainer({"isHorizontal": True, "isWeightExpand": False, "isFillAlign": False})
+    buttonControlBox = self._createContainer({
+        "isHorizontal": True,
+        "isWeightExpand": False,
+        "isFillAlign": False
+    })
     buttonControlBox.generate()
 
     btn = Button({"isWeightExpand": True, "isFillAlign": False})
@@ -381,10 +451,13 @@ class ListInput(BaseLabelInput):
     return result
 
   def updateField(self):
-    if(self.widgetClass == Multibuttonentry):
-      self.fieldSetter({\
-          "finalData": self._inputLst[0].finalData,\
-          })
+    if(self.widgetClass == Multibuttonentry
+        or self.widgetClass == TextInput.widgetClass):
+      self.fieldSetter(
+          {
+            "finalData": self._inputLst[0].finalData,
+          }
+      )
     else:
       for idx in range(len(self._inputLst)):
         self._inputLst[idx].updateField()
@@ -482,11 +555,12 @@ class FilterFormLayout(BasePacker):
 
   def generate(self, *args, **kwargs):
     filterEntryBox = self._createContainer(
-        {\
-            "isHorizontal": True, \
-            "isWeightExpand": False, \
-            "isFillAlign": False, \
-        })
+        {
+            "isHorizontal": True,
+            "isWeightExpand": False,
+            "isFillAlign": False,
+        }
+    )
     filterEntryBox.generate()
 
     lb = Label({"isFillAlign": False, "isWeightExpand": False})
@@ -499,7 +573,12 @@ class FilterFormLayout(BasePacker):
     en._contentChanged = self._filterField
     filterEntryBox.addWidget(en)
 
-    self.inputContainer = self._createContainer({"isFillAlign": True, "isWeightExpand": False})
+    self.inputContainer = self._createContainer(
+        {
+          "isFillAlign": True,
+          "isWeightExpand": False
+        }
+    )
     self.inputContainer.generate()
     self.obj = self.inputContainer.obj
     self.filterEntryBox = filterEntryBox
@@ -511,6 +590,7 @@ class FilterFormLayout(BasePacker):
     # copy by reference, the mainContainer.obj will remain None unless we
     # copy the input again.
     newInputLst = []
+    self.inputLst.reverse()
     for (name, input) in self.inputLst:
       self.inputContainer.addInput(input)
       newInputLst.append((name, input))
