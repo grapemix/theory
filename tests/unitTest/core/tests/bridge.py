@@ -31,6 +31,7 @@ class BridgeTestCase(unittest.TestCase):
     self.asyncChain1CommandModel = AsyncChain1.getCmdModel()
     self.asyncChain2CommandModel = AsyncChain2.getCmdModel()
     self.adapterBufferModel = AdapterBuffer()
+    AdapterBuffer.objects.all().delete()
 
   def testParamFormAssignment(self):
     firstCmd = AsyncChain1()
