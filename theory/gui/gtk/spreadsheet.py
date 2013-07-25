@@ -380,8 +380,11 @@ class SpreadsheetBuilder(MongoModelBSONDataHandler):
     self.modelKlass = queryset[0].__class__
 
     if(self.modelKlass._is_document):
-      (appName, modelName) = self.modelKlass._get_collection_name().split("_")
-      modelName = modelName.title()
+      nameToken = self.modelKlass._get_collection_name().split("_")
+      appName = nameToken[0]
+      modelName = ""
+      for i in nameToken[1:]:
+        modelName += i.title()
       appModelmodel = AppModel.objects.get(name=modelName, app=appName)
     else:
       # embedded document. There has not enough info to get app name.
