@@ -19,7 +19,7 @@ import evas
 
 ##### Misc #####
 
-# TODO: refactor/rewrite this file
+# TODO: MUST rewrite this file!
 #----- common -{{{-
 def my_entry_bt_2(bt, en):
   str = en.entry_get()
@@ -111,10 +111,13 @@ class Terminal(object):
 
   def key_down(self, entry, event, *args, **kwargs):
     # "Shift", "Control", "Alt", "Meta", "Hyper", "Super".
-    #print entry
     #print event, event.modifier_is_set("Alt")
-    #print dir(entry.evas)
-    pass
+    if(event.keyname=="Up"):
+      self.adapter.showPreviousCmdRequest()
+    elif(event.keyname=="Down"):
+      self.adapter.showNextCmdRequest()
+    elif(event.keyname=="Escape"):
+      self.adapter.escapeRequest()
 
   def drawShellInput(self):
     win = self.win

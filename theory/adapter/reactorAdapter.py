@@ -71,14 +71,26 @@ class ReactorAdapter(object):
     """
     self._uiParam = uiParam
 
-  def signalCmdInputSubmit(self, *args, **kwargs):
+  def signalCmdInputSubmit(self):
     if(self.signal.has_key("cmdSubmit")):
-      self.signal["cmdSubmit"](*args, **kwargs)
+      self.signal["cmdSubmit"]()
 
-  def signalCmdInputChange(self, *args, **kwargs):
+  def signalCmdInputChange(self):
     if(self.signal.has_key("cmdChange")):
-      self.signal["cmdChange"](*args, **kwargs)
+      self.signal["cmdChange"]()
 
-  def autocompleteRequest(self, *args, **kwargs):
+  def autocompleteRequest(self):
     if(self.signal.has_key("autocompleteRequest")):
-      self.signal["autocompleteRequest"](self.entrySetterFxn, *args, **kwargs)
+      self.signal["autocompleteRequest"](self.entrySetterFxn)
+
+  def showPreviousCmdRequest(self):
+    if(self.signal.has_key("showPreviousCmdRequest")):
+      self.signal["showPreviousCmdRequest"](self.entrySetterFxn)
+
+  def showNextCmdRequest(self):
+    if(self.signal.has_key("showNextCmdRequest")):
+      self.signal["showNextCmdRequest"](self.entrySetterFxn)
+
+  def escapeRequest(self):
+    if(self.signal.has_key("escapeRequest")):
+      self.signal["escapeRequest"](self.entrySetterFxn)
