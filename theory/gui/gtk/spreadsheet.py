@@ -471,7 +471,7 @@ class SpreadsheetBuilder(MongoModelBSONDataHandler):
   def _buildRenderKwargsSet(self):
     kwargsSet = []
     for fieldName, fieldHandlerFxn in self.fieldType.iteritems():
-      kwargs = fieldHandlerFxn["renderHandler"](self.fieldsDict[fieldName])
+      kwargs = fieldHandlerFxn["renderHandler"](fieldName)
       if(kwargs is not None):
         kwargs.update({"title": fieldName})
         kwargsSet.append(kwargs)
@@ -491,9 +491,9 @@ class SpreadsheetBuilder(MongoModelBSONDataHandler):
 
       for fieldName, fieldHandlerFxnLst in self.fieldType.iteritems():
         try:
-          result = fieldHandlerFxnLst["dataHandler"](id, queryrowInJson[fieldName])
+          result = fieldHandlerFxnLst["dataHandler"](id, fieldName, queryrowInJson[fieldName])
         except KeyError:
-          result = fieldHandlerFxnLst["dataHandler"](id, None)
+          result = fieldHandlerFxnLst["dataHandler"](id, fieldName, None)
         if(result is not None):
           row.append(result)
       gtkDataModel.append(row)
@@ -523,6 +523,8 @@ class SpreadsheetBuilder(MongoModelBSONDataHandler):
         args.append(str)
       elif(fieldHandlerFxn=="floatField"):
         args.append(float)
+      elif(fieldHandlerFxn=="enumField"):
+        args.append(str)
       elif(fieldHandlerFxn=="intField"):
         args.append(int)
       elif(fieldHandlerFxn=="boolField"):
@@ -577,16 +579,16 @@ class SpreadsheetBuilder(MongoModelBSONDataHandler):
         }
 
   def _intFieldRenderHandler(self, field):
-    try:
-      choices = [i[1] for i in getattr(field, "choices")]
-      return {
-          "editable": self.isEditable and True,
-          "fxnName": "renderComboBoxCol",
-          "choices": choices
-          }
-    except (TypeError, AttributeError):
-      return {
-          "editable": self.isEditable and True,
-          "step": 1,
-          "fxnName": "renderFloatCol"
-          }
+    return {
+        "editable": self.isEditable and True,
+        "step": 1,
+        "fxnName": "renderFloatCol"
+        }
+
+  def _enumFieldRenderHandler(self, field):
+    choices = self.fieldType[field]["choices"].values()
+    return {
+        "editable": self.isEditable and True,
+        "fxnName": "renderComboBoxCol",
+        "choices": choices
+        }

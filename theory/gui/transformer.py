@@ -47,48 +47,39 @@ class MongoModelDetectorBase(object):
       for fieldTypeLabelToken in fieldTypeLabelTokenLst:
         if(handlerFxnName==""):
           # When it is in top level, we treated it as normal
-          handlerFxnName += self._typeCatMap[fieldTypeLabelToken][0]
+          handlerFxnName = self._typeCatMap[fieldTypeLabelToken][0]
         else:
           # When it is NOT in top level, we treated it as child
           handlerFxnName += self._typeCatMap[fieldTypeLabelToken][1]
-      self.fieldType[fieldName] = self._fillUpTypeHandler(handlerFxnName, "")
-
+      if(handlerFxnName=="intField" and \
+          hasattr(
+            getattr(self.queryset[0].__class__, fieldName),
+            "choices"
+          ) and \
+          getattr(
+            getattr(self.queryset[0].__class__, fieldName),
+            "choices"
+            ) is not None
+          ):
+        handlerFxnName = self._typeCatMap["EnumField"][0]
+        self.fieldType[fieldName] = self._fillUpTypeHandler(handlerFxnName, "")
+        self.fieldType[fieldName]["choices"] = \
+            dict(
+                getattr(
+                  getattr(self.queryset[0].__class__, fieldName),
+                  "choices"
+                )
+            )
+      else:
+        self.fieldType[fieldName] = self._fillUpTypeHandler(handlerFxnName, "")
 
   @abstractmethod
   def _fillUpTypeHandler(self, klassLabel, prefix=""):
     pass
 
-  def _matchFieldType(self, unknownFieldTypeLabel, typeHandlerCatMap, prefix=""):
-    for catLabel, dbFieldTypeLabelLst in typeHandlerCatMap.iteritems():
-      for dbFieldTypeLabel in dbFieldTypeLabelLst:
-        internalKlassLabel = self._getKlassLabel(
-            unknownFieldTypeLabel,
-            catLabel,
-            dbFieldTypeLabel
-            )
-        if(internalKlassLabel!=None):
-          return self._fillUpTypeHandler(internalKlassLabel, prefix)
-
-  def _getKlassLabel(self, fieldType, klassLabel, klass):
-    if(isinstance(fieldType, klass)):
-      if(klassLabel=="listField"):
-        return self._matchFieldType(
-            fieldType.field,
-            self._childTypeHandlerCatMap,
-            "listField"
-            )["klassLabel"]
-      elif(klassLabel=="mapField"):
-        return self._matchFieldType(
-            fieldType.field,
-            self._childTypeHandlerCatMap,
-            "listField"
-            )["klassLabel"]
-      else:
-        return klassLabel
-    return None
-
   def _buildTypeCatMap(self):
     self._typeCatMap = {
+        #"dbFieldName": ("fieldCategory", "fieldCategoryAsChild"),
         "BinaryField": ("neglectField", "neglectField"),
         "DynamicField": ("neglectField", "neglectField"),
         "FileField": ("neglectField", "neglectField"),
@@ -104,6 +95,7 @@ class MongoModelDetectorBase(object):
         "BooleanField": ("boolField", "editableForceStrField"),
         "DecimalField": ("floatField", "editableForceStrField"),
         "FloatField": ("floatField", "editableForceStrField"),
+        "EnumField": ("enumField", "editableForceStrField"), # Not a native mongo db field
         "IntField": ("intField", "editableForceStrField"),
         "StringField": ("strField", "editableForceStrField"),
         "MapField": ("listField", "listField"),
@@ -126,33 +118,33 @@ class MongoModelBSONDataHandler(MongoModelDetectorBase):
         "dataHandler": getattr(self, "_%s%sDataHandler" % (prefix, klassLabel)),
         }
 
-  def _neglectFieldDataHandler(self, rowId, fieldVal):
+  def _neglectFieldDataHandler(self, rowId, fieldName, fieldVal):
     pass
 
-  def _nonEditableForceStrFieldDataHandler(self, rowId, fieldVal):
+  def _nonEditableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
     return unicode(fieldVal)
 
-  def _editableForceStrFieldDataHandler(self, rowId, fieldVal):
+  def _editableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
     return unicode(fieldVal)
 
-  def _dictFieldDataHandler(self, rowId, fieldVal):
+  def _dictFieldDataHandler(self, rowId, fieldName, fieldVal):
     # we cannot use json.dumps in here because some of the fields cannot be
     # serialize
     return unicode(fieldVal)
 
-  def _embeddedFieldDataHandler(self, rowId, fieldVal):
+  def _embeddedFieldDataHandler(self, rowId, fieldName, fieldVal):
     return rowId
 
-  def _listFieldneglectFieldDataHandler(self, rowId, fieldVal):
+  def _listFieldneglectFieldDataHandler(self, rowId, fieldName, fieldVal):
     pass
 
-  def _listFieldnonEditableForceStrFieldDataHandler(self, rowId, fieldVal):
+  def _listFieldnonEditableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
     return unicode(fieldVal)
 
-  def _listFieldeditableForceStrFieldDataHandler(self, rowId, fieldVal):
+  def _listFieldeditableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
     return jsonDumps(fieldVal)
 
-  def _listFieldembeddedFieldDataHandler(self, rowId, fieldVal):
+  def _listFieldembeddedFieldDataHandler(self, rowId, fieldName, fieldVal):
     try:
       return len(fieldVal)
     except TypeError:
@@ -160,7 +152,7 @@ class MongoModelBSONDataHandler(MongoModelDetectorBase):
       # in SpreadSheetBuilder's fieldType
       return 0
 
-  def _listFieldmodelFieldDataHandler(self, rowId, fieldVal):
+  def _listFieldmodelFieldDataHandler(self, rowId, fieldName, fieldVal):
     try:
       return len(fieldVal)
     except TypeError:
@@ -168,7 +160,7 @@ class MongoModelBSONDataHandler(MongoModelDetectorBase):
       # in SpreadSheetBuilder's fieldType
       return 0
 
-  def _modelFieldDataHandler(self, rowId, fieldVal):
+  def _modelFieldDataHandler(self, rowId, fieldName, fieldVal):
     return "1" if(fieldVal is not None) else "0"
     # The string data might be too long in some case
     #try:
@@ -177,29 +169,32 @@ class MongoModelBSONDataHandler(MongoModelDetectorBase):
     #  # for example, the reference field is None
     #  return ""
 
-  def _boolFieldDataHandler(self, rowId, fieldVal):
+  def _boolFieldDataHandler(self, rowId, fieldName, fieldVal):
     return fieldVal
 
-  def _strFieldDataHandler(self, rowId, fieldVal):
+  def _strFieldDataHandler(self, rowId, fieldName, fieldVal):
     return unicode(fieldVal)
 
-  def _floatFieldDataHandler(self, rowId, fieldVal):
+  def _floatFieldDataHandler(self, rowId, fieldName, fieldVal):
     if(fieldVal is None):
       return 0.0
     return fieldVal
 
-  def _intFieldDataHandler(self, rowId, fieldVal):
+  def _intFieldDataHandler(self, rowId, fieldName, fieldVal):
     if(fieldVal is None):
       return 0
     return fieldVal
 
+  def _enumFieldDataHandler(self, rowId, fieldName, fieldVal):
+    return self.fieldType[fieldName]["choices"][fieldVal]
+
 class MongoModelDataHandler(MongoModelBSONDataHandler):
   """This class handle the data conversion from MongoDB"""
 
-  def _editableForceStrFieldDataHandler(self, rowId, fieldVal):
+  def _editableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
     return unicode(fieldVal)
 
-  def _listFieldeditableForceStrFieldDataHandler(self, rowId, fieldVal):
+  def _listFieldeditableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
     return fieldVal
 
 class GtkSpreadsheetModelBSONDataHandler(MongoModelDetectorBase):
@@ -212,24 +207,36 @@ class GtkSpreadsheetModelBSONDataHandler(MongoModelDetectorBase):
     :param dataRow: model from the gtkListModel as list of the list format as
       input
     :param queryLst: db model instance group as a list which is also as output
-    :param fieldsDict: just a dict to descibe fields in the model
     """
+    #:param fieldsDict: just a map for field name vs field type label in the model
     self.dataRow = dataRow
     self.queryLst = queryLst
     self._buildTypeCatMap()
 
+    # loop for column
     for columnLabel, handlerLabel in columnHandlerLabelZip.iteritems():
+      # fill up field type handler
       if(handlerLabel!=None):
         self.fieldType[columnLabel] = self._fillUpTypeHandler(handlerLabel)
       else:
         self.fieldType[columnLabel] = {"klassLabel": "const"}
+
+      # fill up enum choices
+      if(handlerLabel=="enumField"):
+        choices = \
+            getattr(
+              getattr(self.queryLst[0].__class__, columnLabel),
+              "choices"
+            )
+        self.fieldType[columnLabel]["reverseChoices"] = \
+            dict([(i[1], i[0]) for i in choices])
 
     numOfRow = len(queryLst)
     for rowNum in range(numOfRow):
       i = 0
       for fieldName, fieldProperty in self.fieldType.iteritems():
         if(fieldProperty["klassLabel"]!="const"):
-          newValue = fieldProperty["dataHandler"](i, dataRow[rowNum][i])
+          newValue = fieldProperty["dataHandler"](i, fieldName, dataRow[rowNum][i])
           if(not newValue is None):
             setattr(
                 queryLst[rowNum],
@@ -245,53 +252,56 @@ class GtkSpreadsheetModelBSONDataHandler(MongoModelDetectorBase):
         "dataHandler": getattr(self, "_%s%sDataHandler" % (prefix, klassLabel)),
         }
 
-  def _neglectFieldDataHandler(self, rowId, fieldVal):
+  def _neglectFieldDataHandler(self, rowId, fieldName, fieldVal):
     pass
 
-  def _nonEditableForceStrFieldDataHandler(self, rowId, fieldVal):
+  def _nonEditableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
     pass
 
-  def _editableForceStrFieldDataHandler(self, rowId, fieldVal):
+  def _editableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
     return unicode(fieldVal)
 
-  def _dictFieldDataHandler(self, rowId, fieldVal):
+  def _dictFieldDataHandler(self, rowId, fieldName, fieldVal):
     # it is supposed to be no editable in this version
     pass
 
-  def _embeddedFieldDataHandler(self, rowId, fieldVal):
+  def _embeddedFieldDataHandler(self, rowId, fieldName, fieldVal):
     pass
 
-  def _listFieldneglectFieldDataHandler(self, rowId, fieldVal):
+  def _listFieldneglectFieldDataHandler(self, rowId, fieldName, fieldVal):
     pass
 
-  def _listFieldnonEditableForceStrFieldDataHandler(self, rowId, fieldVal):
+  def _listFieldnonEditableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
     pass
 
-  def _listFieldeditableForceStrFieldDataHandler(self, rowId, fieldVal):
+  def _listFieldeditableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
     return jsonLoads(fieldVal)
 
-  def _listFieldembeddedFieldDataHandler(self, rowId, fieldVal):
+  def _listFieldembeddedFieldDataHandler(self, rowId, fieldName, fieldVal):
     pass
 
-  def _listFieldmodelFieldDataHandler(self, rowId, fieldVal):
+  def _listFieldmodelFieldDataHandler(self, rowId, fieldName, fieldVal):
     pass
 
-  def _modelFieldDataHandler(self, rowId, fieldVal):
+  def _modelFieldDataHandler(self, rowId, fieldName, fieldVal):
     pass
 
-  def _boolFieldDataHandler(self, rowId, fieldVal):
+  def _boolFieldDataHandler(self, rowId, fieldName, fieldVal):
     return bool(fieldVal)
 
-  def _strFieldDataHandler(self, rowId, fieldVal):
+  def _strFieldDataHandler(self, rowId, fieldName, fieldVal):
     return unicode(fieldVal)
 
-  def _floatFieldDataHandler(self, rowId, fieldVal):
+  def _floatFieldDataHandler(self, rowId, fieldName, fieldVal):
     return float(fieldVal)
 
-  def _intFieldDataHandler(self, rowId, fieldVal):
+  def _intFieldDataHandler(self, rowId, fieldName, fieldVal):
     return int(fieldVal)
 
-  def _constDataHandler(self, rowId, fieldVal):
+  def _enumFieldDataHandler(self, rowId, fieldName, fieldVal):
+    return self.fieldType[fieldName]["reverseChoices"][fieldVal]
+
+  def _constDataHandler(self, rowId, fieldName, fieldVal):
     """This fxn is special for the fieldVal being const and hence should not
     be modified during the save/update process(not in this fxn scope). And
     this fxn is only put in here to indicate the existance of this special
@@ -303,10 +313,10 @@ class GtkSpreadsheetModelDataHandler(GtkSpreadsheetModelBSONDataHandler):
   handler, because of the limitation of gtkListModel, only modified rows are
   able to be notified, instead of modified rows and modified fields."""
 
-  def _editableForceStrFieldDataHandler(self, rowId, fieldVal):
+  def _editableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
     return unicode(fieldVal)
 
-  def _listFieldeditableForceStrFieldDataHandler(self, rowId, fieldVal):
+  def _listFieldeditableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
     try:
       return ast.literal_eval(fieldVal)
     except ValueError:
