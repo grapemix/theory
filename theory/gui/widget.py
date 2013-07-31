@@ -17,7 +17,7 @@ from e17.widget import *
 __all__ = (\
     "StringInput", "TextInput", "NumericInput", "SelectBoxInput",\
     "CheckBoxInput", "StringGroupFilterInput", "ModelValidateGroupInput",\
-    "Fileselector", "ListInput", "DictInput", "FilterFormLayout", \
+    "FileselectInput", "ListInput", "DictInput", "FilterFormLayout", \
     )
 
 # Honestly, I am not satisfied with the code related to the GUI. So the code
@@ -247,7 +247,7 @@ class CheckBoxInput(BaseLabelInput):
   def changedData(self):
     pass
 
-class Fileselector(BaseLabelInput):
+class FileselectInput(BaseLabelInput):
   widgetClass = FileSelector
 
 class StringGroupFilterInput(BaseLabelInput):
