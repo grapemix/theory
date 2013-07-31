@@ -220,7 +220,7 @@ class GuiFormBase(FormBase, BasePacker):
   def _changeFormWindowHeight(self, maxHeight):
     # TODO: fix this super ugly hack
     size = self.win.size
-    fieldHeight = len(self.fields) * 200
+    fieldHeight = len(self.fields) * 100
     preferHeight = fieldHeight if(fieldHeight<maxHeight) else maxHeight
 
     if(size[0]<640 or size[1]<preferHeight):
