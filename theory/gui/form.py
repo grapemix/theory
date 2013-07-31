@@ -310,6 +310,11 @@ class CommandFormBase(StepFormBase):
     for k,v in kwargs.iteritems():
       self.fields[k].initData = v
 
+  def focusOnTheFirstChild(self):
+    # We assume the items() result is consistent. Since the list has been
+    # reversed, last input is used.
+    self.fields.items()[-1][1].widget.setFocus()
+
 class Form(FormBase):
   """A collection of Fields, plus their associated data."""
   # This is a separate class from BaseForm in order to abstract the way

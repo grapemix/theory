@@ -76,10 +76,6 @@ class BasePacker(object):
     """
     return data.get(name, None)
 
-  @abstractmethod
-  def updateField(self):
-    pass
-
 class BaseFieldInput(BasePacker):
   def __init__(self, fieldSetter, fieldGetter, win, bx, attrs=None, *args, **kwargs):
     self.fieldSetter = fieldSetter
@@ -181,6 +177,13 @@ class BaseLabelInput(BaseFieldInput):
 
   def show(self):
     self.mainContainer.show()
+
+  def setFocus(self):
+    self.widgetLst[0].setFocus()
+
+  @abstractmethod
+  def updateField(self):
+    pass
 
 class StringInput(BaseLabelInput):
   widgetClass = Entry
