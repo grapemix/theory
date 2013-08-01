@@ -130,7 +130,6 @@ class BaseLabelInput(BaseFieldInput):
       self.packAsFrame(self.title, self.help)
     else:
       self.packAsTbl(self.title, self.help)
-
   def packAsFrame(self, title, help):
     hBox = self._createContainer(attrs={"isFillAlign": True, "isWeightExpand": True})
     hBox.generate()
@@ -532,9 +531,14 @@ class DictInput(ListInput):
 
 class FilterFormLayout(BasePacker):
   def __init__(self, win, bxInput, attrs=None, *args, **kwargs):
-    attrs = self._buildAttrs(\
-        attrs, isContainerAFrame=False, isExpandMainContainer=True)
+    attrs = self._buildAttrs(
+        attrs,
+        isContainerAFrame=False,
+        isExpandMainContainer=True
+        )
     super(FilterFormLayout, self).__init__(win, bxInput.obj, attrs)
+    if(attrs.has_key("unFocusFxn")):
+      self.unFocusFxn = attrs["unFocusFxn"]
     self.labelTitle = "Param Filter:"
     self.inputLst = []
     self.bxInput = bxInput
@@ -602,3 +606,5 @@ class FilterFormLayout(BasePacker):
     self.bxInput.addInput(self.inputContainer)
     self.filterEntryBox.postGenerate()
     self.inputContainer.postGenerate()
+    if(hasattr(self, "unFocusFxn")):
+      self.bxInput.registerUnfocusFxn(self.unFocusFxn)
