@@ -415,7 +415,7 @@ class SpreadsheetBuilder(MongoModelBSONDataHandler):
       self.spreadsheet.isMainWindow = False
 
   def showStackData(self, rowNum, **kwargs) :
-    if(self.fieldType[
+    if(self.fieldPropDict[
         self.modelFieldnameMap[kwargs["colIdx"]]
       ]["klassLabel"].startswith("listField")):
       # This is for listfield linked with reference/embedded field
@@ -451,7 +451,7 @@ class SpreadsheetBuilder(MongoModelBSONDataHandler):
       try:
         if(field["editable"]):
           columnHandlerLabel[field["title"]] = \
-              self.fieldType[field["title"]]["klassLabel"]
+              self.fieldPropDict[field["title"]]["klassLabel"]
         else:
           columnHandlerLabel[field["title"]] = None
       except KeyError:
@@ -470,7 +470,7 @@ class SpreadsheetBuilder(MongoModelBSONDataHandler):
 
   def _buildRenderKwargsSet(self):
     kwargsSet = []
-    for fieldName, fieldHandlerFxn in self.fieldType.iteritems():
+    for fieldName, fieldHandlerFxn in self.fieldPropDict.iteritems():
       kwargs = fieldHandlerFxn["renderHandler"](fieldName)
       if(kwargs is not None):
         kwargs.update({"title": fieldName})
@@ -489,7 +489,7 @@ class SpreadsheetBuilder(MongoModelBSONDataHandler):
         # For example, EmbeddedModel does not have an id
         id = ""
 
-      for fieldName, fieldHandlerFxnLst in self.fieldType.iteritems():
+      for fieldName, fieldHandlerFxnLst in self.fieldPropDict.iteritems():
         try:
           result = fieldHandlerFxnLst["dataHandler"](id, fieldName, queryrowInJson[fieldName])
         except KeyError:
@@ -503,7 +503,7 @@ class SpreadsheetBuilder(MongoModelBSONDataHandler):
     args = []
     self.modelFieldnameMap = {}
     idx = 0
-    for fieldName, fieldHandlerFxnLst in self.fieldType.iteritems():
+    for fieldName, fieldHandlerFxnLst in self.fieldPropDict.iteritems():
       fieldHandlerFxn = fieldHandlerFxnLst["klassLabel"]
       if(fieldHandlerFxn=="neglectField"):
         continue
@@ -586,7 +586,7 @@ class SpreadsheetBuilder(MongoModelBSONDataHandler):
         }
 
   def _enumFieldRenderHandler(self, field):
-    choices = self.fieldType[field]["choices"].values()
+    choices = self.fieldPropDict[field]["choices"].values()
     return {
         "editable": self.isEditable and True,
         "fxnName": "renderComboBoxCol",

@@ -34,14 +34,18 @@ class MongoModelDetectorBase(object):
   __metaclass__ = ABCMeta
 
   def __init__(self):
-    self.fieldType = OrderedDict()
+    self.fieldPropDict = OrderedDict()
 
-  def run(self, queryset, fieldsDict):
+  def run(self, queryset, fieldNameFieldTypeLabelMap):
+    """
+    :param queryset: db model instance queryset
+    :param fieldNameFieldTypeLabelMap: To map the field name vs the db field
+      type label as a string which still retain the nest relationship
+    """
     self.queryset = queryset
 
     self._buildTypeCatMap()
-    self.fieldsDict = fieldsDict
-    for fieldName, fieldTypeLabel in fieldsDict.iteritems():
+    for fieldName, fieldTypeLabel in fieldNameFieldTypeLabelMap.iteritems():
       fieldTypeLabelTokenLst = fieldTypeLabel.split(".")
       handlerFxnName = ""
       for fieldTypeLabelToken in fieldTypeLabelTokenLst:
@@ -62,8 +66,8 @@ class MongoModelDetectorBase(object):
             ) is not None
           ):
         handlerFxnName = self._typeCatMap["EnumField"][0]
-        self.fieldType[fieldName] = self._fillUpTypeHandler(handlerFxnName, "")
-        self.fieldType[fieldName]["choices"] = \
+        self.fieldPropDict[fieldName] = self._fillUpTypeHandler(handlerFxnName, "")
+        self.fieldPropDict[fieldName]["choices"] = \
             dict(
                 getattr(
                   getattr(self.queryset[0].__class__, fieldName),
@@ -71,7 +75,7 @@ class MongoModelDetectorBase(object):
                 )
             )
       else:
-        self.fieldType[fieldName] = self._fillUpTypeHandler(handlerFxnName, "")
+        self.fieldPropDict[fieldName] = self._fillUpTypeHandler(handlerFxnName, "")
 
   @abstractmethod
   def _fillUpTypeHandler(self, klassLabel, prefix=""):
@@ -149,7 +153,7 @@ class MongoModelBSONDataHandler(MongoModelDetectorBase):
       return len(fieldVal)
     except TypeError:
       # This happen when fieldVal is None which is because there has KeyError
-      # in SpreadSheetBuilder's fieldType
+      # in SpreadSheetBuilder's fieldPropDict
       return 0
 
   def _listFieldmodelFieldDataHandler(self, rowId, fieldName, fieldVal):
@@ -157,7 +161,7 @@ class MongoModelBSONDataHandler(MongoModelDetectorBase):
       return len(fieldVal)
     except TypeError:
       # This happen when fieldVal is None which is because there has KeyError
-      # in SpreadSheetBuilder's fieldType
+      # in SpreadSheetBuilder's fieldPropDict
       return 0
 
   def _modelFieldDataHandler(self, rowId, fieldName, fieldVal):
@@ -186,7 +190,7 @@ class MongoModelBSONDataHandler(MongoModelDetectorBase):
     return fieldVal
 
   def _enumFieldDataHandler(self, rowId, fieldName, fieldVal):
-    return self.fieldType[fieldName]["choices"][fieldVal]
+    return self.fieldPropDict[fieldName]["choices"][fieldVal]
 
 class MongoModelDataHandler(MongoModelBSONDataHandler):
   """This class handle the data conversion from MongoDB"""
@@ -207,8 +211,10 @@ class GtkSpreadsheetModelBSONDataHandler(MongoModelDetectorBase):
     :param dataRow: model from the gtkListModel as list of the list format as
       input
     :param queryLst: db model instance group as a list which is also as output
+    :param columnHandlerLabelZip: a dictionary which map the column label vs the
+      handler label that previous transformer probed. In that way, we don't
+      have to re-probe the data type.
     """
-    #:param fieldsDict: just a map for field name vs field type label in the model
     self.dataRow = dataRow
     self.queryLst = queryLst
     self._buildTypeCatMap()
@@ -217,9 +223,9 @@ class GtkSpreadsheetModelBSONDataHandler(MongoModelDetectorBase):
     for columnLabel, handlerLabel in columnHandlerLabelZip.iteritems():
       # fill up field type handler
       if(handlerLabel!=None):
-        self.fieldType[columnLabel] = self._fillUpTypeHandler(handlerLabel)
+        self.fieldPropDict[columnLabel] = self._fillUpTypeHandler(handlerLabel)
       else:
-        self.fieldType[columnLabel] = {"klassLabel": "const"}
+        self.fieldPropDict[columnLabel] = {"klassLabel": "const"}
 
       # fill up enum choices
       if(handlerLabel=="enumField"):
@@ -228,13 +234,13 @@ class GtkSpreadsheetModelBSONDataHandler(MongoModelDetectorBase):
               getattr(self.queryLst[0].__class__, columnLabel),
               "choices"
             )
-        self.fieldType[columnLabel]["reverseChoices"] = \
+        self.fieldPropDict[columnLabel]["reverseChoices"] = \
             dict([(i[1], i[0]) for i in choices])
 
     numOfRow = len(queryLst)
     for rowNum in range(numOfRow):
       i = 0
-      for fieldName, fieldProperty in self.fieldType.iteritems():
+      for fieldName, fieldProperty in self.fieldPropDict.iteritems():
         if(fieldProperty["klassLabel"]!="const"):
           newValue = fieldProperty["dataHandler"](i, fieldName, dataRow[rowNum][i])
           if(not newValue is None):
@@ -299,7 +305,7 @@ class GtkSpreadsheetModelBSONDataHandler(MongoModelDetectorBase):
     return int(fieldVal)
 
   def _enumFieldDataHandler(self, rowId, fieldName, fieldVal):
-    return self.fieldType[fieldName]["reverseChoices"][fieldVal]
+    return self.fieldPropDict[fieldName]["reverseChoices"][fieldVal]
 
   def _constDataHandler(self, rowId, fieldName, fieldVal):
     """This fxn is special for the fieldVal being const and hence should not

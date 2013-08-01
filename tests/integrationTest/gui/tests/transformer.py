@@ -143,7 +143,7 @@ class GtkSpreadsheetModelDataHandlerTestCaseBase(unittest.TestCase):
         'sortedListFieldEmbeddedField': {'klassLabel': 'const', },
     }
 
-    for fieldName, fieldProperty in self.handler.fieldType.iteritems():
+    for fieldName, fieldProperty in self.handler.fieldPropDict.iteritems():
       correctFieldProperty = correctFieldType[fieldName]
       for k,correctValue in correctFieldProperty.iteritems():
         self.assertEqual(fieldProperty[k], correctValue, fieldName)
