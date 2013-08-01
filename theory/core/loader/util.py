@@ -173,6 +173,7 @@ class CommandModuleLoader(ModuleLoader):
       "theoryFilesSurgeon": ["dev"],
       "modelQuery": ["norm"],
       "modelEdit": ["norm"],
+      "modelTblEdit": ["norm"],
       "modelDel": ["norm"],
       "modelAdd": ["norm"],
     }

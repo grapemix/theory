@@ -17,14 +17,14 @@ from theory.utils.importlib import import_class
 
 ##### Misc #####
 
-__all__ = ("modelEdit",)
+__all__ = ("modelTblEdit",)
 
-class ModelEdit(SimpleCommand):
+class ModelTblEdit(SimpleCommand):
   """
   To edit a model
   """
-  name = "modelEdit"
-  verboseName = "model edit"
+  name = "modelTblEdit"
+  verboseName = "model table edit"
   _gongs = ["QuerysetAsSpreadsheet", ]
   _drums = {"Terminal": 1,}
 
