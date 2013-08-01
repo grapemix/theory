@@ -4,9 +4,8 @@
 from collections import OrderedDict
 from bson.json_util import loads as jsonLoads
 ##### Theory lib #####
-from theory.gui import field
 from theory.gui.transformer import (
-    MongoModelDataHandler,
+    #MongoModelDataHandler,
     MongoModelBSONDataHandler
     )
 from theory.model import AppModel
@@ -393,15 +392,29 @@ class SpreadsheetBuilder(MongoModelBSONDataHandler):
       appModelmodel = AppModel.objects.get(name=self.modelKlass._class_name)
 
     self.isEditable = isEditable
-    super(SpreadsheetBuilder, self).run(queryset, appModelmodel.fieldNameTypeMap)
+    super(SpreadsheetBuilder, self).run(
+        queryset,
+        appModelmodel.fieldNameTypeMap
+        )
 
     listStoreDataType = self._buildListStoreDataType()
     gtkDataModel = self._buildGtkDataModel()
     self.renderKwargsSet = self._buildRenderKwargsSet()
 
-    self._showWidget(listStoreDataType, gtkDataModel, self.renderKwargsSet, isMainSpreadsheet)
+    self._showWidget(
+        listStoreDataType,
+        gtkDataModel,
+        self.renderKwargsSet,
+        isMainSpreadsheet
+        )
 
-  def _showWidget(self, listStoreDataType, gtkDataModel, renderKwargsSet, isMainSpreadsheet):
+  def _showWidget(
+      self,
+      listStoreDataType,
+      gtkDataModel,
+      renderKwargsSet,
+      isMainSpreadsheet
+      ):
     self.spreadsheet = Spreadsheet(
         "Listing %s" % (self.modelKlass._class_name),
         listStoreDataType,
@@ -491,7 +504,11 @@ class SpreadsheetBuilder(MongoModelBSONDataHandler):
 
       for fieldName, fieldHandlerFxnLst in self.fieldPropDict.iteritems():
         try:
-          result = fieldHandlerFxnLst["dataHandler"](id, fieldName, queryrowInJson[fieldName])
+          result = fieldHandlerFxnLst["dataHandler"](
+              id,
+              fieldName,
+              queryrowInJson[fieldName]
+              )
         except KeyError:
           result = fieldHandlerFxnLst["dataHandler"](id, fieldName, None)
         if(result is not None):
@@ -551,10 +568,16 @@ class SpreadsheetBuilder(MongoModelBSONDataHandler):
     pass
 
   def _listFieldnonEditableForceStrFieldRenderHandler(self, field):
-    return {"editable": self.isEditable and False, "fxnName": "renderTextCol"}
+    return {
+        "editable": self.isEditable and False,
+        "fxnName": "renderTextCol"
+        }
 
   def _listFieldeditableForceStrFieldRenderHandler(self, field):
-    return {"editable": self.isEditable and True, "fxnName": "renderTextCol"}
+    return {
+        "editable": self.isEditable and True,
+        "fxnName": "renderTextCol"
+        }
 
   def _listFieldembeddedFieldRenderHandler(self, field):
     return {"fxnName": "renderBtnCol"}
@@ -566,7 +589,10 @@ class SpreadsheetBuilder(MongoModelBSONDataHandler):
     return {"fxnName": "renderBtnCol"}
 
   def _boolFieldRenderHandler(self, field):
-    return {"editable": self.isEditable and True, "fxnName": "renderCheckBoxCol"}
+    return {
+        "editable": self.isEditable and True,
+        "fxnName": "renderCheckBoxCol"
+        }
 
   def _strFieldRenderHandler(self, field):
     return {"editable": self.isEditable and True, "fxnName": "renderTextCol"}
