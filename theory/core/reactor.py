@@ -111,6 +111,7 @@ class Reactor(object):
         self.adapter.printTxt("Cannot load command")
       # Cut the last tab out
       self.adapter.restoreCmdLine()
+      self.paramForm.focusOnTheFirstChild()
     self.parser.initVar()
 
   def cleanParamForm(self, btn):
