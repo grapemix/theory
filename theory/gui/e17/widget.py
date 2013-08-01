@@ -46,7 +46,7 @@ class E17Widget(object):
       self.attrs = self._buildAttrs(attrs)
 
   def _buildAttrs(self, extraAttrs=None, **kwargs):
-    "Helper function for building an attribute dictionary."
+    """Helper function for building an attribute dictionary."""
     attrs = dict(self.attrs, **kwargs)
     if extraAttrs:
       attrs.update(extraAttrs)
@@ -85,6 +85,9 @@ class E17Widget(object):
     self.obj.show()
     if(self.attrs["isFocus"]):
       self.obj.focus_set(True)
+
+  def setFocus(self):
+    self.obj.focus_set(True)
 
 class Label(E17Widget):
   def __init__(self, attrs=None, *args, **kwargs):

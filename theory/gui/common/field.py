@@ -585,7 +585,7 @@ class EmailField(TextField):
 
 class FileField(Field):
   # TODO: Not working, fix me
-  widget = Fileselector
+  widget = FileselectInput
   default_error_messages = {
     'invalid': _(u"No file was submitted. Check the encoding type on the form."),
     'missing': _(u"No file was submitted."),

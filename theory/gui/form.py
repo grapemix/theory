@@ -220,7 +220,7 @@ class GuiFormBase(FormBase, BasePacker):
   def _changeFormWindowHeight(self, maxHeight):
     # TODO: fix this super ugly hack
     size = self.win.size
-    fieldHeight = len(self.fields) * 200
+    fieldHeight = len(self.fields) * 100
     preferHeight = fieldHeight if(fieldHeight<maxHeight) else maxHeight
 
     if(size[0]<640 or size[1]<preferHeight):
@@ -310,8 +310,13 @@ class CommandFormBase(StepFormBase):
     for k,v in kwargs.iteritems():
       self.fields[k].initData = v
 
+  def focusOnTheFirstChild(self):
+    # We assume the items() result is consistent. Since the list has been
+    # reversed, last input is used.
+    self.fields.items()[-1][1].widget.setFocus()
+
 class Form(FormBase):
-  "A collection of Fields, plus their associated data."
+  """A collection of Fields, plus their associated data."""
   # This is a separate class from BaseForm in order to abstract the way
   # self.fields is specified. This class (Form) is the one that does the
   # fancy metaclass stuff purely for the semantic sugar -- it allows one

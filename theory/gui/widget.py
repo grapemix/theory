@@ -17,7 +17,7 @@ from e17.widget import *
 __all__ = (\
     "StringInput", "TextInput", "NumericInput", "SelectBoxInput",\
     "CheckBoxInput", "StringGroupFilterInput", "ModelValidateGroupInput",\
-    "Fileselector", "ListInput", "DictInput", "FilterFormLayout", \
+    "FileselectInput", "ListInput", "DictInput", "FilterFormLayout", \
     )
 
 # Honestly, I am not satisfied with the code related to the GUI. So the code
@@ -75,10 +75,6 @@ class BasePacker(object):
     moment, will be used in the future.
     """
     return data.get(name, None)
-
-  @abstractmethod
-  def updateField(self):
-    pass
 
 class BaseFieldInput(BasePacker):
   def __init__(self, fieldSetter, fieldGetter, win, bx, attrs=None, *args, **kwargs):
@@ -182,6 +178,13 @@ class BaseLabelInput(BaseFieldInput):
   def show(self):
     self.mainContainer.show()
 
+  def setFocus(self):
+    self.widgetLst[0].setFocus()
+
+  @abstractmethod
+  def updateField(self):
+    pass
+
 class StringInput(BaseLabelInput):
   widgetClass = Entry
 
@@ -247,7 +250,7 @@ class CheckBoxInput(BaseLabelInput):
   def changedData(self):
     pass
 
-class Fileselector(BaseLabelInput):
+class FileselectInput(BaseLabelInput):
   widgetClass = FileSelector
 
 class StringGroupFilterInput(BaseLabelInput):
