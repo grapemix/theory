@@ -100,17 +100,26 @@ class Command(Model):
     return "%s.command.%s.%s" % (self.app, self.name, self.className)
 
 class History(Model):
-  command = StringField(required=True,\
+  commandName = StringField(required=True,\
       verbose_name=_("Command in Text"),\
       help_text=_("Command in Text including paramter"))
-  commandRef = ReferenceField(Command, required=True,\
-      reverse_delete_rule=CASCADE)
+  # Temp diable. During the development stage, reprobeAllModule is run almost
+  # everytime which delete all command module. However, since the
+  # reverse_delete_rule of the command field is cascade, all history record
+  # will be lost. This field should re-enable in the future.
+  #command = ReferenceField(Command, required=True,\
+  #    reverse_delete_rule=CASCADE)
   mood = StringField(max_length=256,\
       required=True,
       verbose_name=_("Mood"),\
       help_text=_("The moods where the command being executed"))
   touched = DateTimeField(required=True, default=datetime.utcnow())
   repeated = IntField(default=1)
+
+  meta = {
+      'ordering': ['-touched',]
+  }
+
 
 class Adapter(Model):
   name = StringField(required=True, max_length=256,\
@@ -148,3 +157,47 @@ class BinaryClassifierHistory(Model):
   ref = GenericReferenceField()
   initState = SortedListField(BooleanField())
   finalState = SortedListField(BooleanField())
+
+class AppModel(Model):
+  name = StringField(
+      required=True,
+      max_length=256,
+      verbose_name=_("App model name"),
+      help_text=_("Application model name"),
+      unique_with="app",
+      )
+  app = StringField(
+      required=True,
+      max_length=256,
+      verbose_name=_("Application name"),
+      help_text=_("Application name")
+      )
+  tblField = SortedListField(
+      StringField(
+        max_length=256,
+        verbose_name=_("Table field"),
+        help_text=_("The fields being showed in a table")
+        ),
+      required=True,
+      )
+  formField = SortedListField(
+      StringField(
+        max_length=256,
+        verbose_name=_("Form field"),
+        help_text=_("The fields being showed in a form")
+        ),
+      required=True,
+      )
+  fieldNameTypeMap = MapField(
+      field=StringField(max_length=256,),
+      verbose_name=_("Field name and type map"),
+      help_text=_("All fields' name and their type"),
+      required=True,
+      )
+  importPath = StringField(
+      max_length=256,
+      required=True,
+      verbose_name=_("Import path"),
+      unique=True,
+      help_text=_("The path to import the adapter")
+      )

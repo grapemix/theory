@@ -157,6 +157,7 @@ class ModuleLoader(object):
 
 class CommandModuleLoader(ModuleLoader):
   def postPackFxnForTheory(self, lst):
+    # TODO: should move this config into somewhere
     moodCommandRel = {
       "tester": ["norm"],
       "loadDbData": ["norm"],
@@ -170,6 +171,11 @@ class CommandModuleLoader(ModuleLoader):
       "createCmd": ["dev"],
       "indentFormatFix": ["dev"],
       "theoryFilesSurgeon": ["dev"],
+      "modelQuery": ["norm"],
+      "modelEdit": ["norm"],
+      "modelTblEdit": ["norm"],
+      "modelDel": ["norm"],
+      "modelAdd": ["norm"],
     }
     for o in lst:
       if(moodCommandRel.has_key(o[1])):
@@ -241,13 +247,20 @@ def reprobeAllModule(settings_mod, argv=None):
   loadMoodData()
 
   moduleLoader = ModuleLoader(AdapterScanManager, "adapter", apps)
-  moduleLoader.lstPackFxn = lambda lst, app_name, path: [".".join([app_name, i]) for i in lst]
+  moduleLoader.lstPackFxn = \
+      lambda lst, app_name, path: [".".join([app_name, i]) for i in lst]
   moduleLoader.load()
 
   moduleLoader = CommandModuleLoader(CommandScanManager, "command", apps)
   moduleLoader.moodAppRel = moodAppRel
-  moduleLoader.lstPackFxn = lambda lst, app_name, path: [[app_name, i, os.path.join(path, i + ".py"), ["lost"]] for i in lst]
+  moduleLoader.lstPackFxn = \
+      lambda lst, app_name, path:\
+        [[app_name, i, os.path.join(path, i + ".py"), ["lost"]] for i in lst]
   moduleLoader.load()
-  #print [(i.name, i.mood) for i in Command.objects.all()]
+
+  moduleLoader = ModuleLoader(ModelScanManager, "model", apps)
+  moduleLoader.lstPackFxn = \
+      lambda lst, app_name, path: [".".join([app_name, i]) for i in lst]
+  moduleLoader.load()
 
   return

@@ -51,7 +51,7 @@ __all__ = (
   #'ComboField', 'MultiValueField', 'SplitDateTimeField',
   'FloatField', 'DecimalField', 'IPAddressField', 'GenericIPAddressField',
   'FilePathField', 'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField',
-  'PythonModuleField', 'PythonClassField',
+  'PythonModuleField', 'PythonClassField', 'QuerysetField',
 )
 
 FILE_INPUT_CONTRADICTION = object()
@@ -1410,3 +1410,14 @@ class PythonClassField(Field):
     elif(self.required):
       raise ValidationError(self.error_messages['invalid'] % {'value': value})
     # else (value is empty and it is not required, suppress error)
+
+class QuerysetField(Field):
+  default_error_messages = {
+    'invalid': _('Unable to import the given class'),
+    'wrong_classtype': _('The given class is not matched'),
+  }
+
+  def __init__(self, auto_import=False, *args, **kwargs):
+    super(QuerysetField, self).__init__(*args, **kwargs)
+    self.widget = StringInput
+    self.auto_import = auto_import
