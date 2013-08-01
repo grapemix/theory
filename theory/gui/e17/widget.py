@@ -46,7 +46,7 @@ class E17Widget(object):
       self.attrs = self._buildAttrs(attrs)
 
   def _buildAttrs(self, extraAttrs=None, **kwargs):
-    "Helper function for building an attribute dictionary."
+    """Helper function for building an attribute dictionary."""
     attrs = dict(self.attrs, **kwargs)
     if extraAttrs:
       attrs.update(extraAttrs)

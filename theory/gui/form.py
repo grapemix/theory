@@ -311,7 +311,7 @@ class CommandFormBase(StepFormBase):
       self.fields[k].initData = v
 
 class Form(FormBase):
-  "A collection of Fields, plus their associated data."
+  """A collection of Fields, plus their associated data."""
   # This is a separate class from BaseForm in order to abstract the way
   # self.fields is specified. This class (Form) is the one that does the
   # fancy metaclass stuff purely for the semantic sugar -- it allows one
