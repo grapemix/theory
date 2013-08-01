@@ -8,6 +8,7 @@
 ##### Local app #####
 from .field import *
 from .form import *
+from .transformer import *
 
 ##### Theory app #####
 
