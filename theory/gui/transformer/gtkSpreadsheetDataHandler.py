@@ -11,7 +11,8 @@ from json import loads as jsonLoads
 ##### Local app #####
 
 ##### Theory app #####
-from gui.transformer.gtkSpreadsheetBSONDataHandler import GtkSpreadsheetModelBSONDataHandler
+from gui.transformer.gtkSpreadsheetBSONDataHandler \
+    import GtkSpreadsheetModelBSONDataHandler
 
 ##### Misc #####
 
@@ -30,7 +31,12 @@ class GtkSpreadsheetModelDataHandler(GtkSpreadsheetModelBSONDataHandler):
   def _editableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
     return unicode(fieldVal)
 
-  def _listFieldeditableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
+  def _listFieldeditableForceStrFieldDataHandler(
+      self,
+      rowId,
+      fieldName,
+      fieldVal
+      ):
     try:
       return ast.literal_eval(fieldVal)
     except ValueError:

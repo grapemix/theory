@@ -90,10 +90,20 @@ class GtkSpreadsheetModelBSONDataHandler(MongoModelDetectorBase):
   def _listFieldneglectFieldDataHandler(self, rowId, fieldName, fieldVal):
     pass
 
-  def _listFieldnonEditableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
+  def _listFieldnonEditableForceStrFieldDataHandler(
+      self,
+      rowId,
+      fieldName,
+      fieldVal
+      ):
     pass
 
-  def _listFieldeditableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
+  def _listFieldeditableForceStrFieldDataHandler(
+      self,
+      rowId,
+      fieldName,
+      fieldVal
+      ):
     return jsonLoads(fieldVal)
 
   def _listFieldembeddedFieldDataHandler(self, rowId, fieldName, fieldVal):

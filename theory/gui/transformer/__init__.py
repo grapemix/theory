@@ -9,8 +9,10 @@
 ##### Local app #####
 
 ##### Theory app #####
-from gui.transformer.gtkSpreadsheetDataHandler import GtkSpreadsheetModelDataHandler
-from gui.transformer.gtkSpreadsheetBSONDataHandler import GtkSpreadsheetModelBSONDataHandler
+from gui.transformer.gtkSpreadsheetDataHandler \
+    import GtkSpreadsheetModelDataHandler
+from gui.transformer.gtkSpreadsheetBSONDataHandler \
+    import GtkSpreadsheetModelBSONDataHandler
 from gui.transformer.mongoModelDataHandler import MongoModelDataHandler
 from gui.transformer.mongoModelBSONDataHandler import MongoModelBSONDataHandler
 

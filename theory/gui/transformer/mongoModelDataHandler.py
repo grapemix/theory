@@ -25,7 +25,12 @@ class MongoModelDataHandler(MongoModelBSONDataHandler):
   def _editableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
     return unicode(fieldVal)
 
-  def _listFieldeditableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
+  def _listFieldeditableForceStrFieldDataHandler(
+      self,
+      rowId,
+      fieldName,
+      fieldVal
+      ):
     return fieldVal
 
 
