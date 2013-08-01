@@ -52,7 +52,10 @@ class MongoModelDetectorBase(object):
             ) is not None
           ):
         handlerFxnName = self._typeCatMap["EnumField"][0]
-        self.fieldPropDict[fieldName] = self._fillUpTypeHandler(handlerFxnName, "")
+        self.fieldPropDict[fieldName] = self._fillUpTypeHandler(
+            handlerFxnName,
+            ""
+            )
         self.fieldPropDict[fieldName]["choices"] = \
             dict(
                 getattr(
@@ -61,7 +64,10 @@ class MongoModelDetectorBase(object):
                 )
             )
       else:
-        self.fieldPropDict[fieldName] = self._fillUpTypeHandler(handlerFxnName, "")
+        self.fieldPropDict[fieldName] = self._fillUpTypeHandler(
+            handlerFxnName,
+            ""
+            )
 
   @abstractmethod
   def _fillUpTypeHandler(self, klassLabel, prefix=""):
@@ -74,10 +80,19 @@ class MongoModelDetectorBase(object):
         "DynamicField": ("neglectField", "neglectField"),
         "FileField": ("neglectField", "neglectField"),
         "ImageField": ("neglectField", "neglectField"),
-        "ComplexDateTimeField": ("nonEditableForceStrField", "nonEditableForceStrField"),
-        "DateTimeField": ("nonEditableForceStrField", "nonEditableForceStrField"),
+        "ComplexDateTimeField": (
+          "nonEditableForceStrField",
+          "nonEditableForceStrField"
+          ),
+        "DateTimeField": (
+          "nonEditableForceStrField",
+          "nonEditableForceStrField"
+          ),
         "UUIDField": ("nonEditableForceStrField", "nonEditableForceStrField"),
-        "SequenceField": ("nonEditableForceStrField", "nonEditableForceStrField"),
+        "SequenceField": (
+          "nonEditableForceStrField",
+          "nonEditableForceStrField"
+          ),
         "DictField": ("nonEditableForceStrField", "nonEditableForceStrField"),
         "EmailField": ("editableForceStrField", "editableForceStrField"),
         "URLField": ("editableForceStrField", "editableForceStrField"),
@@ -85,7 +100,8 @@ class MongoModelDetectorBase(object):
         "BooleanField": ("boolField", "editableForceStrField"),
         "DecimalField": ("floatField", "editableForceStrField"),
         "FloatField": ("floatField", "editableForceStrField"),
-        "EnumField": ("enumField", "editableForceStrField"), # Not a native mongo db field
+        # Not a native mongo db field
+        "EnumField": ("enumField", "editableForceStrField"),
         "IntField": ("intField", "editableForceStrField"),
         "StringField": ("strField", "editableForceStrField"),
         "MapField": ("listField", "listField"),
