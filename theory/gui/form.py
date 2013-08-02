@@ -252,6 +252,7 @@ class GuiFormBase(FormBase, BasePacker):
         self.formBx,
         {"unFocusFxn": self.unFocusFxn}
         )
+    self.optionalMenu = optionalMenu
     for name, field in self.fields.items():
       if(field.required):
         field.renderWidget(self.win, self.formBx.obj)
@@ -319,7 +320,11 @@ class CommandFormBase(StepFormBase):
   def focusOnTheFirstChild(self):
     # We assume the items() result is consistent. Since the list has been
     # reversed, last input is used.
-    self.fields.items()[-1][1].widget.setFocus()
+    firstChild = self.fields.items()[-1][1]
+    if(firstChild.required):
+      firstChild.widget.setFocus()
+    elif(hasattr(self, "optionalMenu")):
+      self.optionalMenu.setFocusOnFilterEntry()
 
 class Form(FormBase):
   """A collection of Fields, plus their associated data."""
