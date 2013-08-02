@@ -279,6 +279,8 @@ class StepFormBase(GuiFormBase):
     btn.win = self.win
     btn.bx = self.stepControlBox.obj
     btn.label = "Cancel"
+    if(kwargs.has_key("cleanUpCrtFxn")):
+      btn._clicked = kwargs["cleanUpCrtFxn"]
     self.stepControlBox.addWidget(btn)
 
     if(hasattr(self, "_backBtnClick")):
