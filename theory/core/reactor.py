@@ -25,6 +25,13 @@ from theory.utils.importlib import import_class
 __all__ = ('reactor',)
 
 class Reactor(object):
+  """
+  It should be in charge to handle the high level user interaction bewteen
+  theory and user. And it should dedicated on the GUI part, but able to
+  seperate with the logic from a specific toolkit. It is implemented into
+  singleton pattern.
+  """
+
   _mood = settings.DEFAULT_MOOD
   _avblCmd = None
   autocompleteCounter = 0
@@ -125,6 +132,7 @@ class Reactor(object):
   def _escapeRequest(self, entrySetterFxn):
     self.historyIndex = -1
     entrySetterFxn("")
+    self.adapter.cleanUpCrt()
 
   def _autocompleteRequest(self, entrySetterFxn):
     self.parser.cmdInTxt = self.adapter.cmdInTxt
@@ -165,8 +173,8 @@ class Reactor(object):
 
     self.paramForm = cmdParamFormKlass()
     self.paramForm._nextBtnClick = self.cleanParamForm
-    self.paramForm.generateFilterForm(self.ui.win, self.ui.bxCrt)
-    self.paramForm.generateStepControl()
+    self.paramForm.generateFilterForm(*self.adapter.uiParam.values())
+    self.paramForm.generateStepControl(cleanUpCrtFxn=self.adapter.cleanUpCrt)
     return True
 
   def _parse(self):

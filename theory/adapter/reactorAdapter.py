@@ -28,12 +28,9 @@ class ReactorAdapter(object):
     stdOut = field.TextField(label="Standard Output")
 
   def printTxt(self, txt):
-    win = self.uiParam["win"]
-    bx = self.uiParam["bx"]
-
     o = self.TerminalForm()
     o.fields["stdOut"].initData = txt
-    o.generateForm(win, bx)
+    o.generateForm(*self.uiParam.values())
     self.terminalForm = o
 
   def __init__(self, signal):
@@ -42,13 +39,12 @@ class ReactorAdapter(object):
   def registerEntrySetterFxn(self, entrySetterFxn):
     self.entrySetterFxn = entrySetterFxn
 
+  def registerCleanUpCrtFxn(self, cleanUpCrtFxn):
+    self.cleanUpCrt = cleanUpCrtFxn
+
   def restoreCmdLine(self):
     self.entrySetterFxn(self.cmdInTxt)
     self.cmdInTxt = ""
-
-  def cleanUpCrt(self):
-    bx = self.uiParam["bx"]
-    bx.clear()
 
   @property
   def cmdInTxt(self):
