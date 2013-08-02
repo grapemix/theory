@@ -172,11 +172,7 @@ class Reactor(object):
 
     self.paramForm = cmdParamFormKlass()
     self.paramForm._nextBtnClick = self.cleanParamForm
-    self.paramForm.generateFilterForm(
-        self.ui.win,
-        self.ui.bxCrt,
-        self.adapter.unFocusFxn
-        )
+    self.paramForm.generateFilterForm(*self.adapter.uiParam.values())
     self.paramForm.generateStepControl()
     return True
 
