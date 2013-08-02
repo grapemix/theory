@@ -39,13 +39,12 @@ class ReactorAdapter(object):
   def registerEntrySetterFxn(self, entrySetterFxn):
     self.entrySetterFxn = entrySetterFxn
 
+  def registerCleanUpCrtFxn(self, cleanUpCrtFxn):
+    self.cleanUpCrt = cleanUpCrtFxn
+
   def restoreCmdLine(self):
     self.entrySetterFxn(self.cmdInTxt)
     self.cmdInTxt = ""
-
-  def cleanUpCrt(self):
-    bx = self.uiParam["bx"]
-    bx.clear()
 
   @property
   def cmdInTxt(self):

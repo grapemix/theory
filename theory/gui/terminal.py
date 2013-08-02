@@ -56,10 +56,16 @@ class Terminal(object):
         ("unFocusFxn", self.unFocusFxn),
     ])
     self._adapter.registerEntrySetterFxn(self._cmdLineEntry.entry_set)
+    self._adapter.registerCleanUpCrtFxn(self.cleanUpCrt)
 
   def unFocusFxn(self, entry, event, *args, **kwargs):
     if(event.keyname=="Escape"):
       self._cmdLineEntry.focus_set(True)
+
+  def cleanUpCrt(self):
+    """To reset to original form."""
+    self.bxCrt.clear()
+    self.win.resize(640,30)
 
   def __init__(self):
     elementary.init()
@@ -84,7 +90,7 @@ class Terminal(object):
     self.bx.show()
     self.drawShellInput()
     self.drawLabel("")
-    self.win.resize(640,30)
+    self.cleanUpCrt()
     self.win.show()
 
   def drawAll(self):

@@ -132,6 +132,7 @@ class Reactor(object):
   def _escapeRequest(self, entrySetterFxn):
     self.historyIndex = -1
     entrySetterFxn("")
+    self.adapter.cleanUpCrt()
 
   def _autocompleteRequest(self, entrySetterFxn):
     self.parser.cmdInTxt = self.adapter.cmdInTxt
