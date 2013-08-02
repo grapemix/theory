@@ -67,6 +67,7 @@ class Terminal(object):
     """To reset to original form."""
     self.bxCrt.clear()
     self.win.resize(640,30)
+    self._cmdLineEntry.focus_set(True)
 
   def __init__(self):
     elementary.init()
