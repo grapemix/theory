@@ -51,6 +51,11 @@ class Terminal(object):
     self._adapter.crlf = self.crlf
     self._adapter.uiParam = {"win": self.win, "bx": self.bxCrt}
     self._adapter.registerEntrySetterFxn(self._cmdLineEntry.entry_set)
+    self._adapter.registerUnfocusFxn(self.unFocusFxn)
+
+  def unFocusFxn(self, entry, event, *args, **kwargs):
+    if(event.keyname=="Escape"):
+      self._cmdLineEntry.focus_set(True)
 
   def __init__(self):
     elementary.init()

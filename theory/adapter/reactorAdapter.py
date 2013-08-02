@@ -94,3 +94,6 @@ class ReactorAdapter(object):
   def escapeRequest(self):
     if(self.signal.has_key("escapeRequest")):
       self.signal["escapeRequest"](self.entrySetterFxn)
+
+  def registerUnfocusFxn(self, unFocusFxn):
+    self.unFocusFxn = unFocusFxn

@@ -498,6 +498,9 @@ class Box(E17Widget):
     if(self.obj!=None):
       self.obj.show()
 
+  def registerUnfocusFxn(self, unFocusFxn):
+    self.obj.on_key_down_add(unFocusFxn, self.obj)
+
 class Entry(E17Widget):
   def __init__(self, attrs=None, *args, **kwargs):
     defaultAttrs = {
