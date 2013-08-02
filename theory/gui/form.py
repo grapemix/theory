@@ -233,7 +233,8 @@ class GuiFormBase(FormBase, BasePacker):
     self.formBx.bx = self.bx
     self.formBx.generate()
 
-  def generateForm(self, win, bx):
+  def generateForm(self, win, bx, unFocusFxn):
+    self.unFocusFxn = unFocusFxn
     self._createFormSkeleton(win, bx)
 
     for name, field in self.fields.items():
@@ -243,9 +244,15 @@ class GuiFormBase(FormBase, BasePacker):
     self.formBx.postGenerate()
     self._changeFormWindowHeight(720)
 
-  def generateFilterForm(self, win, bx):
+  def generateFilterForm(self, win, bx, unFocusFxn):
+    self.unFocusFxn = unFocusFxn
     self._createFormSkeleton(win, bx)
-    optionalMenu = FilterFormLayout(self.win, self.formBx)
+    optionalMenu = FilterFormLayout(
+        self.win,
+        self.formBx,
+        {"unFocusFxn": self.unFocusFxn}
+        )
+    self.optionalMenu = optionalMenu
     for name, field in self.fields.items():
       if(field.required):
         field.renderWidget(self.win, self.formBx.obj)
@@ -272,6 +279,8 @@ class StepFormBase(GuiFormBase):
     btn.win = self.win
     btn.bx = self.stepControlBox.obj
     btn.label = "Cancel"
+    if(kwargs.has_key("cleanUpCrtFxn")):
+      btn._clicked = kwargs["cleanUpCrtFxn"]
     self.stepControlBox.addWidget(btn)
 
     if(hasattr(self, "_backBtnClick")):
@@ -313,7 +322,11 @@ class CommandFormBase(StepFormBase):
   def focusOnTheFirstChild(self):
     # We assume the items() result is consistent. Since the list has been
     # reversed, last input is used.
-    self.fields.items()[-1][1].widget.setFocus()
+    firstChild = self.fields.items()[-1][1]
+    if(firstChild.required):
+      firstChild.widget.setFocus()
+    elif(hasattr(self, "optionalMenu")):
+      self.optionalMenu.setFocusOnFilterEntry()
 
 class Form(FormBase):
   """A collection of Fields, plus their associated data."""
