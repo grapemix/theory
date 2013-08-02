@@ -28,12 +28,9 @@ class ReactorAdapter(object):
     stdOut = field.TextField(label="Standard Output")
 
   def printTxt(self, txt):
-    win = self.uiParam["win"]
-    bx = self.uiParam["bx"]
-
     o = self.TerminalForm()
     o.fields["stdOut"].initData = txt
-    o.generateForm(win, bx)
+    o.generateForm(*self.uiParam.values())
     self.terminalForm = o
 
   def __init__(self, signal):
@@ -94,6 +91,3 @@ class ReactorAdapter(object):
   def escapeRequest(self):
     if(self.signal.has_key("escapeRequest")):
       self.signal["escapeRequest"](self.entrySetterFxn)
-
-  def registerUnfocusFxn(self, unFocusFxn):
-    self.unFocusFxn = unFocusFxn

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 ##### System wide lib #####
+from collections import OrderedDict
 import os
 
 ##### Theory lib #####
@@ -49,9 +50,12 @@ class Terminal(object):
     self._adapter = adapter
     #self._adapter.printTxt = lambda x: self.lb.text_set(x)
     self._adapter.crlf = self.crlf
-    self._adapter.uiParam = {"win": self.win, "bx": self.bxCrt}
+    self._adapter.uiParam = OrderedDict([
+        ("win", self.win),
+        ("bx", self.bxCrt),
+        ("unFocusFxn", self.unFocusFxn),
+    ])
     self._adapter.registerEntrySetterFxn(self._cmdLineEntry.entry_set)
-    self._adapter.registerUnfocusFxn(self.unFocusFxn)
 
   def unFocusFxn(self, entry, event, *args, **kwargs):
     if(event.keyname=="Escape"):
