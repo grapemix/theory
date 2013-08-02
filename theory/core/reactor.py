@@ -174,7 +174,7 @@ class Reactor(object):
     self.paramForm = cmdParamFormKlass()
     self.paramForm._nextBtnClick = self.cleanParamForm
     self.paramForm.generateFilterForm(*self.adapter.uiParam.values())
-    self.paramForm.generateStepControl()
+    self.paramForm.generateStepControl(cleanUpCrtFxn=self.adapter.cleanUpCrt)
     return True
 
   def _parse(self):

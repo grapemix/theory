@@ -62,7 +62,8 @@ class Terminal(object):
     if(event.keyname=="Escape"):
       self._cmdLineEntry.focus_set(True)
 
-  def cleanUpCrt(self):
+  # keep the *args. It might be called from toolkits which pass widget as param
+  def cleanUpCrt(self, *args, **kwargs):
     """To reset to original form."""
     self.bxCrt.clear()
     self.win.resize(640,30)
