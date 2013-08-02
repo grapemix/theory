@@ -560,6 +560,10 @@ class FilterFormLayout(BasePacker):
       if(name.startswith(requestFieldNamePrefix.lower())):
         input.mainContainer.show()
 
+  def setFocusOnFilterEntry(self):
+    # The first widget must be label and the second one will be the entry box
+    self.filterEntryBox.widgetChildrenLst[1].setFocus()
+
   def generate(self, *args, **kwargs):
     filterEntryBox = self._createContainer(
         {
