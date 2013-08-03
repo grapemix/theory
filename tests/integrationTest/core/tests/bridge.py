@@ -107,3 +107,9 @@ class BridgeTestCase(unittest.TestCase):
     firstCmd.paramForm = firstCmd.ParamForm()
     secondCmdModel = self.simpleChain2CommandModel
     self.assertEqual(firstCmd.run(secondCmdModel), "asyncChain1 received")
+
+  def testSimpleCommandToSelf(self):
+    firstCmd = SimpleChain1()
+    firstCmd.paramForm = firstCmd.ParamForm()
+    firstCmd.run()
+    self.bridge.bridgeToSelf(firstCmd)

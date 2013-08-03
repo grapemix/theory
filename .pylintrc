@@ -132,19 +132,19 @@ const-rgx=(([A-Z_][A-Z0-9_]*)|(__.*__))$
 class-rgx=[A-Z_][a-zA-Z0-9]+$
 
 # Regular expression which should only match correct function names
-function-rgx=[a-z_][A-z0-9_]{2,30}$
+function-rgx=[a-z_][A-z0-9_]{2,50}$
 
 # Regular expression which should only match correct method names
-method-rgx=[a-z_][A-z0-9_]{2,30}$
+method-rgx=[a-z_][A-z0-9_]{2,50}$
 
 # Regular expression which should only match correct instance attribute names
-attr-rgx=[a-z_][A-z0-9_]{0,30}$
+attr-rgx=[a-z_][A-z0-9_]{0,50}$
 
 # Regular expression which should only match correct argument names
-argument-rgx=[a-z_][A-z0-9_]{2,30}$
+argument-rgx=[a-z_][A-z0-9_]{2,50}$
 
 # Regular expression which should only match correct variable names
-variable-rgx=[a-z_][A-z0-9_]{0,30}$
+variable-rgx=[a-z_][A-z0-9_]{0,50}$
 
 # Regular expression which should only match correct list comprehension /
 # generator expression variable names
@@ -211,7 +211,7 @@ int-import-graph=
 [DESIGN]
 
 # Maximum number of arguments for function / method
-max-args=5
+max-args=10
 
 # Argument names that match this expression will be ignored. Default to name
 # with leading underscore
@@ -236,7 +236,7 @@ max-parents=7
 max-attributes=99
 
 # Minimum number of public methods for a class (see R0903).
-min-public-methods=2
+min-public-methods=0
 
 # Maximum number of public methods for a class (see R0904).
 max-public-methods=20
@@ -257,7 +257,7 @@ valid-classmethod-first-arg=cls
 # List of valid names for the first argument in a metaclass class method.
 valid-metaclass-classmethod-first-arg=mcs
 
-
+ignored-modules=theory,google
 [EXCEPTIONS]
 
 # Exceptions that will emit a warning when being caught. Defaults to

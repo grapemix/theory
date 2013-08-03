@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 ##### System wide lib #####
+from collections import OrderedDict
 import os
 
 ##### Theory lib #####
@@ -19,7 +20,7 @@ import evas
 
 ##### Misc #####
 
-# TODO: refactor/rewrite this file
+# TODO: MUST rewrite this file!
 #----- common -{{{-
 def my_entry_bt_2(bt, en):
   str = en.entry_get()
@@ -49,8 +50,24 @@ class Terminal(object):
     self._adapter = adapter
     #self._adapter.printTxt = lambda x: self.lb.text_set(x)
     self._adapter.crlf = self.crlf
-    self._adapter.uiParam = {"win": self.win, "bx": self.bxCrt}
+    self._adapter.uiParam = OrderedDict([
+        ("win", self.win),
+        ("bx", self.bxCrt),
+        ("unFocusFxn", self.unFocusFxn),
+    ])
     self._adapter.registerEntrySetterFxn(self._cmdLineEntry.entry_set)
+    self._adapter.registerCleanUpCrtFxn(self.cleanUpCrt)
+
+  def unFocusFxn(self, entry, event, *args, **kwargs):
+    if(event.keyname=="Escape"):
+      self._cmdLineEntry.focus_set(True)
+
+  # keep the *args. It might be called from toolkits which pass widget as param
+  def cleanUpCrt(self, *args, **kwargs):
+    """To reset to original form."""
+    self.bxCrt.clear()
+    self.win.resize(640,30)
+    self._cmdLineEntry.focus_set(True)
 
   def __init__(self):
     elementary.init()
@@ -75,7 +92,7 @@ class Terminal(object):
     self.bx.show()
     self.drawShellInput()
     self.drawLabel("")
-    self.win.resize(640,30)
+    self.cleanUpCrt()
     self.win.show()
 
   def drawAll(self):
@@ -111,10 +128,13 @@ class Terminal(object):
 
   def key_down(self, entry, event, *args, **kwargs):
     # "Shift", "Control", "Alt", "Meta", "Hyper", "Super".
-    #print entry
     #print event, event.modifier_is_set("Alt")
-    #print dir(entry.evas)
-    pass
+    if(event.keyname=="Up"):
+      self.adapter.showPreviousCmdRequest()
+    elif(event.keyname=="Down"):
+      self.adapter.showNextCmdRequest()
+    elif(event.keyname=="Escape"):
+      self.adapter.escapeRequest()
 
   def drawShellInput(self):
     win = self.win
