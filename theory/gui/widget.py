@@ -17,7 +17,7 @@ from e17.widget import *
 __all__ = (\
     "StringInput", "TextInput", "NumericInput", "SelectBoxInput",\
     "CheckBoxInput", "StringGroupFilterInput", "ModelValidateGroupInput",\
-    "Fileselector", "ListInput", "DictInput", "FilterFormLayout", \
+    "FileselectInput", "ListInput", "DictInput", "FilterFormLayout", \
     )
 
 # Honestly, I am not satisfied with the code related to the GUI. So the code
@@ -76,10 +76,6 @@ class BasePacker(object):
     """
     return data.get(name, None)
 
-  @abstractmethod
-  def updateField(self):
-    pass
-
 class BaseFieldInput(BasePacker):
   def __init__(self, fieldSetter, fieldGetter, win, bx, attrs=None, *args, **kwargs):
     self.fieldSetter = fieldSetter
@@ -134,7 +130,6 @@ class BaseLabelInput(BaseFieldInput):
       self.packAsFrame(self.title, self.help)
     else:
       self.packAsTbl(self.title, self.help)
-
   def packAsFrame(self, title, help):
     hBox = self._createContainer(attrs={"isFillAlign": True, "isWeightExpand": True})
     hBox.generate()
@@ -181,6 +176,13 @@ class BaseLabelInput(BaseFieldInput):
 
   def show(self):
     self.mainContainer.show()
+
+  def setFocus(self):
+    self.widgetLst[0].setFocus()
+
+  @abstractmethod
+  def updateField(self):
+    pass
 
 class StringInput(BaseLabelInput):
   widgetClass = Entry
@@ -247,7 +249,7 @@ class CheckBoxInput(BaseLabelInput):
   def changedData(self):
     pass
 
-class Fileselector(BaseLabelInput):
+class FileselectInput(BaseLabelInput):
   widgetClass = FileSelector
 
 class StringGroupFilterInput(BaseLabelInput):
@@ -451,10 +453,13 @@ class ListInput(BaseLabelInput):
     return result
 
   def updateField(self):
-    if(self.widgetClass == Multibuttonentry):
-      self.fieldSetter({\
-          "finalData": self._inputLst[0].finalData,\
-          })
+    if(self.widgetClass == Multibuttonentry
+        or self.widgetClass == TextInput.widgetClass):
+      self.fieldSetter(
+          {
+            "finalData": self._inputLst[0].finalData,
+          }
+      )
     else:
       for idx in range(len(self._inputLst)):
         self._inputLst[idx].updateField()
@@ -526,9 +531,14 @@ class DictInput(ListInput):
 
 class FilterFormLayout(BasePacker):
   def __init__(self, win, bxInput, attrs=None, *args, **kwargs):
-    attrs = self._buildAttrs(\
-        attrs, isContainerAFrame=False, isExpandMainContainer=True)
+    attrs = self._buildAttrs(
+        attrs,
+        isContainerAFrame=False,
+        isExpandMainContainer=True
+        )
     super(FilterFormLayout, self).__init__(win, bxInput.obj, attrs)
+    if(attrs.has_key("unFocusFxn")):
+      self.unFocusFxn = attrs["unFocusFxn"]
     self.labelTitle = "Param Filter:"
     self.inputLst = []
     self.bxInput = bxInput
@@ -549,6 +559,10 @@ class FilterFormLayout(BasePacker):
     for (name, input) in self.inputLst:
       if(name.startswith(requestFieldNamePrefix.lower())):
         input.mainContainer.show()
+
+  def setFocusOnFilterEntry(self):
+    # The first widget must be label and the second one will be the entry box
+    self.filterEntryBox.widgetChildrenLst[1].setFocus()
 
   def generate(self, *args, **kwargs):
     filterEntryBox = self._createContainer(
@@ -596,3 +610,5 @@ class FilterFormLayout(BasePacker):
     self.bxInput.addInput(self.inputContainer)
     self.filterEntryBox.postGenerate()
     self.inputContainer.postGenerate()
+    if(hasattr(self, "unFocusFxn")):
+      self.bxInput.registerUnfocusFxn(self.unFocusFxn)

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 ##### System wide lib #####
+from collections import OrderedDict
 import copy
 from ludibrio import Stub
 
@@ -39,7 +40,11 @@ class StepFormTestCase(unittest.TestCase):
   def __init__(self, *args, **kwargs):
     super(StepFormTestCase, self).__init__(*args, **kwargs)
     self.formCombinator = FormCombinator(self.TestFormTemplate)
-    self.uiParam={"win": settings.CRTWIN, "bx": settings.CRT}
+    self.uiParam=OrderedDict([
+        ("win", settings.CRTWIN),
+        ("bx", settings.CRT),
+        ("unFocusFxn", lambda: True)
+        ])
 
   def setUp(self):
     self.uiParam["bx"].clear()
@@ -49,12 +54,10 @@ class StepFormTestCase(unittest.TestCase):
       print self.testForm.clean()["d"]
 
   def _renderForm(self, *args, **kwargs):
-    win = self.uiParam["win"]
-    bx = self.uiParam["bx"]
     o = self.formCombinator.genOneFieldForm()()
     o._nextBtnClick = self.btnCallback
     #o.generateFilterForm(win, bx)
-    o.generateForm(win, bx)
+    o.generateForm(*self.uiParam.values())
     o.generateStepControl()
 
   def _getMockCommandObject(self, cmd, classImportPath):

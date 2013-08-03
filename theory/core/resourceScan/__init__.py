@@ -9,9 +9,10 @@
 ##### Local app #####
 from .adapterScanManager import AdapterScanManager
 from .commandScanManager import CommandScanManager
+from .modelScanManager import ModelScanManager
 
 ##### Theory app #####
 
 ##### Misc #####
 
-__all__ = ("AdapterScanManager" , "CommandScanManager")
+__all__ = ("AdapterScanManager" , "CommandScanManager", "ModelScanManager")

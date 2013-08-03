@@ -28,12 +28,9 @@ class ReactorAdapter(object):
     stdOut = field.TextField(label="Standard Output")
 
   def printTxt(self, txt):
-    win = self.uiParam["win"]
-    bx = self.uiParam["bx"]
-
     o = self.TerminalForm()
     o.fields["stdOut"].initData = txt
-    o.generateForm(win, bx)
+    o.generateForm(*self.uiParam.values())
     self.terminalForm = o
 
   def __init__(self, signal):
@@ -42,13 +39,12 @@ class ReactorAdapter(object):
   def registerEntrySetterFxn(self, entrySetterFxn):
     self.entrySetterFxn = entrySetterFxn
 
+  def registerCleanUpCrtFxn(self, cleanUpCrtFxn):
+    self.cleanUpCrt = cleanUpCrtFxn
+
   def restoreCmdLine(self):
     self.entrySetterFxn(self.cmdInTxt)
     self.cmdInTxt = ""
-
-  def cleanUpCrt(self):
-    bx = self.uiParam["bx"]
-    bx.clear()
 
   @property
   def cmdInTxt(self):
@@ -71,14 +67,26 @@ class ReactorAdapter(object):
     """
     self._uiParam = uiParam
 
-  def signalCmdInputSubmit(self, *args, **kwargs):
+  def signalCmdInputSubmit(self):
     if(self.signal.has_key("cmdSubmit")):
-      self.signal["cmdSubmit"](*args, **kwargs)
+      self.signal["cmdSubmit"]()
 
-  def signalCmdInputChange(self, *args, **kwargs):
+  def signalCmdInputChange(self):
     if(self.signal.has_key("cmdChange")):
-      self.signal["cmdChange"](*args, **kwargs)
+      self.signal["cmdChange"]()
 
-  def autocompleteRequest(self, *args, **kwargs):
+  def autocompleteRequest(self):
     if(self.signal.has_key("autocompleteRequest")):
-      self.signal["autocompleteRequest"](self.entrySetterFxn, *args, **kwargs)
+      self.signal["autocompleteRequest"](self.entrySetterFxn)
+
+  def showPreviousCmdRequest(self):
+    if(self.signal.has_key("showPreviousCmdRequest")):
+      self.signal["showPreviousCmdRequest"](self.entrySetterFxn)
+
+  def showNextCmdRequest(self):
+    if(self.signal.has_key("showNextCmdRequest")):
+      self.signal["showNextCmdRequest"](self.entrySetterFxn)
+
+  def escapeRequest(self):
+    if(self.signal.has_key("escapeRequest")):
+      self.signal["escapeRequest"](self.entrySetterFxn)

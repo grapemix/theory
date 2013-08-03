@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 ##### System wide lib #####
+from datetime import datetime
 from mongoengine import Q
 import sys
 
@@ -24,12 +25,21 @@ from theory.utils.importlib import import_class
 __all__ = ('reactor',)
 
 class Reactor(object):
+  """
+  It should be in charge to handle the high level user interaction bewteen
+  theory and user. And it should dedicated on the GUI part, but able to
+  seperate with the logic from a specific toolkit. It is implemented into
+  singleton pattern.
+  """
+
   _mood = settings.DEFAULT_MOOD
   _avblCmd = None
   autocompleteCounter = 0
   lastAutocompleteSuggest = ""
   originalQuest = ""
   paramForm = None
+  historyIndex = -1  # It should be working reversely
+  historyLen = 0
 
   @property
   def mood(self):
@@ -50,11 +60,21 @@ class Reactor(object):
   def __init__(self):
     self.parser = TxtCmdParser()
     self.ui = Terminal()
-    self.adapter = ReactorAdapter({"cmdSubmit": self._parse, "autocompleteRequest": self._autocompleteRequest})
+    self.adapter = ReactorAdapter(
+        {
+          "cmdSubmit": self._parse,
+          "autocompleteRequest": self._autocompleteRequest,
+          "showPreviousCmdRequest": self._showPreviousCmdRequest,
+          "showNextCmdRequest": self._showNextCmdRequest,
+          "escapeRequest": self._escapeRequest,
+        }
+    )
     # The ui will generate its supported output function
     self.ui.adapter = self.adapter
     settings.CRTWIN = self.ui.win
     settings.CRT = self.ui.bxCrt
+    self.historyModel = History.objects.all()
+    self.historyLen = len(self.historyModel)
 
   def _queryCommandAutocomplete(self, frag):
     # which means user keeps tabbing
@@ -90,6 +110,30 @@ class Reactor(object):
             .getDetailAutocompleteHints(self.adapter.crlf)
       return (suggest, crtOutput)
 
+
+  def _showPreviousCmdRequest(self, entrySetterFxn):
+    if(self.historyIndex >= self.historyLen):
+      entrySetterFxn("")
+    else:
+      if(self.historyIndex + 1 < self.historyLen):
+        self.historyIndex += 1
+      commandName = self.historyModel[self.historyIndex].commandName
+      entrySetterFxn(commandName)
+
+  def _showNextCmdRequest(self, entrySetterFxn):
+    if(self.historyIndex == -1):
+      entrySetterFxn("")
+    else:
+      if(self.historyIndex - 1 >= 0):
+        self.historyIndex -= 1
+      commandName = self.historyModel[self.historyIndex].commandName
+      entrySetterFxn(commandName)
+
+  def _escapeRequest(self, entrySetterFxn):
+    self.historyIndex = -1
+    entrySetterFxn("")
+    self.adapter.cleanUpCrt()
+
   def _autocompleteRequest(self, entrySetterFxn):
     self.parser.cmdInTxt = self.adapter.cmdInTxt
     self.parser.run()
@@ -111,6 +155,7 @@ class Reactor(object):
         self.adapter.printTxt("Cannot load command")
       # Cut the last tab out
       self.adapter.restoreCmdLine()
+      self.paramForm.focusOnTheFirstChild()
     self.parser.initVar()
 
   def cleanParamForm(self, btn):
@@ -128,8 +173,8 @@ class Reactor(object):
 
     self.paramForm = cmdParamFormKlass()
     self.paramForm._nextBtnClick = self.cleanParamForm
-    self.paramForm.generateFilterForm(self.ui.win, self.ui.bxCrt)
-    self.paramForm.generateStepControl()
+    self.paramForm.generateFilterForm(*self.adapter.uiParam.values())
+    self.paramForm.generateStepControl(cleanUpCrtFxn=self.adapter.cleanUpCrt)
     return True
 
   def _parse(self):
@@ -155,6 +200,7 @@ class Reactor(object):
     self.parser.initVar()
     self.cmdModel = None
     self.paramForm = None
+    self.historyIndex = -1
 
   def _fillParamForm(self, cmdModel):
     bridge = Bridge()
@@ -165,13 +211,35 @@ class Reactor(object):
     cmdName = self.parser.cmdName
     # should change for chained command
     try:
-      self.cmdModel = Command.objects.get(Q(name=cmdName) & (Q(mood=self.mood) | Q(mood="norm")))
+      self.cmdModel = Command.objects.get(
+          Q(name=cmdName)
+          & (Q(mood=self.mood) | Q(mood="norm"))
+      )
     except Command.DoesNotExist:
       # TODO: integrate with std reactor error system
       self.adapter.printTxt("Command not found")
       self.reset()
       return False
     return True
+
+  def _updateHistory(self):
+    # Temp disable. During the development stage, reprobeAllModule is run almost
+    # everytime which delete all command module. However, since the
+    # reverse_delete_rule of the command field is cascade, all history record
+    # will be lost. This field should re-enable in the future.
+    #History(commandName=self.parser.cmdInTxt, command=self.cmdModel,
+
+    History.objects(
+        commandName=self.parser.cmdInTxt,
+        mood=self.mood
+        ).update_one(
+            inc__repeated=1,
+            set__touched=datetime.utcnow(),
+            upsert=True
+            )
+
+    self.historyModel = History.objects.all()
+    self.historyLen += 1
 
   # TODO: refactor this function, may be with bridge
   def run(self):
@@ -192,8 +260,9 @@ class Reactor(object):
     bridge._execeuteCommand(cmd, self.cmdModel, self.adapter.uiParam)
 
     self._performDrums(cmd)
-    History(command=self.parser.cmdInTxt, commandRef=self.cmdModel,
-        mood=self.mood).save()
+
+    self._updateHistory()
+
     self.reset()
 
 reactor = Reactor()
