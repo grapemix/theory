@@ -19,7 +19,7 @@ from theory.model import AppModel
 ##### Misc #####
 
 __all__ = (
-    'DummyModelFactory',
+    'CombinatoryModelFactory',
     )
 
 def getTestCaseFileAbsPath():
@@ -98,7 +98,7 @@ defaultValueSet1 = {
 }
 
 
-class DummyEmbeddedModelWithDefaultValue(models.EmbeddedDocument):
+class CombinatoryEmbeddedModelWithDefaultValue(models.EmbeddedDocument):
   binaryField = models.BinaryField(default=defaultValueSet1["Binary"])
   fileField = models.FileField(default=defaultValueSet1["File"])
   imageField = models.ImageField(default=defaultValueSet1["Image"])
@@ -116,9 +116,9 @@ class DummyEmbeddedModelWithDefaultValue(models.EmbeddedDocument):
   uRLField = models.URLField(default=defaultValueSet1["URL"])
   dynamicField = models.DynamicField()
 
-  referenceField = models.ReferenceField('DummyModelWithDefaultValue')
+  referenceField = models.ReferenceField('CombinatoryModelWithDefaultValue')
   genericReferenceField = models.GenericReferenceField()
-  embeddedDocumentField = models.EmbeddedDocumentField('DummyEmbeddedModelWithDefaultValue')
+  embeddedDocumentField = models.EmbeddedDocumentField('CombinatoryEmbeddedModelWithDefaultValue')
   genericEmbeddedDocumentField = models.GenericEmbeddedDocumentField()
 
   listFieldBinaryField = models.ListField(field=models.BinaryField(), default=[defaultValueSet1["Binary"],])
@@ -185,7 +185,7 @@ class DummyEmbeddedModelWithDefaultValue(models.EmbeddedDocument):
   mapFieldURLField = models.MapField(field=models.URLField(), default={"keyLabel": defaultValueSet1["URL"],})
   mapFieldUUIDField = models.MapField(field=models.UUIDField(), default={"keyLabel": defaultValueSet1["UUID"],})
 
-class DummyModelWithDefaultValue(models.Model):
+class CombinatoryModelWithDefaultValue(models.Model):
   binaryField = models.BinaryField(default=defaultValueSet1["Binary"])
   fileField = models.FileField(default=defaultValueSet1["File"])
   imageField = models.ImageField(default=defaultValueSet1["Image"])
@@ -203,10 +203,10 @@ class DummyModelWithDefaultValue(models.Model):
   uRLField = models.URLField(default=defaultValueSet1["URL"])
   dynamicField = models.DynamicField()
 
-  referenceField = models.ReferenceField('DummyModelWithDefaultValue')
+  referenceField = models.ReferenceField('CombinatoryModelWithDefaultValue')
   genericReferenceField = models.GenericReferenceField()
-  embeddedDocumentField = models.EmbeddedDocumentField('DummyEmbeddedModelWithDefaultValue', default=DummyEmbeddedModelWithDefaultValue())
-  genericEmbeddedDocumentField = models.GenericEmbeddedDocumentField(default=DummyEmbeddedModelWithDefaultValue())
+  embeddedDocumentField = models.EmbeddedDocumentField('CombinatoryEmbeddedModelWithDefaultValue', default=CombinatoryEmbeddedModelWithDefaultValue())
+  genericEmbeddedDocumentField = models.GenericEmbeddedDocumentField(default=CombinatoryEmbeddedModelWithDefaultValue())
 
   listFieldBinaryField = models.ListField(field=models.BinaryField(), default=[defaultValueSet1["Binary"],])
   listFieldBooleanField = models.ListField(field=models.BooleanField(), default=[defaultValueSet1["Boolean"],])
@@ -223,7 +223,7 @@ class DummyModelWithDefaultValue(models.Model):
   listFieldStringField = models.ListField(field=models.StringField(), default=[defaultValueSet1["String"],])
   listFieldURLField = models.ListField(field=models.URLField(), default=[defaultValueSet1["URL"],])
   listFieldUUIDField = models.ListField(field=models.UUIDField(), default=[defaultValueSet1["UUID"],])
-  listFieldEmbeddedField = models.ListField(field=models.EmbeddedDocumentField("DummyEmbeddedModelWithDefaultValue"), default=[DummyEmbeddedModelWithDefaultValue(),])
+  listFieldEmbeddedField = models.ListField(field=models.EmbeddedDocumentField("CombinatoryEmbeddedModelWithDefaultValue"), default=[CombinatoryEmbeddedModelWithDefaultValue(),])
 
   sortedListFieldBinaryField = models.SortedListField(field=models.BinaryField(), default=[defaultValueSet1["Binary"],])
   sortedListFieldBooleanField = models.SortedListField(field=models.BooleanField(), default=[defaultValueSet1["Boolean"],])
@@ -240,7 +240,7 @@ class DummyModelWithDefaultValue(models.Model):
   sortedListFieldStringField = models.SortedListField(field=models.StringField(), default=[defaultValueSet1["String"],])
   sortedListFieldURLField = models.SortedListField(field=models.URLField(), default=[defaultValueSet1["URL"],])
   sortedListFieldUUIDField = models.SortedListField(field=models.UUIDField(), default=[defaultValueSet1["UUID"],])
-  sortedListFieldEmbeddedField = models.SortedListField(field=models.EmbeddedDocumentField("DummyEmbeddedModelWithDefaultValue"), default=[DummyEmbeddedModelWithDefaultValue(),])
+  sortedListFieldEmbeddedField = models.SortedListField(field=models.EmbeddedDocumentField("CombinatoryEmbeddedModelWithDefaultValue"), default=[CombinatoryEmbeddedModelWithDefaultValue(),])
 
   dictFieldBinaryField = models.DictField(default={"keyLabel": defaultValueSet1["Binary"],})
   dictFieldBooleanField = models.DictField(default={"keyLabel": defaultValueSet1["Boolean"],})
@@ -257,7 +257,7 @@ class DummyModelWithDefaultValue(models.Model):
   dictFieldStringField = models.DictField(default={"keyLabel": defaultValueSet1["String"],})
   dictFieldURLField = models.DictField(default={"keyLabel": defaultValueSet1["URL"],})
   dictFieldUUIDField = models.DictField(default={"keyLabel": defaultValueSet1["UUID"],})
-  dictFieldEmbeddedField = models.DictField(default={"keyLabel": DummyEmbeddedModelWithDefaultValue(),})
+  dictFieldEmbeddedField = models.DictField(default={"keyLabel": CombinatoryEmbeddedModelWithDefaultValue(),})
 
   mapFieldBinaryField = models.MapField(field=models.BinaryField(), default={"keyLabel": defaultValueSet1["Binary"],})
   mapFieldBooleanField = models.MapField(field=models.BooleanField(), default={"keyLabel": defaultValueSet1["Boolean"],})
@@ -274,29 +274,31 @@ class DummyModelWithDefaultValue(models.Model):
   mapFieldStringField = models.MapField(field=models.StringField(), default={"keyLabel": defaultValueSet1["String"],})
   mapFieldURLField = models.MapField(field=models.URLField(), default={"keyLabel": defaultValueSet1["URL"],})
   mapFieldUUIDField = models.MapField(field=models.UUIDField(), default={"keyLabel": defaultValueSet1["UUID"],})
-  mapFieldEmbeddedField = models.MapField(field=models.EmbeddedDocumentField("DummyEmbeddedModelWithDefaultValue"), default={"keyLabel": DummyEmbeddedModelWithDefaultValue(),})
+  mapFieldEmbeddedField = models.MapField(field=models.EmbeddedDocumentField("CombinatoryEmbeddedModelWithDefaultValue"), default={"keyLabel": CombinatoryEmbeddedModelWithDefaultValue(),})
 
-class DummyModelFactory(object):
+  #meta = {'collection': 'tests_CombinatoryModelWithDefaultValue'}
+
+class CombinatoryModelFactory(object):
   def __init__(self, *args, **kwargs):
-    super(DummyModelFactory, self).__init__(*args, **kwargs)
+    super(CombinatoryModelFactory, self).__init__(*args, **kwargs)
 
-  def getDummyQuerySet(self, modelLst):
-    DummyModelWithDefaultValue.objects.all().delete()
+  def getCombinatoryQuerySet(self, modelLst):
+    CombinatoryModelWithDefaultValue.objects.all().delete()
     for model in modelLst:
       model.save()
-    return DummyModelWithDefaultValue.objects.all()
+    return CombinatoryModelWithDefaultValue.objects.all()
 
-  def getDummyModelWithDefaultValue(self):
-    return DummyModelWithDefaultValue()
+  def getCombinatoryModelWithDefaultValue(self):
+    return CombinatoryModelWithDefaultValue()
 
   def getQuerySet(self):
-    return DummyModelWithDefaultValue.objects.all()
+    return CombinatoryModelWithDefaultValue.objects.all()
 
   def getModelWithDefaultValue(self):
-    m = DummyModelWithDefaultValue()
+    m = CombinatoryModelWithDefaultValue()
     m.save()
     o = DummyAppModelManager()
-    o.registerModel("tests", "DummyModelWithDefaultValue", m)
+    o.registerModel("testBase", "CombinatoryModelWithDefaultValue", m)
     return m
 
   def getModelDefaultValue(self):

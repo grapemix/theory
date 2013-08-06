@@ -15,11 +15,12 @@ from theory.utils import unittest
 ##### Theory third-party lib #####
 
 ##### Local app #####
-from dummyModelFactory import DummyModelFactory
 
 ##### Theory app #####
 
 ##### Misc #####
+from tests.testBase.model.combinatoryModelFactory import CombinatoryModelFactory
+
 
 __all__ = ('GtkSpreadsheetModelDataHandlerTestCase', \
     )
@@ -44,7 +45,7 @@ class DummyGtkSpreadsheetBuilder(SpreadsheetBuilder):
 
 class GtkSpreadsheetModelDataHandlerTestCaseBase(unittest.TestCase):
   def setUp(self):
-    modelFactory = DummyModelFactory()
+    modelFactory = CombinatoryModelFactory()
     self.model = modelFactory.getModelWithDefaultValue()
     self.queryLst = modelFactory.getQuerySet()
 

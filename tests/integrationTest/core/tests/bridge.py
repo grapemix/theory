@@ -17,7 +17,7 @@ from theory.model import *
 ##### Theory app #####
 
 ##### Misc #####
-from tests.base.command import *
+from tests.testBase.command import *
 
 __all__ = ('BridgeTestCase',)
 
