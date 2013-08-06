@@ -15,7 +15,7 @@ from .baseCommandTestCase import BaseCommandTestCase
 ##### Theory app #####
 
 ##### Misc #####
-from tests.base.command import *
+from tests.testBase.command import *
 
 __all__ = ('NextStepTestCase',)
 

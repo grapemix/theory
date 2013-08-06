@@ -17,5 +17,5 @@ class BaseChain(object):
 
   @classmethod
   def getCmdModel(cls):
-    cmdModel = Command(name=cls.name, app="tests.base", mood=["test",])
+    cmdModel = Command(name=cls.name, app="tests.testBase", mood=["test",])
     return cmdModel

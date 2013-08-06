@@ -16,7 +16,7 @@ from theory.utils import unittest
 ##### Theory app #####
 
 ##### Misc #####
-from tests.base.command import *
+from tests.testBase.command import *
 
 __all__ = ('BridgeTestCase', )
 
@@ -86,9 +86,9 @@ class BridgeTestCase(unittest.TestCase):
     self.adapterBufferModel.data = '{"stdIn": "asyncChain1"}'
     self.adapterBufferModel.adapter = Adapter.objects.get(name="StdPipe")
     self.assertEqual(self.adapterBufferModel.fromCmd.classImportPath,
-        "tests.base.command.asyncChain1.AsyncChain1")
+        "tests.testBase.command.asyncChain1.AsyncChain1")
     self.assertEqual(self.adapterBufferModel.toCmd.classImportPath,
-        "tests.base.command.asyncChain2.AsyncChain2")
+        "tests.testBase.command.asyncChain2.AsyncChain2")
     self.bridge.bridgeFromDb(
         self.adapterBufferModel,
         thirdpartyObj.saveCmdForTest)
