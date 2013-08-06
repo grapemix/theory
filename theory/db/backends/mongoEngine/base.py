@@ -33,7 +33,6 @@ class DatabaseCreation(BaseDatabaseCreation):
         testDbRepr = " ('%s')" % testDatabaseName
       print "Creating test database for alias '%s'%s..." % (
           self.connection.alias, testDbRepr)
-      print self.connection.database_names()
     self.settings_dict["ORIGINAL_NAME"] = \
         self.settings_dict["NAME"]
 
