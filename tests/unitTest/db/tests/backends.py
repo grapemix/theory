@@ -6,7 +6,7 @@ import pymongo
 
 ##### Theory lib #####
 from theory.conf import settings
-from theory.db.backends.mongoengine.base import DatabaseCreation
+from theory.db.backends.mongoEngine.base import DatabaseCreation
 from theory.model import Command
 from theory.utils import unittest
 

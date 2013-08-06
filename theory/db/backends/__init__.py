@@ -58,8 +58,9 @@ class BaseDatabaseCreation(object):
   """
 
   data_types = {}
-  def __init__(self, connection):
+  def __init__(self, connection, settings_dict):
     self.connection = connection
+    self.settings_dict = settings_dict
 
   def _digest(self, *args):
     """
@@ -75,17 +76,17 @@ class BaseDatabaseCreation(object):
     _create_test_db() and when no external munging is done with the 'NAME'
     or 'TEST_NAME' settings.
     """
-    if self.connection.settings_dict['TEST_NAME']:
-      return self.connection.settings_dict['TEST_NAME']
-    return TEST_DATABASE_PREFIX + self.connection.settings_dict['NAME']
+    if self.settings_dict['TEST_NAME']:
+      return self.settings_dict['TEST_NAME']
+    return TEST_DATABASE_PREFIX + self.settings_dict['NAME']
 
   def testDbSignature(self):
     """
-    Returns a tuple with elements of self.connection.settings_dict (a
+    Returns a tuple with elements of self.settings_dict (a
     DATABASES setting value) that uniquely identify a database
     accordingly to the RDBMS particularities.
     """
-    settings_dict = self.connection.settings_dict
+    settings_dict = self.settings_dict
     return (
       settings_dict['HOST'],
       settings_dict['PORT'],
@@ -103,7 +104,7 @@ class BaseDatabaseCreation(object):
           self.connection.alias, testDbRepr)
     self._closeConnection()
     self._createTestDb(verbosity, autoclobber)
-    self.connection.settings_dict["NAME"] = testDatabaseName
+    self.settings_dict["NAME"] = testDatabaseName
     return testDatabaseName
 
   def _closeConnection(self):
@@ -120,7 +121,7 @@ class BaseDatabaseCreation(object):
     Destroy a test database, prompting the user for confirmation if the
     database already exists.
     """
-    testDatabaseName = self.connection.settings_dict['NAME']
+    testDatabaseName = self.settings_dict['NAME']
     if verbosity >= 1:
       testDbRepr = ''
       if verbosity >= 2:
@@ -145,9 +146,10 @@ class BaseDatabaseClient(object):
   # (e.g., "psql"). Subclasses must override this.
   executable_name = None
 
-  def __init__(self, connection):
+  def __init__(self, connection, settings_dict):
     # connection is an instance of BaseDatabaseWrapper.
     self.connection = connection
+    self.settings_dict = settings_dict
 
   def runshell(self):
     raise NotImplementedError()
@@ -156,8 +158,9 @@ class BaseDatabaseValidation(object):
   """
   This class encapsualtes all backend-specific model validation.
   """
-  def __init__(self, connection):
+  def __init__(self, connection, settings_dict):
     self.connection = connection
+    self.settings_dict = settings_dict
 
   def validate_field(self, errors, opts, f):
     "By default, there is no backend-specific validation"
