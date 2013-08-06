@@ -23,7 +23,13 @@ class ModelMetaClass(TopLevelDocumentMetaclass):
     # Figure out the app_label by looking one level up.
     # For 'django.contrib.sites.models', this would be 'sites'.
     model_module = sys.modules[new_class.__module__]
-    app_label = model_module.__name__.split('.')[-2]
+    model_module_token = model_module.__name__.split('.')
+    if(model_module_token[-2]=="model"):
+      # for case like appLabel.model.modelFile.modelKlass
+      app_label = model_module_token[-3]
+    else:
+      # for case like appLabel.model.modelKlass
+      app_label = model_module_token[-2]
 
     try:
       new_class._meta["collection"] = "%s_%s" % (app_label, new_class._meta["collection"])
