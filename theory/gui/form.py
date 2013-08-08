@@ -143,8 +143,7 @@ class FormBase(object):
       #value = field.widget.value_from_datadict(self.data, self.files, name)
       try:
         if isinstance(field, FileField):
-          initial = self.initial.get(name, field.initial)
-          value = field.clean(value, initial)
+          value = field.clean(value, field.initData)
         else:
           value = field.clean(value)
         self.cleaned_data[name] = value
@@ -197,7 +196,7 @@ class FormBase(object):
         prefixed_name = self.add_prefix(name)
         data_value = field.widget.value_from_datadict(self.data, self.files, prefixed_name)
         if not field.show_hidden_initial:
-          initial_value = self.initial.get(name, field.initial)
+          initial_value = field.initData
         else:
           initial_prefixed_name = self.add_initial_prefix(name)
           hidden_widget = field.hidden_widget()

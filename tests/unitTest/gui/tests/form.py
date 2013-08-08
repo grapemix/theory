@@ -4,7 +4,6 @@ from ludibrio import Stub
 
 ##### Theory lib #####
 from theory.gui.form import *
-from theory.gui.form import FormBase
 from theory.utils import unittest
 
 ##### Theory third-party lib #####
@@ -14,9 +13,12 @@ from theory.utils import unittest
 ##### Theory app #####
 
 ##### Misc #####
+from tests.testBase.form.combinatoryFormFactory import CombinatoryFormFactory
 
-__all__ = ('FormBaseTestCase', 'GuiFormBaseTestCase', \
-    'StepFormBaseTestCase', )
+__all__ = (
+    'FormBaseTestCase',
+    'CombinatoryFormTestCase',
+    )
 
 class FormBaseTestCase(unittest.TestCase):
   def setUp(self):
@@ -37,9 +39,12 @@ class FormBaseTestCase(unittest.TestCase):
   #  form = FormBase()
   #  print form.clean()
 
-class GuiFormBaseTestCase(unittest.TestCase):
-  pass
+class CombinatoryFormTestCase(unittest.TestCase):
+  def setUp(self):
+    self.factory = CombinatoryFormFactory()
+    self.form = self.factory.getCombinatoryFormWithDefaultValue()
 
-class StepFormBaseTestCase(unittest.TestCase):
-  pass
+  def testFormValidateWithDefaultValue(self):
+    self.assertTrue(self.form.is_valid())
+
 
