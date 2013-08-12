@@ -4,6 +4,8 @@
 ##### System wide lib #####
 from abc import ABCMeta, abstractmethod
 import copy
+import datetime as dt
+import json
 
 ##### Theory lib #####
 from theory.core.exceptions import ValidationError
@@ -12,6 +14,7 @@ from theory.gui.widget import *
 from theory.gui.widget import BasePacker
 from theory.gui.e17.widget import *
 from theory.utils.datastructures import SortedDict
+from theory.gui.transformer.theoryJSONEncoder import TheoryJSONEncoder
 
 ##### Theory third-party lib #####
 
@@ -206,6 +209,17 @@ class FormBase(object):
           self._changed_data.append(name)
     return self._changed_data
   changed_data = property(_get_changed_data)
+
+  def toJson(self):
+    encoderKwargs = {"cls": TheoryJSONEncoder}
+    jsonDict = {}
+    for fieldName, field in self.fields.iteritems():
+      try:
+      jsonDict[fieldName] = field.to_python(field.finalData)
+      except Exception as e: # eval can throw many different errors
+        raise ValidationError(str(e))
+
+    return json.dumps(jsonDict, **encoderKwargs)
 
 class GuiFormBase(FormBase, BasePacker):
   def __init__(self, *args, **kwargs):

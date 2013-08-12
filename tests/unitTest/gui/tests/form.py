@@ -47,4 +47,9 @@ class CombinatoryFormTestCase(unittest.TestCase):
   def testFormValidateWithDefaultValue(self):
     self.assertTrue(self.form.is_valid())
 
+  def testFormToJson(self):
+    self.form.is_valid()
+    # Just to see if toJson throw errors, should compare the result in the
+    # future
+    self.form.toJson()
 
