@@ -25,7 +25,7 @@ from theory.core.validators import EMPTY_VALUES
 from theory.gui.util import ErrorList, from_current_timezone, to_current_timezone
 from theory.gui.widget import *
 from theory.utils import formats
-from theory.utils.encoding import smart_unicode, smart_str, force_unicode
+from theory.utils.encoding import smart_text, smart_str, force_unicode
 from theory.utils.importlib import import_class
 from theory.utils.ipv6 import clean_ipv6_address
 from theory.utils.translation import ugettext_lazy as _
@@ -90,7 +90,7 @@ class Field(object):
     # localize -- Boolean that specifies if the field should be localized.
     # widget -- Default widget to use when rendering this type of Field.
     if label is not None:
-      label = smart_unicode(label)
+      label = smart_text(label)
     self.required, self.label, self.initData = required, label, initData
     #self.finalData = self.initData
     self._changedData = self._finalData = None
@@ -98,7 +98,7 @@ class Field(object):
     if help_text is None:
       self.help_text = u''
     else:
-      self.help_text = smart_unicode(help_text)
+      self.help_text = smart_text(help_text)
 
     self.localize = localize
 
@@ -303,7 +303,7 @@ class TextField(Field):
     "Returns a Unicode object."
     if value in validators.EMPTY_VALUES:
       return u''
-    return smart_unicode(value)
+    return smart_text(value)
 
 class IntegerField(Field):
   default_error_messages = {
@@ -830,7 +830,7 @@ class ChoiceField(Field):
     "Returns a Unicode object."
     if value in validators.EMPTY_VALUES:
       return u''
-    return smart_unicode(value)
+    return smart_text(value)
 
   def validate(self, value):
     """
@@ -846,10 +846,10 @@ class ChoiceField(Field):
       if isinstance(v, (list, tuple)):
         # This is an optgroup, so look inside the group for options
         for k2, v2 in v:
-          if value == smart_unicode(k2):
+          if value == smart_text(k2):
             return True
       else:
-        if value == smart_unicode(k):
+        if value == smart_text(k):
           return True
     return False
 
@@ -890,7 +890,7 @@ class MultipleChoiceField(ChoiceField):
       return []
     elif not isinstance(value, (list, tuple)):
       raise ValidationError(self.error_messages['invalid_list'])
-    return [smart_unicode(val) for val in value]
+    return [smart_text(val) for val in value]
 
   def validate(self, value):
     """
