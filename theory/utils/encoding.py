@@ -28,7 +28,7 @@ class StrAndUnicode(object):
   def __str__(self):
     return self.__unicode__().encode('utf-8')
 
-def smart_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
+def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
   """
   Returns a unicode object representing 's'. Treats bytestrings using the
   'encoding' codec.
