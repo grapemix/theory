@@ -7,7 +7,7 @@ import urlparse
 
 from theory.core.exceptions import ValidationError
 from theory.utils.translation import ugettext_lazy as _
-from theory.utils.encoding import smart_unicode
+from theory.utils.encoding import smart_text
 
 # These values, if given to validate(), will trigger the self.required check.
 EMPTY_VALUES = (None, '', [], (), {})
@@ -39,7 +39,7 @@ class RegexValidator(object):
     """
     Validates that the input matches the regular expression.
     """
-    if not self.regex.search(smart_unicode(value)):
+    if not self.regex.search(smart_text(value)):
       raise ValidationError(self.message, code=self.code)
 
 class URLValidator(RegexValidator):
@@ -63,7 +63,7 @@ class URLValidator(RegexValidator):
     except ValidationError, e:
       # Trivial case failed. Try for possible IDN domain
       if value:
-        value = smart_unicode(value)
+        value = smart_text(value)
         scheme, netloc, path, query, fragment = urlparse.urlsplit(value)
         try:
           netloc = netloc.encode('idna') # IDN -> ACE

@@ -215,6 +215,7 @@ class GuiFormBase(FormBase, BasePacker):
     # super().__init__(). We temporary set win and bx as None because
     # form in a Command does not always need to render.
     BasePacker.__init__(self, None, None, *args, **kwargs)
+    self.firstRequiredInputIdx = -1
 
   def _changeFormWindowHeight(self, maxHeight):
     # TODO: fix this super ugly hack
@@ -252,13 +253,17 @@ class GuiFormBase(FormBase, BasePacker):
         {"unFocusFxn": self.unFocusFxn}
         )
     self.optionalMenu = optionalMenu
+    i = 0
     for name, field in self.fields.items():
       if(field.required):
         field.renderWidget(self.win, self.formBx.obj)
         self.formBx.addInput(field.widget)
+        if(self.firstRequiredInputIdx==-1):
+          self.firstRequiredInputIdx = i
       else:
         field.renderWidget(self.win, self.formBx.obj)
         optionalMenu.addInput(name, field.widget)
+      i += 1
 
     self.formBx.postGenerate()
     optionalMenu.generate()
@@ -319,11 +324,8 @@ class CommandFormBase(StepFormBase):
       self.fields[k].initData = v
 
   def focusOnTheFirstChild(self):
-    # We assume the items() result is consistent. Since the list has been
-    # reversed, last input is used.
-    firstChild = self.fields.items()[-1][1]
-    if(firstChild.required):
-      firstChild.widget.setFocus()
+    if(self.firstRequiredInputIdx!=-1):
+      self.fields.values()[self.firstRequiredInputIdx].widget.setFocus()
     elif(hasattr(self, "optionalMenu")):
       self.optionalMenu.setFocusOnFilterEntry()
 

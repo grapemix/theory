@@ -457,7 +457,8 @@ class ListInput(BaseLabelInput):
         or self.widgetClass == TextInput.widgetClass):
       self.fieldSetter(
           {
-            "finalData": self._inputLst[0].finalData,
+            # TODO: this is e17 specific, add one more layer instead
+            "finalData": self._inputLst[0].finalData.split("<br/>"),
           }
       )
     else:

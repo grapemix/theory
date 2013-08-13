@@ -4,7 +4,7 @@
 
 import time
 from datetime import timedelta, tzinfo
-from theory.utils.encoding import smart_unicode, smart_str, DEFAULT_LOCALE_ENCODING
+from theory.utils.encoding import smart_text, smart_str, DEFAULT_LOCALE_ENCODING
 
 class FixedOffset(tzinfo):
   "Fixed offset in minutes east from UTC."
@@ -53,7 +53,7 @@ class LocalTimezone(tzinfo):
 
   def tzname(self, dt):
     try:
-      return smart_unicode(time.tzname[self._isdst(dt)],
+      return smart_text(time.tzname[self._isdst(dt)],
                  DEFAULT_LOCALE_ENCODING)
     except UnicodeDecodeError:
       return None
