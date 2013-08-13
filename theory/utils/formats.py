@@ -7,6 +7,7 @@ from theory.conf import settings
 from theory.utils.translation import get_language, to_locale, check_for_language
 from theory.utils.importlib import import_module
 from theory.utils.encoding import smart_str
+from theory.utils.functional import lazy
 from theory.utils import dateformat, numberformat, datetime_safe
 from theory.utils.safestring import mark_safe
 
@@ -82,6 +83,8 @@ def get_format(format_type, lang=None, use_l10n=None):
           pass
       _format_cache[cache_key] = None
   return getattr(settings, format_type)
+
+get_format_lazy = lazy(get_format, unicode, list, tuple)
 
 def date_format(value, format=None, use_l10n=None):
   """
