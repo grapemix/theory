@@ -215,11 +215,14 @@ class FormBase(object):
     jsonDict = {}
     for fieldName, field in self.fields.iteritems():
       try:
-      jsonDict[fieldName] = field.to_python(field.finalData)
+        jsonDict[fieldName] = field.to_python(field.finalData)
       except Exception as e: # eval can throw many different errors
         raise ValidationError(str(e))
 
-    return json.dumps(jsonDict, **encoderKwargs)
+    try:
+      return json.dumps(jsonDict, **encoderKwargs)
+    except Exception as e: # eval can throw many different errors
+      raise ValidationError(str(e))
 
 class GuiFormBase(FormBase, BasePacker):
   def __init__(self, *args, **kwargs):
