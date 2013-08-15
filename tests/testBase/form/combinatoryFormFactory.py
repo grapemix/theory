@@ -118,8 +118,7 @@ defaultValueSet1 = {
     "File": getImageDefault(),
     "Boolean": getBooleanDefault(),
     "NullBoolean": getNullBooleanDefault(),
-#    "DateTime": datetime.now(),
-#    "ComplexDateTime": datetime.now(),
+    "DateTime": datetime.now(),
     "GeoPoint": getGeoPointDefault(),
     "Decimal": getDecimalDefault(),
     "Float": getFloatDefault(),
@@ -172,8 +171,9 @@ class CombinatoryFormWithDefaultValue(Form):
   querysetField = field.QuerysetField(initData=defaultValueSet1["Queryset"])
 
   #binaryField = field.BinaryField(initData=defaultValueSet1["Binary"])
-  #dateTimeField = field.DateTimeField(initData=defaultValueSet1["DateTime"])
-  #complexDateTimeField = field.ComplexDateTimeField(initData=defaultValueSet1["ComplexDateTime"])
+  dateField = field.DateField(initData=defaultValueSet1["DateTime"])
+  dateTimeField = field.DateTimeField(initData=defaultValueSet1["DateTime"])
+  timeField = field.TimeField(initData=defaultValueSet1["DateTime"])
   #geoPointField = field.GeoPointField(initData=defaultValueSet1["GeoPoint"])
 
 class CombinatoryFormFactory(object):

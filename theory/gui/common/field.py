@@ -44,11 +44,12 @@ Field classes.
 
 __all__ = (
   'Field', 'TextField', 'IntegerField',
-  #'DateField', 'TimeField', 'DateTimeField', 'TimeField',
+  'DateField', 'TimeField', 'DateTimeField',
   'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField',
   'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
   'ListField', 'DictField', 'AdapterField',
-  #'ComboField', 'MultiValueField', 'SplitDateTimeField',
+  'ComboField', 'MultiValueField',
+  #'SplitDateTimeField',
   'FloatField', 'DecimalField', 'IPAddressField', 'GenericIPAddressField',
   'FilePathField', 'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField',
   'PythonModuleField', 'PythonClassField', 'QuerysetField',
@@ -149,7 +150,7 @@ class Field(object):
     if extra_attrs:
       widget.attrs.update(extra_attrs)
 
-    widget.attrs["initData"] = self.initData
+    widget.attrs["initData"] = widget._prepareInitData(self.initData)
     if(settings.UI_DEBUG and settings.DEBUG_LEVEL>5):
       print widget.attrs
     self.widget = widget
@@ -425,7 +426,6 @@ class DecimalField(Field):
       raise ValidationError(self.error_messages['max_whole_digits'] % (self.max_digits - self.decimal_places))
     return value
 
-'''
 class BaseTemporalField(Field):
 
   def __init__(self, input_formats=None, *args, **kwargs):
@@ -498,7 +498,7 @@ class TimeField(BaseTemporalField):
     """
     if value in validators.EMPTY_VALUES:
       return None
-    if isinstance(value, datetime.time):
+    if isinstance(value, datetime.time) or isinstance(value, datetime.datetime):
       return value
     return super(TimeField, self).to_python(value)
 
@@ -542,7 +542,6 @@ class DateTimeField(BaseTemporalField):
 
   def strptime(self, value, format):
     return datetime.datetime.strptime(value, format)
-'''
 
 class RegexField(TextField):
   def __init__(self, regex, max_length=None, min_length=None, error_message=None, *args, **kwargs):
@@ -1149,7 +1148,6 @@ class DictField(ListField):
 class AdapterField(TextField):
   pass
 
-'''
 class MultiValueField(Field):
   """
   A Field that aggregates the logic of multiple Fields.
@@ -1234,7 +1232,6 @@ class MultiValueField(Field):
     object created by combining the date and time in data_list.
     """
     raise NotImplementedError('Subclasses must implement this method.')
-'''
 
 class FilePathField(ChoiceField):
   def __init__(self, path, match=None, recursive=False, required=True,
