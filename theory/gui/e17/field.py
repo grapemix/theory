@@ -22,11 +22,12 @@ Field classes.
 
 __all__ = (
   'Field', 'TextField', 'IntegerField',
-  #'DateField', 'TimeField', 'DateTimeField', 'TimeField',
+  'DateField', 'TimeField', 'DateTimeField',
   'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField',
   'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
   'ListField', 'DictField', 'AdapterField',
-  #'ComboField', 'MultiValueField', 'SplitDateTimeField',
+  'ComboField', 'MultiValueField',
+  #'SplitDateTimeField',
   'FloatField', 'DecimalField', 'IPAddressField', 'GenericIPAddressField',
   'FilePathField', 'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField',
   'StringGroupFilterField', 'ModelValidateGroupField', 'PythonModuleField',
@@ -50,6 +51,15 @@ class FloatField(field.FloatField):
 
 class DecimalField(field.DecimalField):
   widget = NumericInput
+
+class DateField(field.DateField):
+  pass
+
+class DateTimeField(field.DateTimeField):
+  pass
+
+class TimeField(field.TimeField):
+  pass
 
 class RegexField(field.RegexField):
   pass
@@ -94,6 +104,12 @@ class MultipleChoiceField(field.MultipleChoiceField):
   pass
 
 class TypedMultipleChoiceField(field.TypedMultipleChoiceField):
+  pass
+
+class ComboField(field.ComboField):
+  pass
+
+class MultiValueField(field.Field):
   pass
 
 class IPAddressField(field.IPAddressField):

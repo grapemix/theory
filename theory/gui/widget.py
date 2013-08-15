@@ -4,6 +4,7 @@
 from abc import ABCMeta, abstractmethod
 
 ##### Theory lib #####
+from theory.utils import datetime_safe, formats
 
 ##### Theory third-party lib #####
 
@@ -14,10 +15,11 @@ from e17.widget import *
 
 ##### Misc #####
 
-__all__ = (\
-    "StringInput", "TextInput", "NumericInput", "SelectBoxInput",\
-    "CheckBoxInput", "StringGroupFilterInput", "ModelValidateGroupInput",\
-    "FileselectInput", "ListInput", "DictInput", "FilterFormLayout", \
+__all__ = (
+    "StringInput", "TextInput", "NumericInput", "SelectBoxInput",
+    "CheckBoxInput", "DateInput", "DateTimeInput", "TimeInput",
+    "StringGroupFilterInput", "ModelValidateGroupInput", "FileselectInput",
+    "ListInput", "DictInput", "FilterFormLayout",
     )
 
 # Honestly, I am not satisfied with the code related to the GUI. So the code
@@ -38,6 +40,7 @@ class BasePacker(object):
     self.win = win
     self.bx = bx
     self.widgetLst = []
+    self.isLocalized = True
 
     self.attrs = self._buildAttrs(\
         attrs, isContainerAFrame=True)
@@ -90,9 +93,14 @@ class BaseLabelInput(BaseFieldInput):
 
   __metaclass__ = ABCMeta
   def __init__(self, fieldSetter, fieldGetter, win, bx, attrs=None, *args, **kwargs):
-    attrs = self._buildAttrs(\
-        attrs, isExpandMainContainer=False)
+    attrs = self._buildAttrs(
+        attrs,
+        isExpandMainContainer=False
+    )
     super(BaseLabelInput, self).__init__(fieldSetter, fieldGetter, win, bx, attrs, *args, **kwargs)
+
+  def _prepareInitData(self, data):
+    return data
 
   def setupInstructionComponent(self):
     if(self.attrs["isContainerAFrame"]):
@@ -190,10 +198,6 @@ class StringInput(BaseLabelInput):
   def _getData(self):
     return self.widgetLst[0].obj.entry_get()
 
-  @property
-  def initData(self):
-    return self.attrs["initData"]
-
   def updateField(self):
     self.fieldSetter({"finalData": self._getData()})
 
@@ -252,6 +256,92 @@ class CheckBoxInput(BaseLabelInput):
 class FileselectInput(BaseLabelInput):
   widgetClass = FileSelector
 
+class DateInput(StringInput):
+  widgetClass = Entry
+
+  def __init__(self, fieldSetter, fieldGetter, win, bx,
+      attrs=None, *args, **kwargs):
+    super(DateInput, self).__init__(
+        fieldSetter,
+        fieldGetter,
+        win,
+        bx,
+        attrs,
+        *args,
+        **kwargs
+    )
+    if(kwargs.has_key("format") and kwargs["format"]):
+      self.format = format
+      self.manualFormat = True
+    else:
+      self.format = formats.get_format('DATE_INPUT_FORMATS')[0]
+      self.manualFormat = False
+
+  def _prepareInitData(self, value):
+    if self.isLocalized and not self.manualFormat:
+      return formats.localize_input(value)
+    elif hasattr(value, 'strftime'):
+      value = datetime_safe.new_date(value)
+      return value.strftime(self.format)
+    return value
+
+class DateTimeInput(StringInput):
+  widgetClass = Entry
+
+  def __init__(self, fieldSetter, fieldGetter, win, bx,
+      attrs=None, *args, **kwargs):
+    super(DateTimeInput, self).__init__(
+        fieldSetter,
+        fieldGetter,
+        win,
+        bx,
+        attrs,
+        *args,
+        **kwargs
+    )
+    if(kwargs.has_key("format") and kwargs["format"]):
+      self.format = format
+      self.manualFormat = True
+    else:
+      self.format = formats.get_format('DATETIME_INPUT_FORMATS')[0]
+      self.manualFormat = False
+
+  def _prepareInitData(self, value):
+    if self.isLocalized and not self.manualFormat:
+      return formats.localize_input(value)
+    elif hasattr(value, 'strftime'):
+      value = datetime_safe.new_datetime(value)
+      return value.strftime(self.format)
+    return value
+
+class TimeInput(StringInput):
+  widgetClass = Entry
+
+  def __init__(self, fieldSetter, fieldGetter, win, bx,
+      attrs=None, *args, **kwargs):
+    super(TimeInput, self).__init__(
+        fieldSetter,
+        fieldGetter,
+        win,
+        bx,
+        attrs,
+        *args,
+        **kwargs
+    )
+    if(kwargs.has_key("format") and kwargs["format"]):
+      self.format = format
+      self.manualFormat = True
+    else:
+      self.format = formats.get_format('TIME_INPUT_FORMATS')[0]
+      self.manualFormat = False
+
+  def _prepareInitData(self, value):
+    if self.isLocalized and not self.manualFormat:
+      return formats.localize_input(value)
+    elif hasattr(value, 'strftime'):
+      return value.strftime(self.format)
+    return value
+
 class StringGroupFilterInput(BaseLabelInput):
   widgetClass = ListModelValidator
   #widgetClass = ListValidator
@@ -263,7 +353,6 @@ class StringGroupFilterInput(BaseLabelInput):
   @property
   def changedData(self):
     return self.widgetLst[0].changedData
-
 
 class ModelValidateGroupInput(BaseLabelInput):
   widgetClass = ListModelValidator
