@@ -250,14 +250,12 @@ class Reactor(object):
       cmd = cmdKlass()
       cmd.paramForm = self.paramForm
 
-    if(not cmd.paramForm.is_valid()):
+    bridge = Bridge()
+    if(not bridge._execeuteCommand(cmd, self.cmdModel, self.adapter.uiParam)):
       # TODO: integrate with std reactor error system
       print cmd.paramForm.errors
       self.adapter.restoreCmdLine()
       return
-
-    bridge = Bridge()
-    bridge._execeuteCommand(cmd, self.cmdModel, self.adapter.uiParam)
 
     self._performDrums(cmd)
 

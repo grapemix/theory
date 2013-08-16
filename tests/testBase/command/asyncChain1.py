@@ -3,6 +3,7 @@
 
 ##### Theory lib #####
 from theory.command.baseCommand import AsyncCommand
+from theory.model import Command
 
 ##### Theory third-party lib #####
 
@@ -16,7 +17,8 @@ from .baseChain1 import BaseChain1
 class AsyncChain1(BaseChain1, AsyncCommand):
   name = "asyncChain1"
   verboseName = "asyncChain1"
-  _stdOut = name
+  runMode = Command.RUN_MODE_ASYNC
 
-  def run(self):
+  def run(self, *args, **kwargs):
+    super(AsyncChain1, self).run(*args, **kwargs)
     self._stdOut = "asyncChain1"

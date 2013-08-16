@@ -3,8 +3,6 @@
 from ludibrio import Stub
 
 ##### Theory lib #####
-from theory.command.baseCommand import SimpleCommand, AsyncCommand
-from theory.core.bridge import Bridge
 from theory.gui import field
 from theory.model import *
 from theory.utils import unittest
@@ -17,6 +15,7 @@ from theory.utils import unittest
 
 ##### Misc #####
 from tests.testBase.command import *
+from tests.testBase.bridge import Bridge
 
 __all__ = ('BridgeTestCase', )
 
@@ -38,7 +37,7 @@ class BridgeTestCase(unittest.TestCase):
     firstCmd.paramForm = firstCmd.ParamForm()
     firstCmd.paramForm.fields["verbosity"].finalData = 1
     self.assertTrue(firstCmd.paramForm.is_valid())
-    firstCmd.run()
+    firstCmd.run(paramFormData={"verbosity": 1})
 
     self.assertEqual(firstCmd.paramForm.clean()["verbosity"], 1)
 
@@ -47,7 +46,7 @@ class BridgeTestCase(unittest.TestCase):
     firstCmd.paramForm = firstCmd.ParamForm()
     firstCmd.paramForm.fields["verbosity"].finalData = 2
     self.assertTrue(firstCmd.paramForm.is_valid())
-    firstCmd.run()
+    firstCmd.run(paramFormData={"verbosity": 2})
 
     self.assertEqual(firstCmd.paramForm.clean()["verbosity"], 2)
 
@@ -63,7 +62,7 @@ class BridgeTestCase(unittest.TestCase):
 
     firstCmd = AsyncChain1()
     firstCmd.paramForm = firstCmd.ParamForm()
-    firstCmd.run()
+    firstCmd.run(paramFormData={})
 
     Command(name=firstCmd.name, app="", mood=[""]).save()
     secondCmdModel.save()
@@ -102,3 +101,20 @@ class BridgeTestCase(unittest.TestCase):
     self.assertEqual(
         thirdpartyObj.cmd.paramForm.cleaned_data['stdIn'],
         u'asyncChain1')
+
+  def test_execeuteCommand(self):
+    self.assertEqual(
+        self.asyncChain1CommandModel.runMode,
+        Command.RUN_MODE_ASYNC
+        )
+    firstCmd = AsyncChain1()
+    firstCmd.paramForm = firstCmd.ParamForm()
+    self.bridge._execeuteCommand(firstCmd, self.asyncChain1CommandModel)
+    self.assertEqual(firstCmd._stdOut, "asyncChain1")
+    self.assertTrue(firstCmd.paramForm.is_valid())
+
+    cmdModel = SimpleChain1.getCmdModel()
+    firstCmd = SimpleChain1()
+    firstCmd.paramForm = firstCmd.ParamForm()
+    self.bridge._execeuteCommand(firstCmd, cmdModel)
+    self.assertTrue(firstCmd.paramForm.is_valid())

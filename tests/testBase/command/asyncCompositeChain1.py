@@ -3,7 +3,9 @@
 from ludibrio import Stub
 
 ##### Theory lib #####
+from theory.command.baseCommand import AsyncCommand
 from theory.core.bridge import Bridge
+from theory.gui import field
 
 ##### Theory third-party lib #####
 
@@ -17,8 +19,12 @@ from .simpleChain2 import SimpleChain2
 
 class AsyncCompositeChain1(AsyncChain1):
 
-  def run(self, secondCmdModel, *args, **kwargs):
-    super(AsyncCompositeChain1, self).__init__(*args, **kwargs)
+  class ParamForm(AsyncCommand.ParamForm):
+    queryset = field.QuerysetField()
+
+  def run(self, *args, **kwargs):
+    super(AsyncCompositeChain1, self).run(*args, **kwargs)
+    secondCmdModel = self.paramForm.clean()["queryset"]
     bridge = Bridge()
     secondCmdModel = SimpleChain2.getCmdModel()
     (chain2Class, secondCmdStorage) = bridge.bridge(self, secondCmdModel)

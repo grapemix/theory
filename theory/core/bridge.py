@@ -243,9 +243,12 @@ class Bridge(object):
 
   def _execeuteCommand(self, cmd, cmdModel, uiParam={}):
     if(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC):
-      result = cmd.delay(uiParam).get()
+      cmd.delay(paramFormData=cmd.paramForm.toJson())
     else:
+      if(not cmd.paramForm.is_valid()):
+        return False
       cmd._uiParam = uiParam
-      result = cmd.run(uiParam)
+      cmd.run(uiParam)
+    return True
 
 

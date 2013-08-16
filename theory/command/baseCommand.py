@@ -48,8 +48,10 @@ class _BaseCommand(object):
   # stderr should be seen in lig file
 
   def __init__(self, *args, **kwargs):
-    pass
-  #  super(_BaseCommand, self).__init__(*args, **kwargs)
+    # Invocation via super doesn't call all the parents, it calls the next
+    # function in the MRO chain. For this to work properly, you need to use
+    # super in all of the __init__s
+    super(_BaseCommand, self).__init__()
 
   # Objective of attribute:
   # 1) Declare the input and the output of commands
@@ -163,6 +165,11 @@ class AsyncCommand(Task, _BaseCommand):
   """
   abstract = True
 
-  @abstractmethod
-  def run(self):
-    pass
+  def run(self, *args, **kwargs):
+    # Only AsyncCommand need to refill the paramForm because the paramForm is
+    # unable to serialize. The input data can only pass as JSON and be refilled
+    # after the command has been executed.
+    self.paramForm = self.ParamForm()
+    for k,v in kwargs["paramFormData"].iteritems():
+      self.paramForm.fields[k].finalData = v
+    self.paramForm.is_valid()
