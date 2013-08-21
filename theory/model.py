@@ -31,12 +31,10 @@ class Parameter(EmbeddedDocument):
 class Command(Model):
   RUN_MODE_SIMPLE = 1
   RUN_MODE_ASYNC = 2
-  RUN_MODE_ASYNC_WRAPPER = 3
 
   RUN_MODE_CHOICES = (
       (RUN_MODE_SIMPLE, 'Simple run-mode'),
       (RUN_MODE_ASYNC, 'Async run-mode'),
-      (RUN_MODE_ASYNC_WRAPPER, 'Async wrapper run-mode'),
   )
 
   name = StringField(required=True, max_length=256,\

@@ -5,7 +5,6 @@ import json
 
 ##### Theory lib #####
 from theory.adapter import BaseUIAdapter
-from theory.command.baseCommand import AsyncContainer
 from theory.core.exceptions import CommandSyntaxError
 from theory.model import Adapter, AdapterBuffer, Command
 from theory.utils.importlib import import_class
@@ -243,17 +242,10 @@ class Bridge(object):
     return adapter
 
   def _execeuteCommand(self, cmd, cmdModel, uiParam={}):
-    # Since we only allow execute one command in a time thru terminal,
-    # the command doesn't have to return anything
-    if(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC_WRAPPER):
-      asyncContainer = AsyncContainer()
-      result = asyncContainer.delay(cmd, uiParam).get()
-    elif(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC):
-      #result = cmd.delay(storage).get()
-      cmd.delay()
+    if(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC):
+      result = cmd.delay(uiParam).get()
     else:
       cmd._uiParam = uiParam
-      asyncContainer = AsyncContainer()
-      result = asyncContainer.run(cmd, uiParam)
+      result = cmd.run(uiParam)
 
 

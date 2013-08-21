@@ -56,7 +56,7 @@ class CommandClassScanner(BaseClassScanner):
     if(issubclass(cmdClass, AsyncCommand)):
       self.cmdModel.runMode = self.cmdModel.RUN_MODE_ASYNC
     elif(not issubclass(cmdClass, SimpleCommand)):
-      self.cmdModel.runMode = self.cmdModel.RUN_MODE_ASYNC_WRAPPER
+      self.cmdModel.runMode = self.cmdModel.RUN_MODE_SIMPLE
 
     # Get the fields in the paramForm first. All fields in the paramForm
     # are able to pass to adapter. Only the order of the required fields

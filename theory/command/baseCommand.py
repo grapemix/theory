@@ -166,18 +166,3 @@ class AsyncCommand(Task, _BaseCommand):
   @abstractmethod
   def run(self):
     pass
-
-class AsyncContainer(Task):
-  """
-  Normal users should not used this class.
-  """
-
-  # deprecated
-  def extractResult(self, inst, adapterInput):
-    result = {}
-    for property in adapterInput:
-      result[property] = getattr(inst, property)
-    return result
-
-  def run(self, cmdObj, adapterInput):
-    cmdObj.run()
