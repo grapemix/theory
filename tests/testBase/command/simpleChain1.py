@@ -17,5 +17,5 @@ class SimpleChain1(BaseChain1, SimpleCommand):
   name = "simpleChain1"
   verboseName = "simpleChain1"
 
-  def run(self):
+  def run(self, uiParam={}):
     self._stdOut = "simpleChain1"

@@ -24,5 +24,10 @@ class BaseChain1(BaseChain):
 
   @classmethod
   def getCmdModel(cls):
-    cmdModel = Command(name=cls.name, app="tests.testBase", mood=["test",])
+    cmdModel = Command(
+        name=cls.name,
+        app="tests.testBase",
+        mood=["test",],
+        runMode=cls.runMode
+        )
     return cmdModel

@@ -31,5 +31,5 @@ class BaseChain2(BaseChain):
     cmdModel.param = [Parameter(name="stdIn",type="String")]
     return cmdModel
 
-  def run(self):
-    return self.paramForm.clean()["stdIn"] + " received"
+  def run(self, uiParam={}):
+    self._stdOut = self.paramForm.clean()["stdIn"] + " received"
