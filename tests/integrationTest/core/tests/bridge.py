@@ -5,7 +5,7 @@ import os
 import sys
 
 ##### Theory lib #####
-from theory.command.baseCommand import SimpleCommand, AsyncCommand, AsyncContainer
+from theory.command.baseCommand import SimpleCommand, AsyncCommand
 from theory.core.bridge import Bridge
 from theory.utils import unittest
 from theory.model import *

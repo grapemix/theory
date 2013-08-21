@@ -3,7 +3,7 @@
 from ludibrio import Stub
 
 ##### Theory lib #####
-from theory.command.baseCommand import SimpleCommand, AsyncCommand, AsyncContainer
+from theory.command.baseCommand import SimpleCommand, AsyncCommand
 from theory.core.bridge import Bridge
 from theory.gui import field
 from theory.model import *

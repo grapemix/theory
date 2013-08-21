@@ -3,7 +3,6 @@
 import unittest
 
 ##### Theory lib #####
-from theory.command.baseCommand import AsyncContainer
 from theory.core.bridge import Bridge
 
 ##### Theory third-party lib #####
@@ -20,18 +19,11 @@ class BaseCommandTestCase(unittest.TestCase):
 
   def _execeuteCommand(self, cmd, cmdModel):
     """Copied from theory.core.reactor"""
-    # Since we only allow execute one command in a time thru terminal,
-    # the command doesn't have to return anything
     adapterProperty = []
-    if(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC_WRAPPER):
-      asyncContainer = AsyncContainer()
-      result = asyncContainer.delay(cmd, adapterProperty).get()
-    elif(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC):
-      #result = cmd.delay(storage).get()
-      cmd.delay(paramForm=paramForm)
+    if(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC):
+      result = cmd.delay(adapterProperty).get()
     else:
-      asyncContainer = AsyncContainer()
-      result = asyncContainer.run(cmd, adapterProperty)
+      result = cmd.run(adapterProperty)
 
   def _validateParamForm(self, cmd):
     self.cmd = cmd
