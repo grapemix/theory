@@ -165,11 +165,11 @@ class AsyncCommand(Task, _BaseCommand):
   """
   abstract = True
 
-  def run(self, *args, **kwargs):
+  def run(self, paramFormData={}):
     # Only AsyncCommand need to refill the paramForm because the paramForm is
     # unable to serialize. The input data can only pass as JSON and be refilled
     # after the command has been executed.
     self.paramForm = self.ParamForm()
-    for k,v in kwargs["paramFormData"].iteritems():
+    for k,v in paramFormData.iteritems():
       self.paramForm.fields[k].finalData = v
     self.paramForm.is_valid()

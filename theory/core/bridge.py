@@ -248,7 +248,7 @@ class Bridge(object):
       if(not cmd.paramForm.is_valid()):
         return False
       cmd._uiParam = uiParam
-      cmd.run(uiParam)
+      cmd.run()
     return True
 
 

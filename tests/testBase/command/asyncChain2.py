@@ -19,6 +19,6 @@ class AsyncChain2(BaseChain2, AsyncCommand):
   verboseName = "asyncChain2"
   runMode = Command.RUN_MODE_ASYNC
 
-  def run(self, *args, **kwargs):
-    super(AsyncChain2, self).run(*args, **kwargs)
+  def run(self, paramFormData):
+    super(AsyncChain2, self).run(paramFormData)
     self._stdOut = self.paramForm.clean()["stdIn"] + " received"

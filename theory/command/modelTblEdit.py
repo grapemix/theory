@@ -60,7 +60,7 @@ class ModelTblEdit(SimpleCommand):
     self._stdOut += "{0} model has been saved."\
         .format(len(self.paramForm.clean()["queryset"]))
 
-  def run(self, *args, **kwargs):
+  def run(self):
     self._stdOut = ""
     isQuerysetNonEmpty = self._fetchQueryset()
     if(isQuerysetNonEmpty):

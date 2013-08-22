@@ -31,7 +31,7 @@ class IndentFormatFix(SimpleCommand):
         label="The list of filenames being fixed"
     )
 
-  def run(self, *args, **kwargs):
+  def run(self):
     for filename in self.paramForm.cleaned_data["filenameLst"]:
       lines = self._readFileLine(filename)
       lines = self._forceHalfIndent(lines)
