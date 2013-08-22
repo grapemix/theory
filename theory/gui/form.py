@@ -86,6 +86,7 @@ class FormBase(object):
     self.files = {}      # might be removed in the future
     self.error_class = {}
     self._errors = None  # Stores the errors after clean() has been
+    self.jsonData = None
 
   def __iter__(self):
     for name in self.fields:
@@ -119,6 +120,7 @@ class FormBase(object):
     self.cleaned_data.
     """
     self._errors = {}
+    self.jsonData = None
     #!!!!!!!! Do we want errors transparent or add one more layer
     #self._errors = ErrorDict()
     if not self.is_bound: # Stop further processing.
@@ -211,18 +213,21 @@ class FormBase(object):
   changed_data = property(_get_changed_data)
 
   def toJson(self):
-    encoderKwargs = {"cls": TheoryJSONEncoder}
-    jsonDict = {}
-    for fieldName, field in self.fields.iteritems():
-      try:
-        jsonDict[fieldName] = field.to_python(field.finalData)
-      except Exception as e: # eval can throw many different errors
-        raise ValidationError(str(e))
+    if(self.is_valid()):
+      if(self.jsonData is None):
+        encoderKwargs = {"cls": TheoryJSONEncoder}
+        jsonDict = {}
+        for fieldName, field in self.fields.iteritems():
+          try:
+            jsonDict[fieldName] = field.to_python(field.finalData)
+          except Exception as e: # eval can throw many different errors
+            raise ValidationError(str(e))
 
-    try:
-      return json.dumps(jsonDict, **encoderKwargs)
-    except Exception as e: # eval can throw many different errors
-      raise ValidationError(str(e))
+        try:
+          self.jsonData = json.dumps(jsonDict, **encoderKwargs)
+        except Exception as e: # eval can throw many different errors
+          raise ValidationError(str(e))
+      return self.jsonData
 
 class GuiFormBase(FormBase, BasePacker):
   def __init__(self, *args, **kwargs):
