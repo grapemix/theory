@@ -53,7 +53,7 @@ class Tester(SimpleCommand):
         help_text="The parameter passed to the test runner class constructor", \
         required=False)
 
-  def run(self, *args, **kwargs):
+  def run(self):
     formData = self.paramForm.clean()
     if(formData["isTestTheory"]=='1' or formData["isTestTheory"]):
       import imp

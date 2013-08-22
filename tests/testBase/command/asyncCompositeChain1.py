@@ -22,8 +22,8 @@ class AsyncCompositeChain1(AsyncChain1):
   class ParamForm(AsyncCommand.ParamForm):
     queryset = field.QuerysetField()
 
-  def run(self, *args, **kwargs):
-    super(AsyncCompositeChain1, self).run(*args, **kwargs)
+  def run(self, paramFormData):
+    super(AsyncCompositeChain1, self).run(paramFormData)
     secondCmdModel = self.paramForm.clean()["queryset"]
     bridge = Bridge()
     secondCmdModel = SimpleChain2.getCmdModel()

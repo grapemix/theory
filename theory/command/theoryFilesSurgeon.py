@@ -77,7 +77,7 @@ class TheoryFilesSurgeon(SimpleCommand):
   def postGetFiles(self, *args, **kwargs):
     pass
 
-  def run(self, *args, **kwargs):
+  def run(self):
     self.preGetFiles()
     self.getFiles()
     self.postGetFiles()

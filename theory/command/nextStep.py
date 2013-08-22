@@ -71,7 +71,7 @@ class NextStep(SimpleCommand):
         drum.render(uiParam=self._uiParam)
 
 
-  def run(self, *args, **kwargs):
+  def run(self):
     if(self.paramForm.is_valid()):
       if(self.bridge == None):
         self.bridge = Bridge()

@@ -201,7 +201,7 @@ class FilenameScanner(SimpleCommand):
 
     return newDirPath
 
-  def generateFileLst(self, *args, **kwargs):
+  def generateFileLst(self):
     yieldMethod = int(self.paramForm.cleaned_data["yieldMethod"])
     for root in self.paramForm.cleaned_data["rootLst"]:
       for lvlRoot, dirs, files in self._walk(root):
@@ -214,16 +214,16 @@ class FilenameScanner(SimpleCommand):
           else:
             raise Error
 
-  def generateDirLst(self, *args, **kwargs):
+  def generateDirLst(self):
     for root in self.paramForm.cleaned_data["rootLst"]:
       for lvlRoot, dirs, files in self._walk(root):
         yield dirs
 
-  def run(self, *args, **kwargs):
-    for i in self.generateFileLst(*args, **kwargs):
+  def run(self):
+    for i in self.generateFileLst():
       self._filenameLst.append(i)
 
-    for i in self.generateDirLst(*args, **kwargs):
+    for i in self.generateDirLst():
       self._dirnameLst.extend(i)
 
   def _walk(self, root, *args, **kwargs):

@@ -17,13 +17,16 @@ __all__ = ('BaseCommandTestCase',)
 
 class BaseCommandTestCase(unittest.TestCase):
 
-  def _execeuteCommand(self, cmd, cmdModel):
+  def _execeuteCommand(self, cmd, cmdModel, uiParam={}):
     """Copied from theory.core.reactor"""
-    adapterProperty = []
     if(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC):
-      result = cmd.delay(adapterProperty).get()
+      cmd.delay(paramFormData=cmd.paramForm.toJson())
     else:
-      result = cmd.run(adapterProperty)
+      if(not cmd.paramForm.is_valid()):
+        return False
+      cmd._uiParam = uiParam
+      cmd.run()
+    return True
 
   def _validateParamForm(self, cmd):
     self.cmd = cmd

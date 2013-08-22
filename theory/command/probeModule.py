@@ -23,6 +23,6 @@ class ProbeModule(SimpleCommand):
     settingMod = field.TextField(label="Setting Module", \
         help_text=" The python module being used to setup environment during probing", max_length=64)
 
-  def run(self, *args, **kwargs):
+  def run(self):
     self._stdOut = "Probing module: %s" %  (self._settingMod,)
     reprobeAllModule(self.paramForm.clean()["settingMod"])
