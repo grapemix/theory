@@ -111,6 +111,12 @@ class History(Model):
       required=True,
       verbose_name=_("Mood"),\
       help_text=_("The moods where the command being executed"))
+  jsonData = StringField(required=True, \
+      verbose_name=_("Json data"), \
+      help_text=_(
+        "The data from the command paramForm and stored in JSON format"
+        )
+      )
   touched = DateTimeField(required=True, default=datetime.utcnow())
   repeated = IntField(default=1)
 

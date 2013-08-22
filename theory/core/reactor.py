@@ -150,7 +150,7 @@ class Reactor(object):
         self.adapter.printTxt(crtOutput)
       self.paramForm = None
     elif(mode==self.parser.MODE_ARGS):
-      if(not self._queryArgsAutocompleteAsForm(frag)):
+      if(not self._queryArgsAutocompleteAsForm()):
         self.adapter.cleanUpCrt()
         self.adapter.printTxt("Cannot load command")
       # Cut the last tab out
@@ -165,7 +165,7 @@ class Reactor(object):
       # TODO: integrate with std reactor error system
       print self.paramForm.errors
 
-  def _queryArgsAutocompleteAsForm(self, frag):
+  def _queryArgsAutocompleteAsForm(self):
     if(not self._loadCmdModel()):
       return False
 
@@ -222,7 +222,7 @@ class Reactor(object):
       return False
     return True
 
-  def _updateHistory(self):
+  def _updateHistory(self, jsonData):
     # Temp disable. During the development stage, reprobeAllModule is run almost
     # everytime which delete all command module. However, since the
     # reverse_delete_rule of the command field is cascade, all history record
@@ -231,7 +231,8 @@ class Reactor(object):
 
     History.objects(
         commandName=self.parser.cmdInTxt,
-        mood=self.mood
+        mood=self.mood,
+        jsonData=jsonData,
         ).update_one(
             inc__repeated=1,
             set__touched=datetime.utcnow(),
@@ -259,7 +260,7 @@ class Reactor(object):
 
     self._performDrums(cmd)
 
-    self._updateHistory()
+    self._updateHistory(cmd.paramForm.toJson())
 
     self.reset()
 
