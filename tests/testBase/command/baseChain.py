@@ -18,6 +18,8 @@ class BaseChain(object):
 
   @classmethod
   def getCmdModel(cls):
+    # It is mongoengine's bug. Del me after mongoengine fix it.
+    Command.objects.filter(name=cls.name).delete()
     cmdModel = Command(
         name=cls.name,
         app="tests.testBase",
