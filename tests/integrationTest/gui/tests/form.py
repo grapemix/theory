@@ -9,6 +9,7 @@ from theory.conf import settings
 from theory.gui import field
 from theory.gui import widget
 from theory.gui.form import *
+from theory.gui.etk.form import StepForm
 from theory.utils import unittest
 
 ##### Theory third-party lib #####
