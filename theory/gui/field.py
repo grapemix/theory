@@ -3,8 +3,8 @@
 ##### System wide lib #####
 
 ##### Theory lib #####
-# TODO: should import based on project settings
-from theory.gui.e17.field import *
+from theory.conf import settings
+from theory.utils.importlib import import_module
 
 ##### Theory third-party lib #####
 
@@ -19,3 +19,26 @@ from theory.gui.e17.field import *
 #    'from theory.gui.field import *' to avoid the name collision
 #    between field and mongoenigne.
 
+def _importModule():
+  supportModuleLst = (
+    'Field', 'TextField', 'IntegerField',
+    'DateField', 'TimeField', 'DateTimeField',
+    'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField',
+    'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
+    'ListField', 'DictField', 'AdapterField',
+    'ComboField', 'MultiValueField',
+    #'SplitDateTimeField',
+    'FloatField', 'DecimalField', 'IPAddressField', 'GenericIPAddressField',
+    'FilePathField', 'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField',
+    'StringGroupFilterField', 'ModelValidateGroupField', 'PythonModuleField',
+    'PythonClassField', 'QuerysetField',
+  )
+
+  module = import_module("theory.gui.{0}.field".format(settings.UI_TOOLKIT))
+
+  for field in supportModuleLst:
+    if(hasattr(module, field)):
+        globals()[field] = getattr(module, field)
+        #vars()[field] = getattr(module, field)
+
+_importModule()

@@ -52,7 +52,8 @@ __all__ = (
   #'SplitDateTimeField',
   'FloatField', 'DecimalField', 'IPAddressField', 'GenericIPAddressField',
   'FilePathField', 'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField',
-  'PythonModuleField', 'PythonClassField', 'QuerysetField',
+  'StringGroupFilterField', 'ModelValidateGroupField', 'PythonModuleField',
+  'PythonClassField', 'QuerysetField',
 )
 
 FILE_INPUT_CONTRADICTION = object()
@@ -1337,6 +1338,12 @@ class SlugField(TextField):
            u" underscores or hyphens."),
   }
   default_validators = [validators.validate_slug]
+
+class StringGroupFilterField(Field):
+  widget = StringGroupFilterInput
+
+class ModelValidateGroupField(Field):
+  widget = ModelValidateGroupInput
 
 
 class PythonModuleField(Field):

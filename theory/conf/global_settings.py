@@ -158,14 +158,8 @@ DATABASE_ROUTERS = []
 # List of strings representing installed apps.
 INSTALLED_APPS = ()
 
-# List of locations of the template source files, in search order.
-UI_DIRS = ()
-
-# List of callables that know how to import templates from various sources.
-# See the comments in theory/core/template/loader.py for interface
-# documentation.
-UI_LOADERS = (
-)
+# The toolkit being used to render widget
+UI_TOOLKIT = "etk"
 
 # Output to use in template system for invalid (e.g. misspelled) variables.
 UI_STRING_IF_INVALID = ''
