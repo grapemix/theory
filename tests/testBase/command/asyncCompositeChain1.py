@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##### System wide lib #####
-from ludibrio import Stub
 
 ##### Theory lib #####
 from theory.command.baseCommand import AsyncCommand
@@ -18,6 +17,8 @@ from .simpleChain2 import SimpleChain2
 ##### Misc #####
 
 class AsyncCompositeChain1(AsyncChain1):
+  name = "asyncComoisiteChain1"
+  verboseName = "asyncComoisiteChain1"
 
   class ParamForm(AsyncCommand.ParamForm):
     queryset = field.QuerysetField()

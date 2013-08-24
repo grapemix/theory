@@ -6,6 +6,7 @@ import sys
 
 ##### Theory lib #####
 from theory.utils import unittest
+#from theory.db.models import QuerySet
 from theory.model import *
 
 ##### Theory third-party lib #####
@@ -94,18 +95,19 @@ class BridgeTestCase(unittest.TestCase):
     self.bridge._execeuteCommand(cmd, secondCmdModel)
     self.assertEqual(cmd._stdOut, "asyncChain1 received")
 
-# Broken due to the test db problem
-#  def testAsyncCompositeCommandToAsyncCommand(self):
-#    firstCmd = AsyncCompositeChain1()
-#    firstCmd.paramForm = firstCmd.ParamForm()
-#
-#    secondCmdModel = self.asyncChain2CommandModel
-#    print secondCmdModel.id
-#    secondCmdModel.delete()
-#    secondCmdModel.save()
-#    firstCmd.paramForm.fields["queryset"].finalData = [secondCmdModel]
-#    self.bridge._execeuteCommand(firstCmd, firstCmd.getCmdModel())
-#    #self.assertEqual(firstCmd.run(secondCmdModel), "asyncChain1 received")
+  def testAsyncCompositeCommandToAsyncCommand(self):
+    firstCmd = AsyncCompositeChain1()
+    firstCmd.paramForm = firstCmd.ParamForm()
+
+    secondCmdModel = self.asyncChain2CommandModel
+    secondCmdModel.save()
+
+    mockLst = [secondCmdModel]
+    with Stub(type=QuerySet, proxy=mockLst) as queryset:
+      pass
+
+    firstCmd.paramForm.fields["queryset"].finalData = queryset
+    self.bridge._execeuteCommand(firstCmd, firstCmd.getCmdModel())
 
   def testSimpleCommandToSelf(self):
     firstCmd = SimpleChain1()

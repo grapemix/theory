@@ -1418,6 +1418,3 @@ class QuerysetField(Field):
     super(QuerysetField, self).__init__(*args, **kwargs)
     self.widget = StringInput
     self.auto_import = auto_import
-
-  def to_python(self, value):
-    return [str(i.id) for i in value]
