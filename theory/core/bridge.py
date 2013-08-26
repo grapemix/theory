@@ -70,7 +70,7 @@ class Bridge(object):
     cmd = cmdKlass()
     cmdParamForm = import_class(cmdModel.classImportPath).ParamForm
     cmd.paramForm = cmdParamForm()
-    cmd.paramForm.fillFields(cmdModel, args, kwargs)
+    cmd.paramForm.fillInitFields(cmdModel, args, kwargs)
     cmd.paramForm.is_valid()
     return cmd
 

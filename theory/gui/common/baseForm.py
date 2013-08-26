@@ -208,6 +208,22 @@ class FormBase(object):
     return self._changed_data
   changed_data = property(_get_changed_data)
 
+  def fillInitFields(self, cmdModel, args, kwargs):
+    cmdArgs = [i for i in cmdModel.param if(not i.isOptional)]
+    if(args!=[]):
+      for i in range(len(cmdArgs)):
+        try:
+          self.fields[cmdArgs[i].name].initData = args[i]
+        except IndexError:
+          # This means the number of param given unmatch the number of param register in *.command
+          raise CommandSyntaxError
+    for k,v in kwargs.iteritems():
+      self.fields[k].initData = v
+
+  def fillFinalFields(self, kwargs):
+    for k,v in kwargs.iteritems():
+      self.fields[k].finalData = v
+
   def toJson(self):
     if(self.is_valid()):
       if(self.jsonData is None):
