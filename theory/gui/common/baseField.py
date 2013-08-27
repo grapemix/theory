@@ -247,6 +247,8 @@ class Field(object):
       if(isinstance(self.widget, type)):
         # return initial data if widget has not been rendered
         return self.initData
+      elif(self._finalData is not None):
+        return self._finalData
       else:
         # force update
         self.widget.updateField()

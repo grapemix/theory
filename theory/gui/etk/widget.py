@@ -196,7 +196,7 @@ class StringInput(BaseLabelInput):
   widgetClass = Entry
 
   def _getData(self):
-    return self.widgetLst[0].obj.entry_get()
+    return self.widgetLst[0].finalData
 
   def updateField(self):
     self.fieldSetter({"finalData": self._getData()})
@@ -227,7 +227,7 @@ class NumericInput(StringInput):
 
 class SelectBoxInput(BaseLabelInput):
   """Assuming labels are unique."""
-  widgetClass = SelectBox
+  widgetClass = RadioBox
 
   def updateField(self):
     self.fieldSetter({"finalData": self.widgetLst[0].finalData})
@@ -546,7 +546,6 @@ class ListInput(BaseLabelInput):
         or self.widgetClass == TextInput.widgetClass):
       self.fieldSetter(
           {
-            # TODO: this is e17 specific, add one more layer instead
             "finalData": self._inputLst[0].finalData.split("<br/>"),
           }
       )
