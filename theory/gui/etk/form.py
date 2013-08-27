@@ -14,7 +14,7 @@ from theory.gui.common.baseForm import (
 ##### Theory third-party lib #####
 
 ##### Local app #####
-from widget import BasePacker
+from widget import BasePacker, FilterFormLayout
 from element import Button
 
 ##### Theory app #####
