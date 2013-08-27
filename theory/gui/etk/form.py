@@ -127,18 +127,6 @@ class CommandFormBase(StepFormBase):
   def _run(self):
     pass
 
-  def fillFields(self, cmdModel, args, kwargs):
-    cmdArgs = [i for i in cmdModel.param if(not i.isOptional)]
-    if(args!=[]):
-      for i in range(len(cmdArgs)):
-        try:
-          self.fields[cmdArgs[i].name].initData = args[i]
-        except IndexError:
-          # This means the number of param given unmatch the number of param register in *.command
-          raise CommandSyntaxError
-    for k,v in kwargs.iteritems():
-      self.fields[k].initData = v
-
   def focusOnTheFirstChild(self):
     if(self.firstRequiredInputIdx!=-1):
       self.fields.values()[self.firstRequiredInputIdx].widget.setFocus()
