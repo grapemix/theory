@@ -9,7 +9,7 @@ from theory.utils import datetime_safe, formats
 ##### Theory third-party lib #####
 
 ##### Local app #####
-from element import *
+import element
 
 ##### Theory app #####
 
@@ -52,7 +52,7 @@ class BasePacker(object):
     return (widget,)
 
   def _createContainer(self, attrs=None, *args, **kwargs):
-    hBox = Box(attrs)
+    hBox = element.Box(attrs)
     hBox.win = self.win
     if(not self.attrs["isContainerAFrame"]):
       hBox.bx = self.bx
@@ -110,21 +110,21 @@ class BaseLabelInput(BaseFieldInput):
 
   def initLabelMainContainerAsFrame(self):
     if(self.attrs["isExpandMainContainer"]):
-      fr = Frame({"isFillAlign": True, "isWeightExpand": True})
+      fr = element.Frame({"isFillAlign": True, "isWeightExpand": True})
     else:
-      fr = Frame({"isFillAlign": False, "isWeightExpand": False})
+      fr = element.Frame({"isFillAlign": False, "isWeightExpand": False})
     fr.win = self.win
     fr.bx = self.bx
     self.mainContainer = fr
-    lb = Label()
+    lb = element.Label()
     lb.win = self.win
     self.widgetLst.append(lb)
 
   def initLabelMainContainerAsTbl(self):
-    lb = Label()
+    lb = element.Label()
     lb.win = self.win
     self.widgetLst.append(lb)
-    lb = Label()
+    lb = element.Label()
     lb.win = self.win
     self.widgetLst.append(lb)
 
@@ -193,7 +193,7 @@ class BaseLabelInput(BaseFieldInput):
     pass
 
 class StringInput(BaseLabelInput):
-  widgetClass = Entry
+  widgetClass = element.Entry
 
   def _getData(self):
     return self.widgetLst[0].finalData
@@ -227,14 +227,14 @@ class NumericInput(StringInput):
 
 class SelectBoxInput(BaseLabelInput):
   """Assuming labels are unique."""
-  widgetClass = RadioBox
+  widgetClass = element.RadioBox
 
   def updateField(self):
     self.fieldSetter({"finalData": self.widgetLst[0].finalData})
 
 # TODO: Fix the padding problem
 class CheckBoxInput(BaseLabelInput):
-  widgetClass = CheckBox
+  widgetClass = element.CheckBox
 
   def _createWidget(self, *args, **kwargs):
     hBox = self._createContainer({"isFillAlign": False, "isWeightExpand": False, "isHorizontal": True, })
@@ -254,10 +254,10 @@ class CheckBoxInput(BaseLabelInput):
     pass
 
 class FileselectInput(BaseLabelInput):
-  widgetClass = FileSelector
+  widgetClass = element.FileSelector
 
 class DateInput(StringInput):
-  widgetClass = Entry
+  widgetClass = element.Entry
 
   def __init__(self, fieldSetter, fieldGetter, win, bx,
       attrs=None, *args, **kwargs):
@@ -286,7 +286,7 @@ class DateInput(StringInput):
     return value
 
 class DateTimeInput(StringInput):
-  widgetClass = Entry
+  widgetClass = element.Entry
 
   def __init__(self, fieldSetter, fieldGetter, win, bx,
       attrs=None, *args, **kwargs):
@@ -315,7 +315,7 @@ class DateTimeInput(StringInput):
     return value
 
 class TimeInput(StringInput):
-  widgetClass = Entry
+  widgetClass = element.Entry
 
   def __init__(self, fieldSetter, fieldGetter, win, bx,
       attrs=None, *args, **kwargs):
@@ -343,8 +343,8 @@ class TimeInput(StringInput):
     return value
 
 class StringGroupFilterInput(BaseLabelInput):
-  widgetClass = ListModelValidator
-  #widgetClass = ListValidator
+  widgetClass = element.ListModelValidator
+  #widgetClass = element.ListValidator
 
   def __init__(self, fieldSetter, fieldGetter, win, bx, attrs=None, *args, **kwargs):
     attrs = self._buildAttrs(attrs, initData=())
@@ -355,7 +355,7 @@ class StringGroupFilterInput(BaseLabelInput):
     return self.widgetLst[0].changedData
 
 class ModelValidateGroupInput(BaseLabelInput):
-  widgetClass = ListModelValidator
+  widgetClass = element.ListModelValidator
 
   def __init__(self, fieldSetter, fieldGetter, win, bx, attrs=None, *args, **kwargs):
     attrs = self._buildAttrs(attrs, initData=(), isExpandMainContainer=True)
@@ -389,7 +389,7 @@ class ListInput(BaseLabelInput):
         widgetClass = TextInput.widgetClass
         self._createWidget = self._createLongStringWidget
       else:
-        widgetClass = Multibuttonentry
+        widgetClass = element.Multibuttonentry
         self._createWidget = self._createShortStringWidget
       self.fieldSetter = fieldSetter
       self.fieldGetter = fieldGetter
@@ -463,13 +463,13 @@ class ListInput(BaseLabelInput):
     )
     buttonControlBox.generate()
 
-    btn = Button({"isWeightExpand": True, "isFillAlign": False, })
+    btn = element.Button({"isWeightExpand": True, "isFillAlign": False, })
     btn.win = self.win
     btn.label = "Toggle Expand"
     btn._clicked = lambda btn: mbe.expanded_set(not mbe.expanded_get())
     buttonControlBox.addWidget(btn)
 
-    btn = Button({"isWeightExpand": True, "isFillAlign": False, })
+    btn = element.Button({"isWeightExpand": True, "isFillAlign": False, })
     btn.win = self.win
     btn.label = "Clear"
     btn._clicked = lambda bt: widget.obj.clear()
@@ -526,13 +526,13 @@ class ListInput(BaseLabelInput):
     })
     buttonControlBox.generate()
 
-    btn = Button({"isWeightExpand": True, "isFillAlign": False})
+    btn = element.Button({"isWeightExpand": True, "isFillAlign": False})
     btn.win = self.win
     btn.label = "Add"
     btn._clicked = self._addDataWidget
     buttonControlBox.addWidget(btn)
 
-    btn = Button({"isWeightExpand": True, "isFillAlign": False,})
+    btn = element.Button({"isWeightExpand": True, "isFillAlign": False,})
     btn.win = self.win
     btn.label = "Remove"
     btn._clicked = self._rmDataWidget
@@ -542,7 +542,7 @@ class ListInput(BaseLabelInput):
     return result
 
   def updateField(self):
-    if(self.widgetClass == Multibuttonentry
+    if(self.widgetClass == element.Multibuttonentry
         or self.widgetClass == TextInput.widgetClass):
       self.fieldSetter(
           {
@@ -580,19 +580,19 @@ class DictInput(ListInput):
         })
     keyInputBox.generate()
 
-    lb = Label({"isFillAlign": False, "isWeightExpand": False})
+    lb = element.Label({"isFillAlign": False, "isWeightExpand": False})
     lb.win = self.win
     lb.attrs["initData"] = "Key:"
     keyInputBox.addWidget(lb)
 
-    en = Entry({"isFillAlign": False, "isWeightExpand": False})
+    en = element.Entry({"isFillAlign": False, "isWeightExpand": False})
     en.win = self.win
     keyInputBox.addWidget(en)
 
     valueInputBox = self._createContainer({"isWeightExpand": True, "isFillAlign": True})
     valueInputBox.generate()
 
-    lb = Label({"isFillAlign": False, "isWeightExpand": False})
+    lb = element.Label({"isFillAlign": False, "isWeightExpand": False})
     lb.win = self.win
     lb.attrs["initData"] = "Value:"
     valueInputBox.addWidget(lb)
@@ -605,13 +605,13 @@ class DictInput(ListInput):
     buttonControlBox = self._createContainer({"isHorizontal": True, "isWeightExpand": False, "isFillAlign": False})
     buttonControlBox.generate()
 
-    btn = Button({"isWeightExpand": True, "isFillAlign": False})
+    btn = element.Button({"isWeightExpand": True, "isFillAlign": False})
     btn.win = self.win
     btn.label = "Add"
     btn._clicked = self._addDataWidget
     buttonControlBox.addWidget(btn)
 
-    btn = Button({"isWeightExpand": True, "isFillAlign": False,})
+    btn = element.Button({"isWeightExpand": True, "isFillAlign": False,})
     btn.win = self.win
     btn.label = "Remove"
     btn._clicked = self._rmDataWidget
@@ -663,12 +663,12 @@ class FilterFormLayout(BasePacker):
     )
     filterEntryBox.generate()
 
-    lb = Label({"isFillAlign": False, "isWeightExpand": False})
+    lb = element.Label({"isFillAlign": False, "isWeightExpand": False})
     lb.win = self.win
     lb.attrs["initData"] = self.labelTitle
     filterEntryBox.addWidget(lb)
 
-    en = Entry({"isFillAlign": False, "isWeightExpand": False})
+    en = element.Entry({"isFillAlign": False, "isWeightExpand": False})
     en.win = self.win
     en._contentChanged = self._filterField
     filterEntryBox.addWidget(en)
