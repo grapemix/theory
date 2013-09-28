@@ -3,6 +3,7 @@
 ##### System wide lib #####
 from __future__ import absolute_import
 
+from collections import OrderedDict
 import copy
 import datetime
 from decimal import Decimal, DecimalException
@@ -60,7 +61,8 @@ FILE_INPUT_CONTRADICTION = object()
 
 class Field(object):
   """The function being provided by this class should include data validation,
-  valid/error message storage and multiple widget data union."""
+  valid/error message storage. The relationship between field and widget should
+  be one to one."""
   widget = StringInput
   #hidden_widget = HiddenInput # Default widget to use when rendering this as "hidden".
   default_validators = [] # Default set of validators
@@ -96,6 +98,7 @@ class Field(object):
     self.required, self.label, self.initData = required, label, initData
     #self.finalData = self.initData
     self._changedData = self._finalData = None
+
     self.show_hidden_initial = show_hidden_initial
     if help_text is None:
       self.help_text = u''
@@ -118,7 +121,7 @@ class Field(object):
 
     self.isSingular = True # not interact with other fields
 
-    if widget!=None:
+    if widget is not None:
       self.widget = widget
 
   def renderWidget(self, *args, **kwargs):
@@ -132,8 +135,9 @@ class Field(object):
       widget = self.widget(self.widgetSetter, self.widgetGetter, *args, **kwargs)
       # In some case, ListInput for example, their children input only want the
       # core part instead of the whole part including the instruction
-      if(not kwargs.has_key("isSkipInstruction") \
-          or not kwargs["isSkipInstruction"]):
+      if(not kwargs.has_key("attrs") \
+          or not kwargs["attrs"].has_key("isSkipInstruction") \
+          or not kwargs["attrs"]["isSkipInstruction"]):
         widget.setupInstructionComponent()
 
     # Trigger the localization machinery if needed.
@@ -766,8 +770,6 @@ class BooleanField(Field):
     else:
       value = bool(value)
     value = super(BooleanField, self).to_python(value)
-    if not value and self.required:
-      raise ValidationError(self.error_messages['required'])
     return value
 
 class NullBooleanField(BooleanField):
@@ -973,14 +975,13 @@ class ListField(Field):
     self.childFieldTemplate = copy.deepcopy(field)
     # It stores the minium number of elements is required in this field
     self.min_len = min_len
-    self._widgetUpdateIdx = 0 # This idx should be only modified by the widget
     if(not kwargs.has_key("initData")):
       kwargs["initData"] = initData
     super(ListField, self).__init__(*args, **kwargs)
     self._setupInitData()
 
   def _setupInitData(self):
-    if(self.initData!=[]):
+    if(len(self.initData)!=0):
       self.fields[0].initData = self.initData[0]
       if(len(self.initData)>1):
         for i in self.initData[1:]:
@@ -997,15 +998,19 @@ class ListField(Field):
     if isinstance(widget, type):
       # in order to check widget.widgetClass
       self.fields[0].renderWidget(*args, **kwargs)
-      self.widget = widget(self.widgetSetter, self.widgetGetter, \
-          childFieldLst=self.fields, addChildFieldFxn=self.addChildField, \
-          removeChildFieldFxn=self.removeChildField, *args, **kwargs)
+      self.widget = widget(
+          self.widgetSetter,
+          self.widgetGetter,
+          childFieldLst=self.fields,
+          addChildFieldFxn=self.addChildField,
+          removeChildFieldFxn=self.removeChildField,
+          *args, **kwargs)
       self.widget.setupInstructionComponent()
       super(ListField, self).renderWidget(*args, **kwargs)
 
   def addChildField(self, initData=None):
     field = copy.deepcopy(self.childFieldTemplate)
-    if(initData!=None):
+    if(initData is not None):
       field.initData = initData
     self.fields.append(field)
     return field
@@ -1072,46 +1077,114 @@ class ListField(Field):
     else:
       raise NotImplementedError
 
-class DictField(ListField):
+class DictField(Field):
   widget = DictInput
+  default_error_messages = {
+    'lenUnmatch': _(u'The length of various fields unmatch.'),
+  }
 
-  def __init__(self, field, initData={}, min_len=1, *args, **kwargs):
-    super(DictField, self).__init__(field, initData, min_len, *args, **kwargs)
+  def __init__(
+      self, keyField, valueField, initData={}, min_len=1, *args, **kwargs
+      ):
+
+    # Set 'required' to False on the individual fields, because the
+    # required validation will be handled by ListField, not by those
+    # individual fields.
+    keyField.required = False
+    valueField.required = False
+    self.keyFields = [keyField,]
+    self.valueFields = [valueField,]
+    self.childKeyFieldTemplate = copy.deepcopy(keyField)
+    self.childValueFieldTemplate = copy.deepcopy(valueField)
+    # It stores the minium number of elements is required in this field
+    self.min_len = min_len
+    if(not kwargs.has_key("initData")):
+      kwargs["initData"] = initData
+    super(DictField, self).__init__(*args, **kwargs)
+    self._setupInitData()
 
   def _setupInitData(self):
-    # TODO: Fix me
-    pass
+    i = 0
+    if(len(self.initData)!=0):
+      for k,v in self.initData.iteritems():
+        if(i==0):
+          self.keyFields[0].initData = k
+          self.valueFields[0].initData = v
+        else:
+          self.addChildField(k, v)
+        i += 1
+    self._changedData = self._finalData = {}
 
-  @property
-  def finalData(self):
-    return {}
+  def addChildField(self, initKeyData=None, initValueData=None):
+    keyField = copy.deepcopy(self.childKeyFieldTemplate)
+    valueField = copy.deepcopy(self.childValueFieldTemplate)
+    if(initKeyData is not None and initValueData is not None):
+      keyField.initData = initKeyData
+      valueField.initData = initValueData
+    self.keyFields.append(keyField)
+    self.valueFields.append(valueField)
+    return (keyField, valueField)
+
+  def removeChildField(self, idx):
+    del self.keyFields[idx]
+    del self.valueFields[idx]
 
   def validate(self, valueDict):
     if self.required and len(valueDict)<self.min_len:
       raise ValidationError(self.error_messages['required'])
 
-  def clean(self, valueDict):
-    cleanDict = {}
+  def clean(self, valueOrderedDict):
+    """
+    Validates every value in the given list. A value is validated against
+    the corresponding Field in self.fields.
+    """
+    clean_data = OrderedDict()
     errors = ErrorList()
-
-    if self.required and len(valueDict)<self.min_len:
+    valueOrderedDictLen = len(valueOrderedDict)
+    if self.required and valueOrderedDictLen<self.min_len:
       raise ValidationError(self.error_messages['required'])
+    if(valueOrderedDictLen!=len(self.keyFields)
+        or valueOrderedDictLen!=len(self.valueFields)):
+      raise ValidationError(self.error_messages['lenUnmatch'])
 
-    for k,v in valueDict.iteritems():
+    i = 0
+    for k, v in valueOrderedDict.iteritems():
       try:
-        cleanDict[k] = self.fields[0].clean(v)
+        clean_data[self.keyFields[i].clean(k)] = \
+            self.valueFields[i].clean(v)
+      except IndexError:
+        pass
       except ValidationError, e:
         # Collect all validation errors in a single list, which we'll
         # raise at the end of clean(), rather than raising a single
         # exception for the first error we encounter.
         errors.extend(e.messages)
+      finally:
+        i += 1
     if errors:
       raise ValidationError(errors)
 
-    self.validate(cleanDict)
-    self.run_validators(cleanDict)
-    return cleanDict
-    #return super(DictField, self).clean(value)
+    self.validate(clean_data)
+    self.run_validators(clean_data)
+    return clean_data
+
+  # This is a special case of overriding multiple property methods
+  # This class now has an this propertyField with a modified getter
+  # so modify its setter rather than Parent.propertyField's setter.
+  @Field.finalData.getter
+  def finalData(self):
+    """It is used to store data directly from widget before validation and
+    cleaning."""
+    # TODO: allow lazy update
+    if(not isinstance(self.widget, type) and self.widget.isOverridedData):
+      # some widget like Multibuttonentry from the e17 need special treatment
+      # on retriving data
+      return super(DictField, self).finalData
+    else:
+      d = OrderedDict()
+      for i in range(len(self.keyFields)):
+        d[self.keyFields[i].finalData] = self.valueFields[i].finalData
+      return d
 
   def run_validators(self, valueDict):
     if valueDict in validators.EMPTY_VALUES:
@@ -1137,16 +1210,23 @@ class DictField(ListField):
     #           be used for this Field when displaying it. Each Field has a
     #           default Widget that it'll use if you don't specify this. In
     #           most cases, the default widget is TextInput.
-    #widget = widget or self.widget
     widget = self.widget
     if isinstance(widget, type):
-      # in order to check widget.widgetClass
-      self.fields[0].renderWidget(*args, **kwargs)
-      self.widget = widget(self.widgetSetter, self.widgetGetter, \
-          widgetClass=self.fields[0].widget.widgetClass, *args, **kwargs)
-      self.widget.setupInstructionComponent()
-      super(ListField, self).renderWidget(*args, **kwargs)
 
+      childFieldPairLst = []
+      for i in range(len(self.keyFields)):
+        childFieldPairLst.append(
+            (self.keyFields[i], self.valueFields[i])
+        )
+      self.widget = widget(
+          self.widgetSetter,
+          self.widgetGetter,
+          addChildFieldFxn=self.addChildField,
+          removeChildFieldFxn=self.removeChildField,
+          childFieldPairLst=childFieldPairLst,
+          *args, **kwargs)
+      self.widget.setupInstructionComponent()
+      super(DictField, self).renderWidget(*args, **kwargs)
 
 class AdapterField(TextField):
   pass
