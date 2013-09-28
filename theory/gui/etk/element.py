@@ -32,9 +32,9 @@ class E17Widget(object):
   __metaclass__ = ABCMeta
   win = None
   bx = None
-  obj = None
 
   def __init__(self, attrs=None, *args, **kwargs):
+    self.obj = None
     self.attrs = {\
         "isFillAlign": False, \
         "isFocus": False,\
@@ -441,7 +441,7 @@ class Box(E17Widget):
     self.inputChildrenLst = [] # input inside this box
 
   def generate(self, *args, **kwargs):
-    if(self.obj!=None):
+    if(self.obj is not None):
       return
 
     bx = elementary.Box(self.win)
@@ -450,7 +450,7 @@ class Box(E17Widget):
       bx.horizontal_set(True)
 
     # If a box is inside a frame
-    if(self.bx!=None):
+    if(self.bx is not None):
       self.bx.pack_end(bx)
     self.obj = bx
 
@@ -463,11 +463,10 @@ class Box(E17Widget):
     """Must ran after generate. """
     i = startIdx
     for widget in widgetLst:
-      widget.bx = self.obj
       self.widgetChildrenLst.insert(i, widget)
       i += 1
 
-    self._postGenerateChildren(widgetLst)
+    self._postGenerateChildren(widgetLst, i)
 
   def removeWidgetLst(self, startIdx, length):
     """Must ran after generate"""
@@ -484,11 +483,17 @@ class Box(E17Widget):
       input.generate()
       # Don't do pack_end in here. Too late.
 
-  def _postGenerateChildren(self, widgetChildrenLst):
+  def _postGenerateChildren(self, widgetChildrenLst, startIdx=None):
+    i = startIdx
     for child in widgetChildrenLst:
-      if(child.obj==None):
+      if(child.obj is None):
         child.generate()
-      self.obj.pack_end(child.obj)
+      if(startIdx is None):
+        # for first element
+        self.obj.pack_end(child.obj)
+      else:
+        # for appending more element
+        self.obj.pack_before(child.obj, self.widgetChildrenLst[i].obj)
     for child in widgetChildrenLst:
       child.postGenerate()
 
@@ -561,6 +566,9 @@ class Entry(E17Widget):
 
   @finalData.setter
   def finalData(self, finalData):
+    self.reset(finalData=finalData)
+
+  def reset(self, finalData=None):
     self.obj.entry_set(finalData)
 
 class Button(E17Widget):
@@ -637,8 +645,9 @@ class RadioBox(E17Widget):
   def _addRadioChoice(self, value, label, icon=None):
     rd = elementary.Radio(self.win)
     rd.text_set(label)
-    rd.state_value_set(len(self.selectedData))
-    self.selectedData.append(value)
+    rd.state_value_set(len(self.dataChoice))
+    self.dataChoice.append(value)
+
     if(icon is not None):
       rd.icon_set(icon)
     if(self.isDisable):
@@ -661,22 +670,57 @@ class RadioBox(E17Widget):
     self.obj = elementary.Box(self.win)
     self.obj.show()
 
-    self.finalData = self.attrs["choices"]
+    #self.finalData = self.attrs["choices"]
+    self.reset(choices=self.attrs["choices"], initData=self.attrs["initData"])
+
+  def reset(self, choices=None, initData=None, finalData=None):
+    selectedData = initData if finalData is None else finalData
+    isRedraw = False
+    if(choices is not None):
+      self.attrs["choices"] = choices
+      isRedraw = True
+
+    if(finalData is not None):
+      isRedraw = True
+
+    if(isRedraw):
+      self.rdg = None
+      self.objLst = []
+      self.dataChoice= []
+      buf = []
+
+      # !!! Because e17 is unable to set selected data, we have to put the
+      # assigned radio box at the beginning
+      for data in choices:
+        if(data[0]==selectedData):
+          self._addRadioChoice(*data)
+        else:
+          buf.append(data)
+
+      for data in buf:
+        self._addRadioChoice(*data)
+
+#    # !!! Because e17 is unable to set selected data, we have to put the
+#    # assigned radio box at the beginning
+#    if(value == self.attrs["initData"]):
+#      #rd.value_pointer_set(value)
+#      rd.value_set(value)
 
   @property
   def finalData(self):
     if(len(self.objLst)>0):
-      return self.selectedData[self.objLst[0].state_value_get()]
+      return self.dataChoice[self.objLst[0].value_get()]
     else:
       return self.attrs["initData"]
 
   @finalData.setter
   def finalData(self, finalData):
-    self.rdg = None
-    self.objLst = []
-    self.selectedData = []
-    for data in finalData:
-      self._addRadioChoice(*data)
+    if(finalData==self.selectedData):
+      return
+    # we have to check in advance because we have to render data immediately
+    if(finalData not in self.dataChoice):
+      raise
+    self.reset(finalData=finalData)
 
 # TODO: to show init data as pre-select item
 class SelectBox(E17Widget):
@@ -806,5 +850,9 @@ class Multibuttonentry(E17Widget):
 
   @finalData.setter
   def finalData(self, finalData):
+    self.reset(finalData=finalData)
+
+  def reset(self, finalData=None):
     for s in finaData:
       self.obj.item_append(s)
+

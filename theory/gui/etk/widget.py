@@ -116,9 +116,9 @@ class BaseLabelInput(BaseFieldInput):
     fr.win = self.win
     fr.bx = self.bx
     self.mainContainer = fr
-    lb = element.Label()
-    lb.win = self.win
-    self.widgetLst.append(lb)
+    helpLabel = element.Label()
+    helpLabel.win = self.win
+    self.widgetLst.append(helpLabel)
 
   def initLabelMainContainerAsTbl(self):
     lb = element.Label()
@@ -138,6 +138,7 @@ class BaseLabelInput(BaseFieldInput):
       self.packAsFrame(self.title, self.help)
     else:
       self.packAsTbl(self.title, self.help)
+
   def packAsFrame(self, title, help):
     hBox = self._createContainer(attrs={"isFillAlign": True, "isWeightExpand": True})
     hBox.generate()
@@ -191,6 +192,10 @@ class BaseLabelInput(BaseFieldInput):
   @abstractmethod
   def updateField(self):
     pass
+
+  def reset(self, **kwargs):
+    """ To redraw the element when data got update"""
+    self.widgetLst[0].reset(**kwargs)
 
 class StringInput(BaseLabelInput):
   widgetClass = element.Entry
@@ -375,6 +380,19 @@ class ModelValidateGroupInput(BaseLabelInput):
         "changedData":  self.changedData,
         })
 
+class MultipleValueInput(BaseLabelInput):
+  def _chooseWidgetClass(self):
+    pass
+
+  def _addDataWidget(self):
+    pass
+
+  def _rmDataWidget(self):
+    pass
+
+  def _createWidget(self):
+    pass
+
 class ListInput(BaseLabelInput):
   def __init__(self, fieldSetter, fieldGetter, win, bx, childFieldLst, \
       addChildFieldFxn, removeChildFieldFxn, attrs=None, *args, **kwargs):
@@ -553,31 +571,69 @@ class ListInput(BaseLabelInput):
       for idx in range(len(self._inputLst)):
         self._inputLst[idx].updateField()
 
+  def reset(self, data):
+    """ data should be in the format like:
+      (
+      {"choices": ((0, "False"), (1, "True")), "finalData": 1},
+      {"choices": ((0, "False"), (1, "True")), "finalData": 0},
+      )
+    """
+    for i, input in enumerate(self._inputLst):
+      input.reset(**data[i])
+
 class DictInput(ListInput):
-  def __init__(self, fieldSetter, fieldGetter, win, bx, widgetClass, attrs=None, *args, **kwargs):
-    attrs = self._buildAttrs(\
-        attrs, isExpandMainContainer=True, initData=())
-    self.widgetClass = widgetClass
-    self._dataWidgetLst = []
+  def __init__(self, fieldSetter, fieldGetter, win, bx, addChildFieldFxn,
+      removeChildFieldFxn, childFieldPairLst, attrs=None, *args, **kwargs):
+    attrs = self._buildAttrs(
+        attrs,
+        isExpandMainContainer=True,
+        initData={}
+        )
+    self.addChildField = addChildFieldFxn
+    self.removeChildField = removeChildFieldFxn
+    self.isOverridedData = False
+    self.childFieldPairLst = childFieldPairLst
+
     # We should call the __init__() of ListInput's parent because
     # widgetClass should not be changed even StringInput is used.
-    super(ListInput, self).__init__(fieldSetter, fieldGetter, win, bx, attrs, *args, **kwargs)
-
-  def updateField(self):
-    # !!! TODO: Fix me
-    # Since DictInput has no _inputLst
-    # ListInput used input as base child, DictInput used widget as base child
-    # Fix this and test it in tests/integrationTest/gui/tests/field.py:DictFieldTestCase.testMultipleElementInitValue
-    print "DictInput updateField unimplemented"
-    pass
+    super(ListInput, self).__init__(
+        fieldSetter, fieldGetter, win, bx, attrs, *args, **kwargs)
 
   def _createWidget(self, *args, **kwargs):
+    widgetBoxLst = []
+    for (keyField, valueField) in self.childFieldPairLst:
+      widgetBoxLst.extend(self._renderOneWidget(keyField, valueField))
+    return widgetBoxLst
+
+  def _createOneWidget(self, keyField, valueField):
+    return self._renderOneWidget(keyField, valueField)
+
+  def _addDataWidget(self, btn, *args, **kwargs):
+    (keyField, valueField) = self.addChildField()
+    widgetLst = self._renderOneWidget(keyField, valueField)
+
+    startIdx = len(self.widgetLst) - 1
+    for widget in widgetLst:
+      self.widgetLst.insert(len(self.widgetLst) - 1 , widget)
+    self.mainContainer.content.insertAndGenerateWidget(startIdx , widgetLst)
+
+  def _rmDataWidget(self, btn):
+    numOfNewWidget = 3
+    numToShiftFirstElement = len(self.widgetLst) - 1 - numOfNewWidget
+    for i in range(numOfNewWidget):
+      del self.widgetLst[-2]
+    self.mainContainer.content.removeWidgetLst(
+        numToShiftFirstElement, numOfNewWidget)
+    self.removeChildField(numToShiftFirstElement/numOfNewWidget)
+
+  def _renderOneWidget(self, keyField, valueField):
     keyInputBox = self._createContainer(
-        {\
-            "isHorizontal": True, \
-            "isWeightExpand": False, \
-            "isFillAlign": False, \
-        })
+        {
+            "isHorizontal": True,
+            "isWeightExpand": False,
+            "isFillAlign": False,
+        }
+    )
     keyInputBox.generate()
 
     lb = element.Label({"isFillAlign": False, "isWeightExpand": False})
@@ -585,11 +641,26 @@ class DictInput(ListInput):
     lb.attrs["initData"] = "Key:"
     keyInputBox.addWidget(lb)
 
-    en = element.Entry({"isFillAlign": False, "isWeightExpand": False})
-    en.win = self.win
-    keyInputBox.addWidget(en)
 
-    valueInputBox = self._createContainer({"isWeightExpand": True, "isFillAlign": True})
+    defaultParam = {
+        "isWeightExpand": True,
+        "isFillAlign": True,
+        "isSkipInstruction": True,
+        "initData": keyField.initData,
+    }
+
+    keyField.renderWidget(self.win, keyInputBox.obj, attrs=defaultParam)
+    keyField.widget.widgetLst = list(keyField.widget._createWidget())
+
+    keyInputBox.addWidget(keyField.widget.widgetLst[0])
+
+    valueInputBox = self._createContainer(
+        {
+            "isHorizontal": True,
+            "isWeightExpand": False,
+            "isFillAlign": False,
+        }
+    )
     valueInputBox.generate()
 
     lb = element.Label({"isFillAlign": False, "isWeightExpand": False})
@@ -597,12 +668,24 @@ class DictInput(ListInput):
     lb.attrs["initData"] = "Value:"
     valueInputBox.addWidget(lb)
 
-    widget = self.widgetClass({"isWeightExpand": True, "isFillAlign": False })
-    widget.win = self.win
-    valueInputBox.addWidget(widget)
-    self._dataWidgetLst.append(widget)
+    defaultParam = {
+        "isWeightExpand": True,
+        "isFillAlign": False,
+        "isSkipInstruction": True,
+        "initData": valueField.initData,
+    }
 
-    buttonControlBox = self._createContainer({"isHorizontal": True, "isWeightExpand": False, "isFillAlign": False})
+    valueField.renderWidget(self.win, valueInputBox.obj, attrs=defaultParam)
+
+    valueField.widget.widgetLst = list(valueField.widget._createWidget())
+    valueInputBox.addWidget(valueField.widget.widgetLst[0])
+
+    buttonControlBox = self._createContainer(
+        {
+          "isHorizontal": True,
+          "isWeightExpand": False,
+          "isFillAlign": False
+        })
     buttonControlBox.generate()
 
     btn = element.Button({"isWeightExpand": True, "isFillAlign": False})
@@ -617,6 +700,18 @@ class DictInput(ListInput):
     btn._clicked = self._rmDataWidget
     buttonControlBox.addWidget(btn)
     return (keyInputBox, valueInputBox, buttonControlBox,)
+
+  def reset(self, data):
+    pass
+#    """ data should be in the format like:
+#      OrderedDict(
+#      {"choices": ((0, "False"), (1, "True")), "finalData": 1},
+#      {"choices": ((0, "False"), (1, "True")), "finalData": 0},
+#      )
+#    """
+#    for i, input in enumerate(self._inputLst):
+#      input.reset(**data[i])
+
 
 class FilterFormLayout(BasePacker):
   def __init__(self, win, bxInput, attrs=None, *args, **kwargs):

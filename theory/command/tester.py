@@ -35,7 +35,7 @@ class Tester(SimpleCommand):
     #    required=False)
     isTestTheory = field.BooleanField(label="Is test Theory", \
         help_text="The testcase of Theory is being runned or not", \
-        initData='1')
+        initData=1)
     testRunner = field.PythonClassField(label="Test Runner", \
         help_text="The python class of testcase runner being used", \
         initData="", auto_import=True, required=False)
@@ -48,10 +48,13 @@ class Tester(SimpleCommand):
      - app
          Search for doctests and unittests in the named application.""", \
         max_length=128, initData="", required=False)
-    testRunnerClassParam = field.DictField(field.TextField(), \
-        label="Test Runner Class Parameter", \
-        help_text="The parameter passed to the test runner class constructor", \
-        required=False)
+    testRunnerClassParam = field.DictField(
+        field.TextField(),
+        field.TextField(),
+        label="Test Runner Class Parameter",
+        help_text="The parameter passed to the test runner class constructor",
+        required=False,
+        )
 
   def run(self):
     formData = self.paramForm.clean()
