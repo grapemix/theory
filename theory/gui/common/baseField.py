@@ -1070,7 +1070,7 @@ class ListField(Field):
     else:
       return [i.finalData for i in self.fields]
 
-  @Field.finalData.setter
+  @finalData.setter
   def finalData(self, finalData):
     if(not isinstance(self.widget, type) and self.widget.isOverridedData):
       Field.finalData.fset(self, finalData)

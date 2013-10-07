@@ -578,6 +578,7 @@ class Button(E17Widget):
 
   def __init__(self, attrs=None, *args, **kwargs):
     defaultAttrs = {"isFillAlign": True}
+    self._clickedData = None
     if(attrs is not None):
       defaultAttrs.update(attrs)
     super(Button, self).__init__(defaultAttrs, *args, **kwargs)
@@ -587,7 +588,7 @@ class Button(E17Widget):
     if(self.label):
       bt.text_set(self.label)
     if(hasattr(self, "_clicked")):
-      bt.callback_clicked_add(self._clicked)
+      bt.callback_clicked_add(self._clicked, self._clickedData)
     self.obj = bt
 
 
