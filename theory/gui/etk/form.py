@@ -86,11 +86,6 @@ class GuiFormBase(FormBase, BasePacker):
     optionalMenu.postGenerate()
     self._changeFormWindowHeight(960)
 
-  def fillFinalFields(self, kwargs):
-    for k,v in kwargs.iteritems():
-      self.fields[k].finalData = v
-      self.fields[k].widget.reset(finalData=v)
-
 class StepFormBase(GuiFormBase):
   def _nextBtnClick(self):
     pass
@@ -128,7 +123,7 @@ class StepFormBase(GuiFormBase):
   def fillFinalFields(self, kwargs):
     for k,v in kwargs.iteritems():
       self.fields[k].finalData = v
-      self.fields[k].widget.reset(finalData=v)
+      #self.fields[k].widget.reset(finalData=v)
 
 class CommandFormBase(StepFormBase):
   def _nextBtnClick(self):
