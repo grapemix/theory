@@ -189,6 +189,7 @@ class Reactor(object):
     cmdParamFormKlass = import_class(self.cmdModel.classImportPath).ParamForm
     self.paramForm = cmdParamFormKlass()
     self.paramForm._nextBtnClick = self.cleanParamForm
+
     for field, finalData in finalDataDict.iteritems():
       self.paramForm.fields[field].initData = finalData
       self.paramForm.fields[field].finalData = finalData
@@ -234,6 +235,7 @@ class Reactor(object):
           Q(name=cmdName)
           & (Q(mood=self.mood) | Q(mood="norm"))
       )
+      self.parser.cmdInTxt = self.cmdModel.name
     except Command.DoesNotExist:
       # TODO: integrate with std reactor error system
       self.adapter.printTxt("Command not found")
