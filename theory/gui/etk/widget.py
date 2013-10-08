@@ -194,10 +194,6 @@ class BaseLabelInput(BaseFieldInput):
   def updateField(self):
     pass
 
-  def reset(self, **kwargs):
-    """ To redraw the element when data got update"""
-    self.widgetLst[0].reset(**kwargs)
-
 class StringInput(BaseLabelInput):
   widgetClass = element.Entry
 
@@ -602,17 +598,6 @@ class ListInput(BaseLabelInput):
       for idx in range(len(self._inputLst)):
         self._inputLst[idx].updateField()
 
-  def reset(self, **kwargs):
-    """ data should be in the format like:
-      (
-      {"choices": ((0, "False"), (1, "True")), "finalData": 1},
-      {"choices": ((0, "False"), (1, "True")), "finalData": 0},
-      )
-    """
-    finalData = kwargs["finalData"]
-    for i, input in enumerate(self._inputLst):
-      input.reset(finalData=finalData[i])
-
 class DictInput(ListInput):
   def __init__(self, fieldSetter, fieldGetter, win, bx, addChildFieldFxn,
       removeChildFieldFxn, childFieldPairLst, attrs=None, *args, **kwargs):
@@ -727,22 +712,6 @@ class DictInput(ListInput):
     self.btnIdxMap[btnHash] = idx
     buttonControlBox.addWidget(btn)
     return (keyInputBox, valueInputBox, buttonControlBox,)
-
-  def reset(self, **kwargs):
-    """ data should be in the format like:
-      OrderedDict(
-      {"choices": ((0, "False"), (1, "True")), "finalData": {"key": keyValue, "value: value"}},
-      {"choices": ((0, "False"), (1, "True")), "finalData": {"key": keyValue, "value: value"}},
-      )
-    """
-    finalData = kwargs["finalData"]
-    self.mainContainer.content.removeWidgetLst(
-        0, len(self.widgetLst) - 1)
-    self.widgetLst = []
-
-#    for i, input in enumerate(self._inputLst):
-#      input.reset(**data[i])
-
 
 class FilterFormLayout(BasePacker):
   def __init__(self, win, bxInput, attrs=None, *args, **kwargs):
