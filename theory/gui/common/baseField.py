@@ -975,10 +975,9 @@ class ListField(Field):
     self.childFieldTemplate = copy.deepcopy(field)
     # It stores the minium number of elements is required in this field
     self.min_len = min_len
-    if(not kwargs.has_key("initData")):
-      kwargs["initData"] = initData
+
+    kwargs["initData"] = initData
     super(ListField, self).__init__(*args, **kwargs)
-    self._setupInitData()
 
   def _setupInitData(self):
     if(len(self.initData)!=0):
@@ -1051,6 +1050,16 @@ class ListField(Field):
     return clean_data
 
   @property
+  def initData(self):
+    return self._initData
+
+  @initData.setter
+  def initData(self, initData):
+    self.fields = [self.childFieldTemplate,]
+    self._initData = initData
+    self._setupInitData()
+
+  @property
   def changedData(self):
     return [i.changedData for i in self.fields]
 
@@ -1075,7 +1084,9 @@ class ListField(Field):
     if(not isinstance(self.widget, type) and self.widget.isOverridedData):
       Field.finalData.fset(self, finalData)
     else:
-      raise NotImplementedError
+      for i, field in enumerate(self.fields):
+        field.finalData = finalData[i]
+
 
 class DictField(Field):
   widget = DictInput
@@ -1098,10 +1109,9 @@ class DictField(Field):
     self.childValueFieldTemplate = copy.deepcopy(valueField)
     # It stores the minium number of elements is required in this field
     self.min_len = min_len
-    if(not kwargs.has_key("initData")):
-      kwargs["initData"] = initData
+
+    kwargs["initData"] = initData
     super(DictField, self).__init__(*args, **kwargs)
-    self._setupInitData()
 
   def _setupInitData(self):
     i = 0
@@ -1168,10 +1178,24 @@ class DictField(Field):
     self.run_validators(clean_data)
     return clean_data
 
+  @property
+  def initData(self):
+    return self._initData
+
+  @initData.setter
+  def initData(self, initData):
+    self.keyFields = [self.childKeyFieldTemplate, ]
+    self.valueFields = [self.childValueFieldTemplate, ]
+    self._initData = initData
+    self._setupInitData()
+
   # This is a special case of overriding multiple property methods
   # This class now has an this propertyField with a modified getter
   # so modify its setter rather than Parent.propertyField's setter.
-  @Field.finalData.getter
+  # This is an examaple: @Field.finalData.getter
+
+  # OK, since we have setter, we can simply use @property instead
+  @property
   def finalData(self):
     """It is used to store data directly from widget before validation and
     cleaning."""
@@ -1185,6 +1209,17 @@ class DictField(Field):
       for i in range(len(self.keyFields)):
         d[self.keyFields[i].finalData] = self.valueFields[i].finalData
       return d
+
+  @finalData.setter
+  def finalData(self, finalData):
+    if(not isinstance(self.widget, type) and self.widget.isOverridedData):
+      Field.finalData.fset(self, finalData)
+    else:
+      i = 0
+      for keyData, valueData in finalData.iteritems():
+        self.keyFields[i].finalData = keyData
+        self.valueFields[i].finalData = valueData
+        i += 1
 
   def run_validators(self, valueDict):
     if valueDict in validators.EMPTY_VALUES:

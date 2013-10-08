@@ -568,7 +568,7 @@ class Entry(E17Widget):
   def finalData(self, finalData):
     self.reset(finalData=finalData)
 
-  def reset(self, finalData=None):
+  def reset(self, finalData=""):
     self.obj.entry_set(finalData)
 
 class Button(E17Widget):
@@ -674,10 +674,10 @@ class RadioBox(E17Widget):
     #self.finalData = self.attrs["choices"]
     self.reset(choices=self.attrs["choices"], initData=self.attrs["initData"])
 
-  def reset(self, choices=None, initData=None, finalData=None):
+  def reset(self, choices=[], initData=None, finalData=None):
     selectedData = initData if finalData is None else finalData
     isRedraw = False
-    if(choices is not None):
+    if(choices!=[]):
       self.attrs["choices"] = choices
       isRedraw = True
 

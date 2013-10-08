@@ -220,10 +220,6 @@ class FormBase(object):
     for k,v in kwargs.iteritems():
       self.fields[k].initData = v
 
-  def fillFinalFields(self, kwargs):
-    for k,v in kwargs.iteritems():
-      self.fields[k].finalData = v
-
   def toJson(self):
     if(self.is_valid()):
       if(self.jsonData is None):

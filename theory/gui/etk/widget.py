@@ -2,6 +2,7 @@
 #!/usr/bin/env python
 ##### System wide lib #####
 from abc import ABCMeta, abstractmethod
+import copy
 
 ##### Theory lib #####
 from theory.utils import datetime_safe, formats
@@ -601,15 +602,16 @@ class ListInput(BaseLabelInput):
       for idx in range(len(self._inputLst)):
         self._inputLst[idx].updateField()
 
-  def reset(self, data):
+  def reset(self, **kwargs):
     """ data should be in the format like:
       (
       {"choices": ((0, "False"), (1, "True")), "finalData": 1},
       {"choices": ((0, "False"), (1, "True")), "finalData": 0},
       )
     """
+    finalData = kwargs["finalData"]
     for i, input in enumerate(self._inputLst):
-      input.reset(**data[i])
+      input.reset(finalData=finalData[i])
 
 class DictInput(ListInput):
   def __init__(self, fieldSetter, fieldGetter, win, bx, addChildFieldFxn,
@@ -726,13 +728,14 @@ class DictInput(ListInput):
     buttonControlBox.addWidget(btn)
     return (keyInputBox, valueInputBox, buttonControlBox,)
 
-  def reset(self, data):
+  def reset(self, **kwargs):
     """ data should be in the format like:
       OrderedDict(
       {"choices": ((0, "False"), (1, "True")), "finalData": {"key": keyValue, "value: value"}},
       {"choices": ((0, "False"), (1, "True")), "finalData": {"key": keyValue, "value: value"}},
       )
     """
+    finalData = kwargs["finalData"]
     self.mainContainer.content.removeWidgetLst(
         0, len(self.widgetLst) - 1)
     self.widgetLst = []

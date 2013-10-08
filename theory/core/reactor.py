@@ -2,6 +2,7 @@
 #!/usr/bin/env python
 ##### System wide lib #####
 from datetime import datetime
+import json
 from mongoengine import Q
 import sys
 
@@ -117,8 +118,15 @@ class Reactor(object):
     else:
       if(self.historyIndex + 1 < self.historyLen):
         self.historyIndex += 1
+      self.adapter.cleanUpCrt()
       commandName = self.historyModel[self.historyIndex].commandName
       entrySetterFxn(commandName)
+      self.parser.cmdInTxt = commandName
+      self.cmdModel = Command.objects.get(name=commandName)
+
+      self._buildParamForm(
+          json.loads(self.historyModel[self.historyIndex].jsonData)
+      )
 
   def _showNextCmdRequest(self, entrySetterFxn):
     if(self.historyIndex == -1):
@@ -126,9 +134,15 @@ class Reactor(object):
     else:
       if(self.historyIndex - 1 >= 0):
         self.historyIndex -= 1
+      self.adapter.cleanUpCrt()
       commandName = self.historyModel[self.historyIndex].commandName
       entrySetterFxn(commandName)
+      self.parser.cmdInTxt = commandName
+      self.cmdModel = Command.objects.get(name=commandName)
 
+      self._buildParamForm(
+          json.loads(self.historyModel[self.historyIndex].jsonData)
+      )
   def _escapeRequest(self, entrySetterFxn):
     self.historyIndex = -1
     entrySetterFxn("")
@@ -158,7 +172,7 @@ class Reactor(object):
       self.paramForm.focusOnTheFirstChild()
     self.parser.initVar()
 
-  def cleanParamForm(self, btn):
+  def cleanParamForm(self, btn, dummy):
     if(self.paramForm.is_valid()):
       self.run()
     else:
@@ -169,10 +183,15 @@ class Reactor(object):
     if(not self._loadCmdModel()):
       return False
 
-    cmdParamFormKlass = import_class(self.cmdModel.classImportPath).ParamForm
+    return self._buildParamForm()
 
+  def _buildParamForm(self, finalDataDict={}):
+    cmdParamFormKlass = import_class(self.cmdModel.classImportPath).ParamForm
     self.paramForm = cmdParamFormKlass()
     self.paramForm._nextBtnClick = self.cleanParamForm
+    for field, finalData in finalDataDict.iteritems():
+      self.paramForm.fields[field].initData = finalData
+      self.paramForm.fields[field].finalData = finalData
     self.paramForm.generateFilterForm(*self.adapter.uiParam.values())
     self.paramForm.generateStepControl(cleanUpCrtFxn=self.adapter.cleanUpCrt)
     return True
