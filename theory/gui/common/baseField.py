@@ -7,6 +7,7 @@ from collections import OrderedDict
 import copy
 import datetime
 from decimal import Decimal, DecimalException
+from inspect import isclass
 import os
 import re
 import urlparse
@@ -131,7 +132,7 @@ class Field(object):
     #           most cases, the default widget is TextInput.
     #widget = widget or self.widget
     widget = self.widget
-    if(isinstance(widget, type)):
+    if(isclass(widget)):
       widget = self.widget(self.widgetSetter, self.widgetGetter, *args, **kwargs)
       # In some case, ListInput for example, their children input only want the
       # core part instead of the whole part including the instruction
@@ -248,7 +249,7 @@ class Field(object):
     cleaning."""
     # TODO: allow lazy update
     if(self._finalData in validators.EMPTY_VALUES):
-      if(isinstance(self.widget, type)):
+      if(isclass(self.widget)):
         # return initial data if widget has not been rendered
         return self.initData
       elif(self._finalData is not None):
@@ -979,13 +980,16 @@ class ListField(Field):
     kwargs["initData"] = initData
     super(ListField, self).__init__(*args, **kwargs)
 
-  def _setupInitData(self):
-    if(len(self.initData)!=0):
-      self.fields[0].initData = self.initData[0]
-      if(len(self.initData)>1):
-        for i in self.initData[1:]:
-          self.addChildField(i)
-    self._changedData = self._finalData = []
+  def _setupChildrenData(self, data, fieldName):
+    self.fields = [copy.deepcopy(self.childFieldTemplate),]
+    if(len(data)>0):
+      setattr(self.fields[0], fieldName, data[0])
+      if(len(data)>1):
+        for i in data[1:]:
+          self.addChildField(i, fieldName)
+      #if(not isinstance(self.widget, type)):
+      if(not isclass(self.widget)):
+        self.widget.childFieldLst = self.fields
 
   def renderWidget(self, *args, **kwargs):
     # widget -- A Widget class, or instance of a Widget class, that should
@@ -994,7 +998,7 @@ class ListField(Field):
     #           most cases, the default widget is TextInput.
     #widget = widget or self.widget
     widget = self.widget
-    if isinstance(widget, type):
+    if(isclass(widget)):
       # in order to check widget.widgetClass
       self.fields[0].renderWidget(*args, **kwargs)
       self.widget = widget(
@@ -1007,10 +1011,10 @@ class ListField(Field):
       self.widget.setupInstructionComponent()
       super(ListField, self).renderWidget(*args, **kwargs)
 
-  def addChildField(self, initData=None):
+  def addChildField(self, data, fieldName="initData"):
     field = copy.deepcopy(self.childFieldTemplate)
-    if(initData is not None):
-      field.initData = initData
+    if(data is not None):
+      setattr(field, fieldName, data)
     self.fields.append(field)
     return field
 
@@ -1055,9 +1059,9 @@ class ListField(Field):
 
   @initData.setter
   def initData(self, initData):
-    self.fields = [self.childFieldTemplate,]
     self._initData = initData
-    self._setupInitData()
+    self._setupChildrenData(initData, "initData")
+    self._changedData = self._finalData = []
 
   @property
   def changedData(self):
@@ -1072,7 +1076,8 @@ class ListField(Field):
     """It is used to store data directly from widget before validation and
     cleaning."""
     # TODO: allow lazy update
-    if(not isinstance(self.widget, type) and self.widget.isOverridedData):
+    if(isclass(self.widget) or self.widget.isOverridedData):
+    #if(not isinstance(self.widget, type) and self.widget.isOverridedData):
       # some widget like Multibuttonentry from the e17 need special treatment
       # on retriving data
       return super(ListField, self).finalData
@@ -1081,12 +1086,11 @@ class ListField(Field):
 
   @finalData.setter
   def finalData(self, finalData):
-    if(not isinstance(self.widget, type) and self.widget.isOverridedData):
+    if(isclass(self.widget) or self.widget.isOverridedData):
+    #if(not isinstance(self.widget, type) and self.widget.isOverridedData):
       Field.finalData.fset(self, finalData)
     else:
-      for i, field in enumerate(self.fields):
-        field.finalData = finalData[i]
-
+      self._setupChildrenData(finalData, "finalData")
 
 class DictField(Field):
   widget = DictInput
@@ -1113,24 +1117,32 @@ class DictField(Field):
     kwargs["initData"] = initData
     super(DictField, self).__init__(*args, **kwargs)
 
-  def _setupInitData(self):
-    i = 0
-    if(len(self.initData)!=0):
-      for k,v in self.initData.iteritems():
-        if(i==0):
-          self.keyFields[0].initData = k
-          self.valueFields[0].initData = v
-        else:
-          self.addChildField(k, v)
-        i += 1
-    self._changedData = self._finalData = {}
+  def _setupChildrenData(self, data, fieldName):
+    self.keyFields = [copy.deepcopy(self.childKeyFieldTemplate),]
+    self.valueFields = [copy.deepcopy(self.childValueFieldTemplate),]
 
-  def addChildField(self, initKeyData=None, initValueData=None):
+    if(len(data)!=0):
+      if(len(data)>1):
+        keys = data.keys()
+        setattr(self.keyFields[0], fieldName, keys[0])
+        setattr(self.valueFields[0], fieldName, data[keys[0]])
+        #setattr(self.valueFields[0], fieldName, self.finalData[keys[0]])
+        for i in range(1, len(keys)):
+          self.addChildField(keys[i], data[keys[i]], fieldName)
+
+      if(not isinstance(self.widget, type)):
+        self.widget.childFieldPairLst = []
+        for i in range(len(self.keyFields)):
+          self.widget.childFieldPairLst.append(
+              (self.keyFields[i], self.valueFields[i])
+          )
+
+  def addChildField(self, keyData, valueData, fieldName="initData"):
     keyField = copy.deepcopy(self.childKeyFieldTemplate)
     valueField = copy.deepcopy(self.childValueFieldTemplate)
-    if(initKeyData is not None and initValueData is not None):
-      keyField.initData = initKeyData
-      valueField.initData = initValueData
+    if(keyData is not None and valueData is not None):
+      setattr(keyField, fieldName, keyData)
+      setattr(valueField, fieldName, valueData)
     self.keyFields.append(keyField)
     self.valueFields.append(valueField)
     return (keyField, valueField)
@@ -1153,7 +1165,15 @@ class DictField(Field):
     valueOrderedDictLen = len(valueOrderedDict)
     if self.required and valueOrderedDictLen<self.min_len:
       raise ValidationError(self.error_messages['required'])
-    if(valueOrderedDictLen!=len(self.keyFields)
+    if(valueOrderedDictLen==0
+        and len(self.keyFields)==1
+        and self.keyFields[0].finalData==self.keyFields[0].initData
+        and len(self.valueFields)==1
+        and self.valueFields[0].finalData==self.valueFields[0].initData
+        ):
+      # User has not modified anything
+      pass
+    elif(valueOrderedDictLen!=len(self.keyFields)
         or valueOrderedDictLen!=len(self.valueFields)):
       raise ValidationError(self.error_messages['lenUnmatch'])
 
@@ -1184,10 +1204,9 @@ class DictField(Field):
 
   @initData.setter
   def initData(self, initData):
-    self.keyFields = [self.childKeyFieldTemplate, ]
-    self.valueFields = [self.childValueFieldTemplate, ]
     self._initData = initData
-    self._setupInitData()
+    self._setupChildrenData(initData, "initData")
+    self._changedData = self._finalData = {}
 
   # This is a special case of overriding multiple property methods
   # This class now has an this propertyField with a modified getter
@@ -1200,7 +1219,7 @@ class DictField(Field):
     """It is used to store data directly from widget before validation and
     cleaning."""
     # TODO: allow lazy update
-    if(not isinstance(self.widget, type) and self.widget.isOverridedData):
+    if(isclass(self.widget) or self.widget.isOverridedData):
       # some widget like Multibuttonentry from the e17 need special treatment
       # on retriving data
       return super(DictField, self).finalData
@@ -1215,11 +1234,7 @@ class DictField(Field):
     if(not isinstance(self.widget, type) and self.widget.isOverridedData):
       Field.finalData.fset(self, finalData)
     else:
-      i = 0
-      for keyData, valueData in finalData.iteritems():
-        self.keyFields[i].finalData = keyData
-        self.valueFields[i].finalData = valueData
-        i += 1
+      self._setupChildrenData(finalData, "finalData")
 
   def run_validators(self, valueDict):
     if valueDict in validators.EMPTY_VALUES:
