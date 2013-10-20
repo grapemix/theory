@@ -53,8 +53,19 @@ class GuiFormBase(FormBase, BasePacker):
     self.unFocusFxn = unFocusFxn
     self._createFormSkeleton(win, bx)
 
+    focusChgFxnNameTmpl = "{0}FocusChgCallback"
+    contentChgFxnNameTmpl = "{0}ContentChgCallback"
+
     for name, field in self.fields.items():
-      field.renderWidget(self.win, self.formBx.obj)
+      kwargs = {}
+      focusChgFxnName = focusChgFxnNameTmpl.format(name)
+      contentChgFxnName = contentChgFxnNameTmpl.format(name)
+      if(hasattr(self, focusChgFxnName)):
+        kwargs["focusChgFxn"] = getattr(self, focusChgFxnName)
+      elif(hasattr(self, contentChgFxnName)):
+        kwargs["contentChgFxn"] = getattr(self, contentChgFxnName)
+
+      field.renderWidget(self.win, self.formBx.obj, attrs=kwargs)
       self.formBx.addInput(field.widget)
 
     self.formBx.postGenerate()
@@ -69,15 +80,27 @@ class GuiFormBase(FormBase, BasePacker):
         {"unFocusFxn": self.unFocusFxn}
         )
     self.optionalMenu = optionalMenu
+
     i = 0
+    focusChgFxnNameTmpl = "{0}FocusChgCallback"
+    contentChgFxnNameTmpl = "{0}ContentChgCallback"
+
     for name, field in self.fields.items():
+      kwargs = {}
+      focusChgFxnName = focusChgFxnNameTmpl.format(name)
+      contentChgFxnName = contentChgFxnNameTmpl.format(name)
+      if(hasattr(self, focusChgFxnName)):
+        kwargs["focusChgFxn"] = getattr(self, focusChgFxnName)
+      elif(hasattr(self, contentChgFxnName)):
+        kwargs["contentChgFxn"] = getattr(self, contentChgFxnName)
+
       if(field.required):
-        field.renderWidget(self.win, self.formBx.obj)
+        field.renderWidget(self.win, self.formBx.obj, attrs=kwargs)
         self.formBx.addInput(field.widget)
         if(self.firstRequiredInputIdx==-1):
           self.firstRequiredInputIdx = i
       else:
-        field.renderWidget(self.win, self.formBx.obj)
+        field.renderWidget(self.win, self.formBx.obj, attrs=kwargs)
         optionalMenu.addInput(name, field.widget)
       i += 1
 
@@ -119,11 +142,6 @@ class StepFormBase(GuiFormBase):
     self.stepControlBox.addWidget(btn)
 
     self.stepControlBox.postGenerate()
-
-  def fillFinalFields(self, kwargs):
-    for k,v in kwargs.iteritems():
-      self.fields[k].finalData = v
-      #self.fields[k].widget.reset(finalData=v)
 
 class CommandFormBase(StepFormBase):
   def _nextBtnClick(self):

@@ -143,6 +143,7 @@ class Reactor(object):
       self._buildParamForm(
           json.loads(self.historyModel[self.historyIndex].jsonData)
       )
+
   def _escapeRequest(self, entrySetterFxn):
     self.historyIndex = -1
     entrySetterFxn("")
@@ -190,11 +191,12 @@ class Reactor(object):
     self.paramForm = cmdParamFormKlass()
     self.paramForm._nextBtnClick = self.cleanParamForm
 
-    for field, finalData in finalDataDict.iteritems():
-      self.paramForm.fields[field].initData = finalData
-      self.paramForm.fields[field].finalData = finalData
+    for fieldName, data in finalDataDict.iteritems():
+      self.paramForm.fields[fieldName].initData = data
+
     self.paramForm.generateFilterForm(*self.adapter.uiParam.values())
     self.paramForm.generateStepControl(cleanUpCrtFxn=self.adapter.cleanUpCrt)
+
     return True
 
   def _parse(self):

@@ -35,11 +35,11 @@ class E17Widget(object):
 
   def __init__(self, attrs=None, *args, **kwargs):
     self.obj = None
-    self.attrs = {\
-        "isFillAlign": False, \
-        "isFocus": False,\
-        "isWeightExpand": False,\
-        "initData": None,\
+    self.attrs = {
+        "isFillAlign": False,
+        "isFocus": False,
+        "isWeightExpand": False,
+        "initData": None,
     }
 
     if attrs is not None:
@@ -546,6 +546,8 @@ class Entry(E17Widget):
       en.callback_changed_add(self._contentChanged)
     if(self.attrs["autoFocus"]):
       en.focus_set(1)
+    if(hasattr(self, "_focusChanged")):
+      en.callback_unfocused_add(self._focusChanged)
 
     if(self.attrs["isSingleLine"]):
       en.single_line_set(True)
@@ -568,8 +570,13 @@ class Entry(E17Widget):
   def finalData(self, finalData):
     self.reset(finalData=finalData)
 
-  def reset(self, finalData=""):
-    self.obj.entry_set(finalData)
+  def reset(self, **kwargs):
+    txt = ""
+    if(kwargs.has_key("initData")):
+      txt = kwargs["initData"]
+    elif(kwargs.has_key("finalData")):
+      txt = kwargs["finalData"]
+    self.obj.entry_set(txt)
 
 class Button(E17Widget):
   icon = None
@@ -642,9 +649,17 @@ class RadioBox(E17Widget):
 
     super(RadioBox, self).__init__(defaultAttrs, *args, **kwargs)
     self.obj = None
+    self.objLst = []
 
   def _addRadioChoice(self, value, label, icon=None):
     rd = elementary.Radio(self.win)
+    if(hasattr(self, "_focusChanged")):
+      # callback_unfocused_add is not working as we expected, so we use
+      # callback_changed in here
+      rd.callback_changed_add(self._focusChanged)
+    if(hasattr(self, "_contentChanged")):
+      rd.callback_changed_add(self._contentChanged)
+
     rd.text_set(label)
     rd.state_value_set(len(self.dataChoice))
     self.dataChoice.append(value)
@@ -671,20 +686,26 @@ class RadioBox(E17Widget):
     self.obj = elementary.Box(self.win)
     self.obj.show()
 
-    #self.finalData = self.attrs["choices"]
     self.reset(choices=self.attrs["choices"], initData=self.attrs["initData"])
 
-  def reset(self, choices=[], initData=None, finalData=None):
+  def reset(self, choices=None, initData=None, finalData=None):
     selectedData = initData if finalData is None else finalData
     isRedraw = False
-    if(choices!=[]):
+    if(choices is not None):
       self.attrs["choices"] = choices
       isRedraw = True
 
     if(finalData is not None):
       isRedraw = True
+      if(choices is None):
+        # That is only finalData has been assigned, but the choices remain the
+        # same
+        choices = self.attrs["choices"]
 
     if(isRedraw):
+      for i in self.objLst:
+        i.delete()
+      self.obj.unpack_all()
       self.rdg = None
       self.objLst = []
       self.dataChoice= []
@@ -853,7 +874,8 @@ class Multibuttonentry(E17Widget):
   def finalData(self, finalData):
     self.reset(finalData=finalData)
 
-  def reset(self, finalData=None):
-    for s in finaData:
+  def reset(self, initData=[], finalData=[]):
+    data = initData if(len(initData)>0) else finalData
+    for s in data:
       self.obj.item_append(s)
 

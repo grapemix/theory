@@ -7,6 +7,7 @@ from theory.command.baseCommand import SimpleCommand
 from theory.conf import settings
 from theory.core.bridge import Bridge
 from theory.gui import field
+from theory.model import AppModel
 from theory.utils.importlib import import_class
 
 ##### Theory third-party lib #####
@@ -31,11 +32,12 @@ class ModelTblEdit(SimpleCommand):
   class ParamForm(SimpleCommand.ParamForm):
     appName = field.ChoiceField(label="Application Name",
         help_text="Commands provided by this application",
+        initData="theory",
         choices=(set([("theory", "theory")] +
           [(settings.INSTALLED_APPS[i], settings.INSTALLED_APPS[i])
             for i in range(len(settings.INSTALLED_APPS))])),
         )
-    modelName = field.TextField(label="Model Name",
+    modelName = field.ChoiceField(label="Model Name",
         help_text="The name of the model to be listed",
         )
     queryset = field.QuerysetField(required=False, label="Queryset",
@@ -45,6 +47,26 @@ class ModelTblEdit(SimpleCommand):
     #    help_text="Number of items per page",
     #    initData=50,
     #    required=False)
+
+
+    def __init__(self, *args, **kwargs):
+      super(SimpleCommand.ParamForm, self).__init__(*args, **kwargs)
+      appName = self.fields["appName"].initData
+      self.fields["modelName"].choices = self._getModelNameChoices(appName)
+
+    def _getModelNameChoices(self, appName):
+      return set(
+          [(i.name, i.name) for i in AppModel.objects.filter(app=appName)]
+      )
+
+    def appNameFocusChgCallback(self, *args, **kwargs):
+      field = self.fields["appName"]
+      appName = field.clean(field.finalData)
+      field.finalData = None
+
+      field = self.fields["modelName"]
+      field.choices = self._getModelNameChoices(appName)
+      field.widget.reset(choices=field.choices)
 
   @property
   def queryset(self):

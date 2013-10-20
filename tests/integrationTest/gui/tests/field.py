@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 ##### System wide lib #####
+from collections import OrderedDict
 import copy
 from ludibrio import Stub
 import os
@@ -216,7 +217,7 @@ class ListFieldTestCase(FieldTestCaseBase):
     #return [self._getFieldKlass(field) for field in __all__ if(field not in self.complexField)]
 
   def extraInitParam(self):
-    return {"field": self._getFieldKlass("TextFieldTestCase")()}
+    return {"field": self._getFieldKlass("BooleanFieldTestCase")()}
 
   def testEmptyInitValue(self):
     self.field = self.fieldKlass(**self.extraInitParam())
@@ -231,17 +232,17 @@ class ListFieldTestCase(FieldTestCaseBase):
 
   def testSingleElementInitValue(self):
     param = self.extraInitParam()
-    param.update({"initData": ["1"]})
+    param.update({"initData": [True]})
     self.field = self.fieldKlass(**param)
-    self.assertEqual(self.field.initData, ['1'])
-    self.assertEqual(self.field.clean(self.field.finalData), ['1'])
+    self.assertEqual(self.field.initData, [True])
+    self.assertEqual(self.field.clean(self.field.finalData), [True])
 
   def testMultipleElementInitValue(self):
     param = self.extraInitParam()
-    param.update({"initData": ["1", "2"]})
+    param.update({"initData": [True, False]})
     self.field = self.fieldKlass(**param)
-    self.assertEqual(self.field.initData, ['1', '2'])
-    self.assertEqual(self.field.clean(self.field.finalData), ['1', '2'])
+    self.assertEqual(self.field.initData, [True, False])
+    self.assertEqual(self.field.clean(self.field.finalData), [True, False])
 
 class DictFieldTestCase(FieldTestCaseBase):
   fieldKlass = field.DictField
@@ -251,14 +252,19 @@ class DictFieldTestCase(FieldTestCaseBase):
     return  getattr(getattr(self.thisModule, fieldName), "fieldKlass")
 
   def getInitData(self):
-    return None
+    return OrderedDict((("",""),))
 
   def extraInitParam(self):
-    return {"field": self._getFieldKlass("TextFieldTestCase")()}
+    return {
+        "keyField": self._getFieldKlass("TextFieldTestCase")(),
+        "valueField": self._getFieldKlass("TextFieldTestCase")(),
+        "initData": {},
+    }
     #return dict((field, self._getFieldKlass(field)) for field in __all__ if(field not in self.complexField))
 
   def testEmptyFinalValue(self):
     self.field = self.fieldKlass(**self.extraInitParam())
+    self.field.min_len = 5
     with self.assertRaises(ValidationError):
       self.field.clean(self.field.finalData)
     self.field.min_len = 0

@@ -50,6 +50,10 @@ class BasePacker(object):
   def _createWidget(self, *args, **kwargs):
     widget = self.widgetClass(self.attrs)
     widget.win = self.win
+    if(self.attrs.has_key("focusChgFxn")):
+      widget._focusChanged = self.attrs["focusChgFxn"]
+    elif(self.attrs.has_key("contentChgFxn")):
+      widget._contentChanged = self.attrs["contentChgFxn"]
     return (widget,)
 
   def _createContainer(self, attrs=None, *args, **kwargs):
@@ -193,6 +197,10 @@ class BaseLabelInput(BaseFieldInput):
   @abstractmethod
   def updateField(self):
     pass
+
+  def reset(self, **kwargs):
+    """ To redraw the element when data got update"""
+    self.widgetLst[0].reset(**kwargs)
 
 class StringInput(BaseLabelInput):
   widgetClass = element.Entry
@@ -598,6 +606,32 @@ class ListInput(BaseLabelInput):
       for idx in range(len(self._inputLst)):
         self._inputLst[idx].updateField()
 
+  def reset(self, **kwargs):
+    """ data should be in the format like:
+      {
+        "finalData": (1, 0),
+        "choices": ((0, "False"), (1, "True")),
+      }
+    """
+    kwargsKeys = kwargs.keys()
+    widgetLstLen = len(self.widgetLst) - 1
+    self._inputLst = []
+    for i in range(widgetLstLen):
+      del self.widgetLst[0]
+    self.mainContainer.content.removeWidgetLst(0, widgetLstLen)
+    widgetLst = self._createWidget()
+    self.widgetLst = widgetLst + self.widgetLst
+
+    self.mainContainer.content.insertAndGenerateWidget(0 , widgetLst)
+
+    for i, input in enumerate(self._inputLst):
+      if(i>=len(kwargsKeys)):
+        break
+      row = {}
+      for k in kwargsKeys:
+        row[k] = kwargs[k][i]
+      input.reset(**row)
+
 class DictInput(ListInput):
   def __init__(self, fieldSetter, fieldGetter, win, bx, addChildFieldFxn,
       removeChildFieldFxn, childFieldPairLst, attrs=None, *args, **kwargs):
@@ -712,6 +746,64 @@ class DictInput(ListInput):
     self.btnIdxMap[btnHash] = idx
     buttonControlBox.addWidget(btn)
     return (keyInputBox, valueInputBox, buttonControlBox,)
+
+  def reset(self, **kwargs):
+    """ Always assume childFieldPairLst is consistent with initData and
+    finalData. Data should be in the format like:
+      {
+        "finalData": OrderedDict(
+            {"key": keyValue, "value: value"},
+            {"key": keyValue, "value: value"},
+        ),
+      }
+    """
+    widgetLstLen = len(self.widgetLst) - 1
+    for i in range(widgetLstLen):
+      del self.widgetLst[0]
+    self.mainContainer.content.removeWidgetLst(0, widgetLstLen)
+    widgetLst = self._createWidget()
+    self.widgetLst = widgetLst + self.widgetLst
+
+    self.mainContainer.content.insertAndGenerateWidget(0 , widgetLst)
+
+    # Unpack data and reset all child widget
+    kwargsKeyLst = kwargs.keys()
+    fieldNameDataKeyDict = {}
+
+    keyLstToBeDel = []
+
+    for i, k in enumerate(kwargsKeyLst):
+      if(k.endswith("Data")):
+        fieldNameDataKeyDict[k] = kwargs[k].keys()
+        keyLstToBeDel.append(i)
+
+    for i in keyLstToBeDel:
+      del kwargsKeyLst[i]
+
+    for i in range(len(self.childFieldPairLst)):
+      idx = i * 2
+
+      row = {}
+      for k in kwargsKeyLst:
+        row[k] = kwargs[k][idx]
+
+      for fieldName, dataKey in fieldNameDataKeyDict.iteritems():
+        row[fieldName] = dataKey[i]
+
+      keyInputBox = self.childFieldPairLst[i][0].widget
+      keyInputBox.reset(**row)
+
+      idx += 1
+      row = {}
+
+      for k in kwargsKeyLst:
+        row[k] = kwargs[k][idx]
+
+      for fieldName, dataKey in fieldNameDataKeyDict.iteritems():
+        row[fieldName] = kwargs[fieldName][dataKey[i]]
+
+      valueInputBox = self.childFieldPairLst[i][1].widget
+      valueInputBox.reset(**row)
 
 class FilterFormLayout(BasePacker):
   def __init__(self, win, bxInput, attrs=None, *args, **kwargs):
