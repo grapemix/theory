@@ -43,6 +43,7 @@ class FieldTestCaseBase(unittest.TestCase):
   def __init__(self, *args, **kwargs):
     super(FieldTestCaseBase, self).__init__(*args, **kwargs)
     self.testCaseFileAbsPath = os.path.join(os.path.dirname(os.path.dirname(__file__)), "testsFile", "field")
+    self.dummyWin = None
 
   def setUp(self):
     pass
@@ -65,6 +66,10 @@ class FieldTestCaseBase(unittest.TestCase):
     initParam.update({"initData": self.getInitData()})
 
     self.field = self.fieldKlass(**initParam)
+    self.renderWidget(self.field)
+
+  def renderWidget(self, field, *args, **kwargs):
+    pass
 
 class BooleanFieldTestCase(FieldTestCaseBase):
   fieldKlass = field.BooleanField
@@ -137,11 +142,15 @@ class ChoiceFieldTestCase(FieldTestCaseBase):
         initData=1)
     self.assertEqual(self.field.initData, 1)
     self.assertEqual(self.field.finalData, 1)
+    self.renderWidget(self.field)
+    self.assertEqual(self.field.initData, 1)
+    self.assertEqual(self.field.finalData, 1)
     self.field.finalData = 2
     self.assertEqual(self.field.clean(self.field.finalData), '2')
 
   def testRequiredValidation(self):
     self.field = self.fieldKlass(choices=((1, "A"), (2, "B"), ))
+    #self.renderWidget(self.field)
     with self.assertRaises(ValidationError):
       self.assertEqual(self.field.clean(self.field.finalData), '')
     self.field.required = False
@@ -199,12 +208,22 @@ class ImageFieldTestCase(FileFieldTestCase):
 class StringGroupFilterFieldTestCase(FieldTestCaseBase):
   fieldKlass = field.StringGroupFilterField
   def getInitData(self):
-    return (("A", ("a", "b",)),("B", ("c", "d", "e")), ("C", ("f", "g",)))
+    return (
+        ("A", (("a", True), ("b", False))),
+        ("B", (("c", False), ("d", False), ("e", False))),
+        ("C", (("f", True), ("g", True)))
+    )
 
 class ModelValidateGroupFieldTestCase(FieldTestCaseBase):
   fieldKlass = field.ModelValidateGroupField
   def getInitData(self):
-    return list(BinaryClassifierHistory(ref=None, initState=True, finalState=False))
+    return [
+        BinaryClassifierHistory(
+          ref=Adapter.objects.all()[0],
+          initState=[True],
+          finalState=[False],
+        )
+    ]
 
 class ListFieldTestCase(FieldTestCaseBase):
   fieldKlass = field.ListField
@@ -221,10 +240,12 @@ class ListFieldTestCase(FieldTestCaseBase):
 
   def testEmptyInitValue(self):
     self.field = self.fieldKlass(**self.extraInitParam())
+    self.renderWidget(self.field)
     self.assertEqual(self.field.initData, [])
 
   def testEmptyFinalValue(self):
     self.field = self.fieldKlass(**self.extraInitParam())
+    self.renderWidget(self.field)
     with self.assertRaises(ValidationError):
       self.assertEqual(self.field.clean(self.field.finalData), [])
     self.field.min_len = 0
@@ -234,6 +255,7 @@ class ListFieldTestCase(FieldTestCaseBase):
     param = self.extraInitParam()
     param.update({"initData": [True]})
     self.field = self.fieldKlass(**param)
+    self.renderWidget(self.field)
     self.assertEqual(self.field.initData, [True])
     self.assertEqual(self.field.clean(self.field.finalData), [True])
 
@@ -241,6 +263,7 @@ class ListFieldTestCase(FieldTestCaseBase):
     param = self.extraInitParam()
     param.update({"initData": [True, False]})
     self.field = self.fieldKlass(**param)
+    self.renderWidget(self.field)
     self.assertEqual(self.field.initData, [True, False])
     self.assertEqual(self.field.clean(self.field.finalData), [True, False])
 
@@ -264,6 +287,7 @@ class DictFieldTestCase(FieldTestCaseBase):
 
   def testEmptyFinalValue(self):
     self.field = self.fieldKlass(**self.extraInitParam())
+    self.renderWidget(self.field)
     self.field.min_len = 5
     with self.assertRaises(ValidationError):
       self.field.clean(self.field.finalData)
@@ -274,6 +298,7 @@ class DictFieldTestCase(FieldTestCaseBase):
   #  param = self.extraInitParam()
   #  param.update({"initData": {"1": "a"}})
   #  self.field = self.fieldKlass(**param)
+  #  self.renderWidget(self.field)
   #  self.assertEqual(self.field.initData, {"1": "a"})
   #  self.assertEqual(self.field.clean(self.field.finalData), {"1": "a"})
 
@@ -281,6 +306,7 @@ class DictFieldTestCase(FieldTestCaseBase):
   #  param = self.extraInitParam()
   #  param.update({"initData": {"1": "a", "2": "b"}})
   #  self.field = self.fieldKlass(**param)
+  #  self.renderWidget(self.field)
   #  self.assertEqual(self.field.initData, {"1": "a", "2": "b"})
   #  self.assertEqual(self.field.clean(self.field.finalData), {"1": "a", "2": "b"})
 
@@ -292,6 +318,7 @@ class PythonModuleFieldTestCase(FieldTestCaseBase):
 
   def setUp(self):
     self.field = self.fieldKlass(auto_import=True)
+    self.renderWidget(self.field)
 
   def testValidatePlain(self):
     self.field.auto_import = False
@@ -312,6 +339,7 @@ class PythonClassFieldTestCase(FieldTestCaseBase):
 
   def setUp(self):
     self.field = self.fieldKlass(auto_import=True)
+    self.renderWidget(self.field)
 
   def testValidatePlain(self):
     self.field.auto_import = False

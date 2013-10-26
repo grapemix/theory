@@ -9,6 +9,7 @@
 from .field import *
 from .form import *
 from .transformer import *
+from .etk.widget import *
 
 ##### Theory app #####
 
