@@ -263,6 +263,9 @@ class CheckBoxInput(BaseLabelInput):
   def changedData(self):
     pass
 
+  def updateField(self):
+    self.fieldSetter({"finalData": self.widgetLst[0].finalData})
+
 class FileselectInput(BaseLabelInput):
   widgetClass = element.FileSelector
 
@@ -353,8 +356,8 @@ class TimeInput(StringInput):
     return value
 
 class StringGroupFilterInput(BaseLabelInput):
-  widgetClass = element.ListModelValidator
-  #widgetClass = element.ListValidator
+  #widgetClass = element.ListModelValidator
+  widgetClass = element.ListValidator
 
   def __init__(self, fieldSetter, fieldGetter, win, bx, attrs=None, *args, **kwargs):
     attrs = self._buildAttrs(attrs, initData=())
@@ -363,6 +366,9 @@ class StringGroupFilterInput(BaseLabelInput):
   @property
   def changedData(self):
     return self.widgetLst[0].changedData
+
+  def updateField(self):
+    self.fieldSetter({"finalData": self.widgetLst[0].finalData})
 
 class ModelValidateGroupInput(BaseLabelInput):
   widgetClass = element.ListModelValidator
@@ -399,14 +405,15 @@ class MultipleValueInput(BaseLabelInput):
     pass
 
 class ListInput(BaseLabelInput):
-  def __init__(self, fieldSetter, fieldGetter, win, bx, childFieldLst, \
-      addChildFieldFxn, removeChildFieldFxn, attrs=None, *args, **kwargs):
+  def __init__(self, fieldSetter, fieldGetter, win, bx, childFieldLst,
+      addChildFieldFxn, removeChildFieldFxn, widgetClass, attrs=None,
+      *args, **kwargs):
     attrs = self._buildAttrs(
         attrs,
         isExpandMainContainer=True,
         initData=()
     )
-    if(childFieldLst[0].widget.widgetClass==StringInput.widgetClass):
+    if(widgetClass==StringInput.widgetClass):
       if(childFieldLst[0].max_length>20):
         widgetClass = TextInput.widgetClass
         self._createWidget = self._createLongStringWidget
@@ -417,7 +424,6 @@ class ListInput(BaseLabelInput):
       self.fieldGetter = fieldGetter
       self.isOverridedData = True
     else:
-      widgetClass = childFieldLst[0].widget.widgetClass
       self._createWidget = self._initGenericWidget
       self.isOverridedData = False
 
@@ -447,10 +453,10 @@ class ListInput(BaseLabelInput):
 
     idx += 1
 
-    newChildField = self.addChildField()
+    newChildField = self.addChildField(None)
     widgetLst = self._createGenericWidget(newChildField, idx)
 
-    startIdx = idx * self.numOfNewWidget
+    startIdx = ( idx - 1 ) * self.numOfNewWidget + 1
 
     for i in range(self.numOfNewWidget - 1, -1, -1):
       widget = widgetLst[i]
@@ -461,7 +467,7 @@ class ListInput(BaseLabelInput):
   def _rmDataWidget(self, btn, btnHash):
     """Will be only called by generic widget."""
     idx = self.btnIdxMap[btnHash]
-    startIdx = idx * self.numOfNewWidget
+    startIdx = ( idx - 1 ) * self.numOfNewWidget + 1
 
     for i in range(startIdx, startIdx + self.numOfNewWidget):
       del self.widgetLst[startIdx]
@@ -551,9 +557,9 @@ class ListInput(BaseLabelInput):
     return (widget,)
 
   def _initGenericWidget(self):
-    widgetLst = []
+    widgetLst = [self._createGenericWidgetBtnControlBox(0, True),]
     for i, field in enumerate(self.childFieldLst):
-      widgetLst.extend(self._createGenericWidget(field, i))
+      widgetLst.extend(self._createGenericWidget(field, i + 1))
     return widgetLst
 
   def _createGenericWidget(self, newChildField, idx):
@@ -567,6 +573,13 @@ class ListInput(BaseLabelInput):
     input.packInMainContainer()
     self._inputLst.append(input)
 
+    buttonControlBox = self._createGenericWidgetBtnControlBox(idx)
+
+    result = list(input.widgetLst)
+    result.append(buttonControlBox)
+    return result
+
+  def _createGenericWidgetBtnControlBox(self, idx, isFirstBtn=False):
     buttonControlBox = self._createContainer({
         "isHorizontal": True,
         "isWeightExpand": False,
@@ -583,16 +596,15 @@ class ListInput(BaseLabelInput):
     self.btnIdxMap[btnHash] = idx
     buttonControlBox.addWidget(btn)
 
-    btn = element.Button({"isWeightExpand": True, "isFillAlign": False,})
-    btn.win = self.win
-    btn.label = "Remove"
-    btn._clicked = self._rmDataWidget
-    btn._clickedData = btnHash
-    self.btnIdxMap[btnHash] = idx
-    buttonControlBox.addWidget(btn)
-    result = list(input.widgetLst)
-    result.append(buttonControlBox)
-    return result
+    if(not isFirstBtn):
+      btn = element.Button({"isWeightExpand": True, "isFillAlign": False,})
+      btn.win = self.win
+      btn.label = "Remove"
+      btn._clicked = self._rmDataWidget
+      btn._clickedData = btnHash
+      buttonControlBox.addWidget(btn)
+
+    return buttonControlBox
 
   def updateField(self):
     if(self.widgetClass == element.Multibuttonentry
@@ -614,15 +626,15 @@ class ListInput(BaseLabelInput):
       }
     """
     kwargsKeys = kwargs.keys()
-    widgetLstLen = len(self.widgetLst) - 1
+    widgetLstLen = len(self.widgetLst) - 2
     self._inputLst = []
     for i in range(widgetLstLen):
-      del self.widgetLst[0]
-    self.mainContainer.content.removeWidgetLst(0, widgetLstLen)
+      del self.widgetLst[1]
+    self.mainContainer.content.removeWidgetLst(1, widgetLstLen)
     widgetLst = self._createWidget()
     self.widgetLst = widgetLst + self.widgetLst
 
-    self.mainContainer.content.insertAndGenerateWidget(0 , widgetLst)
+    self.mainContainer.content.insertAndGenerateWidget(1 , widgetLst)
 
     for i, input in enumerate(self._inputLst):
       if(i>=len(kwargsKeys)):
@@ -656,8 +668,8 @@ class DictInput(ListInput):
         fieldSetter, fieldGetter, win, bx, attrs, *args, **kwargs)
 
   def _createWidget(self, *args, **kwargs):
-    widgetBoxLst = []
-    i = 0
+    widgetBoxLst = [self._createGenericWidgetBtnControlBox(0, True),]
+    i = 1
     for (keyField, valueField) in self.childFieldPairLst:
       widgetBoxLst.extend(self._createGenericWidget((keyField, valueField), i))
       i += 1
@@ -721,6 +733,10 @@ class DictInput(ListInput):
     valueField.widget.widgetLst = list(valueField.widget._createWidget())
     valueInputBox.addWidget(valueField.widget.widgetLst[0])
 
+    buttonControlBox = self._createGenericWidgetBtnControlBox(idx)
+    return (keyInputBox, valueInputBox, buttonControlBox,)
+
+  def _createGenericWidgetBtnControlBox(self, idx, isFirstBtn=False):
     buttonControlBox = self._createContainer(
         {
           "isHorizontal": True,
@@ -738,14 +754,15 @@ class DictInput(ListInput):
     self.btnIdxMap[btnHash] = idx
     buttonControlBox.addWidget(btn)
 
-    btn = element.Button({"isWeightExpand": True, "isFillAlign": False,})
-    btn.win = self.win
-    btn.label = "Remove"
-    btn._clicked = self._rmDataWidget
-    btn._clickedData = btnHash
-    self.btnIdxMap[btnHash] = idx
-    buttonControlBox.addWidget(btn)
-    return (keyInputBox, valueInputBox, buttonControlBox,)
+    if(not isFirstBtn):
+      btn = element.Button({"isWeightExpand": True, "isFillAlign": False,})
+      btn.win = self.win
+      btn.label = "Remove"
+      btn._clicked = self._rmDataWidget
+      btn._clickedData = btnHash
+      buttonControlBox.addWidget(btn)
+
+    return buttonControlBox
 
   def reset(self, **kwargs):
     """ Always assume childFieldPairLst is consistent with initData and
@@ -757,14 +774,14 @@ class DictInput(ListInput):
         ),
       }
     """
-    widgetLstLen = len(self.widgetLst) - 1
+    widgetLstLen = len(self.widgetLst) - 2
     for i in range(widgetLstLen):
       del self.widgetLst[0]
-    self.mainContainer.content.removeWidgetLst(0, widgetLstLen)
+    self.mainContainer.content.removeWidgetLst(1, widgetLstLen)
     widgetLst = self._createWidget()
     self.widgetLst = widgetLst + self.widgetLst
 
-    self.mainContainer.content.insertAndGenerateWidget(0 , widgetLst)
+    self.mainContainer.content.insertAndGenerateWidget(1 , widgetLst)
 
     # Unpack data and reset all child widget
     kwargsKeyLst = kwargs.keys()
