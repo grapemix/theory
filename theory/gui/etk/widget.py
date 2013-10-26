@@ -406,30 +406,17 @@ class MultipleValueInput(BaseLabelInput):
 
 class ListInput(BaseLabelInput):
   def __init__(self, fieldSetter, fieldGetter, win, bx, childFieldLst,
-      addChildFieldFxn, removeChildFieldFxn, widgetClass, attrs=None,
-      *args, **kwargs):
+      addChildFieldFxn, removeChildFieldFxn, attrs=None, *args, **kwargs):
     attrs = self._buildAttrs(
         attrs,
         isExpandMainContainer=True,
         initData=()
     )
-    if(widgetClass==StringInput.widgetClass):
-      if(childFieldLst[0].max_length>20):
-        widgetClass = TextInput.widgetClass
-        self._createWidget = self._createLongStringWidget
-      else:
-        widgetClass = element.Multibuttonentry
-        self._createWidget = self._createShortStringWidget
-      self.fieldSetter = fieldSetter
-      self.fieldGetter = fieldGetter
-      self.isOverridedData = True
-    else:
-      self._createWidget = self._initGenericWidget
-      self.isOverridedData = False
 
-      self.addChildField = addChildFieldFxn
-      self.removeChildField = removeChildFieldFxn
-    self.widgetClass = widgetClass
+    self.fieldSetter = fieldSetter
+    self.fieldGetter = fieldGetter
+    self.addChildField = addChildFieldFxn
+    self.removeChildField = removeChildFieldFxn
 
     self._inputLst = []
     self.childFieldLst = childFieldLst
@@ -488,6 +475,27 @@ class ListInput(BaseLabelInput):
 
   def _createWidget(self):
     pass
+
+  def _probeChildWidget(self, childFieldTemplate):
+    self.widgetClass = childFieldTemplate.widget.widgetClass
+
+    if(self.widgetClass==StringInput.widgetClass):
+      if(hasattr(childFieldTemplate, "max_length") \
+          and childFieldTemplate.max_length>20):
+        self.widgetClass = TextInput.widgetClass
+        self._createWidget = self._createLongStringWidget
+      else:
+        self.widgetClass = element.Multibuttonentry
+        self._createWidget = self._createShortStringWidget
+      self.isOverridedData = True
+      del self.addChildField
+      del self.removeChildField
+    else:
+      self._createWidget = self._initGenericWidget
+      self.isOverridedData = False
+      del self.fieldSetter
+      del self.fieldGetter
+
 
   def _createShortStringWidget(self, *args, **kwargs):
     """The adding child mechanism is handled by the widget itself."""

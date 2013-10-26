@@ -1001,8 +1001,8 @@ class ListField(Field):
           childFieldLst=self.fields,
           addChildFieldFxn=self.addChildField,
           removeChildFieldFxn=self.removeChildField,
-          widgetClass=self.childFieldTemplate.widget.widgetClass,
           *args, **kwargs)
+      self.widget._probeChildWidget(self.childFieldTemplate)
       self.widget.setupInstructionComponent()
       super(ListField, self).renderWidget(*args, **kwargs)
 
