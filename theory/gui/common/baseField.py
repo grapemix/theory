@@ -972,7 +972,7 @@ class ListField(Field):
     # required validation will be handled by ListField, not by those
     # individual fields.
     field.required = False
-    self.fields = [field,]
+    self.fields = []
     self.childFieldTemplate = copy.deepcopy(field)
     # It stores the minium number of elements is required in this field
     self.min_len = min_len
@@ -981,15 +981,11 @@ class ListField(Field):
     super(ListField, self).__init__(*args, **kwargs)
 
   def _setupChildrenData(self, data, fieldName):
-    self.fields = [copy.deepcopy(self.childFieldTemplate),]
-    if(len(data)>0):
-      setattr(self.fields[0], fieldName, data[0])
-      if(len(data)>1):
-        for i in data[1:]:
-          self.addChildField(i, fieldName)
-      #if(not isinstance(self.widget, type)):
-      if(not isclass(self.widget)):
-        self.widget.childFieldLst = self.fields
+    for i in data:
+      self.addChildField(i, fieldName)
+    #if(not isinstance(self.widget, type)):
+    if(not isclass(self.widget)):
+      self.widget.childFieldLst = self.fields
 
   def renderWidget(self, *args, **kwargs):
     # widget -- A Widget class, or instance of a Widget class, that should
@@ -999,14 +995,13 @@ class ListField(Field):
     #widget = widget or self.widget
     widget = self.widget
     if(isclass(widget)):
-      # in order to check widget.widgetClass
-      self.fields[0].renderWidget(*args, **kwargs)
       self.widget = widget(
           self.widgetSetter,
           self.widgetGetter,
           childFieldLst=self.fields,
           addChildFieldFxn=self.addChildField,
           removeChildFieldFxn=self.removeChildField,
+          widgetClass=self.childFieldTemplate.widget.widgetClass,
           *args, **kwargs)
       self.widget.setupInstructionComponent()
       super(ListField, self).renderWidget(*args, **kwargs)
@@ -1060,6 +1055,7 @@ class ListField(Field):
   @initData.setter
   def initData(self, initData):
     self._initData = initData
+    self.fields = []
     self._setupChildrenData(initData, "initData")
     self._changedData = self._finalData = []
 
@@ -1107,8 +1103,8 @@ class DictField(Field):
     # individual fields.
     keyField.required = False
     valueField.required = False
-    self.keyFields = [keyField,]
-    self.valueFields = [valueField,]
+    self.keyFields = []
+    self.valueFields = []
     self.childKeyFieldTemplate = copy.deepcopy(keyField)
     self.childValueFieldTemplate = copy.deepcopy(valueField)
     # It stores the minium number of elements is required in this field
@@ -1118,29 +1114,22 @@ class DictField(Field):
     super(DictField, self).__init__(*args, **kwargs)
 
   def _setupChildrenData(self, data, fieldName):
-    self.keyFields = [copy.deepcopy(self.childKeyFieldTemplate),]
-    self.valueFields = [copy.deepcopy(self.childValueFieldTemplate),]
+    keys = data.keys()
+    for i in range(len(keys)):
+      self.addChildField((keys[i], data[keys[i]]), fieldName)
 
-    if(len(data)!=0):
-      if(len(data)>1):
-        keys = data.keys()
-        setattr(self.keyFields[0], fieldName, keys[0])
-        setattr(self.valueFields[0], fieldName, data[keys[0]])
-        #setattr(self.valueFields[0], fieldName, self.finalData[keys[0]])
-        for i in range(1, len(keys)):
-          self.addChildField(keys[i], data[keys[i]], fieldName)
+    if(not isinstance(self.widget, type)):
+      self.widget.childFieldPairLst = []
+      for i in range(len(self.keyFields)):
+        self.widget.childFieldPairLst.append(
+            (self.keyFields[i], self.valueFields[i])
+        )
 
-      if(not isinstance(self.widget, type)):
-        self.widget.childFieldPairLst = []
-        for i in range(len(self.keyFields)):
-          self.widget.childFieldPairLst.append(
-              (self.keyFields[i], self.valueFields[i])
-          )
-
-  def addChildField(self, keyData, valueData, fieldName="initData"):
+  def addChildField(self, data, fieldName="initData"):
     keyField = copy.deepcopy(self.childKeyFieldTemplate)
     valueField = copy.deepcopy(self.childValueFieldTemplate)
-    if(keyData is not None and valueData is not None):
+    if(data is not None):
+      (keyData, valueData) = data
       setattr(keyField, fieldName, keyData)
       setattr(valueField, fieldName, valueData)
     self.keyFields.append(keyField)
@@ -1205,6 +1194,8 @@ class DictField(Field):
   @initData.setter
   def initData(self, initData):
     self._initData = initData
+    self.keyFields = []
+    self.valueFields = []
     self._setupChildrenData(initData, "initData")
     self._changedData = self._finalData = {}
 
