@@ -122,7 +122,11 @@ class Reactor(object):
       commandName = self.historyModel[self.historyIndex].commandName
       entrySetterFxn(commandName)
       self.parser.cmdInTxt = commandName
-      self.cmdModel = Command.objects.get(name=commandName)
+      try:
+        self.cmdModel = Command.objects.get(name=commandName)
+      except Command.DoesNotExist as errMsg:
+        print "{0} ({1})".format(errMsg, commandName)
+        raise
 
       self._buildParamForm(
           json.loads(self.historyModel[self.historyIndex].jsonData)
@@ -221,6 +225,8 @@ class Reactor(object):
   def reset(self):
     self.parser.initVar()
     self.cmdModel = None
+    self.paramForm.destroy()
+    del self.paramForm
     self.paramForm = None
     self.historyIndex = -1
 
