@@ -290,7 +290,8 @@ class Reactor(object):
 
     self._performDrums(cmd)
 
-    self._updateHistory(cmd.paramForm.toJson())
+    if(cmd.isSaveToHistory):
+      self._updateHistory(cmd.paramForm.toJson())
 
     self.reset()
 

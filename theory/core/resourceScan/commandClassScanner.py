@@ -74,10 +74,6 @@ class CommandClassScanner(BaseClassScanner):
         param = Parameter(name=k)
         if(getattr(getattr(cmdClass, k), "fset")==None):
           param.isReadOnly = True
-        if(k in getattr(cmdClass, "params")):
-          #param.isOptional = False
-          # To avoid duplicate
-          continue
         self.cmdModel.param.append(param)
 
     paramScanner = ParamScanner()
