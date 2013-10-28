@@ -32,7 +32,6 @@ class _BaseCommand(object):
   #abstract = True
   name = None
   verboseName = None
-  params = [] # TODO: del me
   paramForm = None
 
   # Make sure there has no attribute's name is the same as the notations
@@ -41,11 +40,12 @@ class _BaseCommand(object):
   # case with the first lower char. e.x.: FilenameList -> filenameList;
   # FilefileObjectList -> fileObjectList
 
-  _verbosity = 1
   _gongs = []
   _notations = []
   _drums = {}
-  # stderr should be seen in lig file
+  isSaveToHistory = True
+
+  # stderr should be seen in log file
 
   def __init__(self, *args, **kwargs):
     # Invocation via super doesn't call all the parents, it calls the next
@@ -65,7 +65,11 @@ class _BaseCommand(object):
   # 9) Work with adapter
 
   class ParamForm(CommandForm):
-    verbosity = field.IntegerField(label="verbosity", required=False)
+    verbosity = field.IntegerField(
+        label="verbosity",
+        required=False,
+        initData=1
+        )
     # Not being implemented in this version
     #notations = field.ListField(
     #    field.AdapterField(),
