@@ -217,9 +217,12 @@ class StringGroupFilterFieldTestCase(FieldTestCaseBase):
 class ModelValidateGroupFieldTestCase(FieldTestCaseBase):
   fieldKlass = field.ModelValidateGroupField
   def getInitData(self):
+    # Mocking a model which has links field
+    dummyModel = Adapter.objects.all()[0]
+    dummyModel.links = ["1"]
     return [
         BinaryClassifierHistory(
-          ref=Adapter.objects.all()[0],
+          ref=dummyModel,
           initState=[True],
           finalState=[False],
         )
