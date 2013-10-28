@@ -8,7 +8,7 @@ from theory.core.exceptions import ValidationError
 from theory.model import Adapter, BinaryClassifierHistory
 from theory.gui import field
 from theory.gui import widget
-from theory.gui.etk.element import Box
+from theory.gui.etk.element import Box, Multibuttonentry, Entry
 from theory.gui.form import *
 from theory.utils import unittest
 
@@ -157,7 +157,26 @@ class ModelValidateGroupFieldWidgetTestCase(
   pass
 
 class ListFieldWidgetTestCase(ListFieldTestCase, FieldWidgetTestCaseBase):
-  pass
+  def testTextWidget(self):
+    param = {
+        "field": self._getFieldKlass("TextFieldTestCase")(max_length=200),
+        "initData": ["aa", "bb"]
+    }
+    self.field = self.fieldKlass(**param)
+    self.renderWidget(self.field)
+    self.assertEqual(len(self.field.widget._inputLst), 1)
+    self.assertTrue(isinstance(self.field.widget._inputLst[0], Entry))
+
+  def testTextWidgetWithShortString(self):
+    param = {
+        "field": self._getFieldKlass("TextFieldTestCase")(max_length=2),
+        "initData": ["aa", "bb"]
+        }
+    self.field = self.fieldKlass(**param)
+    self.renderWidget(self.field)
+    self.assertTrue(
+        isinstance(self.field.widget._inputLst[0], Multibuttonentry)
+    )
 
 class DictFieldWidgetTestCase(DictFieldTestCase, FieldWidgetTestCaseBase):
   pass
