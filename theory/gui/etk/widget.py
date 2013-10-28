@@ -212,6 +212,7 @@ class StringInput(BaseLabelInput):
     self.fieldSetter({"finalData": self._getData()})
 
 class TextInput(StringInput):
+  lineBreak = "<br>"
   def __init__(self, fieldSetter, fieldGetter, win, bx,
       attrs=None, *args, **kwargs):
     attrs = self._buildAttrs(
@@ -484,6 +485,7 @@ class ListInput(BaseLabelInput):
           and childFieldTemplate.max_length>20):
         self.widgetClass = TextInput.widgetClass
         self._createWidget = self._createLongStringWidget
+        self.lineBreak = childFieldTemplate.lineBreak
       else:
         self.widgetClass = element.Multibuttonentry
         self._createWidget = self._createShortStringWidget
@@ -556,7 +558,7 @@ class ListInput(BaseLabelInput):
     }
 
     if(len(initDataLst)>0):
-      defaultParam["initData"] = initDataLst
+      defaultParam["initData"] = self.lineBreak.join(initDataLst)
 
     widget = self.widgetClass(defaultParam)
     widget.win = self.win
@@ -615,8 +617,13 @@ class ListInput(BaseLabelInput):
     return buttonControlBox
 
   def updateField(self):
-    if(self.widgetClass == element.Multibuttonentry
-        or self.widgetClass == TextInput.widgetClass):
+    if(self.widgetClass == element.Multibuttonentry):
+      self.fieldSetter(
+          {
+            "finalData": self._inputLst[0].finalData,
+          }
+      )
+    elif(self.widgetClass == TextInput.widgetClass):
       self.fieldSetter(
           {
             "finalData": self._inputLst[0].finalData.split("<br/>"),

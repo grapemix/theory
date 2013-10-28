@@ -236,7 +236,6 @@ class ListFieldTestCase(FieldTestCaseBase):
 
   def getInitData(self):
     return []
-    #return [self._getFieldKlass(field) for field in __all__ if(field not in self.complexField)]
 
   def extraInitParam(self):
     return {"field": self._getFieldKlass("BooleanFieldTestCase")()}
@@ -249,9 +248,10 @@ class ListFieldTestCase(FieldTestCaseBase):
   def testEmptyFinalValue(self):
     self.field = self.fieldKlass(**self.extraInitParam())
     self.renderWidget(self.field)
+    self.field.min_length = 5
     with self.assertRaises(ValidationError):
       self.assertEqual(self.field.clean(self.field.finalData), [])
-    self.field.min_len = 0
+    self.field.min_length = 0
     self.assertEqual(self.field.clean(self.field.finalData), [])
 
   def testSingleElementInitValue(self):
@@ -286,32 +286,15 @@ class DictFieldTestCase(FieldTestCaseBase):
         "valueField": self._getFieldKlass("TextFieldTestCase")(),
         "initData": {},
     }
-    #return dict((field, self._getFieldKlass(field)) for field in __all__ if(field not in self.complexField))
 
   def testEmptyFinalValue(self):
     self.field = self.fieldKlass(**self.extraInitParam())
     self.renderWidget(self.field)
-    self.field.min_len = 5
+    self.field.min_length = 5
     with self.assertRaises(ValidationError):
       self.field.clean(self.field.finalData)
-    self.field.min_len = 0
+    self.field.min_length = 0
     self.assertEqual(self.field.clean(self.field.finalData), {})
-
-  #def testSingleElementInitValue(self):
-  #  param = self.extraInitParam()
-  #  param.update({"initData": {"1": "a"}})
-  #  self.field = self.fieldKlass(**param)
-  #  self.renderWidget(self.field)
-  #  self.assertEqual(self.field.initData, {"1": "a"})
-  #  self.assertEqual(self.field.clean(self.field.finalData), {"1": "a"})
-
-  #def testMultipleElementInitValue(self):
-  #  param = self.extraInitParam()
-  #  param.update({"initData": {"1": "a", "2": "b"}})
-  #  self.field = self.fieldKlass(**param)
-  #  self.renderWidget(self.field)
-  #  self.assertEqual(self.field.initData, {"1": "a", "2": "b"})
-  #  self.assertEqual(self.field.clean(self.field.finalData), {"1": "a", "2": "b"})
 
 class PythonModuleFieldTestCase(FieldTestCaseBase):
   fieldKlass = field.PythonModuleField

@@ -10,6 +10,11 @@ from decimal import Decimal, DecimalException
 from inspect import isclass
 import os
 import re
+try:
+  from sys import maxint
+except AttributeError:
+  from sys import maxsize as maxint
+
 import urlparse
 try:
   from cStringIO import StringIO
@@ -967,7 +972,7 @@ class ListField(Field):
     'invalid': _(u'Enter a list of values.'),
   }
 
-  def __init__(self, field, initData=[], min_len=1, *args, **kwargs):
+  def __init__(self, field, initData=[], min_length=0, max_length=maxint, *args, **kwargs):
     # Set 'required' to False on the individual fields, because the
     # required validation will be handled by ListField, not by those
     # individual fields.
@@ -975,7 +980,9 @@ class ListField(Field):
     self.fields = []
     self.childFieldTemplate = copy.deepcopy(field)
     # It stores the minium number of elements is required in this field
-    self.min_len = min_len
+    self.min_length = min_length
+    # It stores the maxium number of elements is required in this field
+    self.max_length = max_length
 
     kwargs["initData"] = initData
     super(ListField, self).__init__(*args, **kwargs)
@@ -1017,7 +1024,8 @@ class ListField(Field):
     del self.fields[idx]
 
   def validate(self, valueList):
-    if self.required and len(valueList)<self.min_len:
+    if((self.required and len(valueList)<self.min_length) \
+        or len(valueList)>self.max_length):
       raise ValidationError(self.error_messages['required'])
 
   def clean(self, valueList):
@@ -1027,7 +1035,8 @@ class ListField(Field):
     """
     clean_data = []
     errors = ErrorList()
-    if self.required and len(valueList)<self.min_len:
+    if((self.required and len(valueList)<self.min_length) \
+        or len(valueList)>self.max_length):
       raise ValidationError(self.error_messages['required'])
 
     for i, field in enumerate(self.fields):
@@ -1095,7 +1104,8 @@ class DictField(Field):
   }
 
   def __init__(
-      self, keyField, valueField, initData={}, min_len=1, *args, **kwargs
+      self, keyField, valueField, initData={}, min_length=0, max_length=maxint,
+      *args, **kwargs
       ):
 
     # Set 'required' to False on the individual fields, because the
@@ -1108,7 +1118,9 @@ class DictField(Field):
     self.childKeyFieldTemplate = copy.deepcopy(keyField)
     self.childValueFieldTemplate = copy.deepcopy(valueField)
     # It stores the minium number of elements is required in this field
-    self.min_len = min_len
+    self.min_length = min_length
+    # It stores the maxium number of elements is required in this field
+    self.max_length = max_length
 
     kwargs["initData"] = initData
     super(DictField, self).__init__(*args, **kwargs)
@@ -1141,7 +1153,8 @@ class DictField(Field):
     del self.valueFields[idx]
 
   def validate(self, valueDict):
-    if self.required and len(valueDict)<self.min_len:
+    if((self.required and len(valueDict)<self.min_length) \
+        or len(valueDict)>self.max_length):
       raise ValidationError(self.error_messages['required'])
 
   def clean(self, valueOrderedDict):
@@ -1152,7 +1165,8 @@ class DictField(Field):
     clean_data = OrderedDict()
     errors = ErrorList()
     valueOrderedDictLen = len(valueOrderedDict)
-    if self.required and valueOrderedDictLen<self.min_len:
+    if((self.required and valueOrderedDictLen<self.min_length) \
+        or valueOrderedDictLen>self.max_length):
       raise ValidationError(self.error_messages['required'])
     if(valueOrderedDictLen==0
         and len(self.keyFields)==1
