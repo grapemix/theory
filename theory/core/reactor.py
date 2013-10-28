@@ -225,9 +225,10 @@ class Reactor(object):
   def reset(self):
     self.parser.initVar()
     self.cmdModel = None
-    self.paramForm.destroy()
-    del self.paramForm
-    self.paramForm = None
+    if(self.paramForm is not None):
+      self.paramForm.destroy()
+      del self.paramForm
+      self.paramForm = None
     self.historyIndex = -1
 
   def _fillParamForm(self, cmdModel):
