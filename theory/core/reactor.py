@@ -113,11 +113,10 @@ class Reactor(object):
 
 
   def _showPreviousCmdRequest(self, entrySetterFxn):
-    if(self.historyIndex >= self.historyLen):
+    if(self.historyIndex >= self.historyLen or self.historyLen==0):
       entrySetterFxn("")
-    else:
-      if(self.historyIndex + 1 < self.historyLen):
-        self.historyIndex += 1
+    elif(self.historyIndex + 1 < self.historyLen):
+      self.historyIndex += 1
       self.adapter.cleanUpCrt()
       commandName = self.historyModel[self.historyIndex].commandName
       entrySetterFxn(commandName)
@@ -135,9 +134,8 @@ class Reactor(object):
   def _showNextCmdRequest(self, entrySetterFxn):
     if(self.historyIndex == -1):
       entrySetterFxn("")
-    else:
-      if(self.historyIndex - 1 >= 0):
-        self.historyIndex -= 1
+    elif(self.historyIndex - 1 >= 0):
+      self.historyIndex -= 1
       self.adapter.cleanUpCrt()
       commandName = self.historyModel[self.historyIndex].commandName
       entrySetterFxn(commandName)
