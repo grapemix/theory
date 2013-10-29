@@ -93,7 +93,39 @@ class IPAddressFieldWidgetTestCase(
   pass
 
 class IntegerFieldWidgetTestCase(IntegerFieldTestCase, FieldWidgetTestCaseBase):
-  pass
+  def testInitDataInWidget(self):
+    param = {
+        "initData": 2
+    }
+    self.field = self.fieldKlass(**param)
+    self.renderWidget(self.field)
+    self.assertEqual(len(self.field.widget.widgetLst), 2)
+    self.assertTrue(isinstance(self.field.widget.widgetLst[0], Entry))
+    self.assertEqual(self.field.widget.widgetLst[0].finalData, "2")
+    self.assertEqual(self.field.finalData, "2")
+    self.assertEqual(self.field.clean(self.field.finalData), 2)
+
+  def testInvalidInitDataInWidget(self):
+    param = {
+        "initData": "a"
+    }
+    self.field = self.fieldKlass(**param)
+    self.renderWidget(self.field)
+    with self.assertRaises(ValidationError):
+      self.assertEqual(self.field.clean(self.field.finalData), "a")
+
+  def testInvalidDataInWidget(self):
+    self.field = self.fieldKlass()
+    self.renderWidget(self.field)
+    self.field.finalData = "a"
+    with self.assertRaises(ValidationError):
+      self.assertEqual(self.field.clean(self.field.finalData), "a")
+
+  def testValidDataAssignmentInWidget(self):
+    self.field = self.fieldKlass()
+    self.renderWidget(self.field)
+    self.field.finalData = 3
+    self.assertEqual(self.field.clean(self.field.finalData), 3)
 
 class TextFieldWidgetTestCase(TextFieldTestCase, FieldWidgetTestCaseBase):
   pass
