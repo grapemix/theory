@@ -91,9 +91,9 @@ class E17Widget(object):
 
 class Label(E17Widget):
   def __init__(self, attrs=None, *args, **kwargs):
-    defaultAttrs = {\
-        "isFillAlign": False, \
-        "initData": "", \
+    defaultAttrs = {
+        "isFillAlign": False,
+        "initData": "",
     }
     if(attrs is not None):
       defaultAttrs.update(attrs)
@@ -101,8 +101,20 @@ class Label(E17Widget):
 
   def generate(self, *args, **kwargs):
     lb = elementary.Label(self.win)
-    lb.text_set(self.attrs["initData"].replace("\n", "<br>"))
+    lb.text_set(self.attrs["initData"].replace("\n", "<br/>"))
     self.obj = lb
+
+  def reset(self, **kwargs):
+    if(not hasattr(self, "obj")):
+      self.generate()
+    elif(kwargs.has_key("finalData")):
+      self.obj.text_set(kwargs["finalData"].replace("\n", "<br/>"))
+    elif(kwargs.has_key("errData")):
+      # The color should be in red, but elementary has a bug and unable to
+      # display text in red!
+      kwargs["errData"] = \
+         '<font color="#00FFFF">' + "<br/>".join(kwargs["errData"]) + '</font>'
+      self.obj.text_set(kwargs["errData"])
 
 class Frame(E17Widget):
   title = None

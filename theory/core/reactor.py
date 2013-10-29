@@ -180,7 +180,7 @@ class Reactor(object):
       self.run()
     else:
       # TODO: integrate with std reactor error system
-      print self.paramForm.errors
+      self.paramForm.showErrInFieldLabel()
 
   def _queryArgsAutocompleteAsForm(self):
     if(not self._loadCmdModel()):
