@@ -166,6 +166,8 @@ class ListFieldWidgetTestCase(ListFieldTestCase, FieldWidgetTestCaseBase):
     self.renderWidget(self.field)
     self.assertEqual(len(self.field.widget._inputLst), 1)
     self.assertTrue(isinstance(self.field.widget._inputLst[0], Entry))
+    self.assertEqual(self.field.widget._inputLst[0].finalData, "aa<br/>bb")
+    self.assertEqual(self.field.clean(self.field.finalData), ["aa", "bb"])
 
   def testTextWidgetWithShortString(self):
     param = {
@@ -177,9 +179,27 @@ class ListFieldWidgetTestCase(ListFieldTestCase, FieldWidgetTestCaseBase):
     self.assertTrue(
         isinstance(self.field.widget._inputLst[0], Multibuttonentry)
     )
+    self.assertEqual(self.field.clean(self.field.finalData), ["aa", "bb"])
 
 class DictFieldWidgetTestCase(DictFieldTestCase, FieldWidgetTestCaseBase):
-  pass
+  def testSingleElementInitValue(self):
+    param = self.extraInitParam()
+    param.update({"initData": {"1": "a"}})
+    self.field = self.fieldKlass(**param)
+    self.renderWidget(self.field)
+    self.assertEqual(self.field.initData, {"1": "a"})
+    self.assertEqual(self.field.clean(self.field.finalData), {"1": "a"})
+
+  def testMultipleElementInitValue(self):
+    param = self.extraInitParam()
+    param.update({"initData": {"1": "a", "2": "b"}})
+    self.field = self.fieldKlass(**param)
+    self.renderWidget(self.field)
+    self.assertEqual(self.field.initData, {"1": "a", "2": "b"})
+    self.assertEqual(
+        self.field.clean(self.field.finalData),
+        {"1": "a", "2": "b"}
+    )
 
 class PythonModuleFieldWidgetTestCase(
     PythonModuleFieldTestCase,
