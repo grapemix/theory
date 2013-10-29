@@ -328,6 +328,8 @@ class IntegerField(Field):
 
   def __init__(self, max_value=None, min_value=None, *args, **kwargs):
     self.max_value, self.min_value = max_value, min_value
+    if("initData" in kwargs):
+      kwargs["initData"] = str(kwargs["initData"])
     super(IntegerField, self).__init__(*args, **kwargs)
 
     if max_value is not None:
