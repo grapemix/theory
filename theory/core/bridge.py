@@ -241,9 +241,12 @@ class Bridge(object):
       print form.errors
     return adapter
 
-  def _execeuteCommand(self, cmd, cmdModel, uiParam={}):
+  def _execeuteCommand(self, cmd, cmdModel, uiParam={}, forceSync=False):
     if(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC):
-      cmd.delay(paramFormData=cmd.paramForm.toJson())
+      if(forceSync):
+        cmd.run(paramFormData=cmd.paramForm.toJson())
+      else:
+        cmd.delay(paramFormData=cmd.paramForm.toJson())
     else:
       if(not cmd.paramForm.is_valid()):
         return False
