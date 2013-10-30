@@ -109,10 +109,6 @@ class GuiFormBase(FormBase, BasePacker):
     optionalMenu.postGenerate()
     self._changeFormWindowHeight(960)
 
-  def destroy(self):
-    self.formBx.obj.delete()
-    del self.formBx
-
   def showErrInFieldLabel(self):
     for fieldName, errMsg in self.errors.iteritems():
       self.fields[fieldName].widget.reFillLabel(errMsg)
