@@ -1041,10 +1041,9 @@ class ListField(Field):
         or len(valueList)>self.max_length):
       raise ValidationError(self.error_messages['required'])
 
-    for i, field in enumerate(self.fields):
+    for value in valueList:
       try:
-        value = valueList[i]
-        clean_data.append(field.clean(value))
+        clean_data.append(self.childFieldTemplate.clean(value))
       except IndexError:
         pass
       except ValidationError, e:
