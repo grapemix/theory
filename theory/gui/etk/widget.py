@@ -202,6 +202,10 @@ class BaseLabelInput(BaseFieldInput):
     """ To redraw the element when data got update"""
     self.widgetLst[0].reset(**kwargs)
 
+  def reFillLabel(self, txt):
+    helpLabel = self.widgetLst[-1]
+    helpLabel.reset(errData=txt)
+
 class StringInput(BaseLabelInput):
   widgetClass = element.Entry
 

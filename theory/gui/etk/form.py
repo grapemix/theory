@@ -113,6 +113,10 @@ class GuiFormBase(FormBase, BasePacker):
     self.formBx.obj.delete()
     del self.formBx
 
+  def showErrInFieldLabel(self):
+    for fieldName, errMsg in self.errors.iteritems():
+      self.fields[fieldName].widget.reFillLabel(errMsg)
+
 class StepFormBase(GuiFormBase):
   def _nextBtnClick(self):
     pass
