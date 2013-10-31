@@ -119,6 +119,25 @@ class TextFieldTestCase(FieldTestCaseBase):
   def getInitData(self):
     return "test"
 
+  def testAssignFinalData(self):
+    self.field = self.fieldKlass(initData="test")
+    self.assertEqual(self.field.initData, "test")
+
+    self.field.finalData = "for real"
+    self.assertEqual(self.field.initData, "test")
+    self.assertEqual(self.field.finalData, "for real")
+    self.assertEqual(self.field.clean(self.field.finalData), "for real")
+
+    self.field.finalData = "for real again"
+    self.assertEqual(self.field.initData, "test")
+    self.assertEqual(self.field.finalData, "for real again")
+    self.assertEqual(self.field.clean(self.field.finalData), "for real again")
+
+  def testAccessEmptyFinalData(self):
+    self.field = self.fieldKlass(initData="test")
+    self.assertEqual(self.field.initData, "test")
+    self.assertEqual(self.field.finalData, "test")
+
 class URLFieldTestCase(FieldTestCaseBase):
   fieldKlass = field.URLField
   def getInitData(self):

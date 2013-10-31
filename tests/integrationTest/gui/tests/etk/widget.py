@@ -1,15 +1,10 @@
 # -*- coding: utf-8 -*-
 ##### System wide lib #####
-from elementary import Window, ELM_WIN_BASIC
 
 ##### Theory lib #####
-from theory.conf import settings
 from theory.core.exceptions import ValidationError
-from theory.model import Adapter, BinaryClassifierHistory
 from theory.gui import field
-from theory.gui import widget
-from theory.gui.etk.element import Box, Multibuttonentry, Entry
-from theory.gui.form import *
+from theory.gui.etk.element import Multibuttonentry, Entry
 from theory.utils import unittest
 
 ##### Theory third-party lib #####
@@ -17,6 +12,7 @@ from theory.utils import unittest
 ##### Local app #####
 from tests.integrationTest.gui.tests.field import FieldTestCaseBase
 from tests.integrationTest.gui.tests.field import *
+from dummyEnv import getDummyEnv
 
 ##### Theory app #####
 
@@ -41,11 +37,7 @@ __all__ = ('AdapterFieldWidgetTestCase', 'BooleanFieldWidgetTestCase',
 
 class FieldWidgetTestCaseBase(FieldTestCaseBase):
   def renderWidget(self, field, *args, **kwargs):
-    dummyWin = Window("theory", ELM_WIN_BASIC)
-
-    # Copied from gui.etk.widget._createContainer
-    dummyBx = Box()
-    dummyBx.win = dummyWin
+    (dummyWin, dummyBx) = getDummyEnv()
 
     dummyBx.generate()
     field.renderWidget(dummyWin, dummyBx.obj)
@@ -128,7 +120,30 @@ class IntegerFieldWidgetTestCase(IntegerFieldTestCase, FieldWidgetTestCaseBase):
     self.assertEqual(self.field.clean(self.field.finalData), 3)
 
 class TextFieldWidgetTestCase(TextFieldTestCase, FieldWidgetTestCaseBase):
-  pass
+
+  def testAssignFinalDataWithWidget(self):
+    self.field = self.fieldKlass(initData="test")
+    self.renderWidget(self.field)
+
+    self.assertEqual(self.field.initData, "test")
+
+    self.field.widget.reset(finalData="for real")
+    self.assertEqual(self.field.initData, "test")
+    self.assertEqual(self.field.finalData, "for real")
+    self.assertEqual(self.field.clean(self.field.finalData), "for real")
+
+    self.field.widget.reset(finalData="for real again")
+    # formBase will set finalData as None if an error exists
+    self.field.finalData = None
+    self.assertEqual(self.field.initData, "test")
+    self.assertEqual(self.field.finalData, "for real again")
+    self.assertEqual(self.field.clean(self.field.finalData), "for real again")
+
+  def testAccessEmptyFinalDataWithWidget(self):
+    self.field = self.fieldKlass(initData="test")
+    self.renderWidget(self.field)
+    self.assertEqual(self.field.initData, "test")
+    self.assertEqual(self.field.finalData, "test")
 
 class URLFieldWidgetTestCase(URLFieldTestCase, FieldWidgetTestCaseBase):
   pass
