@@ -24,14 +24,23 @@ class CreateCmd(SimpleCommand):
   _drums = {"Terminal": 1, }
 
   class ParamForm(SimpleCommand.ParamForm):
-    appName = field.ChoiceField(label="Application Name", \
-        help_text="The name of application being used", \
-        choices=(set([(len(settings.INSTALLED_APPS)+1, "theory")] + [(i, settings.INSTALLED_APPS[i]) for i in range(len(settings.INSTALLED_APPS))])))
-    cmdName = field.TextField(label="Command Name", \
-        help_text=" The name of command being created", max_length=32)
+    appName = field.ChoiceField(label="Application Name",
+        help_text="The name of application being used",
+        choices=(
+          set(
+            [("theory", "theory")] + \
+            [(app, app) for app in settings.INSTALLED_APPS]
+          )
+        )
+    )
+    cmdName = field.TextField(
+        label="Command Name",
+        help_text=" The name of command being created",
+        max_length=32
+    )
 
   def run(self):
-    appName = self.paramForm.fields["appName"].finalChoiceLabel
+    appName = self.paramForm.clean()["appName"]
     cmdName = self.paramForm.clean()["cmdName"]
     if(appName!="theory"):
       foundApp = False
@@ -39,9 +48,15 @@ class CreateCmd(SimpleCommand):
         if(i==appName):
           foundApp = True
       if(not foundApp):
-        self._stdOut = "You must create the app AND put it into INSTALLED_APPS first!"
+        self._stdOut = \
+            "You must create the app AND put it into INSTALLED_APPS first!"
         return
-      toPath = os.path.join(settings.APPS_ROOT, appName, "command", cmdName + ".py")
+      toPath = os.path.join(
+          settings.APPS_ROOT,
+          appName,
+          "command",
+          cmdName + ".py"
+      )
     else:
       toPath = os.path.join(os.path.dirname(__file__), cmdName + ".py")
 
