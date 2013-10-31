@@ -17,12 +17,8 @@ from theory.model import AppModel
 ##### Theory app #####
 
 ##### Misc #####
-# ensure that PyGTK 2.0 is loaded - not an older version
-import pygtk
-pygtk.require('2.0')
-# import the GTK module
-import gtk
-import gobject
+from gi.repository import Gtk as gtk
+from gi.repository import GObject as gobject
 
 __all__ = ("SpreadsheetBuilder",)
 
