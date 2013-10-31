@@ -27,16 +27,30 @@ class ListCommand(SimpleCommand):
   _drums = {"Terminal": 1,}
 
   class ParamForm(SimpleCommand.ParamForm):
-    appName = field.ChoiceField(label="Application Name", \
-        help_text="Commands provided by this application", \
-        choices=(set([(i, settings.INSTALLED_APPS[i]) for i in range(len(settings.INSTALLED_APPS))])), \
-        initData="", \
-        required=False)
-    mood = field.ChoiceField(label="Mood", \
-        help_text="Commands provided by this mood", \
-        choices=(set([(i, settings.INSTALLED_MOODS[i]) for i in range(len(settings.INSTALLED_MOODS))])), \
-        initData="", \
-        required=False)
+    appName = field.ChoiceField(
+        label="Application Name",
+        help_text="Commands provided by this application",
+        choices=(
+          set(
+            [("all", "all")] + \
+            [(app, app) for app in settings.INSTALLED_APPS]
+          )
+        ),
+        initData="all",
+        required=False
+    )
+    mood = field.ChoiceField(
+        label="Mood",
+        help_text="Commands provided by this mood",
+        choices=(
+          set(
+            [("all", "all")] + \
+            [(mood, mood) for mood in settings.INSTALLED_MOODS]
+          )
+        ),
+        initData="all",
+        required=False
+    )
 
   @property
   def query(self):
@@ -55,10 +69,10 @@ class ListCommand(SimpleCommand):
     queryParam = {}
     formData = self.paramForm.clean()
 
-    if(formData["appName"]!=""):
-      queryParam["app"] = self.paramForm.fields["appName"].finalChoiceLabel
-    if(formData["mood"]!=""):
-      queryParam["mood"] = self.paramForm.fields["mood"].finalChoiceLabel
+    if(formData["appName"]!="all"):
+      queryParam["app"] = formData["appName"]
+    if(formData["mood"]!="all"):
+      queryParam["mood"] = formData["mood"]
 
     self._query = Command.objects.all()
     if(queryParam!={}):
