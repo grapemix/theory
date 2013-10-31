@@ -41,6 +41,7 @@ class Reactor(object):
   paramForm = None
   historyIndex = -1  # It should be working reversely
   historyLen = 0
+  formHasBeenCleared = False
 
   @property
   def mood(self):
@@ -219,14 +220,16 @@ class Reactor(object):
       if(leastDebugLvl<=debugLvl):
         (adapterModel, drum) = bridge.adaptFromCmd(adapterName, cmd)
         drum.render(uiParam=self.adapter.uiParam)
+        self.formHasBeenCleared = True
 
   def reset(self):
     self.parser.initVar()
+    self.adapter.entrySetterFxn("")
     self.cmdModel = None
-    if(self.paramForm is not None):
-      self.paramForm.destroy()
-      del self.paramForm
-      self.paramForm = None
+    if(self.paramForm is not None and not self.formHasBeenCleared):
+      self.adapter.cleanUpCrt()
+      self.formHasBeenCleared = False
+    self.paramForm = None
     self.historyIndex = -1
 
   def _fillParamForm(self, cmdModel):
@@ -272,7 +275,7 @@ class Reactor(object):
 
   # TODO: refactor this function, may be with bridge
   def run(self):
-    if(self.paramForm==None):
+    if(self.paramForm is None):
       cmd = self._fillParamForm(self.cmdModel)
     else:
       cmdKlass = import_class(self.cmdModel.classImportPath)
