@@ -177,6 +177,7 @@ class Reactor(object):
     self.parser.initVar()
 
   def cleanParamForm(self, btn, dummy):
+    self.paramForm.full_clean()
     if(self.paramForm.is_valid()):
       self.run()
     else:
@@ -211,7 +212,10 @@ class Reactor(object):
     if(not self._loadCmdModel()):
       return
 
-    self.run()
+    if(self.paramForm is None):
+      self.run()
+    else:
+      self.cleanParamForm(None, None)
 
   def _performDrums(self, cmd):
     debugLvl = settings.DEBUG_LEVEL

@@ -70,6 +70,13 @@ class DeclarativeFieldsMetaclass(type):
 class FormBase(object):
   """This class should be stateful and picklable. The function being provided
   by this class include the logic to decide which field should be shown."""
+
+  # True is assuming connection is expensive and hence field will connect with
+  # widget as least as possible. Ex: if an error has been detected and the
+  # full_clean() has been called. The lazy mode will only update the error field
+  # while the not lazy mode will update every field.
+  isLazy = True
+
   def __init__(self, *args, **kwargs):
     # The base_fields class attribute is the *class-wide* definition of
     # fields. Because a particular *instance* of the class might want to
@@ -132,14 +139,17 @@ class FormBase(object):
     if self._errors:
       del self.cleaned_data
 
-  # TODO: support fields required interactaction with other fields to get
-  # final data
   def _clean_fields(self):
     for name, field in self.fields.items():
       # value_from_datadict() gets the data from the data dictionaries.
       # Each widget type knows how to retrieve its own data, because some
       # widgets split data over several HTML fields.
       if(field.isSingular):
+        # The forceUpdate is for clearing the invalid data stored in the last
+        # round and force update the field finalData either from widget or
+        # initData
+        if(not self.isLazy):
+          field.forceUpdate()
         value = field.finalData
       #value = field.widget.value_from_datadict(self.data, self.files, name)
       try:
@@ -152,6 +162,8 @@ class FormBase(object):
           value = getattr(self, 'clean_%s' % name)()
           self.cleaned_data[name] = value
       except ValidationError, e:
+        if(self.isLazy):
+          field.finalData = None
         self._errors[name] = e.messages
         if name in self.cleaned_data:
           del self.cleaned_data[name]

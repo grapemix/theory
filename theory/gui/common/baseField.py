@@ -255,10 +255,9 @@ class Field(object):
     # TODO: allow lazy update
     if(self._finalData in validators.EMPTY_VALUES):
       if(isclass(self.widget)):
-        # return initial data if widget has not been rendered
+        # return initial data if widget has not been rendered and finalData
+        # is empty
         return self.initData
-      elif(self._finalData is not None):
-        return self._finalData
       else:
         # force update
         self.widget.updateField()
@@ -267,6 +266,16 @@ class Field(object):
   @finalData.setter
   def finalData(self, finalData):
     self._finalData = finalData
+
+  def forceUpdate(self):
+    """
+    To force the widget to update the finalData. It is usful when invalid
+    data was stored into the field, failed, and new valid data is trying to
+    be stored. If we called the updateField() in here, updateField() won't be
+    called in the finalData.
+    """
+    if(not isclass(self.widget)):
+      self.widget.updateField()
 
   def widgetSetter(self, data):
     try:

@@ -5,10 +5,8 @@ import copy
 from ludibrio import Stub
 
 ##### Theory lib #####
-from theory.conf import settings
 from theory.gui import field
 from theory.gui import widget
-from theory.gui.form import *
 from theory.gui.etk.form import StepForm
 from theory.utils import unittest
 
@@ -19,8 +17,9 @@ from theory.utils import unittest
 ##### Theory app #####
 
 ##### Misc #####
+from tests.integrationTest.gui.tests.etk.dummyEnv import getDummyEnv
 
-__all__ = ('StepFormTestCase',)
+__all__ = ('FormBaseTestCase', 'StepFormTestCase',)
 
 class FormCombinator(object):
   def __init__(self, formKlass):
@@ -34,6 +33,83 @@ class FormCombinator(object):
     setattr(formKlass, "field1", self.dummyField())
     return formKlass
 
+class FormBaseTestCase(unittest.TestCase):
+  """
+  To test the FormBase.
+  """
+  class TestForm(StepForm):
+    initField = field.TextField(initData="test", max_length=5)
+    emptyField = field.TextField()
+
+
+  def __init__(self, *args, **kwargs):
+    super(FormBaseTestCase, self).__init__(*args, **kwargs)
+    (dummyWin, dummyBx) = getDummyEnv()
+    self.uiParam=OrderedDict([
+        ("win", dummyWin),
+        ("bx", dummyBx.obj),
+        ("unFocusFxn", lambda: True)
+        ])
+
+  def setUp(self):
+    self.form = self.TestForm()
+
+  def testFullCleanInLazyMode(self):
+    self.form.generateForm(*self.uiParam.values())
+    self.assertFalse(self.form.is_valid())
+    self.assertEqual(
+        self.form.errors,
+        {"emptyField": ["This field is required."]}
+    )
+    self.assertEqual(self.form.fields["emptyField"]._finalData, None)
+    self.form.fields["emptyField"].widget.reset(finalData="test")
+    self.form.fields["initField"].widget.reset(finalData="test2")
+    self.form.full_clean()
+    self.assertTrue(self.form.is_valid())
+    self.assertEqual(self.form.clean()["emptyField"], "test")
+    self.assertEqual(self.form.clean()["initField"], "test")
+
+  def testFullCleanInNonLazyMode(self):
+    self.form.generateForm(*self.uiParam.values())
+    self.form.isLazy = False
+    self.assertFalse(self.form.is_valid())
+    self.assertEqual(
+        self.form.errors,
+        {"emptyField": ["This field is required."]}
+    )
+    self.assertEqual(self.form.fields["emptyField"]._finalData, "")
+    self.form.fields["emptyField"].widget.reset(finalData="test")
+    self.form.fields["initField"].widget.reset(finalData="test2")
+    self.form.full_clean()
+    self.assertTrue(self.form.is_valid())
+    self.assertEqual(self.form.clean()["emptyField"], "test")
+    self.assertEqual(self.form.clean()["initField"], "test2")
+
+  def testFullCleanInLazyModeWithInitData(self):
+    self.form.generateForm(*self.uiParam.values())
+    self.form.fields["initField"].widget.reset(finalData="test22")
+    self.form.fields["emptyField"].widget.reset(finalData="test")
+    self.form.full_clean()
+    self.assertFalse(self.form.is_valid())
+    self.assertEqual(self.form.fields["initField"]._finalData, None)
+    self.form.fields["initField"].widget.reset(finalData="test2")
+    self.form.full_clean()
+    self.assertTrue(self.form.is_valid())
+
+  def testFullCleanInLazyModeWithoutWidget(self):
+    self.assertFalse(self.form.is_valid())
+    self.assertEqual(
+        self.form.errors,
+        {"emptyField": ["This field is required."]}
+    )
+    self.assertEqual(self.form.fields["emptyField"].finalData, None)
+    self.form.fields["emptyField"].finalData = "test"
+    self.form.fields["initField"].widget.finalData = "test2"
+    self.form.full_clean()
+    self.assertTrue(self.form.is_valid())
+    self.assertEqual(self.form.clean()["emptyField"], "test")
+    self.assertEqual(self.form.clean()["initField"], "test")
+
 class StepFormTestCase(unittest.TestCase):
   class TestFormTemplate(StepForm):
     pass
@@ -41,11 +117,14 @@ class StepFormTestCase(unittest.TestCase):
   def __init__(self, *args, **kwargs):
     super(StepFormTestCase, self).__init__(*args, **kwargs)
     self.formCombinator = FormCombinator(self.TestFormTemplate)
+    (dummyWin, dummyBx) = getDummyEnv()
+    dummyBx.generate()
     self.uiParam=OrderedDict([
-        ("win", settings.CRTWIN),
-        ("bx", settings.CRT),
+        ("win", dummyWin),
+        ("bx", dummyBx.obj),
         ("unFocusFxn", lambda: True)
         ])
+
 
   def setUp(self):
     self.uiParam["bx"].clear()
