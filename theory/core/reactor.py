@@ -16,6 +16,7 @@ from theory.model import Command, Adapter, History
 from theory.utils.importlib import import_class
 
 ##### Theory third-party lib #####
+from theory.gui.gtk.notify import getNotify
 
 ##### Local app #####
 
@@ -125,7 +126,10 @@ class Reactor(object):
       try:
         self.cmdModel = Command.objects.get(name=commandName)
       except Command.DoesNotExist as errMsg:
-        print "{0} ({1})".format(errMsg, commandName)
+        getNotify(
+            "Command not found",
+            "{0} ({1})".format(errMsg, commandName)
+        )
         raise
 
       self._buildParamForm(
