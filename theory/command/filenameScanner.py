@@ -23,8 +23,6 @@ class FilenameScanner(SimpleCommand):
   name = "filenameScanner"
   verboseName = "filenameScanner"
 
-  _filenameLst = []
-  _dirnameLst = []
   _notations = ["Command",]
   _gongs = ["FilenameList", "FileObjectList", ]
   _drums = {"Terminal": 1, }
@@ -219,12 +217,25 @@ class FilenameScanner(SimpleCommand):
       for lvlRoot, dirs, files in self._walk(root):
         yield dirs
 
+  def __init__(self, *args, **kwargs):
+    super(FilenameScanner, self).__init__(*args, **kwargs)
+    self._filenameLst = []
+    self._dirnameLst = []
+
   def run(self):
     for i in self.generateFileLst():
       self._filenameLst.append(i)
 
     for i in self.generateDirLst():
       self._dirnameLst.extend(i)
+
+    self._extractResultToStdOut()
+
+  def _extractResultToStdOut(self):
+    self._stdOut = "Filename List:\n"
+    self._stdOut += "\n".join(self._filenameLst)
+    self._stdOut += "\nDirname List:\n"
+    self._stdOut += "\n".join(self._dirnameLst)
 
   def _walk(self, root, *args, **kwargs):
     root = root.rstrip(os.path.sep)
