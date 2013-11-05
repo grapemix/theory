@@ -112,7 +112,7 @@ class Spreadsheet(object):
 
     treeviewBox = gtk.ScrolledWindow()
     main_vbox.pack_start(treeviewBox, True, True, 0)
-    #treeviewBox.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+    treeviewBox.set_policy(gtk.PolicyType.AUTOMATIC, gtk.PolicyType.AUTOMATIC)
 
     # the treeview
     self.treeview = gtk.TreeView(self.model)
@@ -148,7 +148,7 @@ class Spreadsheet(object):
     cell = gtk.CellRendererText()
     col.pack_start(cell, expand=False)
     cell.set_property("editable", editable)
-    col.set_attributes(cell, text=colIdx)
+    col.add_attribute(cell, "text", colIdx)
     col.set_sort_column_id(colIdx)
     cell.connect('edited', self._text_changed, colIdx)
 
@@ -162,7 +162,7 @@ class Spreadsheet(object):
         )
     cell.set_property("editable", editable)
     col.pack_start(cell, expand=False)
-    col.set_attributes(cell, text=colIdx)
+    col.add_attribute(cell, "text", colIdx)
     cell.connect('edited', self._float_changed, colIdx)
 
   def renderIconCol(self, colIdx):
@@ -180,7 +180,7 @@ class Spreadsheet(object):
     cell.set_property("activatable", True)
     col.pack_start(cell, expand=False)
     cell.set_property('cell-background', 'greenyellow')
-    col.set_attributes(cell, active=self.flagColIdx + 1)
+    col.add_attribute(cell, "active", self.flagColIdx + 1)
     col.set_cell_data_func(cell, self._render_status)
     cell.connect('toggled', self._statusbox_toggled)
 
@@ -197,7 +197,7 @@ class Spreadsheet(object):
     cell = gtk.CellRendererToggle()
     cell.set_property("activatable", editable)
     col.pack_start(cell, expand=False)
-    col.set_attributes(cell, active=colIdx)
+    col.add_attribute(cell, "active", colIdx)
     col.set_sort_column_id(colIdx)
     cell.connect('toggled', self._checkbox_toggled, colIdx)
 
@@ -213,7 +213,7 @@ class Spreadsheet(object):
     cell.set_property("model", model)
     cell.set_property("text-column", 0)
     col.pack_start(cell, expand=False)
-    col.set_attributes(cell, text=colIdx)
+    col.add_attribute(cell, "text", colIdx)
     col.set_sort_column_id(colIdx)
     cell.connect('edited', self._combobox_changed, colIdx)
 
@@ -223,7 +223,7 @@ class Spreadsheet(object):
     self.treeview.append_column(col)
     cell = gtk.CellRendererProgress()
     col.pack_start(cell, expand=True)
-    col.set_attributes(cell, value=colIdx)
+    col.add_attribute(cell, "value", colIdx)
     col.set_sort_column_id(colIdx)
 
   def _render_status(self, column, cell, model, iter, dummy):
