@@ -2,14 +2,16 @@
 #!/usr/bin/env python
 ##### System wide lib #####
 from collections import OrderedDict
+import gevent
 import os
+import signal
 
 ##### Theory lib #####
 
 ##### Theory third-party lib #####
 
 ##### Enlightenment lib #####
-#import ecore
+import ecore
 import edje
 import elementary
 import evas
@@ -72,8 +74,9 @@ class Terminal(object):
   def __init__(self):
     elementary.init()
     self.win = elementary.Window("theory", elementary.ELM_WIN_BASIC)
+    self.win.autodel = True
     self.win.title_set("Theory")
-    #self.win.callback_destroy_add(lambda x: elementary.exit())
+    self.win.callback_delete_request_add(lambda x: elementary.exit())
     self.win.autodel_set(True)
     bg = elementary.Background(self.win)
     self.win.resize_object_add(bg)
@@ -95,9 +98,15 @@ class Terminal(object):
     self.cleanUpCrt()
     self.win.show()
 
+  def _switchToGeventLoop(self):
+    gevent.sleep(0)
+    ecore.timer_add(1, self._switchToGeventLoop)
+
   def drawAll(self):
+    self._switchToGeventLoop()
     elementary.run()
     elementary.shutdown()
+    return True
 
   def _shellInputChangeHooker(self, object, entry, *args, **kwargs):
     curEntryTxt = object.entry_get()
@@ -135,6 +144,13 @@ class Terminal(object):
       self.adapter.showNextCmdRequest()
     elif(event.keyname=="Escape"):
       self.adapter.escapeRequest()
+    elif(
+        event.modifier_is_set("Control")
+        and event.modifier_is_set("Alt")
+        and event.keyname=="q"
+      ):
+      elementary.exit()
+      os.kill(os.getpid(), signal.SIGQUIT)
 
   def drawShellInput(self):
     win = self.win

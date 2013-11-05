@@ -3,6 +3,8 @@
 ##### System wide lib #####
 from collections import OrderedDict
 from bson.json_util import loads as jsonLoads
+import gevent
+
 ##### Theory lib #####
 from theory.gui.transformer import (
     #MongoModelDataHandler,
@@ -47,8 +49,18 @@ class Spreadsheet(object):
     for i in model:
       self.model.append(i + [False, False])
 
+    self._switchToGeventLoop()
+
     self.create_interior()
     self.window.show_all()
+
+  def _switchToGeventLoop(self):
+    gevent.sleep(0)
+    gobject.timeout_add(
+        3,
+        self._switchToGeventLoop,
+        priority=gobject.PRIORITY_HIGH
+    )
 
   def getSelectedRow(self):
     return [i for i, v in enumerate(self.model) if(v[-1])]
