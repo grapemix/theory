@@ -157,6 +157,13 @@ class AdapterBuffer(Model):
       help_text=_("The data adapted to next command and stored in JSON format"))
   created = DateTimeField(required=True, default=datetime.utcnow())
 
+  def __str__(self):
+    return "{0} -> {1} ({2})".format(
+        Command.objects.only("name").get(id=self.fromCmd.id).name,
+        Command.objects.only("name").get(id=self.toCmd.id).name,
+        self.created
+        )
+
 class BinaryClassifierHistory(Model):
   ref = GenericReferenceField()
   initState = SortedListField(BooleanField())
