@@ -62,8 +62,8 @@ class Spreadsheet(object):
     self.close_window()
 
   # Create a Button Box with the specified parameters
-  def create_bbox(self, horizontal, title, spacing, layout):
-    frame = gtk.Frame(title)
+  def create_bbox(self, horizontal, spacing):
+    frame = gtk.Frame()
 
     if horizontal:
       bbox = gtk.HButtonBox()
@@ -74,7 +74,6 @@ class Spreadsheet(object):
     frame.add(bbox)
 
     # Set the appearance of the Button Box
-    bbox.set_layout(layout)
     bbox.set_spacing(spacing)
 
     button = gtk.Button(stock=gtk.STOCK_OK)
@@ -101,7 +100,7 @@ class Spreadsheet(object):
 
     treeviewBox = gtk.ScrolledWindow()
     main_vbox.pack_start(treeviewBox, True, True, 0)
-    treeviewBox.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+    #treeviewBox.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 
     # the treeview
     self.treeview = gtk.TreeView(self.model)
@@ -122,9 +121,7 @@ class Spreadsheet(object):
     main_vbox.pack_start(
         self.create_bbox(
           True,
-          "Action",
           40,
-          gtk.BUTTONBOX_SPREAD
         ),
         False,
         True,
@@ -217,7 +214,7 @@ class Spreadsheet(object):
     col.set_attributes(cell, value=colIdx)
     col.set_sort_column_id(colIdx)
 
-  def _render_status(self, column, cell, model, iter):
+  def _render_status(self, column, cell, model, iter, dummy):
     data = self.model.get_value(iter, self.flagColIdx)
     cell.set_property('cell-background-set', data)
 
