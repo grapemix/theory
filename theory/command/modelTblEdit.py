@@ -41,7 +41,7 @@ class ModelTblEdit(SimpleCommand):
         help_text="The name of the model to be listed",
         )
     queryset = field.QuerysetField(required=False, label="Queryset",
-        help_text="The queryset to be processed", initData=[])
+        help_text="The queryset to be processed")
     # Not yet in this version
     #pagination = field.IntegerField(label="pagination",
     #    help_text="Number of items per page",
