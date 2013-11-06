@@ -30,11 +30,7 @@ class ParamForm(SimpleCommand.ParamForm):
 
   def getCommandChoiceLst(self):
     # example return value:  ((1, "command1"), (2, "command2"))
-    return [(i.pk, "%s -> %s (%s)" % \
-        (Command.objects.get(id=i.fromCmd.id).name, \
-        Command.objects.get(id=i.toCmd.id).name, \
-        i.created)) \
-        for i in AdapterBuffer.objects.all()]
+    return [(i.pk, str(i)) for i in AdapterBuffer.objects.all()]
 
 class NextStep(SimpleCommand):
   """
@@ -45,6 +41,7 @@ class NextStep(SimpleCommand):
   verboseName = "nextStep"
   _notations = ["Command",]
   ParamForm = ParamForm
+  _drums = ["Dummy",]
 
   def __init__(self, *args, **kwargs):
     super(NextStep, self).__init__(*args, **kwargs)
@@ -69,7 +66,7 @@ class NextStep(SimpleCommand):
       if(leastDebugLvl<=debugLvl):
         (adapterModel, drum) = bridge.adaptFromCmd(adapterName, cmd)
         drum.render(uiParam=self._uiParam)
-
+    self.adapterBufferModel.delete()
 
   def run(self):
     if(self.paramForm.is_valid()):
