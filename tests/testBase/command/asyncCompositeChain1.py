@@ -21,10 +21,16 @@ class AsyncCompositeChain1(AsyncChain1):
   verboseName = "asyncComoisiteChain1"
 
   class ParamForm(AsyncCommand.ParamForm):
-    queryset = field.QuerysetField()
+    queryset = field.QuerysetField(
+        app="theory",
+        model="Command",
+        required=False,
+        initData=[]
+    )
 
   def run(self, paramFormData):
     super(AsyncCompositeChain1, self).run(paramFormData)
+    self.paramForm.full_clean()
     secondCmdModel = self.paramForm.clean()["queryset"]
     bridge = Bridge()
     secondCmdModel = SimpleChain2.getCmdModel()

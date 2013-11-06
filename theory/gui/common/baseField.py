@@ -1563,12 +1563,67 @@ class PythonClassField(Field):
     # else (value is empty and it is not required, suppress error)
 
 class QuerysetField(Field):
+  widget = QueryIdInput
+
   default_error_messages = {
-    'invalid': _('Unable to import the given class'),
-    'wrong_classtype': _('The given class is not matched'),
+    'invalid': _('Unable to import the given queryset'),
+    'dbInvalid': _('Unable to find data in DB'),
+    'appInvalid': _('No app has been set'),
+    'modelInvalid': _('No model has been set'),
   }
 
-  def __init__(self, auto_import=False, *args, **kwargs):
+  def __init__(self, auto_import=False, app=None, model=None, *args, **kwargs):
     super(QuerysetField, self).__init__(*args, **kwargs)
-    self.widget = StringInput
     self.auto_import = auto_import
+    self.app = app
+    self.model = model
+
+  def clean(self, value):
+    """
+    Validates the given value and returns its "cleaned" value as an
+    appropriate Python object.
+
+    Raises ValidationError for any errors.
+    """
+    self.validate(value)
+    self.run_validators(value)
+    return value
+
+  def validate(self, value):
+    """
+    Validates if the input exists in the db
+    """
+    super(QuerysetField, self).validate(value)
+
+    if(not self.auto_import):
+      return value
+
+    if(self.app is None):
+      raise ValidationError(
+          self.error_messages['appInvalid'] % {'value': value}
+      )
+    if(self.model is None):
+      raise ValidationError(
+          self.error_messages['modelInvalid'] % {'value': value}
+      )
+
+    try:
+      dbClass = import_class('{0}.model.{1}'.format(
+        self.app,
+        self.model
+        )
+      )
+      return dbClass.objects.in_bulk([i.id for i in value])
+    except:
+      raise ValidationError(
+          self.error_messages['dbInvalid'] % {'value': value}
+      )
+
+  def to_python(self, value):
+    return [str(i.id) for i in value]
+
+  def renderWidget(self, *args, **kwargs):
+    if("attrs" not in kwargs):
+      kwargs["attrs"] = {}
+    kwargs["attrs"].update({"app": self.app, "model": self.model})
+    super(QuerysetField, self).renderWidget(*args, **kwargs)

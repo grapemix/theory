@@ -12,7 +12,6 @@ from theory.model import Model
 from theory.db.models import EmbeddedDocument as TheoryEmbeddedModel
 from theory.conf import settings
 from theory.model import Command, Parameter
-from theory.utils.importlib import import_module, import_class
 
 ##### Theory third-party lib #####
 
