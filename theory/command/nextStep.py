@@ -69,13 +69,9 @@ class NextStep(SimpleCommand):
     self.adapterBufferModel.delete()
 
   def run(self):
-    if(self.paramForm.is_valid()):
-      if(self.bridge == None):
-        self.bridge = Bridge()
-      cmdId = self.paramForm.clean()["commandReady"]
-      self.adapterBufferModel = AdapterBuffer.objects.get(id=cmdId)
+    if(self.bridge == None):
+      self.bridge = Bridge()
+    cmdId = self.paramForm.clean()["commandReady"]
+    self.adapterBufferModel = AdapterBuffer.objects.get(id=cmdId)
 
-      self.bridge.bridgeFromDb(self.adapterBufferModel, self._execeuteCommand, self.uiParam)
-    else:
-      # TODO: integrate with std reactor error system
-      print self.paramForm.errors
+    self.bridge.bridgeFromDb(self.adapterBufferModel, self._execeuteCommand, self.uiParam)
