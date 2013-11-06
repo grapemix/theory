@@ -34,7 +34,7 @@ __all__ = ('AdapterFieldTestCase', 'BooleanFieldTestCase', \
     'StringGroupFilterFieldTestCase', 'TextFieldTestCase', \
     'TypedChoiceFieldTestCase', 'TypedMultipleChoiceFieldTestCase', \
     'URLFieldTestCase', 'PythonModuleFieldTestCase', \
-    'PythonClassFieldTestCase', \
+    'PythonClassFieldTestCase', 'QuerysetFieldTestCase',
     )
 
 class FieldTestCaseBase(unittest.TestCase):
@@ -360,4 +360,74 @@ class PythonClassFieldTestCase(FieldTestCaseBase):
       self.field.validate("theory.command.blah")
     self.assertEqual(self.field.validate("theory.command.listCommand.ListCommand"), expectedKlass)
 
+class QuerysetFieldTestCase(FieldTestCaseBase):
+  fieldKlass = field.QuerysetField
 
+  def getInitData(self):
+    return []
+
+  def setUp(self):
+    initParam = self.extraInitParam()
+    initParam.update({"initData": self.getInitData(), "auto_import": True})
+
+    self.field = self.fieldKlass(**initParam)
+    self.renderWidget(self.field)
+
+  def testEmptyData(self):
+    self.assertEqual(self.field.finalData, [])
+
+    with self.assertRaises(ValidationError):
+      self.assertEqual(self.field.clean(self.field.finalData), [])
+
+    self.field.required = False
+    with self.assertRaises(ValidationError):
+      self.assertEqual(self.field.clean(self.field.finalData), [])
+
+    self.field.auto_import = False
+    self.assertEqual(self.field.clean(self.field.finalData), [])
+
+  def testValidInitData(self):
+    initData = Adapter.objects.all()
+    initParam = self.extraInitParam()
+    initParam.update(
+        {
+          "initData": initData,
+          "auto_import": True
+        })
+
+    self.field = self.fieldKlass(**initParam)
+    self.renderWidget(self.field)
+    self.assertEqual(self.field.finalData, initData)
+
+    with self.assertRaises(ValidationError):
+      self.assertEqual(self.field.clean(self.field.finalData), initData)
+
+    self.field.app = "theory"
+    self.field.model = "Adapter"
+    self.assertEqual(self.field.clean(self.field.finalData), initData)
+
+  def testInvalidInitData(self):
+    initData = [1234, 2345]
+    initParam = self.extraInitParam()
+    initParam.update(
+        {
+          "initData": initData,
+          "auto_import": True
+        })
+
+    self.field = self.fieldKlass(**initParam)
+    self.renderWidget(self.field)
+    self.assertEqual(self.field.finalData, initData)
+
+    with self.assertRaises(ValidationError):
+     self.assertEqual(self.field.clean(self.field.finalData), initData)
+
+    self.field.app = "theory"
+    self.field.model = "Adapter"
+    with self.assertRaises(ValidationError):
+      self.assertEqual(self.field.clean(self.field.finalData), initData)
+
+    self.field.auto_import = False
+    self.field.app = None
+    self.field.model = None
+    self.assertEqual(self.field.clean(self.field.finalData), initData)

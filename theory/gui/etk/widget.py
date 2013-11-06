@@ -841,6 +841,31 @@ class DictInput(ListInput):
       valueInputBox = self.childFieldPairLst[i][1].widget
       valueInputBox.reset(**row)
 
+class QueryIdInput(StringInput):
+
+  @property
+  def initData(self):
+    if(len(self.attrs["initData"])==0):
+      return ""
+    s = ""
+    for i in self.attrs["initData"]:
+      s += i + ","
+    return s[:-1]
+
+  def updateField(self):
+    if(self.attrs["app"] is None or self.attrs["model"] is None):
+      queryset = self.attrs["initData"]
+    else:
+      dbClass = import_class('{0}.model.{1}'.format(
+        self.app,
+        self.model
+        )
+      )
+      queryset = dbClass.objects.in_bulk(
+          [i.id for i in self.widgetLst[0].finalData]
+      )
+    self.fieldSetter({"finalData": queryset})
+
 class FilterFormLayout(BasePacker):
   def __init__(self, win, bxInput, attrs=None, *args, **kwargs):
     attrs = self._buildAttrs(

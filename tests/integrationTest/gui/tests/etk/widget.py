@@ -32,7 +32,7 @@ __all__ = ('AdapterFieldWidgetTestCase', 'BooleanFieldWidgetTestCase',
     'TextFieldWidgetTestCase',
     'TypedChoiceFieldWidgetTestCase', 'TypedMultipleChoiceFieldWidgetTestCase',
     'URLFieldWidgetTestCase', 'PythonModuleFieldWidgetTestCase',
-    'PythonClassFieldWidgetTestCase',
+    'PythonClassFieldWidgetTestCase', 'QuerysetFieldWidgetTestCase',
     )
 
 class FieldWidgetTestCaseBase(FieldTestCaseBase):
@@ -256,6 +256,12 @@ class PythonModuleFieldWidgetTestCase(
 
 class PythonClassFieldWidgetTestCase(
     PythonClassFieldTestCase,
+    FieldWidgetTestCaseBase
+    ):
+  pass
+
+class QuerysetFieldWidgetTestCase(
+    QuerysetFieldTestCase,
     FieldWidgetTestCaseBase
     ):
   pass
