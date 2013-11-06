@@ -79,7 +79,7 @@ class BooleanFieldTestCase(FieldTestCaseBase):
 class DecimalFieldTestCase(FieldTestCaseBase):
   fieldKlass = field.DecimalField
   def getInitData(self):
-    return 1
+    return 1.8
 
 class EmailFieldTestCase(FieldTestCaseBase):
   fieldKlass = field.EmailField
@@ -97,7 +97,7 @@ class FilePathFieldTestCase(FieldTestCaseBase):
 class FloatFieldTestCase(FieldTestCaseBase):
   fieldKlass = field.FloatField
   def getInitData(self):
-    return 1.0
+    return 1.3
 
 class GenericIPAddressFieldTestCase(FieldTestCaseBase):
   fieldKlass = field.GenericIPAddressField
