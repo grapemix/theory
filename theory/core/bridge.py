@@ -120,6 +120,9 @@ class Bridge(object):
     if(hasattr(adapter, "render")):
       adapter.render()
 
+    for field in headInst.paramForm.fields.values():
+      field.widget = field.widget.__class__
+
     return (
         headInst,
         self._propertiesAssign(
