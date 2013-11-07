@@ -272,7 +272,10 @@ class CheckBoxInput(BaseLabelInput):
     pass
 
   def updateField(self):
-    self.fieldSetter({"finalData": self.widgetLst[0].finalData})
+    choices = {}
+    for child in self.widgetLst[0].widgetChildrenLst:
+      choices[child.label] = child.obj.state
+    self.fieldSetter({"finalData": choices})
 
 class FileselectInput(BaseLabelInput):
   widgetClass = element.FileSelector

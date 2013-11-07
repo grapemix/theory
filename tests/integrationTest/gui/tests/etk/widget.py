@@ -5,6 +5,7 @@
 from theory.core.exceptions import ValidationError
 from theory.gui import field
 from theory.gui.etk.element import Multibuttonentry, Entry
+from theory.model import Adapter
 from theory.utils import unittest
 
 ##### Theory third-party lib #####
@@ -36,11 +37,14 @@ __all__ = ('AdapterFieldWidgetTestCase', 'BooleanFieldWidgetTestCase',
     )
 
 class FieldWidgetTestCaseBase(FieldTestCaseBase):
+  def extraWidgetParam(self):
+    return {}
+
   def renderWidget(self, field, *args, **kwargs):
     (dummyWin, dummyBx) = getDummyEnv()
 
     dummyBx.generate()
-    field.renderWidget(dummyWin, dummyBx.obj)
+    field.renderWidget(dummyWin, dummyBx.obj, **self.extraWidgetParam())
     dummyBx.addInput(field.widget)
     dummyBx.postGenerate()
     self.dummyWin = dummyWin
@@ -174,7 +178,16 @@ class AdapterFieldWidgetTestCase(
     AdapterFieldTestCase,
     FieldWidgetTestCaseBase
     ):
-  pass
+
+  def extraWidgetParam(self):
+    #return self._getMockAdapterObject(Adapter(name="dummyAdapter"), "fake.path")
+    try:
+      Adapter.objects.get(name="DummyForTest").delete()
+    except:
+      pass
+    adapter = Adapter(name="DummyForTest", importPath="fake.path")
+    adapter.save()
+    return {"attrs": {"choices": {"DummyForTest": True}}}
 
 class SlugFieldWidgetTestCase(SlugFieldTestCase, FieldWidgetTestCaseBase):
   pass

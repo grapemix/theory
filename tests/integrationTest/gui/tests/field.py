@@ -2,6 +2,7 @@
 ##### System wide lib #####
 from collections import OrderedDict
 import copy
+from inspect import isclass
 from ludibrio import Stub
 import os
 import sys
@@ -47,11 +48,6 @@ class FieldTestCaseBase(unittest.TestCase):
 
   def setUp(self):
     pass
-
-  def _getMockAdapterObject(self, adapter, classImportPath):
-    with Stub(proxy=adapter) as adapter:
-      adapter.classImportPath >> "%s.%s" % (self.__module__, classImportPath)
-    return adapter
 
   def _getMockModelValidateGroupObject(self, modelValidateGroup, classImportPath):
     with Stub(proxy=modelValidateGroup) as modelValidateGroup:
@@ -121,6 +117,7 @@ class TextFieldTestCase(FieldTestCaseBase):
 
   def testAssignFinalData(self):
     self.field = self.fieldKlass(initData="test")
+    self.renderWidget(self.field)
     self.assertEqual(self.field.initData, "test")
 
     self.field.finalData = "for real"
@@ -135,6 +132,7 @@ class TextFieldTestCase(FieldTestCaseBase):
 
   def testAccessEmptyFinalData(self):
     self.field = self.fieldKlass(initData="test")
+    self.renderWidget(self.field)
     self.assertEqual(self.field.initData, "test")
     self.assertEqual(self.field.finalData, "test")
 
@@ -194,7 +192,25 @@ class TypedMultipleChoiceFieldTestCase(MultipleChoiceFieldTestCase):
 class AdapterFieldTestCase(FieldTestCaseBase):
   fieldKlass = field.AdapterField
   def getInitData(self):
-    return self._getMockAdapterObject(Adapter(name="dummyAdapter"), "fake.path")
+    return ["DummyForTest",]
+
+  def testInitData(self):
+    initData = self.getInitData()
+    self.field = self.fieldKlass(**{"initData": initData})
+    self.renderWidget(self.field)
+    if(isclass(self.field.widget)):
+      self.assertEqual(self.field.clean(self.field.finalData), initData)
+    else:
+      self.assertEqual(
+          self.field.clean(self.field.finalData)[0].id,
+          list(Adapter.objects.filter(name__in=initData))[0].id
+      )
+
+  def testEmptyData(self):
+    self.field = self.fieldKlass()
+    self.field.required = False
+    self.renderWidget(self.field)
+    self.assertEqual(list(self.field.clean(self.field.finalData)), [])
 
 class SlugFieldTestCase(FieldTestCaseBase):
   fieldKlass = field.SlugField
@@ -379,12 +395,27 @@ class QuerysetFieldTestCase(FieldTestCaseBase):
     with self.assertRaises(ValidationError):
       self.assertEqual(self.field.clean(self.field.finalData), [])
 
+  def testEmptyDataWithNoAppAndNoModel(self):
     self.field.required = False
     with self.assertRaises(ValidationError):
       self.assertEqual(self.field.clean(self.field.finalData), [])
 
+  def testEmptyDataWithFalseAutoImport(self):
     self.field.auto_import = False
-    self.assertEqual(self.field.clean(self.field.finalData), [])
+    with self.assertRaises(ValidationError):
+      self.assertEqual(self.field.clean(self.field.finalData), [])
+
+  def testEmptyDataWithAppAndModelWithFalseAutoImport(self):
+    self.field.required = False
+    self.field.auto_import = False
+    self.field.app = "anything"
+    self.field.model = "anything"
+
+    if(isclass(self.field.widget)):
+      self.assertEqual(self.field.clean(self.field.finalData), [])
+    else:
+      with self.assertRaises(ValidationError):
+        self.assertEqual(self.field.clean(self.field.finalData), [])
 
   def testValidInitData(self):
     initData = Adapter.objects.all()
@@ -427,7 +458,14 @@ class QuerysetFieldTestCase(FieldTestCaseBase):
     with self.assertRaises(ValidationError):
       self.assertEqual(self.field.clean(self.field.finalData), initData)
 
-    self.field.auto_import = False
-    self.field.app = None
-    self.field.model = None
-    self.assertEqual(self.field.clean(self.field.finalData), initData)
+    if(isclass(self.field.widget)):
+      self.field.auto_import = False
+      self.field.app = None
+      self.field.model = None
+      self.assertEqual(self.field.clean(self.field.finalData), initData)
+    else:
+      self.field.auto_import = False
+      self.field.app = None
+      self.field.model = None
+      with self.assertRaises(ValidationError):
+        self.assertEqual(self.field.clean(self.field.finalData), initData)
