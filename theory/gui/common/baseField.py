@@ -1570,6 +1570,7 @@ class QuerysetField(Field):
     'dbInvalid': _('Unable to find data in DB'),
     'appInvalid': _('No app has been set'),
     'modelInvalid': _('No model has been set'),
+    'configInvalid': _('Configuration has been invalid'),
   }
 
   def __init__(self, auto_import=False, app=None, model=None, *args, **kwargs):
@@ -1596,7 +1597,13 @@ class QuerysetField(Field):
     super(QuerysetField, self).validate(value)
 
     if(not self.auto_import):
-      return value
+      if(isclass(widget)):
+        return value
+      else:
+        # Widget needed to get queryset from DB, but app and model were required
+        raise ValidationError(
+            self.error_messages['configInvalid'] % {'value': value}
+        )
 
     if(self.app is None):
       raise ValidationError(

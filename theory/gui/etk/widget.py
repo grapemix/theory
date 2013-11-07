@@ -240,6 +240,9 @@ class NumericInput(StringInput):
     attrs = self._buildAttrs(attrs, isExpandMainContainer=False)
     super(NumericInput, self).__init__(fieldSetter, fieldGetter, win, bx, attrs, *args, **kwargs)
 
+  def _prepareInitData(self, initData):
+    return str(initData)
+
 class SelectBoxInput(BaseLabelInput):
   """Assuming labels are unique."""
   widgetClass = element.RadioBox
@@ -260,7 +263,7 @@ class CheckBoxInput(BaseLabelInput):
       (label, value) = v
       widget = self.widgetClass({"initData": value, })
       widget.win = self.win
-      widget.label = label
+      widget.label = str(label)
       hBox.addWidget(widget)
     return (hBox,)
 
@@ -842,19 +845,18 @@ class DictInput(ListInput):
       valueInputBox.reset(**row)
 
 class QueryIdInput(StringInput):
-
-  @property
-  def initData(self):
-    if(len(self.attrs["initData"])==0):
+  def _prepareInitData(self, initData):
+    self.rawInitData = initData
+    if(len(initData)==0):
       return ""
     s = ""
-    for i in self.attrs["initData"]:
-      s += i + ","
+    for i in initData:
+      s += str(i) + ","
     return s[:-1]
 
   def updateField(self):
     if(self.attrs["app"] is None or self.attrs["model"] is None):
-      queryset = self.attrs["initData"]
+      queryset = self.rawInitData
     else:
       dbClass = import_class('{0}.model.{1}'.format(
         self.app,
