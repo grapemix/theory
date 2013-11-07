@@ -277,10 +277,10 @@ class CellRendererButton(gtk.CellRendererText):
   _button_height = 30
 
   def __init__(self, callable=None, kwargs={}):
-    self.__gobject_init__()
+    #self.__gobject_init__()
     gtk.CellRendererText.__init__(self)
     self.set_property("xalign", 0.5)
-    self.set_property("mode", gtk.CELL_RENDERER_MODE_ACTIVATABLE)
+    #self.set_property("mode", gtk.CELL_RENDERER_MODE_ACTIVATABLE)
     self.callable = callable
     self.callableKwargs = kwargs
     self.table = None
