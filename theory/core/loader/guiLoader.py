@@ -27,7 +27,7 @@ def _chkAdapterBuffer():
         created__gt=datetime.now()-timedelta(minutes=1)
         )
     for m in adapterBufferModelLst:
-      getNotify(m)
+      getNotify("Done", str(m))
     gevent.sleep(60)
   return False
 
