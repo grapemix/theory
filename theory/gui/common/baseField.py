@@ -28,6 +28,7 @@ from theory.core.exceptions import ValidationError
 
 # Provide this import for backwards compatibility.
 from theory.core.validators import EMPTY_VALUES
+from theory.model import Adapter
 
 from theory.gui.util import ErrorList, from_current_timezone, to_current_timezone
 from theory.gui.widget import *
@@ -1293,8 +1294,30 @@ class DictField(Field):
       self.widget.setupInstructionComponent()
       super(DictField, self).renderWidget(*args, **kwargs)
 
-class AdapterField(TextField):
-  pass
+class AdapterField(Field):
+  widget = CheckBoxInput
+
+  def __init__(self, *args, **kwargs):
+    super(AdapterField, self).__init__(*args, **kwargs)
+    self.initData = [] if self.initData is None else self.initData
+
+  def renderWidget(self, *args, **kwargs):
+    if("attrs" not in kwargs):
+      kwargs["attrs"] = {}
+    kwargs["attrs"]["choices"] = [
+        (i.name, True if i.name in self.initData else False) \
+            for i in Adapter.objects.all()
+        ]
+    super(AdapterField, self).renderWidget(*args, **kwargs)
+
+  def widgetSetter(self, adapterDict):
+    adapterDict = adapterDict["finalData"]
+    nameLst = []
+    for k,v in adapterDict.iteritems():
+      if(v):
+        nameLst.append(k)
+    data = Adapter.objects.filter(name__in=nameLst)
+    super(AdapterField, self).widgetSetter({"finalData": data})
 
 class MultiValueField(Field):
   """
@@ -1597,7 +1620,7 @@ class QuerysetField(Field):
     super(QuerysetField, self).validate(value)
 
     if(not self.auto_import):
-      if(isclass(widget)):
+      if(isclass(self.widget)):
         return value
       else:
         # Widget needed to get queryset from DB, but app and model were required
