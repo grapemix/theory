@@ -89,6 +89,10 @@ class MongoModelDetectorBase(object):
           "nonEditableForceStrField"
           ),
         "UUIDField": ("nonEditableForceStrField", "nonEditableForceStrField"),
+        "ObjectIdField": (
+          "nonEditableForceStrField",
+          "nonEditableForceStrField"
+          ),
         "SequenceField": (
           "nonEditableForceStrField",
           "nonEditableForceStrField"

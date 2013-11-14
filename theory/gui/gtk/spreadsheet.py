@@ -410,6 +410,12 @@ class SpreadsheetBuilder(MongoModelBSONDataHandler):
 
   def _buildGtkDataModel(self):
     gtkDataModel = []
+
+    for i, fieldName in enumerate(self.fieldPropDict.keys()):
+      if(fieldName=="id"):
+        self.idLabelIdx = i
+        break
+
     for queryrow in self.queryset:
       queryrowInJson = jsonLoads(queryrow.to_json())
       row = []
@@ -421,6 +427,8 @@ class SpreadsheetBuilder(MongoModelBSONDataHandler):
         id = ""
 
       for fieldName, fieldHandlerFxnLst in self.fieldPropDict.iteritems():
+        if(fieldName=="id"):
+          fieldName="_id"
         try:
           result = fieldHandlerFxnLst["dataHandler"](
               id,

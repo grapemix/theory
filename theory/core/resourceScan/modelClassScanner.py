@@ -69,7 +69,7 @@ class ModelClassScanner(BaseClassScanner):
         "EmailField", "URLField", "DynamicField", "ReferenceField",
         "GenericReferenceField", "EmbeddedDocumentField",
         "GenericEmbeddedDocumentField", "ListField", "SortedListField",
-        "MapField", "DictField", "StringField",
+        "MapField", "DictField", "StringField", "ObjectIdField",
     ]
 
     # The reason we needed OrderedDict in here instead of Dict is because
