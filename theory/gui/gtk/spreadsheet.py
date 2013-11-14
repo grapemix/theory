@@ -186,9 +186,13 @@ class Spreadsheet(object):
 
   def renderBtnCol(self, title, colIdx, **kwargs):
     kwargs["colIdx"] = colIdx
-    cell = CellRendererButton(callable=self.showStackDataFxn, kwargs=kwargs)
+    cell = gtk.CellRendererText()
+    cell.set_property("editable", False)
     col = gtk.TreeViewColumn(title, cell, text=colIdx)
     self.treeview.append_column(col)
+    col.pack_start(cell, expand=False)
+    cell = gtk.CellRendererToggle()
+    cell.connect("toggled", self.showStackDataFxn, colIdx)
     col.pack_start(cell, expand=False)
 
   def renderCheckBoxCol(self, title, colIdx, editable):
@@ -268,110 +272,6 @@ class Spreadsheet(object):
   def main(self):
     gtk.main()
 
-class CellRendererButton(gtk.CellRendererText):
-  __gproperties__ = { "callable": (gobject.TYPE_PYOBJECT,
-          "callable property",
-          "callable property",
-          gobject.PARAM_READWRITE) }
-  _button_width = 40
-  _button_height = 30
-
-  def __init__(self, callable=None, kwargs={}):
-    #self.__gobject_init__()
-    gtk.CellRendererText.__init__(self)
-    self.set_property("xalign", 0.5)
-    #self.set_property("mode", gtk.CELL_RENDERER_MODE_ACTIVATABLE)
-    self.callable = callable
-    self.callableKwargs = kwargs
-    self.table = None
-
-
-  def do_set_property(self, pspec, value):
-    if pspec.name == "callable":
-      if callable(value):
-        self.callable = value
-      else:
-        raise TypeError("callable property must be callable!")
-    else:
-      raise AttributeError("Unknown property %s" % pspec.name)
-
-
-  def do_get_property(self, pspec):
-    if pspec.name == "callable":
-      return self.callable
-    else:
-      raise AttributeError("Unknown property %s" % pspec.name)
-
-
-  def do_get_size(self, wid, cell_area):
-    xpad = self.get_property("xpad")
-    ypad = self.get_property("ypad")
-
-    if not cell_area:
-      x, y = 0, 0
-      w = 2 * xpad + self._button_width
-      h = 2 * ypad + self._button_height
-    else:
-      w = 2 * xpad + cell_area.width
-      h = 2 * ypad + cell_area.height
-
-      xalign = self.get_property("xalign")
-      yalign = self.get_property("yalign")
-
-      x = max(0, xalign * (cell_area.width - w))
-      y = max(0, yalign * (cell_area.height - h))
-
-    return (x, y, w, h)
-
-
-  def do_render(self, window, wid, bg_area, cell_area, expose_area, flags):
-    if not window:
-      return
-
-    xpad = self.get_property("xpad")
-    ypad = self.get_property("ypad")
-
-    x, y, w, h = self.get_size(wid, cell_area)
-
-    if flags & gtk.CELL_RENDERER_PRELIT :
-      state = gtk.STATE_PRELIGHT
-      shadow = gtk.SHADOW_ETCHED_OUT
-    else :
-      state = gtk.STATE_NORMAL
-      shadow = gtk.SHADOW_OUT
-    wid.get_style().paint_box(
-        window,
-        state,
-        shadow,
-        cell_area,
-        wid,
-        "button",
-        cell_area.x + x + xpad,
-        cell_area.y + y + ypad,
-        w - 6,
-        h - 6
-        )
-    flags = flags & ~gtk.STATE_SELECTED
-    cell = gtk.CellRendererText.do_render(
-        self,
-        window,
-        wid,
-        bg_area,
-        (cell_area[0], cell_area[1] + ypad, cell_area[2],cell_area[3]),
-        expose_area,
-        flags
-        )
-
-  def do_activate(self, event, wid, path, bg_area, cell_area, flags):
-    cb = self.get_property("callable")
-    if cb != None :
-      cb (path, **self.callableKwargs)
-    return True
-
-
-gobject.type_register(CellRendererButton)
-
-
 class SpreadsheetBuilder(MongoModelBSONDataHandler):
 #class SpreadsheetBuilder(MongoModelDataHandler):
   """This class is used to provide information in order to render the data
@@ -381,26 +281,37 @@ class SpreadsheetBuilder(MongoModelBSONDataHandler):
   class."""
 
   def run(self, queryset, isEditable=False, isMainSpreadsheet=True):
-    self.modelKlass = queryset[0].__class__
+    if(len(queryset)>0):
+      self.modelKlass = queryset[0].__class__
+      self.modelKlassName = self.modelKlass._class_name
 
-    if(self.modelKlass._is_document):
-      nameToken = self.modelKlass._get_collection_name().split("_")
-      appName = nameToken[0]
-      modelName = ""
-      for i in nameToken[1:]:
-        modelName += i.title()
-      appModelmodel = AppModel.objects.get(name=modelName, app=appName)
+      # We need this to find rowData in queryset
+      self.idLabelIdx = None
+
+      if(self.modelKlass._is_document):
+        nameToken = self.modelKlass._get_collection_name().split("_")
+        appName = nameToken[0]
+        modelName = ""
+        for i in nameToken[1:]:
+          modelName += i.title()
+        appModelmodel = AppModel.objects.get(name=modelName, app=appName)
+      else:
+        # embedded document. There has not enough info to get app name.
+        # In this way, it will cause a bug if there exists two models with the
+        # same name in different apps.
+        appModelmodel = AppModel.objects.get(name=self.modelKlassName)
+
+      self.isEditable = isEditable
+      super(SpreadsheetBuilder, self).run(
+          queryset,
+          appModelmodel.fieldNameTypeMap
+          )
     else:
-      # embedded document. There has not enough info to get app name.
-      # In this way, it will cause a bug if there exists two models with the
-      # same name in different apps.
-      appModelmodel = AppModel.objects.get(name=self.modelKlass._class_name)
-
-    self.isEditable = isEditable
-    super(SpreadsheetBuilder, self).run(
-        queryset,
-        appModelmodel.fieldNameTypeMap
-        )
+      self.modelKlassName = "Unknown model"
+      super(SpreadsheetBuilder, self).run(
+          queryset,
+          {}
+          )
 
     listStoreDataType = self._buildListStoreDataType()
     gtkDataModel = self._buildGtkDataModel()
@@ -421,7 +332,7 @@ class SpreadsheetBuilder(MongoModelBSONDataHandler):
       isMainSpreadsheet
       ):
     self.spreadsheet = Spreadsheet(
-        "Listing %s" % (self.modelKlass._class_name),
+        "Listing %s" % (self.modelKlassName),
         listStoreDataType,
         gtkDataModel,
         renderKwargsSet,
@@ -432,20 +343,22 @@ class SpreadsheetBuilder(MongoModelBSONDataHandler):
     else:
       self.spreadsheet.isMainWindow = False
 
-  def showStackData(self, rowNum, **kwargs) :
+  def showStackData(self, toggleWidget, rowNum, colIdx):
+    rowNum = int(rowNum)
+
     if(self.fieldPropDict[
-        self.modelFieldnameMap[kwargs["colIdx"]]
+        self.modelFieldnameMap[colIdx]
       ]["klassLabel"].startswith("listField")):
       # This is for listfield linked with reference/embedded field
       queryset = getattr(
-          self.queryset[int(rowNum)],
-          self.modelFieldnameMap[kwargs["colIdx"]]
+          self.queryset[rowNum],
+          self.modelFieldnameMap[colIdx]
           )
     else:
       # This is for reference/embedded field
       id = getattr(
-          self.queryset[int(rowNum)],
-          self.modelFieldnameMap[kwargs["colIdx"]]
+          self.queryset[rowNum],
+          self.modelFieldnameMap[colIdx]
           )
       queryset = [id] if(id is not None) else []
 
