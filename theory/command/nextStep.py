@@ -41,7 +41,7 @@ class NextStep(SimpleCommand):
   verboseName = "nextStep"
   _notations = ["Command",]
   ParamForm = ParamForm
-  _drums = ["Dummy",]
+  _drums = {"Dummy": 1}
 
   def __init__(self, *args, **kwargs):
     super(NextStep, self).__init__(*args, **kwargs)
