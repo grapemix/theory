@@ -1611,31 +1611,12 @@ class QuerysetField(Field):
     """
     self.validate(value)
     self.run_validators(value)
-    return value
 
-  def validate(self, value):
-    """
-    Validates if the input exists in the db
-    """
-    super(QuerysetField, self).validate(value)
+    if(value==[] or value is None):
+      return []
 
     if(not self.auto_import):
-      if(isclass(self.widget)):
-        return value
-      else:
-        # Widget needed to get queryset from DB, but app and model were required
-        raise ValidationError(
-            self.error_messages['configInvalid'] % {'value': value}
-        )
-
-    if(self.app is None):
-      raise ValidationError(
-          self.error_messages['appInvalid'] % {'value': value}
-      )
-    if(self.model is None):
-      raise ValidationError(
-          self.error_messages['modelInvalid'] % {'value': value}
-      )
+      return value
 
     try:
       dbClass = import_class('{0}.model.{1}'.format(
@@ -1643,11 +1624,36 @@ class QuerysetField(Field):
         self.model
         )
       )
-      return dbClass.objects.in_bulk([i.id for i in value])
+      return dbClass.objects.filter(id__in=[i.id for i in value])
     except:
       raise ValidationError(
           self.error_messages['dbInvalid'] % {'value': value}
       )
+
+    return value
+
+  def validate(self, value):
+    """
+    Validates if the input exists in the db
+    """
+    value = super(QuerysetField, self).validate(value)
+    if(not value):
+      return value
+
+    if(not self.auto_import and isclass(self.widget)):
+      return True
+
+    if(value!=[] and value is not None):
+      if(self.app is None):
+        raise ValidationError(
+            self.error_messages['appInvalid'] % {'value': value}
+        )
+      if(self.model is None):
+        raise ValidationError(
+            self.error_messages['modelInvalid'] % {'value': value}
+        )
+
+    return True
 
   def to_python(self, value):
     return [str(i.id) for i in value]
