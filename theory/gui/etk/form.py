@@ -113,6 +113,11 @@ class GuiFormBase(FormBase, BasePacker):
     for fieldName, errMsg in self.errors.iteritems():
       self.fields[fieldName].widget.reFillLabel(errMsg)
 
+  def preFillFields(self):
+    """It is used to prefill fields which depends on the fields'
+    value. It will only be called in the __init__() and when the form
+    needs another set of initData(e.x: when prefilling the history)."""
+    pass
 class StepFormBase(GuiFormBase):
   def _nextBtnClick(self):
     pass

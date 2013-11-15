@@ -202,6 +202,8 @@ class Reactor(object):
     for fieldName, data in finalDataDict.iteritems():
       self.paramForm.fields[fieldName].initData = data
 
+    self.paramForm.preFillFields()
+
     self.paramForm.generateFilterForm(*self.adapter.uiParam.values())
     self.paramForm.generateStepControl(cleanUpCrtFxn=self.adapter.cleanUpCrt)
 
