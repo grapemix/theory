@@ -145,6 +145,7 @@ class ModelClassScanner(BaseClassScanner):
     model.name = modelClassName
     model.fieldNameTypeMap = self._matchFieldType(modelClass._fields)
     model.tblField = model.formField = modelClass._fields.keys()
+    model.isEmbedded = issubclass(modelClass, TheoryEmbeddedModel)
     return model
 
   def scan(self):
