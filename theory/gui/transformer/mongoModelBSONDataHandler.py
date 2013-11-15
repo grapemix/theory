@@ -63,19 +63,19 @@ class MongoModelBSONDataHandler(MongoModelDetectorBase):
 
   def _listFieldembeddedFieldDataHandler(self, rowId, fieldName, fieldVal):
     try:
-      return len(fieldVal)
+      return str(len(fieldVal))
     except TypeError:
       # This happen when fieldVal is None which is because there has KeyError
       # in SpreadSheetBuilder's fieldPropDict
-      return 0
+      return "0"
 
   def _listFieldmodelFieldDataHandler(self, rowId, fieldName, fieldVal):
     try:
-      return len(fieldVal)
+      return str(len(fieldVal))
     except TypeError:
       # This happen when fieldVal is None which is because there has KeyError
       # in SpreadSheetBuilder's fieldPropDict
-      return 0
+      return "0"
 
   def _modelFieldDataHandler(self, rowId, fieldName, fieldVal):
     return "1" if(fieldVal is not None) else "0"
@@ -94,13 +94,13 @@ class MongoModelBSONDataHandler(MongoModelDetectorBase):
 
   def _floatFieldDataHandler(self, rowId, fieldName, fieldVal):
     if(fieldVal is None):
-      return 0.0
-    return fieldVal
+      return "0.0"
+    return str(fieldVal)
 
   def _intFieldDataHandler(self, rowId, fieldName, fieldVal):
     if(fieldVal is None):
-      return 0
-    return fieldVal
+      return "0"
+    return str(fieldVal)
 
   def _enumFieldDataHandler(self, rowId, fieldName, fieldVal):
     return self.fieldPropDict[fieldName]["choices"][fieldVal]
