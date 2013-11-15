@@ -158,7 +158,7 @@ class Spreadsheet(object):
     cell = gtk.CellRendererSpin()
     cell.set_property(
         "adjustment",
-        gtk.Adjustment(lower=min, upper=max, step_incr=step)
+        gtk.Adjustment(lower=min, upper=max, step_increment=step)
         )
     cell.set_property("editable", editable)
     col.pack_start(cell, expand=False)
