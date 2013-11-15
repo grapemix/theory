@@ -94,13 +94,13 @@ class MongoModelBSONDataHandler(MongoModelDetectorBase):
 
   def _floatFieldDataHandler(self, rowId, fieldName, fieldVal):
     if(fieldVal is None):
-      return "0.0"
-    return str(fieldVal)
+      return 0.0
+    return fieldVal
 
   def _intFieldDataHandler(self, rowId, fieldName, fieldVal):
     if(fieldVal is None):
-      return "0"
-    return str(fieldVal)
+      return 0
+    return fieldVal
 
   def _enumFieldDataHandler(self, rowId, fieldName, fieldVal):
     return self.fieldPropDict[fieldName]["choices"][fieldVal]
