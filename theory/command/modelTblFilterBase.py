@@ -40,8 +40,13 @@ class ModelTblFilterBase(SimpleCommand):
     modelName = field.ChoiceField(label="Model Name",
         help_text="The name of models to be listed",
         )
-    queryset = field.QuerysetField(required=False, label="Queryset",
-        help_text="The queryset to be processed", initData=[])
+    queryset = field.QuerysetField(
+        required=False,
+        label="Queryset",
+        help_text="The queryset to be processed",
+        initData=[],
+        isSkipInHistory=True,
+        )
     queryFilter = field.DictField(
         field.TextField(),
         field.TextField(),
