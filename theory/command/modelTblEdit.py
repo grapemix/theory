@@ -3,12 +3,7 @@
 ##### System wide lib #####
 
 ##### Theory lib #####
-from theory.command.baseCommand import SimpleCommand
-from theory.conf import settings
-from theory.core.bridge import Bridge
-from theory.gui import field
-from theory.model import AppModel
-from theory.utils.importlib import import_class
+from theory.command.modelTblFilterBase import ModelTblFilterBase
 
 ##### Theory third-party lib #####
 
@@ -20,93 +15,16 @@ from theory.utils.importlib import import_class
 
 __all__ = ("modelTblEdit",)
 
-class ModelTblEdit(SimpleCommand):
+class ModelTblEdit(ModelTblFilterBase):
   """
   To edit a model
   """
   name = "modelTblEdit"
   verboseName = "model table edit"
-  _gongs = ["QuerysetAsSpreadsheet", ]
-  _drums = {"Terminal": 1,}
 
-  class ParamForm(SimpleCommand.ParamForm):
-    appName = field.ChoiceField(label="Application Name",
-        help_text="Commands provided by this application",
-        initData="theory",
-        choices=(set([("theory", "theory")] +
-          [(settings.INSTALLED_APPS[i], settings.INSTALLED_APPS[i])
-            for i in range(len(settings.INSTALLED_APPS))])),
-        )
-    modelName = field.ChoiceField(label="Model Name",
-        help_text="The name of the model to be listed",
-        )
-    queryset = field.QuerysetField(required=False, label="Queryset",
-        help_text="The queryset to be processed", initData=[])
-    # Not yet in this version
-    #pagination = field.IntegerField(label="pagination",
-    #    help_text="Number of items per page",
-    #    initData=50,
-    #    required=False)
-
-
-    def __init__(self, *args, **kwargs):
-      super(SimpleCommand.ParamForm, self).__init__(*args, **kwargs)
-      appName = self.fields["appName"].initData
-      self.fields["modelName"].choices = self._getModelNameChoices(appName)
-
-    def _getModelNameChoices(self, appName):
-      return set(
-          [(i.name, i.name) for i in AppModel.objects.filter(app=appName)]
-      )
-
-    def appNameFocusChgCallback(self, *args, **kwargs):
-      field = self.fields["appName"]
-      appName = field.clean(field.finalData)
-      field.finalData = None
-
-      field = self.fields["modelName"]
-      field.choices = self._getModelNameChoices(appName)
-      field.widget.reset(choices=field.choices)
-
-  @property
-  def queryset(self):
-    return self._queryset
-
-  @queryset.setter
-  def queryset(self, queryset):
-    self._queryset = queryset
-
-  def _saveEditChanges(self):
+  def _applyChangeOnQueryset(self):
     for model in self.paramForm.clean()["queryset"]:
       model.save()
     self._stdOut += "{0} model has been saved."\
         .format(len(self.paramForm.clean()["queryset"]))
 
-  def run(self):
-    self._stdOut = ""
-    isQuerysetNonEmpty = self._fetchQueryset()
-    if(isQuerysetNonEmpty):
-      bridge = Bridge()
-      (delMe, newParamForm) = bridge.bridgeToSelf(self)
-      self.paramForm = newParamForm
-      self.paramForm.full_clean()
-      self._saveEditChanges()
-    else:
-      self._stdOut += "No data found."
-
-  def _fetchQueryset(self):
-    formData = self.paramForm.clean()
-
-    if(len(formData["queryset"]) > 0):
-      self.queryset = formData["queryset"]
-      return True
-    else:
-      modelName = formData["modelName"]
-      modelName = modelName[0].upper() + modelName[1:]
-      self.modelKlass = import_class(
-          "%s.model.%s" % (formData["appName"], modelName)
-      )
-      self.queryset = self.modelKlass.objects.all()
-      if(len(self.queryset)>0):
-        return True
-    return False
