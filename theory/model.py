@@ -15,6 +15,11 @@ from theory.utils.translation import ugettext_lazy as _
 
 ##### Misc #####
 
+__all__ = (
+      "Command", "Adapter", "History", "AdapterBuffer", "AppModel", \
+      "BinaryClassifierHistory"
+  )
+
 class Parameter(EmbeddedDocument):
   name = StringField(required=True, max_length=256,\
       verbose_name=_("Parameter's name"),\
@@ -211,4 +216,16 @@ class AppModel(Model):
       verbose_name=_("Import path"),
       unique=True,
       help_text=_("The path to import the adapter")
+      )
+  isEmbedded = BooleanField(
+      required=True,
+      verbose_name=_("Is embedded flag"),
+      help_text=_("Is embedded document flag"),
+      )
+  importanceRating = IntField(
+      required=True,
+      default=0,
+      verbose_name=_("importance rating"),
+      help_text=_("""The level of importance of this model to the app. The
+        higher the rating, the more important model to the app."""),
       )
