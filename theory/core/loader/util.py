@@ -174,6 +174,7 @@ class CommandModuleLoader(ModuleLoader):
       "modelQuery": ["norm"],
       "modelEdit": ["norm"],
       "modelTblEdit": ["norm"],
+      "modelTblDel": ["norm"],
       "modelDel": ["norm"],
       "modelAdd": ["norm"],
     }
