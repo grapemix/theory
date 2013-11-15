@@ -78,7 +78,7 @@ class GtkSpreadsheetModelBSONDataHandler(MongoModelDetectorBase):
     pass
 
   def _editableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
-    return unicode(fieldVal)
+    return unicode(fieldVal.decode("utf8"))
 
   def _dictFieldDataHandler(self, rowId, fieldName, fieldVal):
     # it is supposed to be no editable in this version
@@ -119,7 +119,7 @@ class GtkSpreadsheetModelBSONDataHandler(MongoModelDetectorBase):
     return bool(fieldVal)
 
   def _strFieldDataHandler(self, rowId, fieldName, fieldVal):
-    return unicode(fieldVal)
+    return unicode(fieldVal.decode("utf8"))
 
   def _floatFieldDataHandler(self, rowId, fieldName, fieldVal):
     return float(fieldVal)
