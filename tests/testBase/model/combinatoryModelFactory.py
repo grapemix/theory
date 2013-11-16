@@ -298,7 +298,11 @@ class CombinatoryModelFactory(object):
     m = CombinatoryModelWithDefaultValue()
     m.save()
     o = DummyAppModelManager()
-    o.registerModel("testBase", "CombinatoryModelWithDefaultValue", m)
+    o.registerModel(
+        "testBase",
+        "CombinatoryModelWithDefaultValue",
+        CombinatoryModelWithDefaultValue
+        )
     return m
 
   def getModelDefaultValue(self):

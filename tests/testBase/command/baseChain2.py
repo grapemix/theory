@@ -7,6 +7,7 @@
 from theory.command.baseCommand import SimpleCommand
 from theory.gui import field
 from theory.model import *
+from theory.model import Parameter
 
 ##### Local app #####
 from .baseChain import BaseChain

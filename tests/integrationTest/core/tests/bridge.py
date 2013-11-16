@@ -6,7 +6,7 @@ import sys
 
 ##### Theory lib #####
 from theory.utils import unittest
-#from theory.db.models import QuerySet
+from theory.db.models import QuerySet
 from theory.model import *
 
 ##### Theory third-party lib #####
