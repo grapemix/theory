@@ -24,8 +24,23 @@ from element import Button
 __all__ = ("Form", "CommandForm", "GuiForm")
 
 class GuiFormBase(FormBase, BasePacker):
+  def _changeFormWindowHeight(self, maxHeight):
+    pass
+
+  def generateForm(self, win, bx, unFocusFxn):
+    pass
+
+  def _createFormSkeleton(self, win, bx):
+    self.win = win
+    self.bx = bx
+
+class FlexibleGuiFormBase(GuiFormBase):
+  def generateForm(self, win, bx, unFocusFxn):
+    pass
+
+class SimpleGuiFormBase(GuiFormBase):
   def __init__(self, *args, **kwargs):
-    super(GuiFormBase, self).__init__(*args, **kwargs)
+    super(SimpleGuiFormBase, self).__init__(*args, **kwargs)
     # We have to call the initialize fxn explicitly because the
     # BasePacker initialize fxn won't be executed if we only called
     # super().__init__(). We temporary set win and bx as None because
@@ -43,8 +58,7 @@ class GuiFormBase(FormBase, BasePacker):
       self.win.resize(640, preferHeight)
 
   def _createFormSkeleton(self, win, bx):
-    self.win = win
-    self.bx = bx
+    super(SimpleGuiFormBase, self)._createFormSkeleton(win, bx)
     self.formBx = self._createContainer()
     self.formBx.bx = self.bx
     self.formBx.generate()
@@ -118,7 +132,7 @@ class GuiFormBase(FormBase, BasePacker):
     value. It will only be called in the __init__() and when the form
     needs another set of initData(e.x: when prefilling the history)."""
     pass
-class StepFormBase(GuiFormBase):
+class StepFormBase(SimpleGuiFormBase):
   def _nextBtnClick(self):
     pass
 
