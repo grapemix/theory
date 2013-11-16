@@ -21,7 +21,7 @@ from element import Button
 
 ##### Misc #####
 
-__all__ = ("Form", "CommandForm", "GuiForm")
+__all__ = ("Form", "CommandForm", "SimpleGuiForm", "FlexibleGuiForm")
 
 class GuiFormBase(FormBase, BasePacker):
   def _changeFormWindowHeight(self, maxHeight):
@@ -180,6 +180,12 @@ class CommandFormBase(StepFormBase):
       self.optionalMenu.setFocusOnFilterEntry()
 
 class GuiForm(GuiFormBase):
+  __metaclass__ = DeclarativeFieldsMetaclass
+
+class SimpleGuiForm(SimpleGuiFormBase):
+  __metaclass__ = DeclarativeFieldsMetaclass
+
+class FlexibleGuiForm(FlexibleGuiFormBase):
   __metaclass__ = DeclarativeFieldsMetaclass
 
 class StepForm(StepFormBase):
