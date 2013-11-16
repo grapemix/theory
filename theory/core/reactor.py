@@ -281,7 +281,7 @@ class Reactor(object):
             )
 
     self.historyModel = History.objects.all()
-    self.historyLen += 1
+    self.historyLen = len(self.historyModel)
 
   # TODO: refactor this function, may be with bridge
   def run(self):
