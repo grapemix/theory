@@ -83,7 +83,7 @@ class Field(object):
 
   def __init__(self, required=True, label=None, initData=None,
          help_text=None, error_messages=None, show_hidden_initial=False,
-         validators=[], localize=False, widget=None):
+         validators=[], localize=False, isSkipInHistory=False, widget=None):
     # required -- Boolean that specifies whether the field is required.
     #             True by default.
     # label -- A verbose name for this field, for use in displaying this
@@ -126,6 +126,8 @@ class Field(object):
 
     self.validators = self.default_validators + validators
 
+    # should we skip recording this field into history
+    self.isSkipInHistory = isSkipInHistory
     self.isSingular = True # not interact with other fields
 
     if widget is not None:

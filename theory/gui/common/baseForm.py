@@ -238,6 +238,8 @@ class FormBase(object):
         encoderKwargs = {"cls": TheoryJSONEncoder}
         jsonDict = {}
         for fieldName, field in self.fields.iteritems():
+          if(field.isSkipInHistory):
+            continue
           try:
             jsonDict[fieldName] = field.to_python(field.finalData)
           except Exception as e: # eval can throw many different errors
