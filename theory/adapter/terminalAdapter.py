@@ -4,7 +4,7 @@
 
 ##### Theory lib #####
 from theory.gui import field
-from theory.gui.form import GuiForm
+from theory.gui.form import SimpleGuiForm
 
 ##### Theory third-party lib #####
 
@@ -19,7 +19,7 @@ class TerminalAdapter(BaseUIAdapter):
   _stdOut = ""
   _stdErr = ""
 
-  class TerminalForm(GuiForm):
+  class TerminalForm(SimpleGuiForm):
     stdOut = field.TextField(label="Standard Output")
     #stdErr = field.TextField(label="Standard Error")
 

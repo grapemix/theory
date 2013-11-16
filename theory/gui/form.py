@@ -20,7 +20,7 @@ from theory.utils.importlib import import_module
 #    between field and mongoenigne.
 
 def _importModule():
-  supportModuleLst = ("Form", "GuiForm", "CommandForm",)
+  supportModuleLst = ("Form", "SimpleGuiForm", "FlexibleGuiForm", "CommandForm",)
 
   module = import_module("theory.gui.{0}.form".format(settings.UI_TOOLKIT))
 
