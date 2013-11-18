@@ -199,10 +199,7 @@ class Reactor(object):
     self.paramForm = cmdParamFormKlass()
     self.paramForm._nextBtnClick = self.cleanParamForm
 
-    for fieldName, data in finalDataDict.iteritems():
-      self.paramForm.fields[fieldName].initData = data
-
-    self.paramForm.preFillFields()
+    self.paramForm.fillInitData(finalDataDict)
 
     self.paramForm.generateFilterForm(*self.adapter.uiParam.values())
     self.paramForm.generateStepControl(cleanUpCrtFxn=self.adapter.cleanUpCrt)
