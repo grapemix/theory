@@ -2,6 +2,7 @@
 #!/usr/bin/env python
 
 ##### System wide lib #####
+from collections import OrderedDict
 
 ##### Theory lib #####
 from theory.gui.common.baseForm import (
@@ -52,8 +53,68 @@ class GuiFormBase(FormBase, BasePacker):
     self.bx = bx
 
 class FlexibleGuiFormBase(GuiFormBase):
-  def generateForm(self, win, bx, unFocusFxn):
+  def __init__(self, *args, **kwargs):
+    super(FlexibleGuiFormBase, self).__init__(*args, **kwargs)
+    self.modelFieldNameLst = {}
+    self.combineFieldNameVsModelField = {}
+    self.modelCacheDict = {}
+
+  def _generateCombineFieldName(self, modelName, fieldName):
+    combineFieldName = modelName[0].lower() + modelName[1:] + \
+        fieldName[0].upper() + fieldName[1:]
+
+    self.combineFieldNameVsModelField[combineFieldName] = (modelName, fieldName)
+    return combineFieldName
+
+  def getModelInOrderedDict(self, modelKlassVsId):
+    r = OrderedDict()
+    for modelKlass, id in modelKlassVsId.iteritems():
+      modelName = modelKlass.__name__
+      fieldNameLst = self.modelFieldNameLst[modelName]
+      if("." in str(id)):
+        parentModelName, idFieldName = id.split(".")
+        modelRef = r[parentModelName + idFieldName[0].upper() + idFieldName[1:]]
+        self.modelCacheDict[modelName] = modelRef
+
+        if(isinstance(modelRef, (list, tuple))):
+          fieldVal = []
+          for modelObj in modelRef:
+            fieldVal.append(getattr(modelObj, fieldName))
+          for fieldName in fieldNameLst:
+            combineFieldName = self._generateCombineFieldName(modelName, fieldName)
+            r[combineFieldName] = fieldVal
+        elif(isinstance(modelRef, dict)):
+          pass
+        else:
+          for fieldName in fieldNameLst:
+            combineFieldName = self._generateCombineFieldName(modelName, fieldName)
+            r[combineFieldName] = getattr(modelRef, fieldName)
+      else:
+        modelObj = modelKlass.objects.fields(*fieldNameLst).get(id=id)
+        self.modelCacheDict[modelName] = modelObj
+        for i, fieldName in enumerate(fieldNameLst):
+          combineFieldName = self._generateCombineFieldName(modelName, fieldName)
+          r[combineFieldName] = getattr(modelObj, fieldName)
+
+    return r
+
+  def _customRenderAndPackWidget(self, fieldName, field, kwargs):
     pass
+
+  def generateForm(self, win, bx, unFocusFxn):
+    self.unFocusFxn = unFocusFxn
+    focusChgFxnNameTmpl = "{0}FocusChgCallback"
+    contentChgFxnNameTmpl = "{0}ContentChgCallback"
+
+    for name, field in self.fields.items():
+      kwargs = {}
+      focusChgFxnName = focusChgFxnNameTmpl.format(name)
+      contentChgFxnName = contentChgFxnNameTmpl.format(name)
+      if(hasattr(self, focusChgFxnName)):
+        kwargs["focusChgFxn"] = getattr(self, focusChgFxnName)
+      elif(hasattr(self, contentChgFxnName)):
+        kwargs["contentChgFxn"] = getattr(self, contentChgFxnName)
+      self._customRenderAndPackWidget(name, field, kwargs)
 
 class SimpleGuiFormBase(GuiFormBase):
   def __init__(self, *args, **kwargs):
