@@ -528,28 +528,29 @@ class ListInput(BaseLabelInput):
     widget = self.widgetClass(defaultParam)
     widget.win = self.win
     self._inputLst.append(widget)
+    return (widget, )
 
-    buttonControlBox = self._createContainer(
-        {
-          "isHorizontal": True,
-          "isWeightExpand": False,
-          "isFillAlign": False
-        }
-    )
-    buttonControlBox.generate()
+    #buttonControlBox = self._createContainer(
+    #    {
+    #      "isHorizontal": True,
+    #      "isWeightExpand": False,
+    #      "isFillAlign": False
+    #    }
+    #)
+    #buttonControlBox.generate()
 
-    btn = element.Button({"isWeightExpand": True, "isFillAlign": False, })
-    btn.win = self.win
-    btn.label = "Toggle Expand"
-    btn._clicked = lambda btn: mbe.expanded_set(not mbe.expanded_get())
-    buttonControlBox.addWidget(btn)
+    #btn = element.Button({"isWeightExpand": True, "isFillAlign": False, })
+    #btn.win = self.win
+    #btn.label = "Toggle Expand"
+    #btn._clicked = lambda btn: mbe.expanded_set(not mbe.expanded_get())
+    #buttonControlBox.addWidget(btn)
 
-    btn = element.Button({"isWeightExpand": True, "isFillAlign": False, })
-    btn.win = self.win
-    btn.label = "Clear"
-    btn._clicked = lambda bt: widget.obj.clear()
-    buttonControlBox.addWidget(btn)
-    return (widget, buttonControlBox,)
+    #btn = element.Button({"isWeightExpand": True, "isFillAlign": False, })
+    #btn.win = self.win
+    #btn.label = "Clear"
+    #btn._clicked = lambda bt: widget.obj.clear()
+    #buttonControlBox.addWidget(btn)
+    #return (widget, buttonControlBox,)
 
   def _createLongStringWidget(self, *args, **kwargs):
     """The adding child mechanism is handled by the widget itself."""
