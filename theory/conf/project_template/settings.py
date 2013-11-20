@@ -24,12 +24,12 @@ MANAGERS = ADMINS
 
 DATABASES = {
   'default': {
-    'ENGINE': 'theory.db.backends.mongoengine', # Add 'mongoengine',
-    'NAME': join(PROJECT_PATH, 'db',),
-    'USER': '',                      # Not used with sqlite3.
-    'PASSWORD': '',                  # Not used with sqlite3.
-    'HOST': '',                      # Set to empty string for localhost.
-    'PORT': '',                      # Set to empty string for default.
+    'ENGINE': 'theory.db.backends.mongoEngine',
+    'NAME': '',
+    'USER': '',
+    'PASSWORD': '',
+    'HOST': '',
+    'PORT': '27017',
   }
 }
 
@@ -69,6 +69,9 @@ MIDDLEWARE_CLASSES = (
 
 UI_DIRS = (
   join(PROJECT_PATH, 'templates'),
+)
+
+INSTALLED_MOODS = (
 )
 
 INSTALLED_APPS = (
