@@ -30,10 +30,12 @@ FILL_HORIZ = (evas.EVAS_HINT_FILL, 0.0)
 # related to GUI might have a big change in the future
 class E17Widget(object):
   __metaclass__ = ABCMeta
-  win = None
-  bx = None
+  #win = None
+  #bx = None
 
   def __init__(self, attrs=None, *args, **kwargs):
+    self.win = None
+    self.bx = None
     self.obj = None
     self.attrs = {
         "isFillAlign": False,
@@ -852,42 +854,64 @@ class FileSelector(E17Widget):
     self.obj = fs
 
 
-class Multibuttonentry(E17Widget):
-  def cb_filter1(self, mbe, text):
-    return True
-
-  def __init__(self, attrs=None, *args, **kwargs):
-    defaultAttrs = {\
-        "isFillAlign": True, \
-        "isWeightExpand": True, \
-    }
-    if(attrs is not None):
-      defaultAttrs.update(attrs)
-    super(Multibuttonentry, self).__init__(defaultAttrs, *args, **kwargs)
-    self.counter = 0
-    self.item = None
-
-  def generate(self, *args, **kwargs):
-    mbe = elementary.MultiButtonEntry(self.win)
-    self.obj = mbe
-
-    if(self.attrs.has_key("helperLabel")):
-      mbe.text = self.attrs["helperLabel"]
-    mbe.part_text_set("guide", "Tap to add")
-    mbe.filter_append(self.cb_filter1)
-    if(self.attrs["initData"] is not None):
-      self.finalData = self.attrs["initData"]
+class Multibuttonentry(Entry):
 
   @property
   def finalData(self):
-    return [i.text for i in self.obj.items]
+    return self.obj.entry_get().split(",")
 
   @finalData.setter
   def finalData(self, finalData):
-    self.reset(finalData=finalData)
+    self.reset(finalData=",".join(finalData))
 
-  def reset(self, initData=[], finalData=[]):
-    data = initData if(len(initData)>0) else finalData
-    for s in data:
-      self.obj.item_append(s)
+  def reset(self, **kwargs):
+    txt = ""
+    if(kwargs.has_key("initData")):
+      txt = kwargs["initData"]
+    elif(kwargs.has_key("finalData")):
+      txt = kwargs["finalData"]
+    self.obj.entry_set(txt)
+
+  def generate(self, *args, **kwargs):
+    self.attrs["initData"] = ",".join(self.attrs["initData"])
+    super(Multibuttonentry, self).generate(*args, **kwargs)
+
+#class Multibuttonentry(E17Widget):
+#  def cb_filter1(self, mbe, text):
+#    return True
+#
+#  def __init__(self, attrs=None, *args, **kwargs):
+#    defaultAttrs = {\
+#        "isFillAlign": True, \
+#        "isWeightExpand": True, \
+#    }
+#    if(attrs is not None):
+#      defaultAttrs.update(attrs)
+#    super(Multibuttonentry, self).__init__(defaultAttrs, *args, **kwargs)
+#    self.counter = 0
+#    self.item = None
+#
+#  def generate(self, *args, **kwargs):
+#    mbe = elementary.MultiButtonEntry(self.win)
+#    self.obj = mbe
+#
+#    if(self.attrs.has_key("helperLabel")):
+#      mbe.text = self.attrs["helperLabel"]
+#    mbe.part_text_set("guide", "Tap to add")
+#    mbe.filter_append(self.cb_filter1)
+#    if(self.attrs["initData"] is not None):
+#      self.finalData = self.attrs["initData"]
+#
+#  @property
+#  def finalData(self):
+#    return [i.text for i in self.obj.items]
+#
+#  @finalData.setter
+#  def finalData(self, finalData):
+#    self.reset(finalData=finalData)
+#
+#  def reset(self, initData=[], finalData=[]):
+#    data = initData if(len(initData)>0) else finalData
+#    for s in data:
+#      self.obj.item_append(s)
 
