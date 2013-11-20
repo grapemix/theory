@@ -11,7 +11,7 @@ from json import loads as jsonLoads
 ##### Local app #####
 
 ##### Theory app #####
-from gui.transformer.gtkSpreadsheetBSONDataHandler \
+from theory.gui.transformer.gtkSpreadsheetBSONDataHandler \
     import GtkSpreadsheetModelBSONDataHandler
 
 ##### Misc #####
