@@ -34,7 +34,7 @@ class CreateCmd(SimpleCommand):
     )
     cmdName = field.TextField(
         label="Command Name",
-        help_text=" The name of command being created",
+        help_text=" The name of command being created in lowercase.",
         max_length=32
     )
     cmdType = field.ChoiceField(label="Command Type",
@@ -96,7 +96,7 @@ class CreateCmd(SimpleCommand):
 
     propertyLst = self.getPropertyLst(data["propertyNameLst"])
 
-    CmdName=cmdName[0].upper() + cmdName[1:]
+    CmdName = cmdName[0].upper() + cmdName[1:]
     if(data["cmdType"]=="AsyncCommand"):
       extraCode = "super({0}, self).run(*args, **kwargs)".format(CmdName)
     else:
