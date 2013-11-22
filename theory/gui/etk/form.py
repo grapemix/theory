@@ -90,7 +90,7 @@ class FlexibleGuiFormBase(GuiFormBase):
             combineFieldName = self._generateCombineFieldName(modelName, fieldName)
             r[combineFieldName] = getattr(modelRef, fieldName)
       else:
-        modelObj = modelKlass.objects.fields(*fieldNameLst).get(id=id)
+        modelObj = modelKlass.objects.only(*fieldNameLst).get(id=id)
         self.modelCacheDict[modelName] = modelObj
         for i, fieldName in enumerate(fieldNameLst):
           combineFieldName = self._generateCombineFieldName(modelName, fieldName)
