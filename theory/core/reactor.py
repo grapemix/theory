@@ -178,6 +178,7 @@ class Reactor(object):
       # Cut the last tab out
       self.adapter.restoreCmdLine()
       self.paramForm.focusOnTheFirstChild()
+      return
     self.parser.initVar()
 
   def cleanParamForm(self, btn, dummy):
