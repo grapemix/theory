@@ -130,7 +130,8 @@ class Frame(E17Widget):
   def postGenerate(self):
     if(self.content!=None):
       self.obj.content_set(self.content.obj)
-    self.bx.pack_end(self.obj)
+    if(hasattr(self.bx, "pack_end")):
+      self.bx.pack_end(self.obj)
     super(Frame, self).postGenerate()
 
   @property
@@ -527,6 +528,28 @@ class Box(E17Widget):
 
   def registerUnfocusFxn(self, unFocusFxn):
     self.obj.on_key_down_add(unFocusFxn, self.obj)
+
+class Table(Box):
+  def generate(self, *args, **kwargs):
+    if(self.obj is not None):
+      return
+
+    bx = elementary.Table(self.win)
+
+    # If a box is inside a frame
+    if(self.bx is not None):
+      self.bx.pack_end(bx)
+    self.obj = bx
+
+  def addInput(self, input, x, y, w, h):
+    input.generate()
+    self.obj.pack(input.mainContainer.obj, x, y, w, h)
+    self.inputChildrenLst.append(input.mainContainer)
+
+  def postGenerate(self):
+    """Must ran after generate"""
+    for input in self.inputChildrenLst:
+      input.postGenerate()
 
 class Entry(E17Widget):
   def __init__(self, attrs=None, *args, **kwargs):
