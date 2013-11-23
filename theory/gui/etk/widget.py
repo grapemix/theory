@@ -3,9 +3,11 @@
 ##### System wide lib #####
 from abc import ABCMeta, abstractmethod
 import copy
+import os
 
 ##### Theory lib #####
 from theory.utils import datetime_safe, formats
+from theory.gui.util import LocalFileObject
 
 ##### Theory third-party lib #####
 
@@ -279,6 +281,25 @@ class CheckBoxInput(BaseLabelInput):
 
 class FileselectInput(BaseLabelInput):
   widgetClass = element.FileSelector
+
+  def updateField(self):
+    path = self.widgetLst[0].finalData
+    if(path==""):
+      if(self.attrs["initData"] is None):
+        # file path has not been touched and no initData has been assigned
+        path = None
+      elif(self.attrs.has_key("isFolderOnly") and self.attrs["isFolderOnly"]):
+        path = self.attrs["initData"]
+      else:
+        # file path has not been touched
+        path = LocalFileObject(self.attrs["initData"])
+    elif(self.attrs.has_key("isFolderOnly") and self.attrs["isFolderOnly"]):
+      # Folder mode and we only want to return dir path
+      pass
+    else:
+      # Encapsulate the file path into LocalFileObject for fileField
+      path = LocalFileObject(path)
+    self.fieldSetter({"finalData": path})
 
 class DateInput(StringInput):
   widgetClass = element.Entry
@@ -634,9 +655,15 @@ class ListInput(BaseLabelInput):
           }
       )
     elif(self.widgetClass == TextInput.widgetClass):
+      finalData = self._inputLst[0].finalData
+      # For empty case
+      if(finalData==""):
+        finalData = []
+      else:
+        finalData = finalData.split("<br/>")
       self.fieldSetter(
           {
-            "finalData": self._inputLst[0].finalData.split("<br/>"),
+            "finalData": finalData,
           }
       )
     else:

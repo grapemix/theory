@@ -165,7 +165,6 @@ class CommandModuleLoader(ModuleLoader):
       "probeModule": ["norm"],
       "switchMood": ["norm"],
       "filenameScanner": ["norm"],
-      "clipMonitor": ["norm"],
       "nextStep": ["norm"],
       "createApp": ["dev"],
       "createCmd": ["dev"],
@@ -177,6 +176,7 @@ class CommandModuleLoader(ModuleLoader):
       "modelTblDel": ["norm"],
       "modelDel": ["norm"],
       "modelAdd": ["norm"],
+      "infect": ["dev"],
     }
     for o in lst:
       if(moodCommandRel.has_key(o[1])):

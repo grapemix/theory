@@ -30,7 +30,12 @@ from theory.core.exceptions import ValidationError
 from theory.core.validators import EMPTY_VALUES
 from theory.model import Adapter
 
-from theory.gui.util import ErrorList, from_current_timezone, to_current_timezone
+from theory.gui.util import (
+    ErrorList,
+    from_current_timezone,
+    to_current_timezone,
+    LocalFileObject
+    )
 from theory.gui.widget import *
 from theory.utils import formats
 from theory.utils.encoding import smart_text, smart_str, force_unicode
@@ -52,14 +57,14 @@ Field classes.
 
 __all__ = (
   'Field', 'TextField', 'IntegerField',
-  'DateField', 'TimeField', 'DateTimeField',
-  'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField',
-  'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
-  'ListField', 'DictField', 'AdapterField',
+  'DateField', 'TimeField', 'DateTimeField', 'RegexField', 'EmailField',
+  'URLField', 'BooleanField', 'NullBooleanField', 'ChoiceField',
+  'MultipleChoiceField', 'ListField', 'DictField', 'AdapterField',
+  'FileField', 'ImageField', 'FilePathField', 'ImagePathField', 'DirPathField',
   'ComboField', 'MultiValueField',
   #'SplitDateTimeField',
   'FloatField', 'DecimalField', 'IPAddressField', 'GenericIPAddressField',
-  'FilePathField', 'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField',
+  'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField',
   'StringGroupFilterField', 'ModelValidateGroupField', 'PythonModuleField',
   'PythonClassField', 'QuerysetField',
 )
@@ -610,20 +615,30 @@ class EmailField(TextField):
     return super(EmailField, self).clean(value)
 
 class FileField(Field):
-  # TODO: Not working, fix me
   widget = FileselectInput
   default_error_messages = {
-    'invalid': _(u"No file was submitted. Check the encoding type on the form."),
+    'invalid': _(u"""No file was submitted.
+    Check the encoding type on the form."""),
     'missing': _(u"No file was submitted."),
     'empty': _(u"The submitted file is empty."),
-    'max_length': _(u'Ensure this filename has at most %(max)d characters (it has %(length)d).'),
-    'contradiction': _(u'Please either submit a file or check the clear checkbox, not both.')
+    'max_length': _(u"""Ensure this filename has at most %(max)d characters
+      (it has %(length)d)."""),
+    'contradiction': _(u"""Please either submit a file or check the clear
+      checkbox, not both.""")
   }
 
   def __init__(self, *args, **kwargs):
     self.max_length = kwargs.pop('max_length', None)
     self.allow_empty_file = kwargs.pop('allow_empty_file', False)
+    self.initDir = kwargs.pop('initDir', None)
     super(FileField, self).__init__(*args, **kwargs)
+
+  def renderWidget(self, *args, **kwargs):
+    if(self.initData is not None and self.initDir is None):
+      self.initDir = os.path.dirname(self.initData)
+    super(FileField, self).renderWidget(*args, **kwargs)
+    if(self.initDir is not None):
+      self.widget.attrs["initDir"] = self.initDir
 
   def to_python(self, data):
     if data in validators.EMPTY_VALUES:
@@ -647,6 +662,8 @@ class FileField(Field):
     return data
 
   def clean(self, data, initial=None):
+    if(isinstance(data, basestring)):
+      data = LocalFileObject(data)
     # If the widget got contradictory inputs, we raise a validation error
     if data is FILE_INPUT_CONTRADICTION:
       raise ValidationError(self.error_messages['contradiction'])
@@ -725,6 +742,38 @@ class ImageField(FileField):
     if hasattr(f, 'seek') and callable(f.seek):
       f.seek(0)
     return f
+
+class FilePathField(FileField):
+  """
+  From the widget side, FilePathField and FileField would have no difference,
+  but the FilePathField should save the path instead of actual file into DB.
+  """
+  pass
+
+class ImagePathField(ImageField):
+  pass
+
+class DirPathField(Field):
+  widget = FileselectInput
+  default_error_messages = {
+    'missing': _(u"No directory was submitted."),
+    'empty': _(u"The submitted directory is empty."),
+    'notAccessable': _(u"The submitted directory is not accessable."),
+    'notDir': _(u"The submitted directory is not a directory."),
+  }
+
+  def renderWidget(self, *args, **kwargs):
+    super(DirPathField, self).renderWidget(*args, **kwargs)
+    self.widget.attrs["isFolderOnly"] = True
+
+  def validate(self, value):
+    super(DirPathField, self).validate(value)
+    if(not os.access(value, os.R_OK)):
+      raise ValidationError(self.error_messages['notAccessable'])
+    if(not os.path.isdir(value)):
+      raise ValidationError(self.error_messages['notDir'])
+    if(len(os.listdir(value)) == 0):
+      raise ValidationError(self.error_messages['empty'])
 
 class URLField(TextField):
   default_error_messages = {
@@ -1405,40 +1454,6 @@ class MultiValueField(Field):
     object created by combining the date and time in data_list.
     """
     raise NotImplementedError('Subclasses must implement this method.')
-
-class FilePathField(ChoiceField):
-  def __init__(self, path, match=None, recursive=False, required=True,
-         widget=None, label=None, initData=None, help_text=None,
-         *args, **kwargs):
-    self.path, self.match, self.recursive = path, match, recursive
-    super(FilePathField, self).__init__(choices=(), required=required,
-      widget=widget, label=label, initData=initData, help_text=help_text,
-      *args, **kwargs)
-
-    if self.required:
-      self.choices = []
-    else:
-      self.choices = [("", "---------")]
-
-    if self.match is not None:
-      self.match_re = re.compile(self.match)
-
-    if recursive:
-      for root, dirs, files in sorted(os.walk(self.path)):
-        for f in files:
-          if self.match is None or self.match_re.search(f):
-            f = os.path.join(root, f)
-            self.choices.append((f, f.replace(path, "", 1)))
-    else:
-      try:
-        for f in sorted(os.listdir(self.path)):
-          full_file = os.path.join(self.path, f)
-          if os.path.isfile(full_file) and (self.match is None or self.match_re.search(f)):
-            self.choices.append((full_file, f))
-      except OSError:
-        pass
-
-    self.widget.choices = self.choices
 
 '''
 class SplitDateTimeField(MultiValueField):
