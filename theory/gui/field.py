@@ -22,14 +22,14 @@ from theory.utils.importlib import import_module
 def _importModule():
   supportModuleLst = (
     'Field', 'TextField', 'IntegerField',
-    'DateField', 'TimeField', 'DateTimeField',
-    'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField',
-    'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
-    'ListField', 'DictField', 'AdapterField',
+    'DateField', 'TimeField', 'DateTimeField', 'RegexField', 'EmailField',
+    'URLField', 'BooleanField', 'NullBooleanField', 'ChoiceField',
+    'MultipleChoiceField', 'ListField', 'DictField', 'AdapterField',
+    'FileField', 'ImageField', 'FilePathField', 'ImagePathField', 'DirPathField',
     'ComboField', 'MultiValueField',
     #'SplitDateTimeField',
     'FloatField', 'DecimalField', 'IPAddressField', 'GenericIPAddressField',
-    'FilePathField', 'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField',
+    'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField',
     'StringGroupFilterField', 'ModelValidateGroupField', 'PythonModuleField',
     'PythonClassField', 'QuerysetField',
   )

@@ -32,10 +32,7 @@ def getBinaryDefault():
   return bin(10)
 
 def getImageDefault():
-  # All errors should not be catched
-  with open(os.path.join(getTestCaseFileAbsPath(), "jpeg.jpg"), "rb") as fd:
-    dummyImg = fd.read()
-  return dummyImg
+  return os.path.join(getTestCaseFileAbsPath(), "jpeg.jpg")
 
 def getFileDefault():
   return getImageDefault()
@@ -65,9 +62,10 @@ def getIntDefault():
   return 1
 
 def getFilePathDefault():
-  #return getTestCaseFileAbsPath()
-  #return "jpeg.jpg"
   return os.path.join(getTestCaseFileAbsPath(), "jpeg.jpg")
+
+def getDirPathDefault():
+  return getTestCaseFileAbsPath()
 
 def getStringDefault():
   return u"test"
@@ -116,6 +114,7 @@ defaultValueSet1 = {
     "Binary": getBinaryDefault(),
     "Image": getImageDefault(),
     "File": getImageDefault(),
+    "Dir": getDirPathDefault(),
     "Boolean": getBooleanDefault(),
     "NullBoolean": getNullBooleanDefault(),
     "DateTime": datetime.now(),
@@ -146,8 +145,12 @@ class CombinatoryFormWithDefaultValue(Form):
   integerField = field.IntegerField(initData=defaultValueSet1["Int"])
   regexField = field.RegexField(defaultValueSet1["Regex"], initData=defaultValueSet1["String"])
   emailField = field.EmailField(initData=defaultValueSet1["Email"])
-  #fileField = field.FileField(initData=defaultValueSet1["File"])
-  #imageField = field.ImageField(initData=defaultValueSet1["Image"])
+  fileField = field.FileField(initData=defaultValueSet1["File"])
+  imageField = field.ImageField(initData=defaultValueSet1["Image"])
+  filePathField = field.FilePathField(initData=defaultValueSet1["File"])
+  imagePathField = field.ImagePathField(initData=defaultValueSet1["File"])
+  dirPathField = field.DirPathField(initData=defaultValueSet1["Dir"])
+
   uRLField = field.URLField(initData=defaultValueSet1["URL"])
   booleanField = field.BooleanField(initData=defaultValueSet1["Boolean"])
   nullBooleanField = field.NullBooleanField(initData=defaultValueSet1["Boolean"])

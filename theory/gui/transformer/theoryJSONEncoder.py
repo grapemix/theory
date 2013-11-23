@@ -46,5 +46,9 @@ class TheoryJSONEncoder(json.JSONEncoder):
       return str(o)
     elif isinstance(o, QuerySet):
       return [str(i.id) for i in o]
+    elif type(o).__name__=="LocalFileObject":
+      # We don't want to store the data because JSON cannot store binary
+      # natively and no storing solution can provide human readibility
+      return o.filepath
     else:
       return super(TheoryJSONEncoder, self).default(o)
