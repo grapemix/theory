@@ -896,7 +896,6 @@ class Multibuttonentry(Entry):
     self.obj.entry_set(txt)
 
   def generate(self, *args, **kwargs):
-    self.attrs["initData"] = ",".join(self.attrs["initData"])
     super(Multibuttonentry, self).generate(*args, **kwargs)
 
 #class Multibuttonentry(E17Widget):
