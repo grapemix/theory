@@ -247,9 +247,9 @@ class Bridge(object):
   def _execeuteCommand(self, cmd, cmdModel, uiParam={}, forceSync=False):
     if(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC):
       if(forceSync):
-        cmd.run(paramFormData=cmd.paramForm.toJson())
+        cmd.run(paramFormData=cmd.paramForm.toPython())
       else:
-        cmd.delay(paramFormData=cmd.paramForm.toJson())
+        cmd.delay(paramFormData=cmd.paramForm.toPython())
     else:
       if(not cmd.paramForm.is_valid()):
         return False

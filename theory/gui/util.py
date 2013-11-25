@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
+##### System wide lib #####
+import os
+
+##### Theory lib #####
 from theory.conf import settings
 from theory.utils.html import conditional_escape
 from theory.utils.encoding import StrAndUnicode, force_unicode
@@ -8,6 +14,14 @@ from theory.utils.translation import ugettext_lazy as _
 # Import ValidationError so that it can be imported from this
 # module to maintain backwards compatibility.
 from theory.core.exceptions import ValidationError
+
+##### Theory third-party lib #####
+
+##### Local app #####
+
+##### Theory app #####
+
+##### Misc #####
 
 def flatatt(attrs):
   """
@@ -83,3 +97,21 @@ def to_current_timezone(value):
     current_timezone = timezone.get_current_timezone()
     return timezone.make_naive(value, current_timezone)
   return value
+
+class LocalFileObject(object):
+  def __init__(self, filepath):
+    self.name = os.path.split(filepath)[-1]
+    self.filepath = filepath
+    self.storage = {}
+    try:
+      self.size = os.path.getsize(filepath)
+      with open(filepath, 'rb') as f:
+        self.storage["content"] = f.read()
+    except:
+      self.size = 0
+
+  def __getitem__(self, key):
+    return self.storage[key]
+
+  def __unicode__(self):
+    return unicode(self.filepath)

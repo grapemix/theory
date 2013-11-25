@@ -2,7 +2,6 @@
 #!/usr/bin/env python
 ##### System wide lib #####
 import os
-from shutil import copy
 
 ##### Theory lib #####
 from theory.command.baseCommand import SimpleCommand
@@ -35,22 +34,53 @@ class CreateCmd(SimpleCommand):
     )
     cmdName = field.TextField(
         label="Command Name",
-        help_text=" The name of command being created",
+        help_text=" The name of command being created in lowercase.",
         max_length=32
     )
+    cmdType = field.ChoiceField(label="Command Type",
+        help_text="The name of application being used",
+        initData="SimpleCommand",
+        choices=(
+          set((
+            ("SimpleCommand", "SimpleCommand"),
+            ("AsyncCommand", "AsyncCommand"),
+          ))
+        )
+    )
+    propertyNameLst = field.ListField(field.TextField(max_length=96),
+        label="Property Name List",
+        help_text=" The name list of property being created",
+        required=False,
+    )
+
+  _propertyTemplate = '''
+  @property
+  def {cmdProperty}(self):
+    return self._{cmdProperty}
+
+  @{cmdProperty}.setter
+  def {cmdProperty}(self, {cmdProperty}):
+    """
+    :param {cmdProperty}: {cmdProperty} comment
+    :type {cmdProperty}: {cmdProperty} type
+    """
+    self._{cmdProperty} = {cmdProperty}
+  '''
+
+  def getPropertyLst(self, propertLst):
+    if(len(propertLst)==0):
+      return ""
+    else:
+      r = ""
+      for property in propertLst:
+        r += self._propertyTemplate.format(cmdProperty=property)
+      return r
 
   def run(self):
-    appName = self.paramForm.clean()["appName"]
-    cmdName = self.paramForm.clean()["cmdName"]
+    data = self.paramForm.clean()
+    appName = data["appName"]
+    cmdName = data["cmdName"]
     if(appName!="theory"):
-      foundApp = False
-      for i in settings.INSTALLED_APPS:
-        if(i==appName):
-          foundApp = True
-      if(not foundApp):
-        self._stdOut = \
-            "You must create the app AND put it into INSTALLED_APPS first!"
-        return
       toPath = os.path.join(
           settings.APPS_ROOT,
           appName,
@@ -61,6 +91,24 @@ class CreateCmd(SimpleCommand):
       toPath = os.path.join(os.path.dirname(__file__), cmdName + ".py")
 
     fromPath = os.path.join(os.path.dirname(os.path.dirname(__file__)),
-        "conf", "app_template", "command", "__init__.py")
+        "conf", "command.tmpl")
     self._stdOut += "Coping %s --> %s\n" % (fromPath, toPath)
-    copy(fromPath, toPath)
+
+    propertyLst = self.getPropertyLst(data["propertyNameLst"])
+
+    CmdName = cmdName[0].upper() + cmdName[1:]
+    if(data["cmdType"]=="AsyncCommand"):
+      extraCode = "super({0}, self).run(*args, **kwargs)".format(CmdName)
+    else:
+      extraCode = "pass"
+
+    with open(fromPath) as tmplFile:
+      tmpl = tmplFile.read().format(
+          propertLst=propertyLst,
+          cmdType=data["cmdType"],
+          cmdName=cmdName,
+          CmdName=CmdName,
+          extraCode=extraCode,
+          )
+      with open(toPath, 'w') as fd:
+        fd.write(tmpl)

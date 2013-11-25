@@ -124,7 +124,9 @@ class Reactor(object):
       entrySetterFxn(commandName)
       self.parser.cmdInTxt = commandName
       try:
-        self.cmdModel = Command.objects.get(name=commandName)
+        self.cmdModel = Command.objects.get(
+            Q(name=commandName) & (Q(mood=self.mood) | Q(mood="norm"))
+            )
       except Command.DoesNotExist as errMsg:
         getNotify(
             "Command not found",
@@ -145,7 +147,9 @@ class Reactor(object):
       commandName = self.historyModel[self.historyIndex].commandName
       entrySetterFxn(commandName)
       self.parser.cmdInTxt = commandName
-      self.cmdModel = Command.objects.get(name=commandName)
+      self.cmdModel = Command.objects.get(
+          Q(name=commandName) & (Q(mood=self.mood) | Q(mood="norm"))
+          )
 
       self._buildParamForm(
           json.loads(self.historyModel[self.historyIndex].jsonData)
@@ -178,6 +182,7 @@ class Reactor(object):
       # Cut the last tab out
       self.adapter.restoreCmdLine()
       self.paramForm.focusOnTheFirstChild()
+      return
     self.parser.initVar()
 
   def cleanParamForm(self, btn, dummy):

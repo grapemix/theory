@@ -135,17 +135,6 @@ DEFAULT_CHARSET = 'utf-8'
 # Encoding of files read from disk (template and initial SQL files).
 FILE_CHARSET = 'utf-8'
 
-# Database connection info.
-# Legacy format
-DATABASE_ENGINE = ''           # 'mongoengone'
-DATABASE_NAME = ''
-DATABASE_USER = ''
-DATABASE_PASSWORD = ''
-DATABASE_HOST = ''             # Set to empty string for localhost.
-DATABASE_PORT = ''             # Set to empty string for default.
-DATABASE_OPTIONS = {}          # Set to empty dictionary for default.
-
-# New format
 DATABASES = {
 }
 
@@ -154,6 +143,9 @@ DEFAULT_MOOD = "norm"
 
 # Classes used to implement db routing behaviour
 DATABASE_ROUTERS = []
+
+# List of strings representing installed moods.
+INSTALLED_MOODS = ()
 
 # List of strings representing installed apps.
 INSTALLED_APPS = ()

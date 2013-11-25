@@ -98,5 +98,6 @@ setup(
         'setuptools',
         'celery-with-mongodb',
         'gevent',
+        'mongoengine',
     ],
 )
