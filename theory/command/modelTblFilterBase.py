@@ -63,7 +63,7 @@ class ModelTblFilterBase(SimpleCommand):
 
     def __init__(self, *args, **kwargs):
       super(SimpleCommand.ParamForm, self).__init__(*args, **kwargs)
-      self.preFillFields()
+      self._preFillFieldProperty()
 
     def _preFillFieldProperty(self):
       appName = self.fields["appName"].initData
