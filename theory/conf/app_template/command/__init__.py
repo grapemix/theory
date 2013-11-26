@@ -3,7 +3,6 @@
 ##### System wide lib #####
 
 ##### Theory lib #####
-from theory.command.baseCommand import SimpleCommand
 
 ##### Theory third-party lib #####
 
@@ -12,27 +11,3 @@ from theory.command.baseCommand import SimpleCommand
 ##### Theory app #####
 
 ##### Misc #####
-
-#class CmdName(SimpleCommand):
-#  """
-#  Cmd Description in here
-#  """
-#  name = "cmdName"
-#  verboseName = "cmdName"
-#  params = []
-#
-#  @property
-#  def cmdProperty(self):
-#    return self._cmdProperty
-#
-#  @cmdProperty.setter
-#  def cmdProperty(self, cmdProperty):
-#    """
-#    :param cmdProperty: cmdProperty comment
-#    :type cmdProperty: cmdProperty type
-#    """
-#    self._cmdProperty = cmdProperty
-#
-#  def run(self, *args, **kwargs):
-#    super(CmdName, self).run()
-#    pass

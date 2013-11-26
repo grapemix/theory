@@ -14,6 +14,7 @@ from theory.model import Adapter, BinaryClassifierHistory
 from theory.gui import field
 from theory.gui import widget
 from theory.gui.form import *
+from theory.gui.util import LocalFileObject
 from theory.utils import unittest
 
 ##### Theory third-party lib #####
@@ -24,17 +25,17 @@ from theory.utils import unittest
 
 ##### Misc #####
 
-__all__ = ('AdapterFieldTestCase', 'BooleanFieldTestCase', \
-    'ChoiceFieldTestCase', 'DecimalFieldTestCase', 'DictFieldTestCase', \
-    'EmailFieldTestCase', 'FileFieldTestCase', 'FilePathFieldTestCase', \
-    'FloatFieldTestCase', 'GenericIPAddressFieldTestCase', \
-    'IPAddressFieldTestCase', 'ImageFieldTestCase', \
-    'IntegerFieldTestCase', 'ListFieldTestCase', \
-    'ModelValidateGroupFieldTestCase', 'MultipleChoiceFieldTestCase', \
-    'NullBooleanFieldTestCase', 'RegexFieldTestCase', 'SlugFieldTestCase', \
-    'StringGroupFilterFieldTestCase', 'TextFieldTestCase', \
-    'TypedChoiceFieldTestCase', 'TypedMultipleChoiceFieldTestCase', \
-    'URLFieldTestCase', 'PythonModuleFieldTestCase', \
+__all__ = ('AdapterFieldTestCase', 'BooleanFieldTestCase',
+    'ChoiceFieldTestCase', 'DecimalFieldTestCase', 'DictFieldTestCase',
+    'EmailFieldTestCase', 'FileFieldTestCase', 'FilePathFieldTestCase',
+    'ImageFieldTestCase', 'DirPathFieldTestCase', 'ImagePathFieldTestCase',
+    'FloatFieldTestCase', 'GenericIPAddressFieldTestCase',
+    'IPAddressFieldTestCase',     'IntegerFieldTestCase', 'ListFieldTestCase',
+    'ModelValidateGroupFieldTestCase', 'MultipleChoiceFieldTestCase',
+    'NullBooleanFieldTestCase', 'RegexFieldTestCase', 'SlugFieldTestCase',
+    'StringGroupFilterFieldTestCase', 'TextFieldTestCase',
+    'TypedChoiceFieldTestCase', 'TypedMultipleChoiceFieldTestCase',
+    'URLFieldTestCase', 'PythonModuleFieldTestCase',
     'PythonClassFieldTestCase', 'QuerysetFieldTestCase',
     )
 
@@ -43,7 +44,14 @@ class FieldTestCaseBase(unittest.TestCase):
 
   def __init__(self, *args, **kwargs):
     super(FieldTestCaseBase, self).__init__(*args, **kwargs)
-    self.testCaseFileAbsPath = os.path.join(os.path.dirname(os.path.dirname(__file__)), "testsFile", "field")
+    self.testCaseFileAbsPath = os.path.join(
+        os.path.dirname(
+          os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        ),
+        "testBase",
+        "testsFile",
+        "field"
+        )
     self.dummyWin = None
 
   def setUp(self):
@@ -81,14 +89,6 @@ class EmailFieldTestCase(FieldTestCaseBase):
   fieldKlass = field.EmailField
   def getInitData(self):
     return "test@grape.mx"
-
-class FilePathFieldTestCase(FieldTestCaseBase):
-  fieldKlass = field.FilePathField
-  def getInitData(self):
-    return "/tmp/test"
-
-  def extraInitParam(self):
-    return {"path": "/tmp"}
 
 class FloatFieldTestCase(FieldTestCaseBase):
   fieldKlass = field.FloatField
@@ -237,8 +237,120 @@ class FileFieldTestCase(FieldTestCaseBase):
   def getInitData(self):
     return os.path.join(self.testCaseFileAbsPath, "jpeg.jpg")
 
+  def testEmptyFinalValue(self):
+    self.field = self.fieldKlass()
+    self.renderWidget(self.field)
+
+    with self.assertRaises(ValidationError):
+      self.assertEqual(self.field.clean(self.field.finalData), None)
+
+    self.field.required = False
+    self.assertEqual(self.field.clean(self.field.finalData), None)
+
+  def testInvalidFile(self):
+    self.field = self.fieldKlass(
+        initData=os.path.join(self.testCaseFileAbsPath, "invalid.jpg"),
+        )
+    self.renderWidget(self.field)
+
+    with self.assertRaises(ValidationError):
+      self.assertEqual(self.field.clean(self.field.finalData), {})
+
+  def testMaxLength(self):
+    initData=os.path.join(self.testCaseFileAbsPath, "jpeg.jpg")
+    self.field = self.fieldKlass(
+        initData=initData,
+        max_length=1,
+        )
+    self.renderWidget(self.field)
+
+    with self.assertRaises(ValidationError):
+      self.assertEqual(self.field.clean(self.field.finalData), {})
+
+    self.field.max_length = 99999
+    self.assertEqual(
+        self.field.clean(self.field.finalData).filepath,
+        LocalFileObject(initData).filepath
+        )
+
 class ImageFieldTestCase(FileFieldTestCase):
   fieldKlass = field.ImageField
+
+class FilePathFieldTestCase(FieldTestCaseBase):
+  fieldKlass = field.FilePathField
+  def getInitData(self):
+    return os.path.join(self.testCaseFileAbsPath, "jpeg.jpg")
+
+  def testEmptyFinalValue(self):
+    self.field = self.fieldKlass()
+    self.renderWidget(self.field)
+
+    with self.assertRaises(ValidationError):
+      self.assertEqual(self.field.clean(self.field.finalData), None)
+
+    self.field.required = False
+    self.assertEqual(self.field.clean(self.field.finalData), None)
+
+  def testInvalidFile(self):
+    self.field = self.fieldKlass(
+        initData=os.path.join(self.testCaseFileAbsPath, "invalid.jpg"),
+        )
+    self.renderWidget(self.field)
+
+    with self.assertRaises(ValidationError):
+      self.assertEqual(self.field.clean(self.field.finalData), {})
+
+  def testMaxLength(self):
+    initData=os.path.join(self.testCaseFileAbsPath, "jpeg.jpg")
+    self.field = self.fieldKlass(
+        initData=initData,
+        max_length=1,
+        )
+    self.renderWidget(self.field)
+
+    with self.assertRaises(ValidationError):
+      self.assertEqual(self.field.clean(self.field.finalData), {})
+
+    self.field.max_length = 99999
+    self.assertEqual(
+        self.field.clean(self.field.finalData).filepath,
+        LocalFileObject(initData).filepath
+        )
+
+class ImagePathFieldTestCase(FileFieldTestCase):
+  fieldKlass = field.ImageField
+
+class DirPathFieldTestCase(FieldTestCaseBase):
+  fieldKlass = field.DirPathField
+  def getInitData(self):
+    return self.testCaseFileAbsPath
+
+  def testInvalidDir(self):
+    self.field = self.fieldKlass(
+        initData=os.path.join(self.testCaseFileAbsPath, "invalid"),
+        )
+    self.renderWidget(self.field)
+
+    with self.assertRaises(ValidationError):
+      self.assertEqual(self.field.clean(self.field.finalData), {})
+
+  def testInvalidFile(self):
+    self.field = self.fieldKlass(
+        initData=os.path.join(self.testCaseFileAbsPath, "jpeg.jpg"),
+        )
+    self.renderWidget(self.field)
+
+    with self.assertRaises(ValidationError):
+      self.assertEqual(self.field.clean(self.field.finalData), {})
+
+  def testUnaccessableDir(self):
+    self.field = self.fieldKlass(
+        initData=os.path.join(self.testCaseFileAbsPath, "unaccessable"),
+        )
+    self.renderWidget(self.field)
+
+    with self.assertRaises(ValidationError):
+      self.assertEqual(self.field.clean(self.field.finalData), {})
 
 class StringGroupFilterFieldTestCase(FieldTestCaseBase):
   fieldKlass = field.StringGroupFilterField

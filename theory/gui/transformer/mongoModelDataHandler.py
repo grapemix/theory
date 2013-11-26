@@ -9,7 +9,8 @@
 ##### Local app #####
 
 ##### Theory app #####
-from gui.transformer.mongoModelBSONDataHandler import MongoModelBSONDataHandler
+from theory.gui.transformer.mongoModelBSONDataHandler \
+    import MongoModelBSONDataHandler
 
 ##### Misc #####
 

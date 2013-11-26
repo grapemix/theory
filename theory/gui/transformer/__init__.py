@@ -9,12 +9,13 @@
 ##### Local app #####
 
 ##### Theory app #####
-from gui.transformer.gtkSpreadsheetDataHandler \
+from theory.gui.transformer.gtkSpreadsheetDataHandler \
     import GtkSpreadsheetModelDataHandler
-from gui.transformer.gtkSpreadsheetBSONDataHandler \
+from theory.gui.transformer.gtkSpreadsheetBSONDataHandler \
     import GtkSpreadsheetModelBSONDataHandler
-from gui.transformer.mongoModelDataHandler import MongoModelDataHandler
-from gui.transformer.mongoModelBSONDataHandler import MongoModelBSONDataHandler
+from theory.gui.transformer.mongoModelDataHandler import MongoModelDataHandler
+from theory.gui.transformer.mongoModelBSONDataHandler \
+    import MongoModelBSONDataHandler
 
 ##### Misc #####
 

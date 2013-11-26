@@ -10,7 +10,7 @@ from json import dumps as jsonDumps
 ##### Local app #####
 
 ##### Theory app #####
-from gui.transformer.mongoModelDetectorBase import MongoModelDetectorBase
+from theory.gui.transformer.mongoModelDetectorBase import MongoModelDetectorBase
 
 ##### Misc #####
 

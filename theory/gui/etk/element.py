@@ -842,43 +842,38 @@ class SelectBox(E17Widget):
     self.obj = bt
 
 class FileSelector(E17Widget):
-  icon = []
-  isDisable = False
-  label = None
-  initPath = None
+  # This class will be unable to set initData because python-elementary does not
+  # support
 
   def __init__(self, attrs=None, *args, **kwargs):
-    defaultAttrs = {"isFillAlign": True, "isWeightExpand": True}
+    defaultAttrs = {
+        "isFillAlign": True,
+        "isWeightExpand": True,
+        "isFolderOnly": False,
+        "initPath": "",
+        }
     if(attrs is not None):
       defaultAttrs.update(attrs)
     super(FileSelector, self).__init__(defaultAttrs, *args, **kwargs)
 
-  def fsDone(self, fs, selected, win):
-      self.win.delete()
+  @property
+  def finalData(self):
+    return self.obj.selected_get()
 
-  def _selected(self, fs, selected, win):
-      print "Selected file:", selected
-      print "or:", fs.selected_get()
+  @finalData.setter
+  def finalData(self, finalData):
+    pass
 
   def generate(self, *args, **kwargs):
-    fs = elementary.Fileselector(self.win)
-    fs.is_save_set(True)
-    fs.expandable_set(False)
-    if(self.initPath==None):
-      import os
-      fs.path_set(os.getenv("HOME"))
-    else:
-      fs.path_set(self.initPath)
-
-    fs.callback_done_add(self.fsDone, self.win)
-    if(hasattr(self, "_selected")):
-      fs.callback_selected_add(self._selected, self.win)
+    fs = elementary.FileselectorEntry(self.win)
+    fs.text_set("Select a file")
+    fs.inwin_mode_set(False)
+    fs.folder_only_set(self.attrs["isFolderOnly"])
+    fs.path_set(self.attrs["initPath"])
 
     self.obj = fs
 
-
 class Multibuttonentry(Entry):
-
   @property
   def finalData(self):
     return self.obj.entry_get().split(",")

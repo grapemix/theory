@@ -24,12 +24,12 @@ MANAGERS = ADMINS
 
 DATABASES = {
   'default': {
-    'ENGINE': 'theory.db.backends.mongoengine', # Add 'mongoengine',
-    'NAME': join(PROJECT_PATH, 'db',),
-    'USER': '',                      # Not used with sqlite3.
-    'PASSWORD': '',                  # Not used with sqlite3.
-    'HOST': '',                      # Set to empty string for localhost.
-    'PORT': '',                      # Set to empty string for default.
+    'ENGINE': 'theory.db.backends.mongoEngine',
+    'NAME': '',
+    'USER': '',
+    'PASSWORD': '',
+    'HOST': '',
+    'PORT': '27017',
   }
 }
 
@@ -55,20 +55,10 @@ USE_I18N = True
 # calendars according to the current locale
 USE_L10N = True
 
-UI_CONTEXT_PROCESSORS = (
-
-)
-
-# List of callables that know how to import templates from various sources.
-UI_LOADERS = (
-
-)
-
 MIDDLEWARE_CLASSES = (
 )
 
-UI_DIRS = (
-  join(PROJECT_PATH, 'templates'),
+INSTALLED_MOODS = (
 )
 
 INSTALLED_APPS = (
@@ -77,7 +67,7 @@ INSTALLED_APPS = (
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
 # the site admins on every HTTP 500 error.
-# See http://docs.djangoproject.com/en/dev/topics/logging for
+# See http://docs.theoryproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
 LOGGING = {
   'version': 1,
@@ -85,12 +75,17 @@ LOGGING = {
   'handlers': {
     'mail_admins': {
       'level': 'ERROR',
-      'class': 'django.utils.log.AdminEmailHandler'
+      'class': 'theory.utils.log.AdminEmailHandler'
+    },
+    'default': {
+      'level': 'ERROR',
+      'class': 'logging.handlers.RotatingFileHandler',
+      'filename': join(PROJECT_PATH, 'logs', 'default.log'),
     }
   },
   'loggers': {
-    'django.request': {
-      'handlers': ['mail_admins'],
+    '': {
+      'handlers': ['default'],
       'level': 'ERROR',
       'propagate': True,
     },

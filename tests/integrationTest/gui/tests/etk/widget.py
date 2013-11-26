@@ -22,7 +22,8 @@ from dummyEnv import getDummyEnv
 __all__ = ('AdapterFieldWidgetTestCase', 'BooleanFieldWidgetTestCase',
     'ChoiceFieldWidgetTestCase', 'DecimalFieldWidgetTestCase',
     'DictFieldWidgetTestCase', 'EmailFieldWidgetTestCase',
-    #'FileFieldWidgetTestCase', 'FilePathFieldWidgetTestCase',
+    'FileFieldWidgetTestCase', 'FilePathFieldWidgetTestCase',
+    'DirPathFieldWidgetTestCase', 'ImagePathFieldTestCase',
     'FloatFieldWidgetTestCase', 'GenericIPAddressFieldWidgetTestCase',
     'IPAddressFieldWidgetTestCase', 'ImageFieldWidgetTestCase',
     'IntegerFieldWidgetTestCase', 'ListFieldWidgetTestCase',
@@ -64,14 +65,26 @@ class DecimalFieldWidgetTestCase(DecimalFieldTestCase, FieldWidgetTestCaseBase):
 class EmailFieldWidgetTestCase(EmailFieldTestCase, FieldWidgetTestCaseBase):
   pass
 
-#class FilePathFieldWidgetTestCase(
-#    FilePathFieldTestCase,
-#    FieldWidgetTestCaseBase
-#    ):
-#  pass
-#
-#class FileFieldWidgetTestCase(FileFieldTestCase, FieldWidgetTestCaseBase):
-#  pass
+class DirPathFieldWidgetTestCase(
+    DirPathFieldTestCase,
+    FieldWidgetTestCaseBase
+    ):
+  pass
+
+class FilePathFieldWidgetTestCase(
+    FilePathFieldTestCase,
+    FieldWidgetTestCaseBase
+    ):
+  pass
+
+class ImagePathFieldWidgetTestCase(
+    FilePathFieldTestCase,
+    FieldWidgetTestCaseBase
+    ):
+  pass
+
+class FileFieldWidgetTestCase(FileFieldTestCase, FieldWidgetTestCaseBase):
+  pass
 
 class FloatFieldWidgetTestCase(FloatFieldTestCase, FieldWidgetTestCaseBase):
   pass

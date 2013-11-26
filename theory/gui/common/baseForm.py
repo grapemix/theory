@@ -232,21 +232,30 @@ class FormBase(object):
     for k,v in kwargs.iteritems():
       self.fields[k].initData = v
 
+  def toPython(self):
+    if(self.is_valid()):
+      pythonDict = {}
+      for fieldName, field in self.fields.iteritems():
+        # Make sure not getting data from widget because the widget may be
+        # destroied
+        tmpWidget = field.widget
+        field.widget = field.widget.__class__
+        if(field.isSkipInHistory):
+          continue
+        try:
+          pythonDict[fieldName] = field.to_python(field.clean(field.finalData))
+        except Exception as e: # eval can throw many different errors
+          raise ValidationError(str(e))
+
+      return pythonDict
+
   def toJson(self):
     if(self.is_valid()):
       if(self.jsonData is None):
         encoderKwargs = {"cls": TheoryJSONEncoder}
-        jsonDict = {}
-        for fieldName, field in self.fields.iteritems():
-          if(field.isSkipInHistory):
-            continue
-          try:
-            jsonDict[fieldName] = field.to_python(field.finalData)
-          except Exception as e: # eval can throw many different errors
-            raise ValidationError(str(e))
-
+        pythonDict = self.toPython()
         try:
-          self.jsonData = json.dumps(jsonDict, **encoderKwargs)
+          self.jsonData = json.dumps(pythonDict, **encoderKwargs)
         except Exception as e: # eval can throw many different errors
           raise ValidationError(str(e))
       return self.jsonData
