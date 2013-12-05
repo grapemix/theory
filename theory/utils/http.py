@@ -8,8 +8,8 @@ import urllib
 import urlparse
 from email.Utils import formatdate
 
-from theory.utils.encoding import smart_str, force_unicode
-from theory.utils.functional import allow_lazy
+from theory.utils.encoding import smartStr, forceUnicode
+from theory.utils.functional import allowLazy
 
 ETAG_MATCH = re.compile(r'(?:W/)?"((?:\\.|[^"])*)"')
 
@@ -31,9 +31,9 @@ def urlquote(url, safe='/'):
   can safely be used as part of an argument to a subsequent iri_to_uri() call
   without double-quoting occurring.
   """
-  return force_unicode(urllib.quote(smart_str(url), smart_str(safe)))
+  return forceUnicode(urllib.quote(smartStr(url), smartStr(safe)))
 
-urlquote = allow_lazy(urlquote, unicode)
+urlquote = allowLazy(urlquote, unicode)
 
 def urlquote_plus(url, safe=''):
   """
@@ -42,8 +42,8 @@ def urlquote_plus(url, safe=''):
   returned string can safely be used as part of an argument to a subsequent
   iri_to_uri() call without double-quoting occurring.
   """
-  return force_unicode(urllib.quote_plus(smart_str(url), smart_str(safe)))
-urlquote_plus = allow_lazy(urlquote_plus, unicode)
+  return forceUnicode(urllib.quote_plus(smartStr(url), smartStr(safe)))
+urlquote_plus = allowLazy(urlquote_plus, unicode)
 
 def urlencode(query, doseq=0):
   """
@@ -54,8 +54,8 @@ def urlencode(query, doseq=0):
   if hasattr(query, 'items'):
     query = query.items()
   return urllib.urlencode(
-    [(smart_str(k),
-     isinstance(v, (list,tuple)) and [smart_str(i) for i in v] or smart_str(v))
+    [(smartStr(k),
+     isinstance(v, (list,tuple)) and [smartStr(i) for i in v] or smartStr(v))
       for k, v in query],
     doseq)
 

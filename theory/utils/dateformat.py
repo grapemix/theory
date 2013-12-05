@@ -19,7 +19,7 @@ import calendar
 from theory.utils.dates import MONTHS, MONTHS_3, MONTHS_ALT, MONTHS_AP, WEEKDAYS, WEEKDAYS_ABBR
 from theory.utils.tzinfo import LocalTimezone
 from theory.utils.translation import ugettext as _
-from theory.utils.encoding import force_unicode
+from theory.utils.encoding import forceUnicode
 
 re_formatchars = re.compile(r'(?<!\\)([aAbBcdDEfFgGhHiIjlLmMnNOPrsStTUuwWyYzZ])')
 re_escaped = re.compile(r'\\(.)')
@@ -27,9 +27,9 @@ re_escaped = re.compile(r'\\(.)')
 class Formatter(object):
   def format(self, formatstr):
     pieces = []
-    for i, piece in enumerate(re_formatchars.split(force_unicode(formatstr))):
+    for i, piece in enumerate(re_formatchars.split(forceUnicode(formatstr))):
       if i % 2:
-        pieces.append(force_unicode(getattr(self, piece)()))
+        pieces.append(forceUnicode(getattr(self, piece)()))
       elif piece:
         pieces.append(re_escaped.sub(r'\1', piece))
     return u''.join(pieces)

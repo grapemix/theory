@@ -12,7 +12,7 @@ from cStringIO import StringIO
 from threading import local
 
 from theory.utils.importlib import import_module
-from theory.utils.safestring import mark_safe, SafeData
+from theory.utils.safestring import markSafe, SafeData
 
 
 # Translations are cached in a dictionary for every language+app tuple.
@@ -278,7 +278,7 @@ def do_translate(message, translation_function):
       _default = translation(settings.LANGUAGE_CODE)
     result = getattr(_default, translation_function)(eol_message)
   if isinstance(message, SafeData):
-    return mark_safe(result)
+    return markSafe(result)
   return result
 
 def gettext(message):

@@ -6,8 +6,8 @@ import os
 ##### Theory lib #####
 from theory.conf import settings
 from theory.utils.html import conditional_escape
-from theory.utils.encoding import StrAndUnicode, force_unicode
-from theory.utils.safestring import mark_safe
+from theory.utils.encoding import StrAndUnicode, forceUnicode
+from theory.utils.safestring import markSafe
 from theory.utils import timezone
 from theory.utils.translation import ugettext_lazy as _
 
@@ -44,11 +44,11 @@ class ErrorDict(dict, StrAndUnicode):
   def as_ul(self):
     if not self: return u''
     return mark_safe(u'<ul class="errorlist">%s</ul>'
-        % ''.join([u'<li>%s%s</li>' % (k, conditional_escape(force_unicode(v)))
+        % ''.join([u'<li>%s%s</li>' % (k, conditional_escape(forceUnicode(v)))
           for k, v in self.items()]))
 
   def as_text(self):
-    return u'\n'.join([u'* %s\n%s' % (k, u'\n'.join([u'  * %s' % force_unicode(i) for i in v])) for k, v in self.items()])
+    return u'\n'.join([u'* %s\n%s' % (k, u'\n'.join([u'  * %s' % forceUnicode(i) for i in v])) for k, v in self.items()])
 
 class ErrorList(list, StrAndUnicode):
   """
@@ -60,14 +60,14 @@ class ErrorList(list, StrAndUnicode):
   def as_ul(self):
     if not self: return u''
     return mark_safe(u'<ul class="errorlist">%s</ul>'
-        % ''.join([u'<li>%s</li>' % conditional_escape(force_unicode(e)) for e in self]))
+        % ''.join([u'<li>%s</li>' % conditional_escape(forceUnicode(e)) for e in self]))
 
   def as_text(self):
     if not self: return u''
-    return u'\n'.join([u'* %s' % force_unicode(e) for e in self])
+    return u'\n'.join([u'* %s' % forceUnicode(e) for e in self])
 
   def __repr__(self):
-    return repr([force_unicode(e) for e in self])
+    return repr([forceUnicode(e) for e in self])
 
 # Utilities for time zone support in DateTimeField et al.
 

@@ -16,7 +16,7 @@ from theory.test.utils import (get_warnings_state, restore_warnings_state,
   override_settings)
 from theory.test.utils import ContextList
 from theory.utils import simplejson, unittest as ut2
-from theory.utils.encoding import smart_str, force_unicode
+from theory.utils.encoding import smartStr, forceUnicode
 from theory.utils.unittest.util import safe_repr
 
 __all__ = ('TestCase', 'SimpleTestCase', )
@@ -113,7 +113,7 @@ class SimpleTestCase(ut2.TestCase):
         optional.clean(input)
       self.assertEqual(context_manager.exception.messages, errors)
     # test required inputs
-    error_required = [force_unicode(required.error_messages['required'])]
+    error_required = [forceUnicode(required.error_messages['required'])]
     for e in EMPTY_VALUES:
       with self.assertRaises(ValidationError) as context_manager:
         required.clean(e)
