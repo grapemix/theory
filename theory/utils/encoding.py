@@ -1,13 +1,26 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
-import types
-import urllib
-import locale
-import datetime
-import codecs
-from decimal import Decimal
+##### System wide lib #####
+#from __future__ import unicodeLiterals
 
+import codecs
+import datetime
+from decimal import Decimal
+import locale
+import warnings
+
+##### Theory lib #####
 from theory.utils.functional import Promise
+from theory.utils import six
+from theory.utils.six.moves.urllib.parse import quote
+
+##### Theory third-party lib #####
+
+##### Local app #####
+
+##### Theory app #####
+
+##### Misc #####
 
 class TheoryUnicodeDecodeError(UnicodeDecodeError):
   def __init__(self, obj, *args):
@@ -21,76 +34,96 @@ class TheoryUnicodeDecodeError(UnicodeDecodeError):
 
 class StrAndUnicode(object):
   """
-  A class whose __str__ returns its __unicode__ as a UTF-8 bytestring.
+  A class that derives __str__ from __unicode__.
 
-  Useful as a mix-in.
+  On Python 2, __str__ returns the output of __unicode__ encoded as a UTF-8
+  bytestring. On Python 3, __str__ returns the output of __unicode__.
+
+  Useful as a mix-in. If you support Python 2 and 3 with a single code base,
+  you can inherit this mix-in and just define __unicode__.
   """
-  def __str__(self):
-    return self.__unicode__().encode('utf-8')
+  def __init__(self, *args, **kwargs):
+    warnings.warn("StrAndUnicode is deprecated. Define a __str__ method "
+           "and apply the @python2_unicodeCompatible decorator "
+           "instead.", DeprecationWarning, stacklevel=2)
+    super(StrAndUnicode, self).__init__(*args, **kwargs)
 
-def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
+  if six.PY3:
+    def __str__(self):
+      return self.__unicode__()
+  else:
+    def __str__(self):
+      return self.__unicode__().encode('utf-8')
+
+def python2UnicodeCompatible(klass):
   """
-  Returns a unicode object representing 's'. Treats bytestrings using the
-  'encoding' codec.
+  A decorator that defines __unicode__ and __str__ methods under Python 2.
+  Under Python 3 it does nothing.
 
-  If strings_only is True, don't convert (some) non-string-like objects.
+  To support Python 2 and 3 with a single code base, define a __str__ method
+  returning text and apply this decorator to the class.
+  """
+  if six.PY2:
+    if '__str__' not in klass.__dict__:
+      raise ValueError("@python2_unicodeCompatible cannot be applied "
+               "to %s because it doesn't define __str__()." %
+               klass.__name__)
+    klass.__unicode__ = klass.__str__
+    klass.__str__ = lambda self: self.__unicode__().encode('utf-8')
+  return klass
+
+def smartText(s, encoding='utf-8', stringsOnly=False, errors='strict'):
+  """
+  Returns a text object representing 's' -- unicode on Python 2 and str on
+  Python 3. Treats bytestrings using the 'encoding' codec.
+
+  If stringsOnly is True, don't convert (some) non-string-like objects.
   """
   if isinstance(s, Promise):
-    # The input is the result of a gettext_lazy() call.
+    # The input is the result of a gettextLazy() call.
     return s
-  return force_unicode(s, encoding, strings_only, errors)
+  return forceText(s, encoding, stringsOnly, errors)
 
-def is_protected_type(obj):
+def isProtectedType(obj):
   """Determine if the object instance is of a protected type.
 
   Objects of protected types are preserved as-is when passed to
-  force_unicode(strings_only=True).
+  forceText(stringsOnly=True).
   """
-  return isinstance(obj, (
-    types.NoneType,
-    int, long,
-    datetime.datetime, datetime.date, datetime.time,
-    float, Decimal)
-  )
+  return isinstance(obj, six.integerTypes + (type(None), float, Decimal,
+    datetime.datetime, datetime.date, datetime.time))
 
-def force_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
+def forceText(s, encoding='utf-8', stringsOnly=False, errors='strict'):
   """
-  Similar to smart_unicode, except that lazy instances are resolved to
+  Similar to smartText, except that lazy instances are resolved to
   strings, rather than kept as lazy objects.
 
-  If strings_only is True, don't convert (some) non-string-like objects.
+  If stringsOnly is True, don't convert (some) non-string-like objects.
   """
-  # Handle the common case first, saves 30-40% in performance when s
-  # is an instance of unicode. This function gets called often in that
-  # setting.
-  if isinstance(s, unicode):
+  # Handle the common case first, saves 30-40% when s is an instance of
+  # six.text_type. This function gets called often in that setting.
+  if isinstance(s, six.text_type):
     return s
-  if strings_only and is_protected_type(s):
+  if stringsOnly and isProtectedType(s):
     return s
   try:
-    if not isinstance(s, basestring,):
+    if not isinstance(s, six.string_types):
       if hasattr(s, '__unicode__'):
-        s = unicode(s)
+        s = s.__unicode__()
       else:
-        try:
-          s = unicode(str(s), encoding, errors)
-        except UnicodeEncodeError:
-          if not isinstance(s, Exception):
-            raise
-          # If we get to here, the caller has passed in an Exception
-          # subclass populated with non-ASCII data without special
-          # handling to display as a string. We need to handle this
-          # without raising a further exception. We do an
-          # approximation to what the Exception's standard str()
-          # output should be.
-          s = ' '.join([force_unicode(arg, encoding, strings_only,
-              errors) for arg in s])
-    elif not isinstance(s, unicode):
-      # Note: We use .decode() here, instead of unicode(s, encoding,
-      # errors), so that if s is a SafeString, it ends up being a
-      # SafeUnicode at the end.
+        if six.PY3:
+          if isinstance(s, bytes):
+            s = six.text_type(s, encoding, errors)
+          else:
+            s = six.text_type(s)
+        else:
+          s = six.text_type(bytes(s), encoding, errors)
+    else:
+      # Note: We use .decode() here, instead of six.text_type(s, encoding,
+      # errors), so that if s is a SafeBytes, it ends up being a
+      # SafeText at the end.
       s = s.decode(encoding, errors)
-  except UnicodeDecodeError, e:
+  except UnicodeDecodeError as e:
     if not isinstance(s, Exception):
       raise TheoryUnicodeDecodeError(s, *e.args)
     else:
@@ -99,39 +132,78 @@ def force_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
       # working unicode method. Try to handle this without raising a
       # further exception by individually forcing the exception args
       # to unicode.
-      s = ' '.join([force_unicode(arg, encoding, strings_only,
+      s = ' '.join([forceText(arg, encoding, stringsOnly,
           errors) for arg in s])
   return s
 
-def smart_str(s, encoding='utf-8', strings_only=False, errors='strict'):
+def smartBytes(s, encoding='utf-8', stringsOnly=False, errors='strict'):
   """
   Returns a bytestring version of 's', encoded as specified in 'encoding'.
 
-  If strings_only is True, don't convert (some) non-string-like objects.
+  If stringsOnly is True, don't convert (some) non-string-like objects.
   """
-  if strings_only and isinstance(s, (types.NoneType, int)):
+  if isinstance(s, Promise):
+    # The input is the result of a gettextLazy() call.
+    return s
+  return forceBytes(s, encoding, stringsOnly, errors)
+
+
+def forceBytes(s, encoding='utf-8', stringsOnly=False, errors='strict'):
+  """
+  Similar to smartBytes, except that lazy instances are resolved to
+  strings, rather than kept as lazy objects.
+
+  If stringsOnly is True, don't convert (some) non-string-like objects.
+  """
+  if isinstance(s, six.memoryview):
+    s = bytes(s)
+  if isinstance(s, bytes):
+    if encoding == 'utf-8':
+      return s
+    else:
+      return s.decode('utf-8', errors).encode(encoding, errors)
+  if stringsOnly and (s is None or isinstance(s, int)):
     return s
   if isinstance(s, Promise):
-    return unicode(s).encode(encoding, errors)
-  elif not isinstance(s, basestring):
+    return six.text_type(s).encode(encoding, errors)
+  if not isinstance(s, six.string_types):
     try:
-      return str(s)
+      if six.PY3:
+        return six.text_type(s).encode(encoding)
+      else:
+        return bytes(s)
     except UnicodeEncodeError:
       if isinstance(s, Exception):
         # An Exception subclass containing non-ASCII data that doesn't
         # know how to print itself properly. We shouldn't raise a
         # further exception.
-        return ' '.join([smart_str(arg, encoding, strings_only,
+        return b' '.join([forceBytes(arg, encoding, stringsOnly,
             errors) for arg in s])
-      return unicode(s).encode(encoding, errors)
-  elif isinstance(s, unicode):
-    return s.encode(encoding, errors)
-  elif s and encoding != 'utf-8':
-    return s.decode('utf-8', errors).encode(encoding, errors)
+      return six.text_type(s).encode(encoding, errors)
   else:
-    return s
+    return s.encode(encoding, errors)
 
-def iri_to_uri(iri):
+if six.PY3:
+  smartStr = smartText
+  forceStr = forceText
+else:
+  smartStr = smartBytes
+  forceStr = forceBytes
+  # backwards compatibility for Python 2
+  smartUnicode = smartText
+  forceUnicode = forceText
+
+smartStr.__doc__ = """\
+Apply smartText in Python 3 and smartBytes in Python 2.
+
+This is suitable for writing to sys.stdout (for instance).
+"""
+
+forceStr.__doc__ = """\
+Apply forceText in Python 3 and forceBytes in Python 2.
+"""
+
+def iriToUri(iri):
   """
   Convert an Internationalized Resource Identifier (IRI) portion to a URI
   portion that is suitable for inclusion in a URL.
@@ -156,10 +228,10 @@ def iri_to_uri(iri):
   # converted.
   if iri is None:
     return iri
-  return urllib.quote(smart_str(iri), safe="/#%[]=:;$&()+,!?*@'~")
+  return quote(forceBytes(iri), safe=b"/#%[]=:;$&()+,!?*@'~")
 
-def filepath_to_uri(path):
-  """Convert an file system path to a URI portion that is suitable for
+def filepathToUri(path):
+  """Convert a file system path to a URI portion that is suitable for
   inclusion in a URL.
 
   We are assuming input is either UTF-8 or unicode already.
@@ -175,13 +247,19 @@ def filepath_to_uri(path):
     return path
   # I know about `os.sep` and `os.altsep` but I want to leave
   # some flexibility for hardcoding separators.
-  return urllib.quote(smart_str(path).replace("\\", "/"), safe="/~!*()'")
+  return quote(forceBytes(path).replace(b"\\", b"/"), safe=b"/~!*()'")
 
-# The encoding of the default system locale but falls back to the
-# given fallback encoding if the encoding is unsupported by python or could
-# not be determined.  See tickets #10335 and #5846
-try:
-  DEFAULT_LOCALE_ENCODING = locale.getdefaultlocale()[1] or 'ascii'
-  codecs.lookup(DEFAULT_LOCALE_ENCODING)
-except:
-  DEFAULT_LOCALE_ENCODING = 'ascii'
+def getSystemEncoding():
+  """
+  The encoding of the default system locale but falls back to the given
+  fallback encoding if the encoding is unsupported by python or could
+  not be determined.  See tickets #10335 and #5846
+  """
+  try:
+    encoding = locale.getdefaultlocale()[1] or 'ascii'
+    codecs.lookup(encoding)
+  except Exception:
+    encoding = 'ascii'
+  return encoding
+
+DEFAULT_LOCALE_ENCODING = getSystemEncoding()

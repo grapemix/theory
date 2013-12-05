@@ -6,10 +6,10 @@ import datetime
 from theory.conf import settings
 from theory.utils.translation import get_language, to_locale, check_for_language
 from theory.utils.importlib import import_module
-from theory.utils.encoding import smart_str
+from theory.utils.encoding import smartStr
 from theory.utils.functional import lazy
 from theory.utils import dateformat, numberformat, datetime_safe
-from theory.utils.safestring import mark_safe
+from theory.utils.safestring import markSafe
 
 # format_cache is a mapping from (format_type, lang) to the format string.
 # By using the cache, it is possible to avoid running get_format_modules
@@ -66,7 +66,7 @@ def get_format(format_type, lang=None, use_l10n=None):
   If use_l10n is provided and is not None, that will force the value to
   be localized (or not), overriding the value of settings.USE_L10N.
   """
-  format_type = smart_str(format_type)
+  format_type = smartStr(format_type)
   if use_l10n or (use_l10n is None and settings.USE_L10N):
     if lang is None:
       lang = get_language()
@@ -154,14 +154,14 @@ def localize_input(value, default=None):
     return number_format(value)
   elif isinstance(value, datetime.datetime):
     value = datetime_safe.new_datetime(value)
-    format = smart_str(default or get_format('DATETIME_INPUT_FORMATS')[0])
+    format = smartStr(default or get_format('DATETIME_INPUT_FORMATS')[0])
     return value.strftime(format)
   elif isinstance(value, datetime.date):
     value = datetime_safe.new_date(value)
-    format = smart_str(default or get_format('DATE_INPUT_FORMATS')[0])
+    format = smartStr(default or get_format('DATE_INPUT_FORMATS')[0])
     return value.strftime(format)
   elif isinstance(value, datetime.time):
-    format = smart_str(default or get_format('TIME_INPUT_FORMATS')[0])
+    format = smartStr(default or get_format('TIME_INPUT_FORMATS')[0])
     return value.strftime(format)
   return value
 

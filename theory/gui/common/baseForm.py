@@ -7,7 +7,7 @@ import copy
 import json
 
 ##### Theory lib #####
-from theory.core.exceptions import ValidationError
+from theory.core.exceptions import CommandSyntaxError, ValidationError
 from theory.gui import field as FormField
 from theory.utils.datastructures import SortedDict
 from theory.gui.transformer.theoryJSONEncoder import TheoryJSONEncoder

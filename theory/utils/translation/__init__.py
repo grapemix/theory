@@ -6,7 +6,7 @@ Internationalization support.
 import warnings
 from os import path
 
-from theory.utils.encoding import force_unicode
+from theory.utils.encoding import forceUnicode
 from theory.utils.functional import lazy
 from theory.utils.importlib import import_module
 
@@ -136,7 +136,7 @@ def _string_concat(*strings):
   Lazy variant of string concatenation, needed for translations that are
   constructed from multiple parts.
   """
-  return u''.join([force_unicode(s) for s in strings])
+  return u''.join([forceUnicode(s) for s in strings])
 string_concat = lazy(_string_concat, unicode)
 
 def get_language_info(lang_code):

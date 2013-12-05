@@ -38,7 +38,7 @@ from theory.gui.util import (
     )
 from theory.gui.widget import *
 from theory.utils import formats
-from theory.utils.encoding import smart_text, smart_str, force_unicode
+from theory.utils.encoding import smartText, smartStr, forceUnicode
 from theory.utils.importlib import import_class
 from theory.utils.ipv6 import clean_ipv6_address
 from theory.utils.translation import ugettext_lazy as _
@@ -106,7 +106,7 @@ class Field(object):
     # localize -- Boolean that specifies if the field should be localized.
     # widget -- Default widget to use when rendering this type of Field.
     if label is not None:
-      label = smart_text(label)
+      label = smartText(label)
     self.required, self.label, self.initData = required, label, initData
     #self.finalData = self.initData
     self._changedData = self._finalData = None
@@ -115,7 +115,7 @@ class Field(object):
     if help_text is None:
       self.help_text = u''
     else:
-      self.help_text = smart_text(help_text)
+      self.help_text = smartText(help_text)
 
     self.localize = localize
 
@@ -334,7 +334,7 @@ class TextField(Field):
     "Returns a Unicode object."
     if value in validators.EMPTY_VALUES:
       return u''
-    return smart_text(value)
+    return smartText(value)
 
 class IntegerField(Field):
   default_error_messages = {
@@ -422,7 +422,7 @@ class DecimalField(Field):
       return None
     if self.localize:
       value = formats.sanitize_separators(value)
-    value = smart_str(value).strip()
+    value = smartStr(value).strip()
     try:
       value = Decimal(value)
     except DecimalException:
@@ -467,7 +467,7 @@ class BaseTemporalField(Field):
 
   def to_python(self, value):
     # Try to coerce the value to unicode.
-    unicode_value = force_unicode(value, strings_only=True)
+    unicode_value = forceUnicode(value, strings_only=True)
     if isinstance(unicode_value, unicode):
       value = unicode_value.strip()
     # If unicode, try to strptime against each input format.
@@ -903,7 +903,7 @@ class ChoiceField(Field):
     "Returns a Unicode object."
     if value in validators.EMPTY_VALUES:
       return u''
-    return smart_text(value)
+    return smartText(value)
 
   def validate(self, value):
     """
@@ -919,10 +919,10 @@ class ChoiceField(Field):
       if isinstance(v, (list, tuple)):
         # This is an optgroup, so look inside the group for options
         for k2, v2 in v:
-          if value == smart_text(k2):
+          if value == smartText(k2):
             return True
       else:
-        if value == smart_text(k):
+        if value == smartText(k):
           return True
     return False
 
@@ -963,7 +963,7 @@ class MultipleChoiceField(ChoiceField):
       return []
     elif not isinstance(value, (list, tuple)):
       raise ValidationError(self.error_messages['invalid_list'])
-    return [smart_text(val) for val in value]
+    return [smartText(val) for val in value]
 
   def validate(self, value):
     """

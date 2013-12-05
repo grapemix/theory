@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 from theory.conf import settings
-from theory.utils.safestring import mark_safe
+from theory.utils.safestring import markSafe
 
 
 def format(number, decimal_sep, decimal_pos, grouping=0, thousand_sep=''):
