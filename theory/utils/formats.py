@@ -4,8 +4,8 @@ import decimal
 import datetime
 
 from theory.conf import settings
-from theory.utils.translation import get_language, to_locale, check_for_language
-from theory.utils.importlib import import_module
+from theory.utils.translation import getLanguage, toLocale, checkForLanguage
+from theory.utils.importlib import importModule
 from theory.utils.encoding import smartStr
 from theory.utils.functional import lazy
 from theory.utils import dateformat, numberformat, datetime_safe
@@ -31,19 +31,19 @@ def iter_format_modules(lang):
   """
   Does the heavy lifting of finding format modules.
   """
-  if check_for_language(lang):
+  if checkForLanguage(lang):
     format_locations = ['theory.conf.locale.%s']
     if settings.FORMAT_MODULE_PATH:
       format_locations.append(settings.FORMAT_MODULE_PATH + '.%s')
       format_locations.reverse()
-    locale = to_locale(lang)
+    locale = toLocale(lang)
     locales = [locale]
     if '_' in locale:
       locales.append(locale.split('_')[0])
     for location in format_locations:
       for loc in locales:
         try:
-          yield import_module('.formats', location % loc)
+          yield importModule('.formats', location % loc)
         except ImportError:
           pass
 
@@ -51,7 +51,7 @@ def get_format_modules(reverse=False):
   """
   Returns a list of the format modules found
   """
-  lang = get_language()
+  lang = getLanguage()
   modules = _format_modules_cache.setdefault(lang, list(iter_format_modules(lang)))
   if reverse:
     return list(reversed(modules))
@@ -69,7 +69,7 @@ def get_format(format_type, lang=None, use_l10n=None):
   format_type = smartStr(format_type)
   if use_l10n or (use_l10n is None and settings.USE_L10N):
     if lang is None:
-      lang = get_language()
+      lang = getLanguage()
     cache_key = (format_type, lang)
     try:
       return _format_cache[cache_key] or getattr(settings, format_type)
@@ -113,7 +113,7 @@ def number_format(value, decimal_pos=None, use_l10n=None):
   be localized (or not), overriding the value of settings.USE_L10N.
   """
   if use_l10n or (use_l10n is None and settings.USE_L10N):
-    lang = get_language()
+    lang = getLanguage()
   else:
     lang = None
   return numberformat.format(

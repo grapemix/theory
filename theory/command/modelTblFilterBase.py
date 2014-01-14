@@ -9,7 +9,7 @@ from theory.conf import settings
 from theory.core.bridge import Bridge
 from theory.gui import field
 from theory.model import AppModel
-from theory.utils.importlib import import_class
+from theory.utils.importlib import importClass
 
 ##### Theory third-party lib #####
 
@@ -126,7 +126,7 @@ class ModelTblFilterBase(SimpleCommand):
     else:
       modelName = formData["modelName"]
       modelName = modelName[0].upper() + modelName[1:]
-      self.modelKlass = import_class(
+      self.modelKlass = importClass(
           "%s.model.%s" % (formData["appName"], modelName)
       )
       self.queryset = self.modelKlass.objects.filter(

@@ -8,7 +8,7 @@ import unittest
 
 ##### Theory lib #####
 from theory.db.loading import load_app
-from theory.utils.importlib import import_module
+from theory.utils.importlib import importModule
 
 ##### Theory third-party lib #####
 
@@ -57,7 +57,7 @@ def registerTestApp():
   for testModuleDirPath, testModuleFileName in testModuleAbsPaths:
     moduleLabel = ".".join([testModuleDirPath, testModuleFileName])
     #mod = load_app(moduleLabel, True)
-    mod = import_module(moduleLabel)
+    mod = importModule(moduleLabel)
     if(mod and moduleLabel not in settings.INSTALLED_APPS):
       settings.INSTALLED_APPS.append(moduleLabel)
 

@@ -458,8 +458,8 @@ class PythonModuleFieldTestCase(FieldTestCaseBase):
     self.assertEqual(self.field.validate("anything"), "anything")
 
   def testValidateAutoImport(self):
-    from theory.utils.importlib import import_class
-    expectedModule = import_class("theory.command")
+    from theory.utils.importlib import importClass
+    expectedModule = importClass("theory.command")
     self.assertEqual(self.field.validate("theory.command"), expectedModule)
     self.assertRaises(ValidationError, self.field.validate, "theory.command.blah")
     self.assertRaises(ValidationError, self.field.validate, "theory.command.listCommand.ListCommand")
@@ -479,8 +479,8 @@ class PythonClassFieldTestCase(FieldTestCaseBase):
     self.assertEqual(self.field.validate("anything"), "anything")
 
   def testValidateAutoImport(self):
-    from theory.utils.importlib import import_class
-    expectedKlass = import_class("theory.command.listCommand.ListCommand")
+    from theory.utils.importlib import importClass
+    expectedKlass = importClass("theory.command.listCommand.ListCommand")
 
     with self.assertRaises(ValidationError):
       self.field.validate("theory.command")

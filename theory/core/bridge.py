@@ -7,7 +7,7 @@ import json
 from theory.adapter import BaseUIAdapter
 from theory.core.exceptions import CommandSyntaxError
 from theory.model import Adapter, AdapterBuffer, Command
-from theory.utils.importlib import import_class
+from theory.utils.importlib import importClass
 
 ##### Theory third-party lib #####
 
@@ -39,7 +39,7 @@ class Bridge(object):
     return o
 
   def _getCmdForAssignment(self, cmdModel):
-    cmdKlass = import_class(cmdModel.classImportPath)
+    cmdKlass = importClass(cmdModel.classImportPath)
     cmd = cmdKlass()
 
     if(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC):
@@ -66,9 +66,9 @@ class Bridge(object):
     return storage
 
   def getCmdComplex(self, cmdModel, args, kwargs):
-    cmdKlass = import_class(cmdModel.classImportPath)
+    cmdKlass = importClass(cmdModel.classImportPath)
     cmd = cmdKlass()
-    cmdParamForm = import_class(cmdModel.classImportPath).ParamForm
+    cmdParamForm = importClass(cmdModel.classImportPath).ParamForm
     cmd.paramForm = cmdParamForm()
     cmd.paramForm.fillInitFields(cmdModel, args, kwargs)
     cmd.paramForm.is_valid()
@@ -157,7 +157,7 @@ class Bridge(object):
   def bridgeFromDb(self, adapterBufferModel, callbackFxn, uiParam={}):
     jsonData = json.loads(adapterBufferModel.data)
     adapterModel = adapterBufferModel.adapter
-    adapterKlass = import_class(adapterModel.importPath)
+    adapterKlass = importClass(adapterModel.importPath)
     adapter = adapterKlass()
     for k,v in jsonData.iteritems():
       setattr(adapter, k, v)
@@ -201,7 +201,7 @@ class Bridge(object):
 
     adapter = None
     if(adapterModel!=None):
-      adapterKlass = import_class(adapterModel.importPath)
+      adapterKlass = importClass(adapterModel.importPath)
       adapter = adapterKlass()
       #adapter = self._assignAdapterProperties(adapterModel.property, adapter, cmd)
       adapter = self._assignAdapterPropertiesFromCmd(adapterModel.property, adapter, cmd)

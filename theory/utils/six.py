@@ -71,7 +71,7 @@ def _add_doc(func, doc):
   func.__doc__ = doc
 
 
-def _import_module(name):
+def _importModule(name):
   """Import module, returning the module after the last dot."""
   __import__(name)
   return sys.modules[name]
@@ -102,7 +102,7 @@ class MovedModule(_LazyDescr):
       self.mod = old
 
   def _resolve(self):
-    return _import_module(self.mod)
+    return _importModule(self.mod)
 
 
 class MovedAttribute(_LazyDescr):
@@ -126,7 +126,7 @@ class MovedAttribute(_LazyDescr):
       self.attr = old_attr
 
   def _resolve(self):
-    module = _import_module(self.mod)
+    module = _importModule(self.mod)
     return getattr(module, self.attr)
 
 

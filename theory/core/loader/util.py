@@ -8,7 +8,7 @@ import sys
 ##### Theory lib #####
 #from theory.command import filenameScanner
 from theory.core.resourceScan import *
-from theory.utils.importlib import import_module
+from theory.utils.importlib import importModule
 from theory.utils.mood import loadMoodData
 
 ##### Theory third-party lib #####
@@ -62,7 +62,7 @@ def setup_environ(settings_mod, original_settings_path=None):
   # Import the mood module. We add the parent directory to PYTHONPATH to
   # avoid some of the path errors new users can have.
   sys.path.append(os.path.join(mood_directory, os.pardir))
-  mood_module = import_module(mood_name)
+  mood_module = importModule(mood_name)
   sys.path.pop()
 
   return mood_directory
@@ -227,7 +227,7 @@ def reprobeAllModule(settings_mod, argv=None):
   # Find the project directory
   try:
     from theory.conf import settings
-    module = import_module(settings.SETTINGS_MODULE)
+    module = importModule(settings.SETTINGS_MODULE)
     project_directory = setup_environ(module, settings.SETTINGS_MODULE)
   except (AttributeError, EnvironmentError, ImportError, KeyError):
     project_directory = None
@@ -238,7 +238,7 @@ def reprobeAllModule(settings_mod, argv=None):
   settings.INSTALLED_MOODS.append("norm")
   settings.INSTALLED_MOODS = tuple(settings.INSTALLED_MOODS)
   for moodDirName in settings.INSTALLED_MOODS:
-    config = import_module("%s.config" % (moodDirName))
+    config = importModule("%s.config" % (moodDirName))
     for appName in config.APPS:
       if(moodAppRel.has_key(appName)):
         moodAppRel[appName] += moodDirName

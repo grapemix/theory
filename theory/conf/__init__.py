@@ -71,7 +71,7 @@ class Settings(object):
     self.SETTINGS_MODULE = settings_module
 
     try:
-      mod = importlib.import_module(self.SETTINGS_MODULE)
+      mod = importlib.importModule(self.SETTINGS_MODULE)
     except ImportError, e:
       raise ImportError("Could not import settings '%s' (Is it on sys.path?): %s" % (self.SETTINGS_MODULE, e))
 
@@ -91,7 +91,7 @@ class Settings(object):
     new_installed_apps = []
     for app in self.INSTALLED_APPS:
       if app.endswith('.*'):
-        app_mod = importlib.import_module(app[:-2])
+        app_mod = importlib.importModule(app[:-2])
         appdir = os.path.dirname(app_mod.__file__)
         app_subdirs = os.listdir(appdir)
         app_subdirs.sort()
@@ -119,7 +119,7 @@ class Settings(object):
     if self.LOGGING_CONFIG:
       # First find the logging configuration function ...
       logging_config_path, logging_config_func_name = self.LOGGING_CONFIG.rsplit('.', 1)
-      logging_config_module = importlib.import_module(logging_config_path)
+      logging_config_module = importlib.importModule(logging_config_path)
       logging_config_func = getattr(logging_config_module, logging_config_func_name)
 
       # ... then invoke it with the logging settings

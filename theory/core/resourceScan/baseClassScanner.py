@@ -3,7 +3,7 @@
 ##### System wide lib #####
 from abc import ABCMeta, abstractmethod
 ##### Theory lib #####
-from theory.utils.importlib import import_module
+from theory.utils.importlib import importModule
 
 ##### Theory third-party lib #####
 
@@ -23,14 +23,12 @@ class BaseClassScanner(object):
     (ImportError, AttributeError) are allowed to propagate.
     """
     if(submoduleName=="__init__"):
-      module = import_module('%s.%s' % (packageName, moduleName))
+      module = importModule('%s.%s' % (packageName, moduleName))
     else:
       #print packageName, moduleName, submoduleName
-      module = import_module('%s.%s.%s' % (packageName, moduleName, submoduleName))
+      module = importModule('%s.%s.%s' % (packageName, moduleName, submoduleName))
     return module
 
   @abstractmethod
   def scan(self, *args, **kwargs):
     pass
-
-

@@ -5,7 +5,7 @@ from datetime import datetime
 
 ##### Theory lib #####
 from theory.db.models import *
-from theory.utils.translation import ugettext_lazy as _
+from theory.utils.translation import ugettextLazy as _
 
 ##### Theory third-party lib #####
 

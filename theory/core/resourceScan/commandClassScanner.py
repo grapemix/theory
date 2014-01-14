@@ -7,7 +7,6 @@ from mongoengine import *
 from theory.command.baseCommand import SimpleCommand, AsyncCommand
 from theory.conf import settings
 from theory.model import Command, Parameter
-from theory.utils.importlib import import_module
 
 ##### Theory third-party lib #####
 
@@ -61,7 +60,7 @@ class CommandClassScanner(BaseClassScanner):
     # Get the fields in the paramForm first. All fields in the paramForm
     # are able to pass to adapter. Only the order of the required fields
     # are important.
-    for paramName, param in cmdClass.ParamForm.base_fields.iteritems():
+    for paramName, param in cmdClass.ParamForm.baseFields.iteritems():
       if(param.required):
         parameter = Parameter(name=paramName, isOptional = False)
       else:

@@ -4,7 +4,7 @@
 
 ##### Theory lib #####
 from theory.conf import settings
-from theory.utils.importlib import import_module
+from theory.utils.importlib import importModule
 
 ##### Theory third-party lib #####
 
@@ -20,7 +20,7 @@ from theory.utils.importlib import import_module
 #    between field and mongoenigne.
 
 def _importModule():
-  module = import_module("theory.gui.{0}.widget".format(settings.UI_TOOLKIT))
+  module = importModule("theory.gui.{0}.widget".format(settings.UI_TOOLKIT))
   widgetNameLst = [i for i in dir(module) if i.endswith("Input")]
 
   for widgetName in widgetNameLst:

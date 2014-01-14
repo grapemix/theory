@@ -6,7 +6,6 @@ import codecs
 ##### Theory lib #####
 from theory.conf import settings
 from theory.model import Command, Parameter
-from theory.utils.importlib import import_module
 
 ##### Theory third-party lib #####
 

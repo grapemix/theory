@@ -4,7 +4,7 @@
 
 ##### Theory lib #####
 from theory.conf import settings
-from theory.utils.importlib import import_module
+from theory.utils.importlib import importModule
 
 ##### Theory third-party lib #####
 
@@ -21,13 +21,13 @@ def loadMoodData(mood=None):
       if(i==i.upper()):
         settings.MOOD[i] = getattr(config, i)
 
-  config = import_module("norm.config")
+  config = importModule("norm.config")
   _assignPropertyIntoSettings(config)
 
   try:
     if(not mood):
       mood = settings.DEFAULT_MOOD
-    config = import_module("%s.config" % (mood))
+    config = importModule("%s.config" % (mood))
   except (AttributeError, EnvironmentError, ImportError, KeyError):
     config = None
 

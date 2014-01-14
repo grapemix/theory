@@ -13,7 +13,7 @@ from theory.core.cmdParser.txtCmdParser import TxtCmdParser
 from theory.conf import settings
 from theory.gui.terminal import Terminal
 from theory.model import Command, Adapter, History
-from theory.utils.importlib import import_class
+from theory.utils.importlib import importClass
 
 ##### Theory third-party lib #####
 from theory.gui.gtk.notify import getNotify
@@ -200,7 +200,7 @@ class Reactor(object):
     return self._buildParamForm()
 
   def _buildParamForm(self, finalDataDict={}):
-    cmdParamFormKlass = import_class(self.cmdModel.classImportPath).ParamForm
+    cmdParamFormKlass = importClass(self.cmdModel.classImportPath).ParamForm
     self.paramForm = cmdParamFormKlass()
     self.paramForm._nextBtnClick = self.cleanParamForm
 
@@ -290,7 +290,7 @@ class Reactor(object):
     if(self.paramForm is None):
       cmd = self._fillParamForm(self.cmdModel)
     else:
-      cmdKlass = import_class(self.cmdModel.classImportPath)
+      cmdKlass = importClass(self.cmdModel.classImportPath)
       cmd = cmdKlass()
       cmd.paramForm = self.paramForm
 
