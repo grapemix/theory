@@ -24,7 +24,7 @@ from element import Button
 
 __all__ = ("Form", "CommandForm", "SimpleGuiForm", "FlexibleGuiForm")
 
-class GuiFormBase(FormBase, BasePacker):
+class GuiFormBase(BasePacker):
   def _preFillFieldProperty(self):
     """It is used to prefill fields which depends on the fields'
     value. It will only be called in the __init__() and when the form
@@ -118,12 +118,7 @@ class FlexibleGuiFormBase(GuiFormBase):
 
 class SimpleGuiFormBase(GuiFormBase):
   def __init__(self, *args, **kwargs):
-    super(SimpleGuiFormBase, self).__init__(*args, **kwargs)
-    # We have to call the initialize fxn explicitly because the
-    # BasePacker initialize fxn won't be executed if we only called
-    # super().__init__(). We temporary set win and bx as None because
-    # form in a Command does not always need to render.
-    BasePacker.__init__(self, None, None, *args, **kwargs)
+    super(SimpleGuiFormBase, self).__init__(self, None, None, *args, **kwargs)
     self.firstRequiredInputIdx = -1
 
   def _changeFormWindowHeight(self, maxHeight):
@@ -141,7 +136,7 @@ class SimpleGuiFormBase(GuiFormBase):
     self.formBx.bx = self.bx
     self.formBx.generate()
 
-  def generateForm(self, win, bx, unFocusFxn):
+  def generateForm(self, win, bx, unFocusFxn, **kwargs):
     self.unFocusFxn = unFocusFxn
     self._createFormSkeleton(win, bx)
 
@@ -158,12 +153,13 @@ class SimpleGuiFormBase(GuiFormBase):
         kwargs["contentChgFxn"] = getattr(self, contentChgFxnName)
 
       field.renderWidget(self.win, self.formBx.obj, attrs=kwargs)
-      self.formBx.addInput(field.widget)
+      if(field.widget is not None):
+        self.formBx.addInput(field.widget)
 
     self.formBx.postGenerate()
     self._changeFormWindowHeight(720)
 
-  def generateFilterForm(self, win, bx, unFocusFxn):
+  def generateFilterForm(self, win, bx, unFocusFxn, **kwargs):
     self.unFocusFxn = unFocusFxn
     self._createFormSkeleton(win, bx)
     optionalMenu = FilterFormLayout(
@@ -193,7 +189,8 @@ class SimpleGuiFormBase(GuiFormBase):
           self.firstRequiredInputIdx = i
       else:
         field.renderWidget(self.win, self.formBx.obj, attrs=kwargs)
-        optionalMenu.addInput(name, field.widget)
+        if(field.widget is not None):
+          optionalMenu.addInput(name, field.widget)
       i += 1
 
     self.formBx.postGenerate()
@@ -252,17 +249,17 @@ class CommandFormBase(StepFormBase):
     elif(hasattr(self, "optionalMenu")):
       self.optionalMenu.setFocusOnFilterEntry()
 
-class GuiForm(GuiFormBase):
+class GuiForm(FormBase, GuiFormBase):
   __metaclass__ = DeclarativeFieldsMetaclass
 
-class SimpleGuiForm(SimpleGuiFormBase):
+class SimpleGuiForm(FormBase, SimpleGuiFormBase):
   __metaclass__ = DeclarativeFieldsMetaclass
 
-class FlexibleGuiForm(FlexibleGuiFormBase):
+class FlexibleGuiForm(FormBase, FlexibleGuiFormBase):
   __metaclass__ = DeclarativeFieldsMetaclass
 
-class StepForm(StepFormBase):
+class StepForm(FormBase, StepFormBase):
   __metaclass__ = DeclarativeFieldsMetaclass
 
-class CommandForm(CommandFormBase):
+class CommandForm(FormBase, CommandFormBase):
   __metaclass__ = DeclarativeFieldsMetaclass

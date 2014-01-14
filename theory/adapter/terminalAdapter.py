@@ -60,5 +60,5 @@ class TerminalAdapter(BaseUIAdapter):
     o = self.TerminalForm()
     o.fields["stdOut"].initData = self.stdOut
     #o.fields["stdErr"].initData = self.stdErr
-    o.generateForm(*kwargs["uiParam"].values())
+    o.generateForm(**kwargs["uiParam"])
     self.terminalForm = o

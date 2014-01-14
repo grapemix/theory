@@ -206,7 +206,7 @@ class Reactor(object):
 
     self.paramForm.fillInitData(finalDataDict)
 
-    self.paramForm.generateFilterForm(*self.adapter.uiParam.values())
+    self.paramForm.generateFilterForm(**self.adapter.uiParam)
     self.paramForm.generateStepControl(cleanUpCrtFxn=self.adapter.cleanUpCrt)
 
     return True
