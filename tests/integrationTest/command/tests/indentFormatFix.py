@@ -4,6 +4,7 @@ import os
 
 ##### Theory lib #####
 from theory.model import Command
+from theory.gui.util import LocalFileObject
 
 ##### Theory third-party lib #####
 
@@ -40,13 +41,17 @@ class IndentFormatFixTestCase(BaseCommandTestCase):
     correctFileObj.close()
 
   def testSimplePath(self):
-    cmd = self._getCmd(self.cmdModel, [[self.thisTestCaseFilesAbsPath,]])
+    fileObj = LocalFileObject(self.thisTestCaseFilesAbsPath)
+    cmd = self._getCmd(self.cmdModel, [[fileObj], True, 1])
     self._validateParamForm(cmd)
     self._execeuteCommand(cmd, self.cmdModel)
     self._compareFile(self.thisTestCaseFilesAbsPath)
     self._restoreFile(self.thisTestCaseFilesAbsPath)
 
-    cmd = self._getCmd(self.cmdModel, kwargs={"filenameLst": [self.thisTestCaseFilesAbsPath,]})
+    cmd = self._getCmd(
+        self.cmdModel,
+        kwargs={"filenameLst": [fileObj,], "writtenMode": 1}
+        )
     self._validateParamForm(cmd)
     self._execeuteCommand(cmd, self.cmdModel)
     self._compareFile(self.thisTestCaseFilesAbsPath)

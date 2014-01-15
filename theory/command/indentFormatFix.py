@@ -2,6 +2,7 @@
 #!/usr/bin/env python
 ##### System wide lib #####
 import codecs
+import re
 from shutil import move
 
 ##### Theory lib #####
@@ -26,23 +27,55 @@ class IndentFormatFix(SimpleCommand):
   _indentSpace = 2
 
   class ParamForm(SimpleCommand.ParamForm):
+    WRITTEN_MODE_COPY = 1
+    WRITTEN_MODE_REPLACE = 2
+    WRITTEN_MODE_DRY_RUN = 3
+    WRITTEN_MODE_DRY_RUN_PRINT = 4
+
+    WRITTEN_MODE_CHOICES = (
+        (WRITTEN_MODE_COPY, "Copy"),
+        (WRITTEN_MODE_REPLACE, "Replace"),
+        (WRITTEN_MODE_DRY_RUN, "Dry run"),
+        (WRITTEN_MODE_DRY_RUN_PRINT, "Dry run and print"),
+    )
+
     filenameLst = field.ListField(
-        field.TextField(max_length=512),
+        field.FilePathField(initData="/home/kingston/formset.py"),
         label="The list of filenames being fixed"
+    )
+    writtenMode = field.ChoiceField(label="Written Mood",
+        help_text="The way to write the changes",
+        choices=WRITTEN_MODE_CHOICES,
+        initData=WRITTEN_MODE_DRY_RUN_PRINT,
+    )
+    isReplaceCamalCase = field.BooleanField(
+        label="Is replace camal case",
+        initData=True,
     )
 
   def run(self):
-    for filename in self.paramForm.cleaned_data["filenameLst"]:
-      lines = self._readFileLine(filename)
+    self.formData = self.paramForm.clean()
+    for fileObj in self.formData["filenameLst"]:
+      lines = self._readFileLine(fileObj.filepath)
       lines = self._forceHalfIndent(lines)
       lines = self._convertDjango(lines)
-      self._writeToFile(lines, filename)
+      lines = self._convertCamelCase(lines)
+      self._writeToFile(lines, fileObj.filepath)
 
   def _writeToFile(self, lines, oldFilename):
-    move(oldFilename, oldFilename + ".orig")
+    writtenMode = int(self.formData["writtenMode"])
+    self._drums = {}
+    lines = "\n".join(lines)
+    if(writtenMode==self.paramForm.WRITTEN_MODE_COPY):
+      move(oldFilename, oldFilename + ".orig")
+    elif(writtenMode==self.paramForm.WRITTEN_MODE_DRY_RUN):
+      return
+    elif(writtenMode==self.paramForm.WRITTEN_MODE_DRY_RUN_PRINT):
+      self._stdOut = lines
+      self._drums = {"Terminal": 1, }
+      return
     fileObj = open(oldFilename,"w")
     #fileObj.writelines(lines)
-    lines = "\n".join(lines)
     fileObj.write(lines)
     fileObj.close()
 
@@ -59,6 +92,23 @@ class IndentFormatFix(SimpleCommand):
       #  del s[-1]
     fileObj.close()
     return s
+
+  def _convertCamelCase(self, lines):
+    if(not self.formData["isReplaceCamalCase"]):
+      return lines
+    underscorePattern = re.compile("[a-z0-9]_([a-z0-9])")
+    newLines = []
+    for i in lines:
+      lastIdx = 0
+      s = ""
+      for m in underscorePattern.finditer(i):
+        s += m.string[lastIdx:m.start(0)+1] + m.string[m.start(0)+2].upper()
+        lastIdx = m.start(0) + 3
+      if(lastIdx!=0):
+        newLines.append(s + i[lastIdx:])
+      else:
+        newLines.append(i)
+    return newLines
 
   # Todo: remove this fxn
   def _convertDjango(self, lines):
