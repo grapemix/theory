@@ -30,7 +30,7 @@ class ReactorAdapter(object):
   def printTxt(self, txt):
     o = self.TerminalForm()
     o.fields["stdOut"].initData = txt
-    o.generateForm(*self.uiParam.values())
+    o.generateForm(**self.uiParam)
     self.terminalForm = o
 
   def __init__(self, signal):
