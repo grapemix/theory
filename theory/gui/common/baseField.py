@@ -8,6 +8,7 @@ import copy
 import datetime
 from decimal import Decimal, DecimalException
 from inspect import isclass
+from json import loads as jsonLoads
 import os
 import re
 try:
@@ -25,6 +26,7 @@ except ImportError:
 from theory.conf import settings
 from theory.core import validators
 from theory.core.exceptions import ValidationError
+from theory.model import AppModel
 
 # Provide this import for backwards compatibility.
 from theory.core.validators import EMPTY_VALUES
@@ -66,7 +68,8 @@ __all__ = (
   'FloatField', 'DecimalField', 'IPAddressField', 'GenericIPAddressField',
   'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField',
   'StringGroupFilterField', 'ModelValidateGroupField', 'PythonModuleField',
-  'PythonClassField', 'QuerysetField',
+  'PythonClassField', 'QuerysetField', 'ModelField', 'EmbeddedField',
+  'ObjectIdField', 'BinaryField', 'GeoPointField',
 )
 
 FILE_INPUT_CONTRADICTION = object()
@@ -852,7 +855,7 @@ class NullBooleanField(BooleanField):
     """
     Explicitly checks for the string 'True' and 'False', which is what a
     hidden field will submit for True and False, and for '1' and '0', which
-    is what a RadioField will submit. Unlike the Booleanfield we need to
+    is what a RadioField will submit. Unlike the BooleanField we need to
     explicitly check for True, because we are not using the bool() function
     """
     if value in (True, 'True', '1'):
@@ -1064,7 +1067,10 @@ class ListField(Field):
     #           most cases, the default widget is TextInput.
     #widget = widget or self.widget
     widget = self.widget
-    if(isclass(widget)):
+    # For some widget which is unable to display e.x: binary data
+    if(self.childFieldTemplate.widget is None):
+      self.widget = None
+    elif(isclass(widget)):
       self.widget = widget(
           self.widgetSetter,
           self.widgetGetter,
@@ -1078,6 +1084,12 @@ class ListField(Field):
 
   def addChildField(self, data, fieldName="initData"):
     field = copy.deepcopy(self.childFieldTemplate)
+    if(hasattr(field, "embeddedFieldDict")):
+      # The deepcopy is unable to do the copy the embeddedFieldDict, so we
+      # have to make a special case for embeddedField
+      field.embeddedFieldDict = copy.deepcopy(
+          self.childFieldTemplate.embeddedFieldDict
+          )
     if(data is not None):
       setattr(field, fieldName, data)
     self.fields.append(field)
@@ -1328,7 +1340,10 @@ class DictField(Field):
     #           default Widget that it'll use if you don't specify this. In
     #           most cases, the default widget is TextInput.
     widget = self.widget
-    if isinstance(widget, type):
+    # For some widget which is unable to display e.x: binary data
+    if(self.childValueFieldTemplate.widget is None):
+      self.widget = None
+    elif isinstance(widget, type):
 
       childFieldPairLst = []
       for i in range(len(self.keyFields)):
@@ -1680,3 +1695,96 @@ class QuerysetField(Field):
       kwargs["attrs"] = {}
     kwargs["attrs"].update({"app": self.app, "model": self.model})
     super(QuerysetField, self).renderWidget(*args, **kwargs)
+
+class ModelField(Field):
+  #widget = ModelInput
+
+  def __init__(self, appName, modelName, *args, **kwargs):
+    self.modelConfigModel = AppModel.objects.get(
+        isEmbedded=False,
+        app=appName,
+        name=modelName
+        )
+    self.modelFieldLst = []
+    for fieldName in self.modelConfigModel.formField:
+      fieldType = self.modelConfigModel.fieldNameTypeMap[fieldName]
+
+    super(ModelField, self).__init__(*args, **kwargs)
+
+class EmbeddedField(Field):
+  widget = EmbeddedInput
+
+  def __init__(self, appName, embeddedModelName, *args, **kwargs):
+    # To avoid circular dependency
+    from theory.gui.model import fieldsForModel
+    from theory.gui.transformer.mongoModelFormDetector import \
+        MongoModelFormDetector
+    self.embeddedConfigModel = AppModel.objects.get(
+        isEmbedded=True,
+        app=appName,
+        name=embeddedModelName
+        )
+
+    detector = MongoModelFormDetector()
+    self.embeddedFieldDict = fieldsForModel(
+        detector.run(appModelObj = self.embeddedConfigModel)
+        )
+    super(EmbeddedField, self).__init__(*args, **kwargs)
+
+  def renderWidget(self, *args, **kwargs):
+    # widget -- A Widget class, or instance of a Widget class, that should
+    #           be used for this Field when displaying it. Each Field has a
+    #           default Widget that it'll use if you don't specify this. In
+    #           most cases, the default widget is TextInput.
+    #widget = widget or self.widget
+    widget = self.widget
+    # For some widget which is unable to display e.x: binary data
+    if(self.embeddedFieldDict == {}):
+      self.widget = None
+    elif(isclass(widget)):
+      self.widget = widget(
+          self.widgetSetter,
+          self.widgetGetter,
+          self.embeddedFieldDict,
+          *args, **kwargs)
+      self.widget.setupInstructionComponent()
+      super(EmbeddedField, self).renderWidget(*args, **kwargs)
+
+class ObjectIdField(Field):
+  @property
+  def initData(self):
+    return self._initData
+
+  @initData.setter
+  def initData(self, initData):
+    self._initData = str(initData)
+
+class BinaryField(Field):
+  widget = None
+
+  def renderWidget(self, *args, **kwargs):
+    pass
+
+class GeoPointField(TextField):
+
+  @property
+  def initData(self):
+    return self._initData
+
+  @initData.setter
+  def initData(self, initData):
+    self._initData = str(initData)
+
+  def to_python(self, value):
+    if value in validators.EMPTY_VALUES:
+      return None
+    try:
+      value = jsonLoads(value)
+      if(len(value)!=2):
+        raise
+      for i in value:
+        if(not isinstance(i, (int, float))):
+          raise
+    except:
+      return None
+    return value
