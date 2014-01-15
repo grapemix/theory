@@ -36,9 +36,13 @@ class MongoModelDetectorBase(object):
       handlerFxnName = ""
       for fieldTypeLabelToken in fieldTypeLabelTokenLst:
         if(handlerFxnName==""):
+          fieldTypeLabelToken = fieldTypeLabelToken.split("_")[0]
           # When it is in top level, we treated it as normal
           handlerFxnName = self._typeCatMap[fieldTypeLabelToken][0]
+        elif(handlerFxnName=="nonEditableForceStrField"):
+          break
         else:
+          fieldTypeLabelToken = fieldTypeLabelToken.split("_")[0]
           # When it is NOT in top level, we treated it as child
           handlerFxnName += self._typeCatMap[fieldTypeLabelToken][1]
       if(handlerFxnName=="intField" and \
@@ -73,46 +77,6 @@ class MongoModelDetectorBase(object):
   def _fillUpTypeHandler(self, klassLabel, prefix=""):
     pass
 
+  @abstractmethod
   def _buildTypeCatMap(self):
-    self._typeCatMap = {
-        #"dbFieldName": ("fieldCategory", "fieldCategoryAsChild"),
-        "BinaryField": ("neglectField", "neglectField"),
-        "DynamicField": ("neglectField", "neglectField"),
-        "FileField": ("neglectField", "neglectField"),
-        "ImageField": ("neglectField", "neglectField"),
-        "ComplexDateTimeField": (
-          "nonEditableForceStrField",
-          "nonEditableForceStrField"
-          ),
-        "DateTimeField": (
-          "nonEditableForceStrField",
-          "nonEditableForceStrField"
-          ),
-        "UUIDField": ("nonEditableForceStrField", "nonEditableForceStrField"),
-        "ObjectIdField": (
-          "nonEditableForceStrField",
-          "nonEditableForceStrField"
-          ),
-        "SequenceField": (
-          "nonEditableForceStrField",
-          "nonEditableForceStrField"
-          ),
-        "DictField": ("nonEditableForceStrField", "nonEditableForceStrField"),
-        "EmailField": ("editableForceStrField", "editableForceStrField"),
-        "URLField": ("editableForceStrField", "editableForceStrField"),
-        "GeoPointField": ("editableForceStrField", "editableForceStrField"),
-        "BooleanField": ("boolField", "editableForceStrField"),
-        "DecimalField": ("floatField", "editableForceStrField"),
-        "FloatField": ("floatField", "editableForceStrField"),
-        # Not a native mongo db field
-        "EnumField": ("enumField", "editableForceStrField"),
-        "IntField": ("intField", "editableForceStrField"),
-        "StringField": ("strField", "editableForceStrField"),
-        "MapField": ("listField", "listField"),
-        "ReferenceField": ("modelField", "modelField"),
-        "GenericReferenceField": ("modelField", "modelField"),
-        "EmbeddedDocumentField": ("embeddedField", "embeddedField"),
-        "GenericEmbeddedDocumentField": ("embeddedField", "embeddedField"),
-        "ListField": ("listField", "listField"),
-        "SortedListField": ("listField", "listField"),
-    }
+    pass

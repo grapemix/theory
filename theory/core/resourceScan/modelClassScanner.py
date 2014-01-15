@@ -96,19 +96,29 @@ class ModelClassScanner(BaseClassScanner):
 
   def _getKlassLabel(self, fieldType, mongoTypeDict, prefix=""):
     for typeName, typeKlass in mongoTypeDict.iteritems():
-      if(isinstance(fieldType, typeKlass)):
+      if(
+          isinstance(fieldType, typeKlass)
+          or (inspect.isclass(fieldType) and issubclass(fieldType, typeKlass))
+          ):
         if(typeName in [
             "ListField",
             "SortedListField",
             "MapField",
-            #"ReferenceField"
+            "DictField",
           ]):
           return self._getKlassLabel(
               fieldType.field,
               mongoTypeDict,
               typeName
               )
-        elif(prefix!=""):
+        if(typeName == "EmbeddedDocumentField"
+            or typeName == "ReferenceField"
+            ):
+          typeName ="{0}_{1}".format(
+                typeName,
+                fieldType.document_type._types[0]
+                )
+        if(prefix!=""):
           return "{0}.{1}".format(prefix, typeName)
         else:
           return typeName
