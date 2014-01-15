@@ -19,7 +19,9 @@ from theory.utils import unittest
 ##### Theory app #####
 
 ##### Misc #####
-from tests.testBase.model.combinatoryModelFactory import CombinatoryModelFactory
+from tests.testBase.model.combinatoryModel import (
+    DummyAppModelManager,
+    )
 
 
 __all__ = ('GtkSpreadsheetModelDataHandlerTestCase', \
@@ -45,9 +47,9 @@ class DummyGtkSpreadsheetBuilder(SpreadsheetBuilder):
 
 class GtkSpreadsheetModelDataHandlerTestCaseBase(unittest.TestCase):
   def setUp(self):
-    modelFactory = CombinatoryModelFactory()
-    self.model = modelFactory.getModelWithDefaultValue()
-    self.queryLst = modelFactory.getQuerySet()
+    dummyAppModelManager = DummyAppModelManager()
+    self.model = dummyAppModelManager.getCombinatoryModelWithDefaultValue()
+    self.queryLst = dummyAppModelManager.getCombinatoryQuerySet([self.model])
 
   def test_getKlasslabel(self):
     fieldDict = self.queryLst[0]._fields
