@@ -56,6 +56,7 @@ class Terminal(object):
         ("win", self.win),
         ("bx", self.bxCrt),
         ("unFocusFxn", self.unFocusFxn),
+        ("cleanUpCrtFxn", self.cleanUpCrt),
     ])
     self._adapter.registerEntrySetterFxn(self._cmdLineEntry.entry_set)
     self._adapter.registerCleanUpCrtFxn(self.cleanUpCrt)
