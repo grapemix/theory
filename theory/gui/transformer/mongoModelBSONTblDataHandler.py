@@ -10,11 +10,12 @@ from json import dumps as jsonDumps
 ##### Local app #####
 
 ##### Theory app #####
-from theory.gui.transformer.mongoModelDetectorBase import MongoModelDetectorBase
+from theory.gui.transformer.mongoModelTblDetectorBase \
+    import MongoModelTblDetectorBase
 
 ##### Misc #####
 
-class MongoModelBSONDataHandler(MongoModelDetectorBase):
+class MongoModelBSONTblDataHandler(MongoModelTblDetectorBase):
   """This class handle the data conversion from MongoDB in BSON, which means
   this class should able to handle all mongoDB datatype, but it is less
   user-friendly"""

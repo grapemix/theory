@@ -9,12 +9,12 @@
 ##### Local app #####
 
 ##### Theory app #####
-from theory.gui.transformer.mongoModelBSONDataHandler \
-    import MongoModelBSONDataHandler
+from theory.gui.transformer.mongoModelBSONTblDataHandler \
+    import MongoModelBSONTblDataHandler
 
 ##### Misc #####
 
-class MongoModelDataHandler(MongoModelBSONDataHandler):
+class MongoModelTblDataHandler(MongoModelBSONTblDataHandler):
   """
   This class handle the data conversion from MongoDB. Not being used
   currently. The reason for using this class instead of

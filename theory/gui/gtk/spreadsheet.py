@@ -7,8 +7,8 @@ import gevent
 
 ##### Theory lib #####
 from theory.gui.transformer import (
-    #MongoModelDataHandler,
-    MongoModelBSONDataHandler
+    #MongoModelTblDataHandler,
+    MongoModelBSONTblDataHandler
     )
 from theory.model import AppModel
 
@@ -272,8 +272,8 @@ class Spreadsheet(object):
   def main(self):
     gtk.main()
 
-class SpreadsheetBuilder(MongoModelBSONDataHandler):
-#class SpreadsheetBuilder(MongoModelDataHandler):
+class SpreadsheetBuilder(MongoModelBSONTblDataHandler):
+#class SpreadsheetBuilder(MongoModelTblDataHandler):
   """This class is used to provide information in order to render the data
   field and to decide the interaction of the data field based on the
   data field type being detected. It is specific to work with spreadsheet
@@ -417,7 +417,11 @@ class SpreadsheetBuilder(MongoModelBSONDataHandler):
         break
 
     for queryrow in self.queryset:
-      queryrowInJson = jsonLoads(queryrow.to_json())
+      try:
+        queryrowInJson = jsonLoads(queryrow.to_json())
+      except:
+        queryrow.to_json()
+        pass
       row = []
 
       try:
