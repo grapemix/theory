@@ -8,7 +8,7 @@ from theory.db.loading import get_app
 from theory.test.utils import setup_test_environment, teardown_test_environment
 from theory.test.testcases import TestCase
 from theory.utils import unittest
-from theory.utils.importlib import import_module
+from theory.utils.importlib import importModule
 from theory.utils.module_loading import module_has_submodule
 
 __all__ = ('TheoryTestRunner', 'TheoryTestSuiteRunner')
@@ -29,7 +29,7 @@ class TheoryTestRunner(unittest.TextTestRunner):
 
 def get_tests(app_module):
   try:
-    return import_module('.'.join([app_module.__name__] + [TEST_MODULE]))
+    return importModule('.'.join([app_module.__name__] + [TEST_MODULE]))
   except ImportError:
     return None
 
@@ -208,11 +208,11 @@ class TheoryTestSuiteRunner(object):
           suite.addTest(build_test(label))
         else:
           for appName in settings.INSTALLED_APPS:
-            app = import_module(appName)
+            app = importModule(appName)
             suite.addTest(build_suite(app))
     else:
       for appName in settings.INSTALLED_APPS:
-        app = import_module(appName)
+        app = importModule(appName)
         suite.addTest(build_suite(app))
 
     if extra_tests:

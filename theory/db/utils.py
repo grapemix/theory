@@ -7,7 +7,7 @@ import os
 ##### Theory lib #####
 from theory.conf import settings
 from theory.core.exceptions import ImproperlyConfigured
-from theory.utils.importlib import import_module
+from theory.utils.importlib import importModule
 
 ##### Theory third-party lib #####
 
@@ -32,7 +32,7 @@ class IntegrityError(DatabaseError):
 def load_backend(backend_name):
   # Look for a fully qualified database backend name
   try:
-    return import_module('.base', backend_name)
+    return importModule('.base', backend_name)
   except ImportError, e_user:
     # The database backend wasn't found. Display a helpful error message
     # listing all possible (built-in) database backends.
@@ -122,7 +122,7 @@ class ConnectionRouter(object):
       if isinstance(r, basestring):
         try:
           module_name, klass_name = r.rsplit('.', 1)
-          module = import_module(module_name)
+          module = importModule(module_name)
         except ImportError, e:
           raise ImproperlyConfigured('Error importing database router %s: "%s"' % (klass_name, e))
         try:

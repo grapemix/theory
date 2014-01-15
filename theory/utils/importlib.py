@@ -1,28 +1,14 @@
-# -*- coding: utf-8 -*-
-#!/usr/bin/env python
-##### System wide lib #####
+# Taken from Python 2.7 with permission from/by the original author.
 import sys
 
-##### Theory lib #####
+from theory.utils import six
 
-##### Theory third-party lib #####
-
-##### Local app #####
-
-##### Theory app #####
-
-##### Misc #####
-
-"""
-Taken from Python 2.7 with permission from/by the original author.
-"""
-
-def _resolve_name(name, package, level):
+def _resolveName(name, package, level):
   """Return the absolute name of the module to be imported."""
   if not hasattr(package, 'rindex'):
     raise ValueError("'package' not set to a string")
   dot = len(package)
-  for x in xrange(level, 1, -1):
+  for x in range(level, 1, -1):
     try:
       dot = package.rindex('.', 0, dot)
     except ValueError:
@@ -31,28 +17,31 @@ def _resolve_name(name, package, level):
   return "%s.%s" % (package[:dot], name)
 
 
-def import_module(name, package=None):
-  """Import a module.
+if six.PY3:
+  from importlib import importModule
+else:
+  def importModule(name, package=None):
+    """Import a module.
 
-  The 'package' argument is required when performing a relative import. It
-  specifies the package to use as the anchor point from which to resolve the
-  relative import to an absolute import.
+    The 'package' argument is required when performing a relative import. It
+    specifies the package to use as the anchor point from which to resolve the
+    relative import to an absolute import.
 
-  """
-  if name.startswith('.'):
-    if not package:
-      raise TypeError("relative imports require the 'package' argument")
-    level = 0
-    for character in name:
-      if character != '.':
-        break
-      level += 1
-    name = _resolve_name(name[level:], package, level)
-  __import__(name)
-  return sys.modules[name]
+    """
+    if name.startswith('.'):
+      if not package:
+        raise TypeError("relative imports require the 'package' argument")
+      level = 0
+      for character in name:
+        if character != '.':
+          break
+        level += 1
+      name = _resolveName(name[level:], package, level)
+    __import__(name)
+    return sys.modules[name]
 
 
-def import_class(name, package=None):
+def importClass(name, package=None):
   """Import a class.
 
   To import Module.Class directly instead of from Module import Class in programatically way
@@ -68,7 +57,7 @@ def import_class(name, package=None):
   if(sys.modules.has_key(moduleName)):
     return getattr(sys.modules[moduleName], klassName)
 
-  module = import_module(moduleName, package)
+  module = importModule(moduleName, package)
   del sys.modules[moduleName]
 
   return getattr(module, klassName)

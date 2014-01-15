@@ -8,7 +8,7 @@ import os
 from theory.conf import settings
 from theory.core.exceptions import ImproperlyConfigured
 from theory.utils.datastructures import SortedDict
-from theory.utils.importlib import import_module
+from theory.utils.importlib import importModule
 from theory.utils.module_loading import module_has_submodule
 
 ##### Theory third-party lib #####
@@ -91,9 +91,9 @@ class AppCache(object):
     """
     self.handled[app_name] = None
     self.nesting_level += 1
-    app_module = import_module(app_name)
+    app_module = importModule(app_name)
     try:
-      models = import_module('.models', app_name)
+      models = importModule('.models', app_name)
     except ImportError:
       self.nesting_level -= 1
       # If the app doesn't have a models module, we can just ignore the

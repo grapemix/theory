@@ -1,23 +1,30 @@
-# -*- coding: utf-8 -*-
-#!/usr/bin/env python
 """
 Internationalization support.
 """
-import warnings
-from os import path
+#from __future__ import unicodeLiterals
 
-from theory.utils.encoding import forceUnicode
+from theory.utils.encoding import forceText
 from theory.utils.functional import lazy
-from theory.utils.importlib import import_module
+from theory.utils import six
 
 
-__all__ = ['gettext', 'gettext_noop', 'gettext_lazy', 'ngettext',
-    'ngettext_lazy', 'string_concat', 'activate', 'deactivate',
-    'get_language', 'get_language_bidi', 'get_date_formats',
-    'get_partial_date_formats', 'check_for_language', 'to_locale',
-    'get_language_from_request', 'templatize', 'ugettext', 'ugettext_lazy',
-    'ungettext', 'ungettext_lazy', 'pgettext', 'pgettext_lazy',
-    'npgettext', 'npgettext_lazy', 'deactivate_all', 'get_language_info']
+__all__ = [
+  'activate', 'deactivate', 'override', 'deactivateAll',
+  'getLanguage',  'getLanguageFromRequest',
+  'getLanguageInfo', 'getLanguageBidi',
+  'checkForLanguage', 'toLocale', 'templatize', 'stringConcat',
+  'gettext', 'gettextLazy', 'gettextNoop',
+  'ugettext', 'ugettextLazy', 'ugettextNoop',
+  'ngettext', 'ngettextLazy',
+  'ungettext', 'ungettextLazy',
+  'pgettext', 'pgettextLazy',
+  'npgettext', 'npgettextLazy',
+]
+
+
+class TranslatorCommentWarning(SyntaxWarning):
+  pass
+
 
 # Here be dragons, so a short explanation of the logic won't hurt:
 # We are trying to solve two problems: (1) access settings, in particular
@@ -40,38 +47,24 @@ class Trans(object):
   instead of using __getattr__.
   """
 
-  def __getattr__(self, real_name):
+  def __getattr__(self, realName):
     from theory.conf import settings
     if settings.USE_I18N:
-      from theory.utils.translation import trans_real as trans
-      # Make sure the project's locale dir isn't in LOCALE_PATHS
-      if settings.SETTINGS_MODULE is not None:
-        parts = settings.SETTINGS_MODULE.split('.')
-        project = import_module(parts[0])
-        project_locale_path = path.normpath(
-          path.join(path.dirname(project.__file__), 'locale'))
-        normalized_locale_paths = [path.normpath(locale_path)
-          for locale_path in settings.LOCALE_PATHS]
-        if (path.isdir(project_locale_path) and
-            not project_locale_path in normalized_locale_paths):
-          warnings.warn("Translations in the project directory "
-                 "aren't supported anymore. Use the "
-                 "LOCALE_PATHS setting instead.",
-                 PendingDeprecationWarning)
+      from theory.utils.translation import transReal as trans
     else:
-      from theory.utils.translation import trans_null as trans
-    setattr(self, real_name, getattr(trans, real_name))
-    return getattr(trans, real_name)
+      from theory.utils.translation import transNull as trans
+    setattr(self, realName, getattr(trans, realName))
+    return getattr(trans, realName)
 
 _trans = Trans()
 
 # The Trans class is no more needed, so remove it from the namespace.
 del Trans
 
-def gettext_noop(message):
-  return _trans.gettext_noop(message)
+def gettextNoop(message):
+  return _trans.gettextNoop(message)
 
-ugettext_noop = gettext_noop
+ugettextNoop = gettextNoop
 
 def gettext(message):
   return _trans.gettext(message)
@@ -91,12 +84,47 @@ def pgettext(context, message):
 def npgettext(context, singular, plural, number):
   return _trans.npgettext(context, singular, plural, number)
 
-ngettext_lazy = lazy(ngettext, str)
-gettext_lazy = lazy(gettext, str)
-ungettext_lazy = lazy(ungettext, unicode)
-ugettext_lazy = lazy(ugettext, unicode)
-pgettext_lazy = lazy(pgettext, unicode)
-npgettext_lazy = lazy(npgettext, unicode)
+gettextLazy = lazy(gettext, str)
+ugettextLazy = lazy(ugettext, six.text_type)
+pgettextLazy = lazy(pgettext, six.text_type)
+
+def lazyNumber(func, resultclass, number=None, **kwargs):
+  if isinstance(number, int):
+    kwargs['number'] = number
+    proxy = lazy(func, resultclass)(**kwargs)
+  else:
+    class NumberAwareString(resultclass):
+      def __mod__(self, rhs):
+        if isinstance(rhs, dict) and number:
+          try:
+            numberValue = rhs[number]
+          except KeyError:
+            raise KeyError('Your dictionary lacks key \'%s\'. '
+              'Please provide it, because it is required to '
+              'determine whether string is singular or plural.'
+              % number)
+        else:
+          numberValue = rhs
+        kwargs['number'] = numberValue
+        translated = func(**kwargs)
+        try:
+          translated = translated % rhs
+        except TypeError:
+          # String doesn't contain a placeholder for the number
+          pass
+        return translated
+
+    proxy = lazy(lambda **kwargs: NumberAwareString(), NumberAwareString)(**kwargs)
+  return proxy
+
+def ngettextLazy(singular, plural, number=None):
+  return lazyNumber(ngettext, str, singular=singular, plural=plural, number=number)
+
+def ungettextLazy(singular, plural, number=None):
+  return lazyNumber(ungettext, six.text_type, singular=singular, plural=plural, number=number)
+
+def npgettextLazy(context, singular, plural, number=None):
+  return lazyNumber(npgettext, six.text_type, context=context, singular=singular, plural=plural, number=number)
 
 def activate(language):
   return _trans.activate(language)
@@ -104,44 +132,65 @@ def activate(language):
 def deactivate():
   return _trans.deactivate()
 
-def get_language():
-  return _trans.get_language()
+class override(object):
+  def __init__(self, language, deactivate=False):
+    self.language = language
+    self.deactivate = deactivate
+    self.oldLanguage = getLanguage()
 
-def get_language_bidi():
-  return _trans.get_language_bidi()
+  def __enter__(self):
+    if self.language is not None:
+      activate(self.language)
+    else:
+      deactivateAll()
 
-def get_date_formats():
-  return _trans.get_date_formats()
+  def __exit__(self, excType, excValue, traceback):
+    if self.deactivate:
+      deactivate()
+    else:
+      activate(self.oldLanguage)
 
-def get_partial_date_formats():
-  return _trans.get_partial_date_formats()
+def getLanguage():
+  return _trans.getLanguage()
 
-def check_for_language(lang_code):
-  return _trans.check_for_language(lang_code)
+def getLanguageBidi():
+  return _trans.getLanguageBidi()
 
-def to_locale(language):
-  return _trans.to_locale(language)
+def checkForLanguage(langCode):
+  return _trans.checkForLanguage(langCode)
 
-def get_language_from_request(request):
-  return _trans.get_language_from_request(request)
+def toLocale(language):
+  return _trans.toLocale(language)
+
+def getLanguageFromRequest(request, checkPath=False):
+  return _trans.getLanguageFromRequest(request, checkPath)
+
+def getLanguageFromPath(path, supported=None):
+  return _trans.getLanguageFromPath(path, supported=supported)
 
 def templatize(src, origin=None):
   return _trans.templatize(src, origin)
 
-def deactivate_all():
-  return _trans.deactivate_all()
+def deactivateAll():
+  return _trans.deactivateAll()
 
-def _string_concat(*strings):
+def _stringConcat(*strings):
   """
   Lazy variant of string concatenation, needed for translations that are
   constructed from multiple parts.
   """
-  return u''.join([forceUnicode(s) for s in strings])
-string_concat = lazy(_string_concat, unicode)
+  return ''.join([forceText(s) for s in strings])
+stringConcat = lazy(_stringConcat, six.text_type)
 
-def get_language_info(lang_code):
+def getLanguageInfo(langCode):
   from theory.conf.locale import LANG_INFO
   try:
-    return LANG_INFO[lang_code]
+    return LANG_INFO[langCode]
   except KeyError:
-    raise KeyError("Unknown language code %r." % lang_code)
+    if '-' not in langCode:
+      raise KeyError("Unknown language code %s." % langCode)
+    genericLangCode = langCode.split('-')[0]
+    try:
+      return LANG_INFO[genericLangCode]
+    except KeyError:
+      raise KeyError("Unknown language code %s and %s." % (langCode, genericLangCode))

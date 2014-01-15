@@ -2,7 +2,7 @@
 #!/usr/bin/env python
 "Commonly-used date structures"
 
-from theory.utils.translation import ugettext_lazy as _, pgettext_lazy
+from theory.utils.translation import ugettextLazy as _, pgettextLazy
 
 WEEKDAYS = {
   0:_('Monday'), 1:_('Tuesday'), 2:_('Wednesday'), 3:_('Thursday'), 4:_('Friday'),
@@ -30,30 +30,30 @@ MONTHS_3_REV = {
   'sep':9, 'oct':10, 'nov':11, 'dec':12
 }
 MONTHS_AP = { # month names in Associated Press style
-  1: pgettext_lazy('abbrev. month', 'Jan.'),
-  2: pgettext_lazy('abbrev. month', 'Feb.'),
-  3: pgettext_lazy('abbrev. month', 'March'),
-  4: pgettext_lazy('abbrev. month', 'April'),
-  5: pgettext_lazy('abbrev. month', 'May'),
-  6: pgettext_lazy('abbrev. month', 'June'),
-  7: pgettext_lazy('abbrev. month', 'July'),
-  8: pgettext_lazy('abbrev. month', 'Aug.'),
-  9: pgettext_lazy('abbrev. month', 'Sept.'),
-  10: pgettext_lazy('abbrev. month', 'Oct.'),
-  11: pgettext_lazy('abbrev. month', 'Nov.'),
-  12: pgettext_lazy('abbrev. month', 'Dec.')
+  1: pgettextLazy('abbrev. month', 'Jan.'),
+  2: pgettextLazy('abbrev. month', 'Feb.'),
+  3: pgettextLazy('abbrev. month', 'March'),
+  4: pgettextLazy('abbrev. month', 'April'),
+  5: pgettextLazy('abbrev. month', 'May'),
+  6: pgettextLazy('abbrev. month', 'June'),
+  7: pgettextLazy('abbrev. month', 'July'),
+  8: pgettextLazy('abbrev. month', 'Aug.'),
+  9: pgettextLazy('abbrev. month', 'Sept.'),
+  10: pgettextLazy('abbrev. month', 'Oct.'),
+  11: pgettextLazy('abbrev. month', 'Nov.'),
+  12: pgettextLazy('abbrev. month', 'Dec.')
 }
 MONTHS_ALT = { # required for long date representation by some locales
-  1: pgettext_lazy('alt. month', 'January'),
-  2: pgettext_lazy('alt. month', 'February'),
-  3: pgettext_lazy('alt. month', 'March'),
-  4: pgettext_lazy('alt. month', 'April'),
-  5: pgettext_lazy('alt. month', 'May'),
-  6: pgettext_lazy('alt. month', 'June'),
-  7: pgettext_lazy('alt. month', 'July'),
-  8: pgettext_lazy('alt. month', 'August'),
-  9: pgettext_lazy('alt. month', 'September'),
-  10: pgettext_lazy('alt. month', 'October'),
-  11: pgettext_lazy('alt. month', 'November'),
-  12: pgettext_lazy('alt. month', 'December')
+  1: pgettextLazy('alt. month', 'January'),
+  2: pgettextLazy('alt. month', 'February'),
+  3: pgettextLazy('alt. month', 'March'),
+  4: pgettextLazy('alt. month', 'April'),
+  5: pgettextLazy('alt. month', 'May'),
+  6: pgettextLazy('alt. month', 'June'),
+  7: pgettextLazy('alt. month', 'July'),
+  8: pgettextLazy('alt. month', 'August'),
+  9: pgettextLazy('alt. month', 'September'),
+  10: pgettextLazy('alt. month', 'October'),
+  11: pgettextLazy('alt. month', 'November'),
+  12: pgettextLazy('alt. month', 'December')
 }

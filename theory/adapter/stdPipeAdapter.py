@@ -7,7 +7,6 @@ import re
 ##### Theory lib #####
 from theory.core.exceptions import CommandSyntaxError
 from theory.model import Command
-from theory.utils.importlib import import_module
 
 ##### Theory third-party lib #####
 

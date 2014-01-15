@@ -9,7 +9,7 @@ from theory.utils.html import conditional_escape
 from theory.utils.encoding import StrAndUnicode, forceUnicode
 from theory.utils.safestring import markSafe
 from theory.utils import timezone
-from theory.utils.translation import ugettext_lazy as _
+from theory.utils.translation import ugettextLazy as _
 
 # Import ValidationError so that it can be imported from this
 # module to maintain backwards compatibility.

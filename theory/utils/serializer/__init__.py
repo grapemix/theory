@@ -1,13 +1,28 @@
 # -*- coding: utf-8 -*-
-#!/usr/bin/env python
+##### System wide lib #####
+
+##### Theory lib #####
+from theory.conf import settings
+from theory.utils import importlib
+from theory.utils import six
+from theory.utils.serializer.base import SerializerDoesNotExist
+
+##### Theory third-party lib #####
+
+##### Local app #####
+
+##### Theory app #####
+
+##### Misc #####
+
 """
 Interfaces for serializing Theory objects.
 
 Usage::
 
-  from theory.core import serializers
-  json = serializers.serialize("json", some_query_set)
-  objects = list(serializers.deserialize("json", json))
+  from theory.utils import serializer
+  json = serializer.serialize("json", some_query_set)
+  objects = list(serializer.deserialize("json", json))
 
 To add your own serializers, use the SERIALIZATION_MODULES setting::
 
@@ -18,26 +33,14 @@ To add your own serializers, use the SERIALIZATION_MODULES setting::
 
 """
 
-from theory.conf import settings
-from theory.utils import importlib
-
 # Built-in serializers
 BUILTIN_SERIALIZERS = {
-  "xml"    : "theory.core.serializers.xml_serializer",
-  "python" : "theory.core.serializers.python",
-  "json"   : "theory.core.serializers.json",
+  "json"   : "theory.utils.serializer.json",
 }
-
-# Check for PyYaml and register the serializer if it's available.
-try:
-  import yaml
-  BUILTIN_SERIALIZERS["yaml"] = "theory.core.serializers.pyyaml"
-except ImportError:
-  pass
 
 _serializers = {}
 
-def register_serializer(format, serializer_module, serializers=None):
+def registerSerializer(format, serializer_module, serializers=None):
   """Register a new serializer.
 
   ``serializer_module`` should be the fully qualified module name
@@ -51,37 +54,43 @@ def register_serializer(format, serializer_module, serializers=None):
   directly is not a thread-safe operation.
   """
   if serializers is None and not _serializers:
-    _load_serializers()
-  module = importlib.importModule(serializer_module)
+    _loadSerializers()
+  module = importlib.import_module(serializer_module)
   if serializers is None:
     _serializers[format] = module
   else:
     serializers[format] = module
 
-def unregister_serializer(format):
+def unregisterSerializer(format):
   "Unregister a given serializer. This is not a thread-safe operation."
   if not _serializers:
-    _load_serializers()
+    _loadSerializers()
+  if format not in _serializers:
+    raise SerializerDoesNotExist(format)
   del _serializers[format]
 
-def get_serializer(format):
+def getSerializer(format):
   if not _serializers:
-    _load_serializers()
+    _loadSerializers()
+  if format not in _serializers:
+    raise SerializerDoesNotExist(format)
   return _serializers[format].Serializer
 
-def get_serializer_formats():
+def getSerializerFormats():
   if not _serializers:
-    _load_serializers()
-  return _serializers.keys()
+    _loadSerializers()
+  return list(_serializers)
 
-def get_public_serializer_formats():
+def getPublicSerializerFormats():
   if not _serializers:
-    _load_serializers()
-  return [k for k, v in _serializers.iteritems() if not v.Serializer.internal_use_only]
+    _loadSerializers()
+  return [k for k, v in six.iteritems(_serializers) if not v.Serializer.internal_use_only]
 
-def get_deserializer(format):
+def getDeserializer(format):
   if not _serializers:
-    _load_serializers()
+    _loadSerializers()
+  if format not in _serializers:
+    raise SerializerDoesNotExist(format)
   return _serializers[format].Deserializer
 
 def serialize(format, queryset, **options):
@@ -89,21 +98,20 @@ def serialize(format, queryset, **options):
   Serialize a queryset (or any iterator that returns database objects) using
   a certain serializer.
   """
-  s = get_serializer(format)()
+  s = getSerializer(format)()
   s.serialize(queryset, **options)
   return s.getvalue()
 
 def deserialize(format, stream_or_string, **options):
   """
-  Deserialize a stream or a string. Returns an iterator that yields ``(obj,
-  m2m_relation_dict)``, where ``obj`` is a instantiated -- but *unsaved* --
-  object, and ``m2m_relation_dict`` is a dictionary of ``{m2m_field_name :
-  list_of_related_objects}``.
+  Deserialize a stream or a string. Returns an iterator that yields ``(obj
+  )``, where ``obj`` is a instantiated -- but *unsaved* --
+  object.
   """
-  d = get_deserializer(format)
+  d = getDeserializer(format)
   return d(stream_or_string, **options)
 
-def _load_serializers():
+def _loadSerializers():
   """
   Register built-in and settings-defined serializers. This is done lazily so
   that user code has a chance to (e.g.) set up custom settings without
@@ -112,8 +120,8 @@ def _load_serializers():
   global _serializers
   serializers = {}
   for format in BUILTIN_SERIALIZERS:
-    register_serializer(format, BUILTIN_SERIALIZERS[format], serializers)
+    registerSerializer(format, BUILTIN_SERIALIZERS[format], serializers)
   if hasattr(settings, "SERIALIZATION_MODULES"):
     for format in settings.SERIALIZATION_MODULES:
-      register_serializer(format, settings.SERIALIZATION_MODULES[format], serializers)
+      registerSerializer(format, settings.SERIALIZATION_MODULES[format], serializers)
   _serializers = serializers

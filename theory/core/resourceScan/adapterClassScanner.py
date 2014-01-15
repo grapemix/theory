@@ -9,7 +9,6 @@ from mongoengine import *
 from theory.adapter import BaseAdapter
 from theory.conf import settings
 from theory.model import Command, Parameter
-from theory.utils.importlib import import_module, import_class
 
 ##### Theory third-party lib #####
 

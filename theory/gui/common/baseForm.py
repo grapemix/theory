@@ -9,7 +9,9 @@ import json
 ##### Theory lib #####
 from theory.core.exceptions import CommandSyntaxError, ValidationError
 from theory.gui import field as FormField
+from theory.utils import six
 from theory.utils.datastructures import SortedDict
+from theory.utils.encoding import python2UnicodeCompatible
 from theory.gui.transformer.theoryJSONEncoder import TheoryJSONEncoder
 
 ##### Theory third-party lib #####
@@ -28,45 +30,49 @@ def pretty_name(name):
     return u''
   return name.replace('_', ' ').capitalize()
 
-def get_declared_fields(bases, attrs, with_base_fields=True):
+def getDeclaredFields(bases, attrs, withBaseFields=True):
   """
   Create a list of form field instances from the passed in 'attrs', plus any
   similar fields on the base classes (in 'bases'). This is used by both the
   Form and ModelForm metclasses.
 
-  If 'with_base_fields' is True, all fields from the bases are used.
-  Otherwise, only fields in the 'declared_fields' attribute on the bases are
+  If 'withBaseFields' is True, all fields from the bases are used.
+  Otherwise, only fields in the 'declaredFields' attribute on the bases are
   used. The distinction is useful in ModelForm subclassing.
   Also integrates any additional media definitions
   """
-  fields = [(field_name, attrs.pop(field_name)) for field_name, obj in attrs.items() if isinstance(obj, FormField.Field)]
+  fields = [
+      (fieldName, attrs.pop(fieldName)) for fieldName, obj in attrs.items() \
+          if isinstance(obj, FormField.Field)
+  ]
   fields.sort(key=lambda x: x[1].creation_counter)
 
   # If this class is subclassing another Form, add that Form's fields.
   # Note that we loop over the bases in *reverse*. This is necessary in
   # order to preserve the correct order of fields.
-  if with_base_fields:
+  if withBaseFields:
     for base in bases[::-1]:
-      if(hasattr(base, 'base_fields') and base.base_fields!=None):
-        fields = base.base_fields.items() + fields
+      if(hasattr(base, 'baseFields') and base.baseFields!=None):
+        fields = base.baseFields.items() + fields
   else:
     for base in bases[::-1]:
-      if(hasattr(base, 'declared_fields') and base.declared_fields!=None):
-        fields = base.declared_fields.items() + fields
+      if(hasattr(base, 'declaredFields') and base.declaredFields!=None):
+        fields = base.declaredFields.items() + fields
 
   return SortedDict(fields)
 
 class DeclarativeFieldsMetaclass(type):
   """
   Metaclass that converts Field attributes to a dictionary called
-  'base_fields', taking into account parent class 'base_fields' as well.
+  'baseFields', taking into account parent class 'baseFields' as well.
   """
   def __new__(cls, name, bases, attrs):
-    attrs['base_fields'] = get_declared_fields(bases, attrs)
+    attrs['baseFields'] = getDeclaredFields(bases, attrs)
     new_class = super(DeclarativeFieldsMetaclass,
                  cls).__new__(cls, name, bases, attrs)
     return new_class
 
+@python2UnicodeCompatible
 class FormBase(object):
   """This class should be stateful and picklable. The function being provided
   by this class include the logic to decide which field should be shown."""
@@ -78,18 +84,22 @@ class FormBase(object):
   isLazy = True
 
   def __init__(self, *args, **kwargs):
-    # The base_fields class attribute is the *class-wide* definition of
+    # The baseFields class attribute is the *class-wide* definition of
     # fields. Because a particular *instance* of the class might want to
-    # alter self.fields, we create self.fields here by copying base_fields.
+    # alter self.fields, we create self.fields here by copying baseFields.
     # Instances should always modify self.fields; they should not modify
-    # self.base_fields.
+    # self.baseFields.
+    super(FormBase, self).__init__()
     self.is_bound = True # should be hash the initDate in the future
-    self.fields = copy.deepcopy(self.base_fields)
+    self.fields = copy.deepcopy(self.baseFields)
     self.data = {}       # only used if fields are not singular
     self.files = {}      # might be removed in the future
     self.error_class = {}
     self._errors = None  # Stores the errors after clean() has been
     self.jsonData = None
+
+  def __str__(self):
+    return self.__class__.__name__
 
   def __iter__(self):
     for name in self.fields:
@@ -207,7 +217,11 @@ class FormBase(object):
       # method of each widget.
       for name, field in self.fields.items():
         prefixed_name = self.add_prefix(name)
-        data_value = field.widget.value_from_datadict(self.data, self.files, prefixed_name)
+        data_value = field.widget.value_from_datadict(
+            self.data,
+            self.files,
+            prefixed_name
+            )
         if not field.show_hidden_initial:
           initial_value = field.initData
         else:
@@ -226,9 +240,10 @@ class FormBase(object):
       for i in range(len(cmdArgs)):
         try:
           self.fields[cmdArgs[i].name].initData = args[i]
-        except IndexError:
-          # This means the number of param given unmatch the number of param register in *.command
-          raise CommandSyntaxError
+        except IndexError as e:
+          # This means the number of param given unmatch the number of param
+          # register in *.command
+          raise CommandSyntaxError(str(e))
     for k,v in kwargs.iteritems():
       self.fields[k].initData = v
 

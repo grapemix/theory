@@ -6,7 +6,7 @@ import urllib2
 import urlparse
 
 from theory.core.exceptions import ValidationError
-from theory.utils.translation import ugettext_lazy as _
+from theory.utils.translation import ugettextLazy as _
 from theory.utils.encoding import smartText
 
 # These values, if given to validate(), will trigger the self.required check.

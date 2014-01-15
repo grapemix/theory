@@ -39,9 +39,9 @@ from theory.gui.util import (
 from theory.gui.widget import *
 from theory.utils import formats
 from theory.utils.encoding import smartText, smartStr, forceUnicode
-from theory.utils.importlib import import_class
+from theory.utils.importlib import importClass
 from theory.utils.ipv6 import clean_ipv6_address
-from theory.utils.translation import ugettext_lazy as _
+from theory.utils.translation import ugettextLazy as _
 
 ##### Theory third-party lib #####
 
@@ -1555,7 +1555,7 @@ class PythonModuleField(Field):
       return value
 
     try:
-      inspectModule = import_class(value)
+      inspectModule = importClass(value)
       if(type(inspectModule).__name__!="module"):
         raise ValidationError(self.error_messages['invalid'] % {'value': value})
     except (ImportError, AttributeError) as e:
@@ -1590,12 +1590,12 @@ class PythonClassField(Field):
 
     if(value!="" and value!=None):
       try:
-        inspectKlass = import_class(value)
+        inspectKlass = importClass(value)
       except (ImportError, AttributeError) as e:
         inspectKlass = None
       if(inspectKlass==None):
           raise ValidationError(self.error_messages['invalid'] % {'value': value})
-      if(self.klass_type !=None and not issubclass(inspectKlass, import_class(self.klass_type))):
+      if(self.klass_type !=None and not issubclass(inspectKlass, importClass(self.klass_type))):
         raise ValidationError(self.error_messages['wrong_classtype'] % {'value': value})
       return inspectKlass
     elif(self.required):
@@ -1636,7 +1636,7 @@ class QuerysetField(Field):
       return value
 
     try:
-      dbClass = import_class('{0}.model.{1}'.format(
+      dbClass = importClass('{0}.model.{1}'.format(
         self.app,
         self.model
         )

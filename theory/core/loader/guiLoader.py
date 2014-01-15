@@ -36,9 +36,9 @@ def wakeup(settings_mod, argv=None):
     from .util import reprobeAllModule
     reprobeAllModule(settings_mod, argv)
   else:
-    from theory.utils.importlib import import_module
+    from theory.utils.importlib import importModule
     for cmd in Command.objects.all():
-      import_module(cmd.moduleImportPath)
+      importModule(cmd.moduleImportPath)
 
   gevent.signal(signal.SIGQUIT, gevent.shutdown)
   gevent.joinall(
