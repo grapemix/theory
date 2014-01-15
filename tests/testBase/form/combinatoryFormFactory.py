@@ -179,6 +179,10 @@ class CombinatoryFormWithDefaultValue(Form):
   timeField = field.TimeField(initData=defaultValueSet1["DateTime"])
   #geoPointField = field.GeoPointField(initData=defaultValueSet1["GeoPoint"])
 
+  embeddedField = field.EmbeddedField("theory", "Parameter", required=False)
+
+  __name__ = "CombinatoryFormWithDefaultValueForm"
+
 class CombinatoryFormFactory(object):
   def __init__(self, *args, **kwargs):
     super(CombinatoryFormFactory, self).__init__(*args, **kwargs)

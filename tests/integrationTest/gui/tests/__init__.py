@@ -8,6 +8,8 @@
 ##### Local app #####
 from .field import *
 from .form import *
+from .formset import *
+from .model import *
 from .transformer import *
 from .etk.widget import *
 
