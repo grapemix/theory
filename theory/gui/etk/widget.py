@@ -19,10 +19,10 @@ import element
 ##### Misc #####
 
 __all__ = (
-    "StringInput", "TextInput", "NumericInput", "SelectBoxInput",
+    "HiddenInput", "StringInput", "TextInput", "NumericInput", "SelectBoxInput",
     "CheckBoxInput", "DateInput", "DateTimeInput", "TimeInput",
     "StringGroupFilterInput", "ModelValidateGroupInput", "FileselectInput",
-    "ListInput", "DictInput", "FilterFormLayout",
+    "EmbeddedInput", "ListInput", "DictInput", "FilterFormLayout",
     )
 
 # Honestly, I am not satisfied with the code related to the GUI. So the code
@@ -40,6 +40,7 @@ class BasePacker(object):
   def __init__(self, win, bx, attrs=None, *args, **kwargs):
     """attrs being asssigned should have higher priority than the default attrs
     """
+    super(BasePacker, self).__init__()
     self.win = win
     self.bx = bx
     self.widgetLst = []
@@ -207,6 +208,10 @@ class BaseLabelInput(BaseFieldInput):
   def reFillLabel(self, txt):
     helpLabel = self.widgetLst[-1]
     helpLabel.reset(errData=txt)
+
+class HiddenInput(BaseLabelInput):
+  def generate(self, *args, **kwargs):
+    pass
 
 class StringInput(BaseLabelInput):
   widgetClass = element.Entry
@@ -436,6 +441,44 @@ class MultipleValueInput(BaseLabelInput):
   def _createWidget(self):
     pass
 
+class EmbeddedInput(BaseLabelInput):
+  def __init__(self, fieldSetter, fieldGetter, embeddedFieldDict, win, bx,
+      attrs=None, *args, **kwargs):
+    self.fieldSetter = fieldSetter
+    self.fieldGetter = fieldGetter
+    self.embeddedFieldDict = embeddedFieldDict
+    self._inputLst = []
+
+    super(EmbeddedInput, self).__init__(
+        fieldSetter, fieldGetter,
+        win, bx, attrs, *args, **kwargs
+    )
+
+  def _createWidget(self):
+    embeddedBox = self._createContainer({
+        "isHorizontal": False,
+        "isWeightExpand": True,
+        "isFillAlign": True
+    })
+    embeddedBox.generate()
+
+
+    widgetLst = [embeddedBox,]
+    for fieldName, fieldObj in self.embeddedFieldDict.iteritems():
+      fieldObj.renderWidget(
+          self.win,
+          embeddedBox.obj,
+          )
+
+      input = fieldObj.widget
+      if(input is not None):
+        embeddedBox.addInput(input)
+
+    return widgetLst
+
+  def updateField(self):
+    pass
+
 class ListInput(BaseLabelInput):
   def __init__(self, fieldSetter, fieldGetter, win, bx, childFieldLst,
       addChildFieldFxn, removeChildFieldFxn, attrs=None, *args, **kwargs):
@@ -533,9 +576,11 @@ class ListInput(BaseLabelInput):
   def _createShortStringWidget(self, *args, **kwargs):
     """The adding child mechanism is handled by the widget itself."""
     initDataLst = []
+    if(len(self.childFieldLst)>0):
+      tmpChildWidget = self.childFieldLst[0].widget(None, None, None, None)
     for field in self.childFieldLst:
-      if(field.initData!="" or field.initData!=None):
-        initDataLst.append(field.initData)
+      if(field.initData!="" or field.initData is not None):
+        initDataLst.append(tmpChildWidget._prepareInitData(field.initData))
 
     defaultParam = {
         "isWeightExpand": True,
