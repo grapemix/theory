@@ -58,7 +58,8 @@ class Terminal(object):
         ("unFocusFxn", self.unFocusFxn),
         ("cleanUpCrtFxn", self.cleanUpCrt),
     ])
-    self._adapter.registerEntrySetterFxn(self.cmdLineSetter)
+    self._adapter.registerEntrySetterFxn(self._cmdLineEntry.entry_set)
+    self._adapter.registerEntrySetAndSelectFxn(self.cmdLineSetter)
     self._adapter.registerCleanUpCrtFxn(self.cleanUpCrt)
 
   def cmdLineSetter(self, txt):
