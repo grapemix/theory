@@ -21,5 +21,6 @@ def getDummyEnv():
   # Copied from gui.etk.widget._createContainer
   dummyBx = Box()
   dummyBx.win = dummyWin
+  dummyBx.generate()
   return (dummyWin, dummyBx)
 

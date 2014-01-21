@@ -8,6 +8,7 @@
 ##### Local app #####
 from filenameScanner import *
 from indentFormatFix import *
+from modelUpsert import *
 from nextStep import *
 
 ##### Theory app #####
