@@ -58,8 +58,13 @@ class Terminal(object):
         ("unFocusFxn", self.unFocusFxn),
         ("cleanUpCrtFxn", self.cleanUpCrt),
     ])
-    self._adapter.registerEntrySetterFxn(self._cmdLineEntry.entry_set)
+    self._adapter.registerEntrySetterFxn(self.cmdLineSetter)
     self._adapter.registerCleanUpCrtFxn(self.cleanUpCrt)
+
+  def cmdLineSetter(self, txt):
+    self._cmdLineEntry.entry_set(txt)
+    if(txt!=""):
+      self._cmdLineEntry.select_all()
 
   def unFocusFxn(self, entry, event, *args, **kwargs):
     if(event.keyname=="Escape"):
