@@ -121,7 +121,7 @@ class Reactor(object):
       self.historyIndex += 1
       self.adapter.cleanUpCrt()
       commandName = self.historyModel[self.historyIndex].commandName
-      entrySetterFxn(commandName)
+      self.adapter.entrySetAndSelectFxn(commandName)
       self.parser.cmdInTxt = commandName
       try:
         self.cmdModel = Command.objects.get(
@@ -145,7 +145,7 @@ class Reactor(object):
       self.historyIndex -= 1
       self.adapter.cleanUpCrt()
       commandName = self.historyModel[self.historyIndex].commandName
-      entrySetterFxn(commandName)
+      self.adapter.entrySetAndSelectFxn(commandName)
       self.parser.cmdInTxt = commandName
       self.cmdModel = Command.objects.get(
           Q(name=commandName) & (Q(mood=self.mood) | Q(mood="norm"))

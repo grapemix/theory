@@ -39,6 +39,9 @@ class ReactorAdapter(object):
   def registerEntrySetterFxn(self, entrySetterFxn):
     self.entrySetterFxn = entrySetterFxn
 
+  def registerEntrySetAndSelectFxn(self, entrySetterFxn):
+    self.entrySetAndSelectFxn = entrySetterFxn
+
   def registerCleanUpCrtFxn(self, cleanUpCrtFxn):
     self.cleanUpCrt = cleanUpCrtFxn
 
