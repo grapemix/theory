@@ -215,7 +215,7 @@ class AppModel(Model):
       required=True,
       verbose_name=_("Import path"),
       unique=True,
-      help_text=_("The path to import the adapter")
+      help_text=_("The path to import the model")
       )
   isEmbedded = BooleanField(
       required=True,

@@ -171,11 +171,9 @@ class CommandModuleLoader(ModuleLoader):
       "indentFormatFix": ["dev"],
       "theoryFilesSurgeon": ["dev"],
       "modelQuery": ["norm"],
-      "modelEdit": ["norm"],
       "modelTblEdit": ["norm"],
       "modelTblDel": ["norm"],
-      "modelDel": ["norm"],
-      "modelAdd": ["norm"],
+      "modelUpsert": ["norm"],
       "infect": ["dev"],
     }
     for o in lst:
