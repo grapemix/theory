@@ -32,7 +32,7 @@ class BaseCommandTestCase(unittest.TestCase):
     self.cmd = cmd
     if(not self.cmd.paramForm.is_valid()):
       print self.cmd.paramForm.errors
-    self.assertTrue(self.cmd.paramForm.is_valid())
+    self.assertTrue(self.cmd.paramForm.is_valid(), self.cmd.paramForm.errors)
     self.cmd.paramForm.clean()
 
   def _getCmd(self, cmdModel, args=[], kwargs={}):
