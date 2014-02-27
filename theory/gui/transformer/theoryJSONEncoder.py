@@ -7,6 +7,7 @@ from __future__ import absolute_import
 import datetime as dt
 import decimal
 import json
+from uuid import UUID
 
 ##### Theory lib #####
 from theory.db.models import QuerySet
@@ -42,7 +43,7 @@ class TheoryJSONEncoder(json.JSONEncoder):
       if o.microsecond:
         r = r[:12]
       return r
-    elif isinstance(o, decimal.Decimal):
+    elif(isinstance(o, decimal.Decimal) or isinstance(o, UUID)):
       return str(o)
     elif isinstance(o, QuerySet):
       return [str(i.id) for i in o]
