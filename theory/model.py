@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 ##### System wide lib #####
-from datetime import datetime
+import datetime
 
 ##### Theory lib #####
 from theory.db.models import *
@@ -50,11 +50,11 @@ class Command(Model):
       verbose_name=_("Application"),\
       unique_with="name",\
       help_text=_("The applications which carry this command"))
-  mood = ListField(StringField(max_length=256,\
+  mood = ListField(StringField(max_length=256),\
       required=True,
       verbose_name=_("Mood"),\
-      help_text=_("The moods which carry this command")))
-  param = SortedListField(EmbeddedDocumentField(Parameter),\
+      help_text=_("The moods which carry this command"))
+  param = ListField(EmbeddedDocumentField(Parameter),\
       verbose_name=_("Parameter"),\
       help_text=_("The parameters of this command"))
   sourceFile = StringField(help_text=_("Command's source code location"))
@@ -122,7 +122,7 @@ class History(Model):
         "The data from the command paramForm and stored in JSON format"
         )
       )
-  touched = DateTimeField(required=True, default=datetime.utcnow())
+  touched = DateTimeField(required=True, default=datetime.datetime.utcnow())
   repeated = IntField(default=1)
 
   meta = {
@@ -139,9 +139,9 @@ class Adapter(Model):
       verbose_name=_("Import Path"),\
       unique=True,\
       help_text=_("The path to import the adapter"))
-  property = ListField(StringField(max_length=256,\
+  property = ListField(StringField(max_length=256),\
       verbose_name=_("Property"),\
-      help_text=_("The properties which accepted by this adapter")))
+      help_text=_("The properties which accepted by this adapter"))
 
 class AdapterBuffer(Model):
   """This model is designed as a buffer for adapters between async commands"""
@@ -160,7 +160,7 @@ class AdapterBuffer(Model):
   data = StringField(required=True, \
       verbose_name=_("data"), \
       help_text=_("The data adapted to next command and stored in JSON format"))
-  created = DateTimeField(required=True, default=datetime.utcnow())
+  created = DateTimeField(required=True, default=datetime.datetime.utcnow())
 
   def __str__(self):
     return "{0} -> {1} ({2})".format(
@@ -188,7 +188,7 @@ class AppModel(Model):
       verbose_name=_("Application name"),
       help_text=_("Application name")
       )
-  tblField = SortedListField(
+  tblField = ListField(
       StringField(
         max_length=256,
         verbose_name=_("Table field"),
@@ -196,7 +196,7 @@ class AppModel(Model):
         ),
       required=True,
       )
-  formField = SortedListField(
+  formField = ListField(
       StringField(
         max_length=256,
         verbose_name=_("Form field"),
