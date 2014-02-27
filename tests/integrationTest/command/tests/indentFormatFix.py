@@ -42,7 +42,7 @@ class IndentFormatFixTestCase(BaseCommandTestCase):
 
   def testSimplePath(self):
     fileObj = LocalFileObject(self.thisTestCaseFilesAbsPath)
-    cmd = self._getCmd(self.cmdModel, [[fileObj], True, 1])
+    cmd = self._getCmd(self.cmdModel, [[fileObj], 1, True])
     self._validateParamForm(cmd)
     self._execeuteCommand(cmd, self.cmdModel)
     self._compareFile(self.thisTestCaseFilesAbsPath)
