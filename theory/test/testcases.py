@@ -12,9 +12,9 @@ from theory.core.exceptions import ValidationError
 # TODO: enable it
 #from theory.core.signals import request_started
 from theory.core.validators import EMPTY_VALUES
-from theory.test.utils import (get_warnings_state, restore_warnings_state,
+from theory.test.util import (get_warnings_state, restore_warnings_state,
   override_settings)
-from theory.test.utils import ContextList
+from theory.test.util import ContextList
 from theory.utils import simplejson, unittest as ut2
 from theory.utils.encoding import smartStr, forceUnicode
 from theory.utils.unittest.util import safe_repr

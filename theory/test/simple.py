@@ -5,7 +5,7 @@ import unittest as real_unittest
 from theory.conf import settings
 from theory.core.exceptions import ImproperlyConfigured
 from theory.db.loading import get_app
-from theory.test.utils import setup_test_environment, teardown_test_environment
+from theory.test.util import setup_test_environment, teardown_test_environment
 from theory.test.testcases import TestCase
 from theory.utils import unittest
 from theory.utils.importlib import importModule

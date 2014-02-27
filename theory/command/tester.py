@@ -6,7 +6,7 @@
 from theory.conf import settings
 from theory.command.baseCommand import SimpleCommand
 from theory.gui import field
-from theory.test.utils import get_runner
+from theory.test.util import get_runner
 
 ##### Theory third-party lib #####
 
