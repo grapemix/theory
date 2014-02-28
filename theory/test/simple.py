@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
+##### System wide lib #####
+import os
+import sys
 import unittest as real_unittest
 
+##### Theory lib #####
 from theory.conf import settings
 from theory.core.exceptions import ImproperlyConfigured
 from theory.db.loading import get_app
@@ -10,6 +14,14 @@ from theory.test.testcases import TestCase
 from theory.utils import unittest
 from theory.utils.importlib import importModule
 from theory.utils.module_loading import module_has_submodule
+
+##### Theory third-party lib #####
+
+##### Local app #####
+
+##### Theory app #####
+
+##### Misc #####
 
 __all__ = ('TheoryTestRunner', 'TheoryTestSuiteRunner')
 
@@ -190,6 +202,15 @@ class TheoryTestSuiteRunner(object):
       self.suite = kwargs["suite"]
     except KeyError:
       self.suite = None
+
+  def _add_mock_app_into_sys_path(self, **kwargs):
+    testAppPath = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+        "tests",
+        "testBase"
+        )
+    if(testAppPath in sys.path):
+      sys.path.append(testAppPath)
 
   def setup_test_environment(self, **kwargs):
     setup_test_environment()
