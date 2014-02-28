@@ -45,7 +45,8 @@ class ModelFormTestCase(unittest.TestCase):
   def getModelFormKlass(self):
     class TestModelModelForm(ModelForm):
       class Meta:
-        model = "testBase.model.combinatoryModel.CombinatoryModelWithDefaultValue"
+        model = \
+            "testBase.model.combinatoryModel.CombinatoryModelWithDefaultValue"
     return TestModelModelForm
 
   def getGuiModelFormKlass(self, importPath):
@@ -86,11 +87,14 @@ class ModelFormTestCase(unittest.TestCase):
               v.valueFields[0].to_python(v.valueFields[0].initData),
               getattr(modelObj, childFieldTypeStr)
               )
-      else:
-        if(fieldName not in ["fileField", "id", "imageField"]):
-          self._testEmbeddedObj(
-                v.to_python(v.initData), getattr(modelObj, fieldName)
-                )
+      elif(fieldName=="choiceField"):
+        self._testEmbeddedObj(
+              str(v.to_python(v.initData)), str(getattr(modelObj, fieldName))
+              )
+      elif(fieldName not in ["fileField", "id", "imageField"]):
+        self._testEmbeddedObj(
+              v.to_python(v.initData), getattr(modelObj, fieldName)
+              )
 
   def testFormGenenarate(self):
     form = self.getGuiModelFormKlass(

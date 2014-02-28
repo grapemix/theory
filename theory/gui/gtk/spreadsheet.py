@@ -303,15 +303,14 @@ class SpreadsheetBuilder(MongoModelBSONTblDataHandler):
 
       self.isEditable = isEditable
       super(SpreadsheetBuilder, self).run(
-          queryset,
-          appModelmodel.fieldNameTypeMap
+          appModelmodel.fieldParamMap
           )
     else:
       self.modelKlassName = "Unknown model"
       super(SpreadsheetBuilder, self).run(
-          queryset,
           {}
           )
+    self.queryset = queryset
 
     listStoreDataType = self._buildListStoreDataType()
     gtkDataModel = self._buildGtkDataModel()

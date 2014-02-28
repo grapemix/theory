@@ -22,56 +22,35 @@ class MongoModelDetectorBase(object):
   def __init__(self):
     self.fieldPropDict = OrderedDict()
 
-  def run(self, queryset, fieldNameFieldTypeLabelMap):
+  def run(self, fieldParamMap):
     """
     :param queryset: db model instance queryset
     :param fieldNameFieldTypeLabelMap: To map the field name vs the db field
       type label as a string which still retain the nest relationship
     """
-    self.queryset = queryset
 
     self._buildTypeCatMap()
-    for fieldName, fieldTypeLabel in fieldNameFieldTypeLabelMap.iteritems():
-      fieldTypeLabelTokenLst = fieldTypeLabel.split(".")
-      handlerFxnName = ""
-      for fieldTypeLabelToken in fieldTypeLabelTokenLst:
-        if(handlerFxnName==""):
-          fieldTypeLabelToken = fieldTypeLabelToken.split("_")[0]
-          # When it is in top level, we treated it as normal
-          handlerFxnName = self._typeCatMap[fieldTypeLabelToken][0]
-        elif(handlerFxnName=="nonEditableForceStrField"):
-          break
-        else:
-          fieldTypeLabelToken = fieldTypeLabelToken.split("_")[0]
-          # When it is NOT in top level, we treated it as child
-          handlerFxnName += self._typeCatMap[fieldTypeLabelToken][1]
-      if(handlerFxnName=="intField" and \
-          hasattr(
-            getattr(self.queryset[0].__class__, fieldName),
-            "choices"
-          ) and \
-          getattr(
-            getattr(self.queryset[0].__class__, fieldName),
-            "choices"
-            ) is not None
-          ):
-        handlerFxnName = self._typeCatMap["EnumField"][0]
-        self.fieldPropDict[fieldName] = self._fillUpTypeHandler(
-            handlerFxnName,
-            ""
-            )
-        self.fieldPropDict[fieldName]["choices"] = \
-            dict(
-                getattr(
-                  getattr(self.queryset[0].__class__, fieldName),
-                  "choices"
-                )
-            )
-      else:
-        self.fieldPropDict[fieldName] = self._fillUpTypeHandler(
-            handlerFxnName,
-            ""
-            )
+
+    for fieldName, fieldParam in fieldParamMap.iteritems():
+      handlerFxnName = self._typeCatMap[fieldParam.name][0]
+      choices = None
+      if(handlerFxnName=="listField"):
+        handlerFxnName += self._typeCatMap[fieldParam.childParamLst[0].name][1]
+      elif(handlerFxnName=="dictField"):
+        handlerFxnName += self._typeCatMap[fieldParam.childParamLst[1].name][1]
+      elif(handlerFxnName=="intField"):
+        for i in fieldParam.childParamLst:
+          if(i.name=="choices"):
+            handlerFxnName = self._typeCatMap["EnumField"][0]
+            choices = i.data
+            break
+
+      self.fieldPropDict[fieldName] = self._fillUpTypeHandler(
+          handlerFxnName,
+          ""
+          )
+      if(choices is not None):
+        self.fieldPropDict[fieldName]["choices"] = dict(i.data)
 
   @abstractmethod
   def _fillUpTypeHandler(self, klassLabel, prefix=""):

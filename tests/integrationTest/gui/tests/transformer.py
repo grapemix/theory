@@ -10,6 +10,7 @@ from theory.conf import settings
 from theory.db import models
 from theory.gui.transformer import *
 from theory.gui.gtk.spreadsheet import SpreadsheetBuilder
+from theory.model import AppModel
 from theory.utils import unittest
 
 ##### Theory third-party lib #####
@@ -50,6 +51,9 @@ class GtkSpreadsheetModelDataHandlerTestCaseBase(unittest.TestCase):
     dummyAppModelManager = DummyAppModelManager()
     self.model = dummyAppModelManager.getCombinatoryModelWithDefaultValue()
     self.queryLst = dummyAppModelManager.getCombinatoryQuerySet([self.model])
+    self.appModelConfig = AppModel.objects.get(
+        app="testBase", name="CombinatoryModelWithDefaultValue"
+        )
 
   def test_getKlasslabel(self):
     fieldDict = self.queryLst[0]._fields
@@ -58,10 +62,15 @@ class GtkSpreadsheetModelDataHandlerTestCaseBase(unittest.TestCase):
 
     dataRow = spreadsheetBuilder.getDataModel()
     columnHandlerLabel = spreadsheetBuilder.getColumnHandlerLabel()
-    convertedQueryLst = self.handler.run(dataRow, self.queryLst, columnHandlerLabel)
+    convertedQueryLst = self.handler.run(
+        dataRow,
+        self.queryLst,
+        columnHandlerLabel,
+        self.appModelConfig.fieldParamMap,
+        )
 
     correctFieldType = {\
-        'binaryField': {'klassLabel': 'const', },
+        #'binaryField': {'klassLabel': 'const', },
         #fileField
         #imageField
         'booleanField': {'klassLabel': 'boolField', },
@@ -76,6 +85,7 @@ class GtkSpreadsheetModelDataHandlerTestCaseBase(unittest.TestCase):
         'stringField': {'klassLabel': 'strField', },
         'emailField': {'klassLabel': 'editableForceStrField', },
         'uRLField': {'klassLabel': 'editableForceStrField', },
+        'choiceField': {'klassLabel': 'enumField', },
         #dynamicField
 
         'id': {'klassLabel': 'const', },
@@ -85,7 +95,7 @@ class GtkSpreadsheetModelDataHandlerTestCaseBase(unittest.TestCase):
         'embeddedDocumentField': {'klassLabel': 'const', },
         'genericEmbeddedDocumentField': {'klassLabel': 'const', },
 
-        'listFieldBinaryField': {'klassLabel': 'const', },
+        #'listFieldBinaryField': {'klassLabel': 'const', },
         'listFieldBooleanField': {'klassLabel': 'listFieldeditableForceStrField', },
         'listFieldDateTimeField': {'klassLabel': 'const', },
         'listFieldComplexDateTimeField': {'klassLabel': 'const', },
@@ -116,21 +126,21 @@ class GtkSpreadsheetModelDataHandlerTestCaseBase(unittest.TestCase):
         'dictFieldEmbeddedField': {'klassLabel': 'const', },
 
         'mapFieldBinaryField': {'klassLabel': 'const', },
-        'mapFieldBooleanField': {'klassLabel': 'listFieldeditableForceStrField', },
+        'mapFieldBooleanField': {'klassLabel': 'const', },
         'mapFieldDateTimeField': {'klassLabel': 'const', },
         'mapFieldComplexDateTimeField': {'klassLabel': 'const', },
         'mapFieldUUIDField': {'klassLabel': 'const', },
         'mapFieldSequenceField': {'klassLabel': 'const', },
-        'mapFieldGeoPointField': {'klassLabel': 'listFieldeditableForceStrField', },
-        'mapFieldDecimalField': {'klassLabel': 'listFieldeditableForceStrField', },
-        'mapFieldFloatField': {'klassLabel': 'listFieldeditableForceStrField', },
-        'mapFieldIntField': {'klassLabel': 'listFieldeditableForceStrField', },
-        'mapFieldStringField': {'klassLabel': 'listFieldeditableForceStrField', },
-        'mapFieldEmailField': {'klassLabel': 'listFieldeditableForceStrField', },
-        'mapFieldURLField': {'klassLabel': 'listFieldeditableForceStrField', },
+        'mapFieldGeoPointField': {'klassLabel': 'const', },
+        'mapFieldDecimalField': {'klassLabel': 'const', },
+        'mapFieldFloatField': {'klassLabel': 'const', },
+        'mapFieldIntField': {'klassLabel': 'const', },
+        'mapFieldStringField': {'klassLabel': 'const', },
+        'mapFieldEmailField': {'klassLabel': 'const', },
+        'mapFieldURLField': {'klassLabel': 'const', },
         'mapFieldEmbeddedField': {'klassLabel': 'const', },
 
-        'sortedListFieldBinaryField': {'klassLabel': 'const', },
+        #'sortedListFieldBinaryField': {'klassLabel': 'const', },
         'sortedListFieldBooleanField': {'klassLabel': 'listFieldeditableForceStrField', },
         'sortedListFieldDateTimeField': {'klassLabel': 'const', },
         'sortedListFieldComplexDateTimeField': {'klassLabel': 'const', },
@@ -147,9 +157,16 @@ class GtkSpreadsheetModelDataHandlerTestCaseBase(unittest.TestCase):
     }
 
     for fieldName, fieldProperty in self.handler.fieldPropDict.iteritems():
-      correctFieldProperty = correctFieldType[fieldName]
+      try:
+        correctFieldProperty = correctFieldType[fieldName]
+      except KeyError:
+        continue
       for k,correctValue in correctFieldProperty.iteritems():
-        self.assertEqual(fieldProperty[k], correctValue, fieldName)
+        self.assertEqual(
+            fieldProperty[k],
+            correctValue,
+            "In {0}: {1}!={2}".format(fieldName, fieldProperty[k], correctValue)
+            )
 
   def test_emptyRowSelected(self):
     fieldDict = self.queryLst[0]._fields
@@ -159,7 +176,12 @@ class GtkSpreadsheetModelDataHandlerTestCaseBase(unittest.TestCase):
     dataRow = []
     columnHandlerLabel = spreadsheetBuilder.getColumnHandlerLabel()
     queryLst = []
-    convertedQueryLst = self.handler.run(dataRow, queryLst, columnHandlerLabel)
+    convertedQueryLst = self.handler.run(
+        dataRow,
+        queryLst,
+        columnHandlerLabel,
+        self.appModelConfig.fieldParamMap,
+        )
 
   def test_getValueConversion(self):
     fieldDict = self.model._fields
@@ -169,7 +191,12 @@ class GtkSpreadsheetModelDataHandlerTestCaseBase(unittest.TestCase):
     dataRow = spreadsheetBuilder.getDataModel()
     columnHandlerLabel = spreadsheetBuilder.getColumnHandlerLabel()
 
-    convertedQueryLst = self.handler.run(dataRow, self.queryLst, columnHandlerLabel)
+    convertedQueryLst = self.handler.run(
+        dataRow,
+        self.queryLst,
+        columnHandlerLabel,
+        self.appModelConfig.fieldParamMap,
+        )
 
     for fieldName in fieldDict.keys():
       self.assertEqual(self.queryLst[0][fieldName], convertedQueryLst[0][fieldName])

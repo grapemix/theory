@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
+#!/usr/bin/env python
 ##### System wide lib #####
-#from __future__ import absoluteImport, unicodeLiterals
+from __future__ import absoluteImport, unicodeLiterals
 import warnings
 
 ##### Theory lib #####
 from theory.core.exceptions import ValidationError, NON_FIELD_ERRORS, FieldError
-#from theory.gui.common.baseForm import DeclarativeFieldsMetaclass, Form
 from theory.gui.common.baseForm import (
     DeclarativeFieldsMetaclass,
     FormBase,
@@ -17,10 +17,7 @@ from theory.gui.formset import BaseFormSet, formsetFactory
 from theory.gui.util import ErrorList
 from theory.gui.transformer.mongoModelFormDetector import MongoModelFormDetector
 from theory.gui.widget import (
-    #SelectMultiple,
     HiddenInput,
-    #MultipleHiddenInput,
-    #CheckboxSelectMultiple
     )
 from theory.model import AppModel
 from theory.utils import six
@@ -45,7 +42,6 @@ and database field objects.
 
 __all__ = (
   'ModelForm', 'ModelFormBase', 'fieldsForModel',
-  #'ModelForm', 'ModelFormBase', 'GuiModelForm', 'fieldsForModel',
   'saveInstance', 'ModelChoiceField', 'ModelMultipleChoiceField',
   'ALL_FIELDS',
 )
@@ -152,25 +148,18 @@ def fieldsForModel(fieldDict, fields=None, exclude=None, widgets=None,
   a form field.
   """
   ignored = []
-  #opts = model._meta
-  #for f in sorted(opts.concreteFields + opts.manyToMany):
   for fieldName, fieldComplex in fieldDict.iteritems():
-    (fieldKlass, args) = fieldComplex
-    #if not fieldKlass.editable:
-    #  continue
+    (fieldKlass, args, kwargs) = fieldComplex
     if fields is not None and not fieldName in fields:
       continue
     if exclude and fieldName in exclude:
       continue
 
-    kwargs = {}
     if widgets and fieldName in widgets:
       kwargs['widget'] = widgets[fieldName]
     if localizedFields == ALL_FIELDS \
         or (localizedFields and fieldKlass.name in localizedFields):
       kwargs['localize'] = True
-    #if labels and fieldKlass.name in labels:
-    #  kwargs['label'] = labels[fieldName]
     kwargs['label'] = fieldName
     if helpTexts and f.name in helpTexts:
       kwargs['helpText'] = helpTexts[fieldName]
@@ -182,7 +171,6 @@ def fieldsForModel(fieldDict, fields=None, exclude=None, widgets=None,
     elif not callable(formfieldCallback):
       raise TypeError('formfieldCallback must be a function or callable')
     else:
-      #formfield = formfieldCallback(f, **kwargs)
       formfield = formfieldCallback(fieldName, **kwargs)
 
     if formfield:
@@ -293,7 +281,6 @@ class ModelFormMetaclass(type):
 
 
 class ModelFormBase(FormBase):
-#class BaseModelForm(Form):
   def __init__(self, data=None, files=None, autoId='id_%s', prefix=None,
          initial=None, errorClass=ErrorList, labelSuffix=None,
          emptyPermitted=False, instance=None):

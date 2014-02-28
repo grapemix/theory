@@ -7,6 +7,7 @@
 
 ##### Local app #####
 from .bridge import *
+from .modelClassScanner import *
 
 ##### Theory app #####
 

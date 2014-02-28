@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 ##### System wide lib #####
+from collections import defaultdict
 from datetime import datetime
 import os
 import uuid
@@ -114,6 +115,7 @@ class DummyAppModelManager(object):
     modelTemplate = AppModel(importPath=importPath + "__init__")
     o = ModelClassScanner()
     o.modelTemplate = modelTemplate
+    o.modelDepMap = defaultdict(list)
     model = o._probeModelField(modelKlassName, modelKlass)
     model.isEmbedded = isEmbedded
     model.importPath = importPath
@@ -166,6 +168,12 @@ class DummyAppModelManager(object):
 
 
 class CombinatoryEmbeddedModelLiteWithDefaultValue(models.EmbeddedDocument):
+  DUMMY_CHOICE_ONE = 1
+  DUMMY_CHOICE_TWO = 2
+  DUMMY_CHOICES = (
+      (DUMMY_CHOICE_ONE, "Dummy Choice One"),
+      (DUMMY_CHOICE_TWO, "Dummy Choice Two"),
+      )
   binaryField = models.BinaryField(default=defaultValueSet1["Binary"])
   fileField = models.FileField(default=defaultValueSet1["File"])
   imageField = models.ImageField(default=defaultValueSet1["Image"])
@@ -182,6 +190,7 @@ class CombinatoryEmbeddedModelLiteWithDefaultValue(models.EmbeddedDocument):
   emailField = models.EmailField(default=defaultValueSet1["Email"])
   uRLField = models.URLField(default=defaultValueSet1["URL"])
   dynamicField = models.DynamicField()
+  choiceField = models.IntField(choices=DUMMY_CHOICES, default=DUMMY_CHOICE_ONE)
 
   listFieldBinaryField = models.ListField(field=models.BinaryField(), default=[defaultValueSet1["Binary"],])
   listFieldBooleanField = models.ListField(field=models.BooleanField(), default=[defaultValueSet1["Boolean"],])
@@ -248,6 +257,12 @@ class CombinatoryEmbeddedModelLiteWithDefaultValue(models.EmbeddedDocument):
   mapFieldUUIDField = models.MapField(field=models.UUIDField(), default={"keyLabel": defaultValueSet1["UUID"],})
 
 class CombinatoryModelLiteWithDefaultValue(models.Model):
+  DUMMY_CHOICE_ONE = 1
+  DUMMY_CHOICE_TWO = 2
+  DUMMY_CHOICES = (
+      (DUMMY_CHOICE_ONE, "Dummy Choice One"),
+      (DUMMY_CHOICE_TWO, "Dummy Choice Two"),
+      )
   binaryField = models.BinaryField(default=defaultValueSet1["Binary"])
   fileField = models.FileField(default=defaultValueSet1["File"])
   imageField = models.ImageField(default=defaultValueSet1["Image"])
@@ -264,6 +279,7 @@ class CombinatoryModelLiteWithDefaultValue(models.Model):
   emailField = models.EmailField(default=defaultValueSet1["Email"])
   uRLField = models.URLField(default=defaultValueSet1["URL"])
   dynamicField = models.DynamicField()
+  choiceField = models.IntField(choices=DUMMY_CHOICES, default=DUMMY_CHOICE_ONE)
 
   listFieldBinaryField = models.ListField(field=models.BinaryField(), default=[defaultValueSet1["Binary"],])
   listFieldBooleanField = models.ListField(field=models.BooleanField(), default=[defaultValueSet1["Boolean"],])
@@ -332,6 +348,12 @@ class CombinatoryModelLiteWithDefaultValue(models.Model):
   #meta = {'collection': 'tests_CombinatoryModelWithDefaultValue'}
 
 class CombinatoryEmbeddedModelWithDefaultValue(models.EmbeddedDocument):
+  DUMMY_CHOICE_ONE = 1
+  DUMMY_CHOICE_TWO = 2
+  DUMMY_CHOICES = (
+      (DUMMY_CHOICE_ONE, "Dummy Choice One"),
+      (DUMMY_CHOICE_TWO, "Dummy Choice Two"),
+      )
   binaryField = models.BinaryField(default=defaultValueSet1["Binary"])
   fileField = models.FileField(default=defaultValueSet1["File"])
   imageField = models.ImageField(default=defaultValueSet1["Image"])
@@ -348,6 +370,7 @@ class CombinatoryEmbeddedModelWithDefaultValue(models.EmbeddedDocument):
   emailField = models.EmailField(default=defaultValueSet1["Email"])
   uRLField = models.URLField(default=defaultValueSet1["URL"])
   dynamicField = models.DynamicField()
+  choiceField = models.IntField(choices=DUMMY_CHOICES, default=DUMMY_CHOICE_ONE)
 
   referenceField = models.ReferenceField('CombinatoryModelLiteWithDefaultValue')
   genericReferenceField = models.GenericReferenceField()
@@ -419,6 +442,12 @@ class CombinatoryEmbeddedModelWithDefaultValue(models.EmbeddedDocument):
   mapFieldUUIDField = models.MapField(field=models.UUIDField(), default={"keyLabel": defaultValueSet1["UUID"],})
 
 class CombinatoryModelWithDefaultValue(models.Model):
+  DUMMY_CHOICE_ONE = 1
+  DUMMY_CHOICE_TWO = 2
+  DUMMY_CHOICES = (
+      (DUMMY_CHOICE_ONE, "Dummy Choice One"),
+      (DUMMY_CHOICE_TWO, "Dummy Choice Two"),
+      )
   binaryField = models.BinaryField(default=defaultValueSet1["Binary"])
   fileField = models.FileField(default=defaultValueSet1["File"])
   imageField = models.ImageField(default=defaultValueSet1["Image"])
@@ -435,6 +464,7 @@ class CombinatoryModelWithDefaultValue(models.Model):
   emailField = models.EmailField(default=defaultValueSet1["Email"])
   uRLField = models.URLField(default=defaultValueSet1["URL"])
   dynamicField = models.DynamicField()
+  choiceField = models.IntField(choices=DUMMY_CHOICES, default=DUMMY_CHOICE_ONE)
 
   referenceField = models.ReferenceField('CombinatoryModelLiteWithDefaultValue')
   genericReferenceField = models.GenericReferenceField()

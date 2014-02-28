@@ -171,8 +171,37 @@ class AdapterBuffer(Model):
 
 class BinaryClassifierHistory(Model):
   ref = GenericReferenceField()
-  initState = SortedListField(BooleanField())
-  finalState = SortedListField(BooleanField())
+  initState = ListField(BooleanField())
+  finalState = ListField(BooleanField())
+
+class FieldParameter(EmbeddedDocument):
+  name = StringField(
+      max_length=256,
+      verbose_name=_("Parameter's name"),
+      help_text=_(
+        "The name of this parameter. Regard as args if name is missing"
+        )
+      )
+  data = DynamicField(
+      verbose_name=_("Parameter's value"),
+      help_text=_("The type of this parameter"),
+      #required=True,
+      )
+  isField = BooleanField(
+      default=False,
+      verbose_name=_("Is a field flag"),
+      help_text=_("Is a field flag")
+      )
+  isCircular = BooleanField(
+      default=False,
+      verbose_name=_("Is circular graph flag"),
+      help_text=_("Is circular graph flag")
+      )
+  childParamLst = ListField(
+      EmbeddedDocumentField("FieldParameter"),
+      verbose_name=_("Field name and parameter list"),
+      help_text=_("All fields' name and their parameter"),
+      )
 
 class AppModel(Model):
   name = StringField(
@@ -204,11 +233,11 @@ class AppModel(Model):
         ),
       required=True,
       )
-  fieldNameTypeMap = MapField(
-      field=StringField(max_length=256,),
-      verbose_name=_("Field name and type map"),
-      help_text=_("All fields' name and their type"),
-      required=True,
+  fieldParamMap = MapField(
+      EmbeddedDocumentField(FieldParameter),
+      verbose_name=_("Field name and parameter map"),
+      help_text=_("All fields' name and their parameter"),
+      #required=True,
       )
   importPath = StringField(
       max_length=256,

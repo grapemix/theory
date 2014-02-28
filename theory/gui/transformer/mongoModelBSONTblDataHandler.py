@@ -4,6 +4,7 @@
 from json import dumps as jsonDumps
 
 ##### Theory lib #####
+from theory.gui.transformer.theoryJSONEncoder import TheoryJSONEncoder
 
 ##### Theory third-party lib #####
 
@@ -60,7 +61,7 @@ class MongoModelBSONTblDataHandler(MongoModelTblDetectorBase):
       fieldName,
       fieldVal
       ):
-    return jsonDumps(fieldVal)
+    return jsonDumps(fieldVal, cls=TheoryJSONEncoder)
 
   def _listFieldembeddedFieldDataHandler(self, rowId, fieldName, fieldVal):
     try:
