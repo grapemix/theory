@@ -75,6 +75,11 @@ class MongoModelFormDetector(object):
   def intFieldHandler(self):
     return field.IntegerField
 
+  def choiceFieldHandler(self):
+    # There is no choiceField in mongoengine, it is just intField with choices.
+    # And we are just mocking this field.
+    return field.ChoiceField
+
   def stringFieldHandler(self):
     return field.TextField
 
@@ -101,10 +106,66 @@ class MongoModelFormDetector(object):
   def sortedListFieldHandler(self):
     return field.ListField
 
-  def _getHandlerByFieldName(self, fieldTypeStr):
+  def _getHandlerByFieldName(self, fieldTypeStr, fieldKwargs):
     handlerFxnTmpl = "{0}Handler"
     fieldTypeStr = fieldTypeStr[0].lower() + fieldTypeStr[1:]
+    if(fieldTypeStr=="intField" and "choices" in fieldKwargs):
+      fieldTypeStr = "choiceField"
     return getattr(self, handlerFxnTmpl.format(fieldTypeStr))()
+
+  def _getChildParam(self, fieldParamLst, circularLvl, isRoot=False):
+    """To get all args and kwargs ready recursively for a field to be initalize.
+    """
+    args = []
+    kwargs = {}
+    for fieldParam in fieldParamLst:
+      if(fieldParam.isCircular):
+        # Should be some other fields
+        fieldParam.name="ReferenceField"
+      if(fieldParam.isField):
+        if(fieldParam.name=="ReferenceField"
+            or fieldParam.name=="EmbeddedDocumentField"
+            ):
+          childArgs = [
+              fieldParam.childParamLst[0].data,
+              fieldParam.childParamLst[1].data,
+              ]
+          childKwargs = {}
+        else:
+          childArgs, childKwargs = self._getChildParam(
+              fieldParam.childParamLst,
+              circularLvl
+              )
+        childKwargs = self._convertKwargsName(childKwargs)
+        childField = self._getHandlerByFieldName(fieldParam.name, childKwargs)
+        if(isRoot):
+          # We wanna initialize the childField in gui/model.py, so we have to
+          # keep all parameters in the top level. For others level, we want to
+          # initialize all of them
+          args.extend(childArgs)
+          kwargs = childKwargs
+        else:
+          args.append(childField(*childArgs, **childKwargs))
+      else:
+        kwargs[fieldParam.name] = fieldParam.data
+    return (args, kwargs)
+
+  def _convertKwargsName(self, kwargs):
+    """To convert the mongoengine field keyword to theory field keyword"""
+    newNameDict= {
+        "verbose_name": "label",
+        "help_text": "help_text",
+        "choices": "choices",
+        "default": "initData",
+        "required": "required",
+        "max_length": "max_length",
+        "min_length": "min_length",
+      }
+    newDict = {}
+    for k, v in kwargs.iteritems():
+      if(k in newNameDict):
+        newDict[newNameDict[k]] = v
+    return newDict
 
   def run(self, modelImportPath="", appModelObj=None):
     if(modelImportPath=="" and appModelObj is None):
@@ -112,40 +173,13 @@ class MongoModelFormDetector(object):
     fieldLst = []
     if(appModelObj is None):
       appModelObj = AppModel.objects\
-          .only("app", "formField", "fieldNameTypeMap")\
+          .only("app", "formField", "fieldParamMap")\
           .get(importPath=modelImportPath)
     for fieldName in appModelObj.formField:
-      fieldTypeStr = appModelObj.fieldNameTypeMap[fieldName]
-      args = []
-      if(fieldTypeStr.startswith("ListField")):
-        (fieldTypeStr, childFieldTypeStr) = fieldTypeStr.split(".")
-        args = [self._getHandlerByFieldName(childFieldTypeStr.split("_")[0])]
-
-        if(
-            childFieldTypeStr.startswith("Embedded") \
-                or childFieldTypeStr.startswith("ReferenceField")
-          ):
-          args[0] = args[0](appModelObj.app, childFieldTypeStr.split("_")[1])
-        else:
-          args[0] = args[0]()
-
-      elif(fieldTypeStr.startswith("MapField") \
-          or fieldTypeStr.startswith("DictField")):
-        (fieldTypeStr, valueFieldTypeStr) = fieldTypeStr.split(".")
-        args = [
-            self._getHandlerByFieldName("StringField")(),
-            self._getHandlerByFieldName(valueFieldTypeStr.split("_")[0])
-            ]
-
-        if(valueFieldTypeStr.startswith("Embedded")):
-          args[1] = args[1](appModelObj.app, valueFieldTypeStr.split("_")[1])
-        else:
-          args[1] = args[1]()
-      elif(fieldTypeStr.startswith("EmbeddedDocumentField")
-          or fieldTypeStr.startswith("ReferenceField")
-          ):
-        (fieldTypeStr, childFieldTypeStr) = fieldTypeStr.split("_")
-        args = [appModelObj.app, childFieldTypeStr,]
-      fieldType = self._getHandlerByFieldName(fieldTypeStr)
-      fieldLst.append((fieldName, (fieldType, args)))
+      fieldParam = appModelObj.fieldParamMap[fieldName]
+      args, kwargs = self._getChildParam([fieldParam], 0, True)
+      fieldLst.append((
+        fieldName,
+        (self._getHandlerByFieldName(fieldParam.data, kwargs), args, kwargs)
+        ))
     return SortedDict(fieldLst)

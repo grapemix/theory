@@ -20,7 +20,7 @@ class GtkSpreadsheetModelBSONDataHandler(MongoModelTblDetectorBase):
   handler, because of the limitation of gtkListModel, only modified rows are
   able to be notified, instead of modified rows and modified fields."""
 
-  def run(self, dataRow, queryLst, columnHandlerLabelZip):
+  def run(self, dataRow, queryLst, columnHandlerLabelZip, fieldParamMap):
     """
     :param dataRow: model from the gtkListModel as list of the list format as
       input
@@ -30,40 +30,35 @@ class GtkSpreadsheetModelBSONDataHandler(MongoModelTblDetectorBase):
       have to re-probe the data type.
     """
     self.dataRow = dataRow
-    self.queryLst = queryLst
-    self._buildTypeCatMap()
 
+    super(GtkSpreadsheetModelBSONDataHandler, self).run(fieldParamMap)
+    numOfRow = len(queryLst)
+    rowCounter = 0
     # loop for column
     for columnLabel, handlerLabel in columnHandlerLabelZip.iteritems():
       # fill up field type handler
-      if(handlerLabel!=None):
-        self.fieldPropDict[columnLabel] = self._fillUpTypeHandler(handlerLabel)
-      else:
+      if(handlerLabel is None):
         self.fieldPropDict[columnLabel] = {"klassLabel": "const"}
-
-      # fill up enum choices
-      if(handlerLabel=="enumField"):
-        choices = \
-            getattr(
-              getattr(self.queryLst[0].__class__, columnLabel),
-              "choices"
-            )
-        self.fieldPropDict[columnLabel]["reverseChoices"] = \
-            dict([(i[1], i[0]) for i in choices])
-
-    numOfRow = len(queryLst)
-    for rowNum in range(numOfRow):
-      i = 0
-      for fieldName, fieldProperty in self.fieldPropDict.iteritems():
-        if(fieldProperty["klassLabel"]!="const"):
-          newValue = fieldProperty["dataHandler"](i, fieldName, dataRow[rowNum][i])
+      else:
+        fieldProperty =  self.fieldPropDict[columnLabel]
+        if(handlerLabel=="enumField"):
+          fieldProperty["reverseChoices"] = \
+              dict([
+                (v, k) for k,v in fieldProperty["choices"].iteritems()
+                ])
+        for rowNum in range(numOfRow):
+          newValue = fieldProperty["dataHandler"](
+              rowCounter,
+              columnLabel,
+              dataRow[rowNum][rowCounter]
+              )
           if(not newValue is None):
             setattr(
                 queryLst[rowNum],
-                fieldName,
+                columnLabel,
                 newValue
             )
-        i += 1
+      rowCounter += 1
     return queryLst
 
   def _fillUpTypeHandler(self, klassLabel, prefix=""):

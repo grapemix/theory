@@ -52,7 +52,7 @@ class MongoModelTblDetectorBase(MongoModelDetectorBase):
         "EnumField": ("enumField", "editableForceStrField"),
         "IntField": ("intField", "editableForceStrField"),
         "StringField": ("strField", "editableForceStrField"),
-        "MapField": ("listField", "listField"),
+        "MapField": ("nonEditableForceStrField", "nonEditableForceStrField"),
         "ReferenceField": ("modelField", "modelField"),
         "GenericReferenceField": ("modelField", "modelField"),
         "EmbeddedDocumentField": ("embeddedField", "embeddedField"),

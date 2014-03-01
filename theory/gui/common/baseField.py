@@ -1071,13 +1071,16 @@ class ListField(Field):
     if(self.childFieldTemplate.widget is None):
       self.widget = None
     elif(isclass(widget)):
+      # args[0] is always win, args[1] is always bx
       self.widget = widget(
           self.widgetSetter,
           self.widgetGetter,
+          args[0],
+          args[1],
           childFieldLst=self.fields,
           addChildFieldFxn=self.addChildField,
           removeChildFieldFxn=self.removeChildField,
-          *args, **kwargs)
+          **kwargs)
       self.widget._probeChildWidget(self.childFieldTemplate)
       self.widget.setupInstructionComponent()
       super(ListField, self).renderWidget(*args, **kwargs)
@@ -1214,6 +1217,12 @@ class DictField(Field):
   def addChildField(self, data, fieldName="initData"):
     keyField = copy.deepcopy(self.childKeyFieldTemplate)
     valueField = copy.deepcopy(self.childValueFieldTemplate)
+    if(hasattr(valueField, "embeddedFieldDict")):
+      # The deepcopy is unable to do the copy the embeddedFieldDict, so we
+      # have to make a special case for embeddedField
+      valueField.embeddedFieldDict = copy.deepcopy(
+          self.childValueFieldTemplate.embeddedFieldDict
+          )
     if(data is not None):
       (keyData, valueData) = data
       setattr(keyField, fieldName, keyData)
@@ -1700,14 +1709,14 @@ class ModelField(Field):
   #widget = ModelInput
 
   def __init__(self, appName, modelName, *args, **kwargs):
-    self.modelConfigModel = AppModel.objects.get(
-        isEmbedded=False,
-        app=appName,
-        name=modelName
-        )
+    #self.modelConfigModel = AppModel.objects.get(
+    #    isEmbedded=False,
+    #    app=appName,
+    #    name=modelName
+    #    )
     self.modelFieldLst = []
-    for fieldName in self.modelConfigModel.formField:
-      fieldType = self.modelConfigModel.fieldNameTypeMap[fieldName]
+    #for fieldName in self.modelConfigModel.formField:
+    #  fieldType = self.modelConfigModel.fieldNameTypeMap[fieldName]
 
     super(ModelField, self).__init__(*args, **kwargs)
 
@@ -1727,7 +1736,7 @@ class EmbeddedField(Field):
 
     detector = MongoModelFormDetector()
     self.embeddedFieldDict = fieldsForModel(
-        detector.run(appModelObj = self.embeddedConfigModel)
+        detector.run(appModelObj=self.embeddedConfigModel)
         )
     super(EmbeddedField, self).__init__(*args, **kwargs)
 

@@ -7,6 +7,7 @@
 
 ##### Local app #####
 from .form import *
+from .transformer import *
 
 ##### Theory app #####
 
