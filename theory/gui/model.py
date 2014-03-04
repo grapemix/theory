@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 ##### System wide lib #####
-from __future__ import absoluteImport, unicodeLiterals
 import warnings
 
 ##### Theory lib #####
