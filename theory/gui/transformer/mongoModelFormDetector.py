@@ -106,14 +106,19 @@ class MongoModelFormDetector(object):
   def sortedListFieldHandler(self):
     return field.ListField
 
+  def querysetFieldHandler(self):
+    return field.QuerysetField
+
   def _getHandlerByFieldName(self, fieldTypeStr, fieldKwargs):
     handlerFxnTmpl = "{0}Handler"
     fieldTypeStr = fieldTypeStr[0].lower() + fieldTypeStr[1:]
+    if(fieldTypeStr=="listField" and "model" in fieldKwargs):
+      fieldTypeStr = "querysetField"
     if(fieldTypeStr=="intField" and "choices" in fieldKwargs):
       fieldTypeStr = "choiceField"
     return getattr(self, handlerFxnTmpl.format(fieldTypeStr))()
 
-  def _getChildParam(self, fieldParamLst, circularLvl, isRoot=False):
+  def _getChildParam(self, fieldParamLst, isRoot=False):
     """To get all args and kwargs ready recursively for a field to be initalize.
     """
     args = []
@@ -131,13 +136,24 @@ class MongoModelFormDetector(object):
               fieldParam.childParamLst[1].data,
               ]
           childKwargs = {}
+        elif (fieldParam.name=="ListField" and
+            fieldParam.childParamLst[0].name=="ReferenceField"
+            ):
+          fieldParam.name = "QuerysetField"
+          app = fieldParam.childParamLst[0].childParamLst[0].data
+          model = fieldParam.childParamLst[0].childParamLst[1].data
+          del fieldParam.childParamLst[0]
+          childArgs, childKwargs = self._getChildParam(fieldParam.childParamLst)
+          childKwargs["app"] = app
+          childKwargs["model"] = model
         else:
-          childArgs, childKwargs = self._getChildParam(
-              fieldParam.childParamLst,
-              circularLvl
-              )
+          childArgs, childKwargs = self._getChildParam(fieldParam.childParamLst)
+
         childKwargs = self._convertKwargsName(childKwargs)
+
         childField = self._getHandlerByFieldName(fieldParam.name, childKwargs)
+        if("choices" in childKwargs):
+          childKwargs["coerce"] = int
         if(isRoot):
           # We wanna initialize the childField in gui/model.py, so we have to
           # keep all parameters in the top level. For others level, we want to
@@ -160,6 +176,8 @@ class MongoModelFormDetector(object):
         "required": "required",
         "max_length": "max_length",
         "min_length": "min_length",
+        "app": "app",
+        "model": "model",
       }
     newDict = {}
     for k, v in kwargs.iteritems():

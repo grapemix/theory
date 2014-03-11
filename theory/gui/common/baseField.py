@@ -1038,7 +1038,15 @@ class ListField(Field):
     'invalid': _(u'Enter a list of values.'),
   }
 
-  def __init__(self, field, initData=[], min_length=0, max_length=maxint, *args, **kwargs):
+  def __init__(
+      self,
+      field,
+      initData=[],
+      min_length=0,
+      max_length=maxint,
+      *args,
+      **kwargs
+      ):
     # Set 'required' to False on the individual fields, because the
     # required validation will be handled by ListField, not by those
     # individual fields.
@@ -1157,12 +1165,17 @@ class ListField(Field):
   def finalData(self):
     """It is used to store data directly from widget before validation and
     cleaning."""
-    # TODO: allow lazy update
     if(isclass(self.widget) or self.widget.isOverridedData):
-    #if(not isinstance(self.widget, type) and self.widget.isOverridedData):
       # some widget like Multibuttonentry from the e17 need special treatment
       # on retriving data
-      return super(ListField, self).finalData
+      data = super(ListField, self).finalData
+      if (data==[u""] and
+          self.initData==[] and
+          issubclass(self.childFieldTemplate.widget, StringInput)
+          ):
+        return self.initData
+      else:
+        return data
     else:
       return [i.finalData for i in self.fields]
 
@@ -1704,6 +1717,8 @@ class QuerysetField(Field):
       kwargs["attrs"] = {}
     kwargs["attrs"].update({"app": self.app, "model": self.model})
     super(QuerysetField, self).renderWidget(*args, **kwargs)
+    self.widget.app = self.app
+    self.widget.model = self.model
 
 class ModelField(Field):
   #widget = ModelInput

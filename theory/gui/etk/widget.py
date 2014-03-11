@@ -6,8 +6,9 @@ import copy
 import os
 
 ##### Theory lib #####
-from theory.utils import datetime_safe, formats
 from theory.gui.util import LocalFileObject
+from theory.utils import datetime_safe, formats
+from theory.utils.importlib import importClass
 
 ##### Theory third-party lib #####
 
@@ -934,14 +935,17 @@ class QueryIdInput(StringInput):
     if(self.attrs["app"] is None or self.attrs["model"] is None):
       queryset = self.rawInitData
     else:
-      dbClass = import_class('{0}.model.{1}'.format(
+      dbClass = importClass('{0}.model.{1}'.format(
         self.app,
         self.model
         )
       )
-      queryset = dbClass.objects.in_bulk(
+      idInDict = dbClass.objects.in_bulk(
           [i.id for i in self.widgetLst[0].finalData]
       )
+      queryset = []
+      for i in self.widgetLst[0].finalData:
+        queryset.append(idInDict[i.id])
     self.fieldSetter({"finalData": queryset})
 
 class FilterFormLayout(BasePacker):

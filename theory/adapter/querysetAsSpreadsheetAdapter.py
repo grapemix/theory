@@ -35,6 +35,14 @@ class QuerysetAsSpreadsheetAdapter(BaseUIAdapter):
   def isEditable(self, isEditable):
     self._isEditable = isEditable
 
+  @property
+  def appModelFieldParamMap(self):
+    return self._appModelFieldParamMap
+
+  @appModelFieldParamMap.setter
+  def appModelFieldParamMap(self, appModelFieldParamMap):
+    self._appModelFieldParamMap = appModelFieldParamMap
+
   def run(self):
     self.isEditable = True
     if(self.queryset!=None):
@@ -45,9 +53,12 @@ class QuerysetAsSpreadsheetAdapter(BaseUIAdapter):
     self.isQuerysetNonEmpty = True
     return
 
+  def _getSpreadsheetBuilder(self):
+    return SpreadsheetBuilder()
+
   def render(self, *args, **kwargs):
     if(self.isQuerysetNonEmpty):
-      spreadsheet = SpreadsheetBuilder()
+      spreadsheet = self._getSpreadsheetBuilder()
       spreadsheet.run(self.queryset, self.isEditable)
       selectedRow = spreadsheet.getSelectedRow()
       dataRow = spreadsheet.getDataModel()
@@ -61,6 +72,11 @@ class QuerysetAsSpreadsheetAdapter(BaseUIAdapter):
         columnHandlerLabel = spreadsheet.getColumnHandlerLabel()
         handler = GtkSpreadsheetModelBSONDataHandler()
         #handler = GtkSpreadsheetModelDataHandler()
-        self.queryset = handler.run(newDataRow, newQueryset, columnHandlerLabel)
+        self.queryset = handler.run(
+            newDataRow,
+            newQueryset,
+            columnHandlerLabel,
+            self.appModelFieldParamMap,
+            )
       else:
         self.queryset = []
