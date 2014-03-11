@@ -29,7 +29,7 @@ class ModelUpsertTestCase(BaseCommandTestCase):
         ("cleanUpCrtFxn", lambda: True),
         ])
 
-  def testAdding(self):
+  def testAddingFormCreation(self):
     cmd = self._getCmd(
         self.cmdModel,
         kwargs={
@@ -39,8 +39,49 @@ class ModelUpsertTestCase(BaseCommandTestCase):
         )
     self._validateParamForm(cmd)
     self._execeuteCommand(cmd, self.cmdModel, uiParam=self.uiParam)
+    self.cmd.paramForm._nextBtnClick()
 
-  def testEditing(self):
+  def testListFieldError(self):
+    cmd = self._getCmd(
+        self.cmdModel,
+        kwargs={
+          "appName": "theory",
+          "modelName": "Command",
+          }
+        )
+    self._validateParamForm(cmd)
+    self._execeuteCommand(cmd, self.cmdModel, uiParam=self.uiParam)
+    self.cmd.paramForm._nextBtnClick()
+
+    self.cmd.modelForm._nextBtnClick(None, None)
+    self.assertEqual(
+        self.cmd.modelForm.errors,
+        {
+          u"app": [u"This field is required.",],
+          u"name": [u"This field is required.",]
+          }
+        )
+
+  def testAsAdding(self):
+    cmd = self._getCmd(
+        self.cmdModel,
+        kwargs={
+          "appName": "theory",
+          "modelName": "Command",
+          }
+        )
+    self._validateParamForm(cmd)
+    self._execeuteCommand(cmd, self.cmdModel, uiParam=self.uiParam)
+    self.cmd.paramForm._nextBtnClick()
+
+    self.cmd.modelForm.fields["app"].finalData = "testBase"
+    self.cmd.modelForm.fields["name"].finalData = "testCmd"
+    self.cmd.modelForm.fields["mood"].finalData = ["dev",]
+
+    self.cmd.modelForm._nextBtnClick(None, None)
+    self.assertEqual(self.cmd.modelForm.errors, {})
+
+  def testAsEditing(self):
     cmd = self._getCmd(
         self.cmdModel,
         kwargs={
