@@ -289,6 +289,7 @@ class ModelFormBase(FormBase):
     if instance is None:
       # if we didn't get an instance, instantiate a new one
       self.instance = opts.model()
+      del self.baseFields["id"]
     else:
       self.instance = instance
     for fieldName in self.baseFields.keys():

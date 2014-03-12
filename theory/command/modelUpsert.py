@@ -88,6 +88,8 @@ class ModelUpsert(SimpleCommand):
   def cleanParamForm(self, btn, dummy):
     if(self.modelForm.is_valid()):
       dataInDict = self.modelForm.clean()
+      if self.instance is None:
+        self.instance = self.modelForm.instance
       for k, v in dataInDict.iteritems():
         setattr(self.instance, k, v)
       self.instance.save()
@@ -101,10 +103,11 @@ class ModelUpsert(SimpleCommand):
     f = self.paramForm.clean()
     appModel = AppModel.objects.get(app=f["appName"], name=f["modelName"])
     modelFormKlass = self.getModelFormKlass(appModel.importPath)
+    self.instance = None
+    self.modelKlass = importClass(appModel.importPath)
     if(f["instanceId"]!=""):
-      modelKlass = importClass(appModel.importPath)
-      instance = modelKlass.objects.get(id=f["instanceId"])
-      self.modelForm = modelFormKlass(instance=instance)
+      self.instance = self.modelKlass.objects.get(id=f["instanceId"])
+      self.modelForm = modelFormKlass(instance=self.instance)
     else:
       self.modelForm = modelFormKlass()
     self.modelForm._nextBtnClick = self.cleanParamForm

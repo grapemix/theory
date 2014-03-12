@@ -78,7 +78,7 @@ class MongoModelFormDetector(object):
   def choiceFieldHandler(self):
     # There is no choiceField in mongoengine, it is just intField with choices.
     # And we are just mocking this field.
-    return field.ChoiceField
+    return field.TypedChoiceField
 
   def stringFieldHandler(self):
     return field.TextField
