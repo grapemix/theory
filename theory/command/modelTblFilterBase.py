@@ -101,6 +101,14 @@ class ModelTblFilterBase(SimpleCommand):
   def queryset(self, queryset):
     self._queryset = queryset
 
+  @property
+  def appModelFieldParamMap(self):
+    return self._appModelFieldParamMap
+
+  @appModelFieldParamMap.setter
+  def appModelFieldParamMap(self, appModelFieldParamMap):
+    self._appModelFieldParamMap = appModelFieldParamMap
+
   @abstractmethod
   def _applyChangeOnQueryset(self):
     pass
@@ -125,10 +133,12 @@ class ModelTblFilterBase(SimpleCommand):
       return True
     else:
       modelName = formData["modelName"]
-      modelName = modelName[0].upper() + modelName[1:]
-      self.modelKlass = importClass(
-          "%s.model.%s" % (formData["appName"], modelName)
-      )
+      appModel = AppModel.objects.get(
+          app=formData["appName"],
+          name=formData["modelName"]
+          )
+      self.modelKlass = importClass(appModel.importPath)
+      self.appModelFieldParamMap = appModel.fieldParamMap
       self.queryset = self.modelKlass.objects.filter(
           **dict(formData["queryFilter"])
           )
