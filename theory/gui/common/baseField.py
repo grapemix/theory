@@ -340,6 +340,7 @@ class TextField(Field):
     return smartText(value)
 
 class IntegerField(Field):
+  widget = NumericInput
   default_error_messages = {
     'invalid': _(u'Enter a whole number.'),
     'max_value': _(u'Ensure this value is less than or equal to %(limit_value)s.'),
