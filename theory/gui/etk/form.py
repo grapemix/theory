@@ -35,9 +35,33 @@ class GuiFormBase(BasePacker):
     pass
 
   def fillInitData(self, initDataAsDict):
+    """This is used for updating form and destroy all widget and past
+    reference. It should be used when no previous fields and widgets
+    can be reused and need reference to.
+    """
     for fieldName, data in initDataAsDict.iteritems():
       try:
         self.fields[fieldName].initData = data
+      except KeyError:
+        pass
+
+    # used to fill in other properties which depends on the
+    # other field's initData
+    self._preFillFieldProperty()
+
+  def reFillInitData(self, initDataAsDict):
+    """This fxn will not destroy any widgets, instead, it will just update it.
+    It should be faster and allow previous reference to it.
+    """
+    for fieldName, data in initDataAsDict.iteritems():
+      try:
+        self.fields[fieldName].initData = data
+        # To force widget to update in next time
+        self.fields[fieldName].finalData = None
+        self.fields[fieldName].widget.reset(
+            initData=data,
+            finalData=data # To force radio element to update
+            )
       except KeyError:
         pass
 
@@ -54,7 +78,8 @@ class GuiFormBase(BasePacker):
 
 class FlexibleGuiFormBase(GuiFormBase):
   def __init__(self, *args, **kwargs):
-    super(FlexibleGuiFormBase, self).__init__(*args, **kwargs)
+    super(FlexibleGuiFormBase, self).__init__(None, None, None)
+    #super(FlexibleGuiFormBase, self).__init__(*args, **kwargs)
     self.modelFieldNameLst = {}
     self.combineFieldNameVsModelField = {}
     self.modelCacheDict = {}
@@ -65,6 +90,17 @@ class FlexibleGuiFormBase(GuiFormBase):
 
     self.combineFieldNameVsModelField[combineFieldName] = (modelName, fieldName)
     return combineFieldName
+
+  def updateModelInOrderedDict(self):
+    for modelName, fieldNameLst in self.modelFieldNameLst.iteritems():
+      modelObj = self.modelCacheDict[modelName]
+      for fieldName in fieldNameLst:
+        combineFieldName = self._generateCombineFieldName(modelName, fieldName)
+        formData = self.clean()
+        if (formData.has_key(combineFieldName)
+            and not isinstance(modelObj, (list, tuple))
+            ):
+          print formData[combineFieldName], getattr(modelObj, fieldName)
 
   def getModelInOrderedDict(self, modelKlassVsId):
     r = OrderedDict()
