@@ -882,17 +882,6 @@ class Multibuttonentry(Entry):
   def finalData(self, finalData):
     self.reset(finalData=",".join(finalData))
 
-  def reset(self, **kwargs):
-    txt = ""
-    if(kwargs.has_key("initData")):
-      txt = kwargs["initData"]
-    elif(kwargs.has_key("finalData")):
-      txt = kwargs["finalData"]
-    self.obj.entry_set(txt)
-
-  def generate(self, *args, **kwargs):
-    super(Multibuttonentry, self).generate(*args, **kwargs)
-
 #class Multibuttonentry(E17Widget):
 #  def cb_filter1(self, mbe, text):
 #    return True
