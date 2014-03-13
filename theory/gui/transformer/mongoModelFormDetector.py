@@ -195,7 +195,7 @@ class MongoModelFormDetector(object):
           .get(importPath=modelImportPath)
     for fieldName in appModelObj.formField:
       fieldParam = appModelObj.fieldParamMap[fieldName]
-      args, kwargs = self._getChildParam([fieldParam], 0, True)
+      args, kwargs = self._getChildParam([fieldParam], True)
       fieldLst.append((
         fieldName,
         (self._getHandlerByFieldName(fieldParam.data, kwargs), args, kwargs)
