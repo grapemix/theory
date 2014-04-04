@@ -258,3 +258,15 @@ class Bridge(object):
     return True
 
 
+  def execeuteEzCommand(
+      self,
+      appName,
+      cmdName,
+      args,
+      kwargs,
+      uiParam={},
+      forceSync=False
+      ):
+    cmdModel = Command.objects.get(app=appName, name=cmdName)
+    cmd = self.getCmdComplex(cmdModel, args, kwargs)
+    return (cmd, self._execeuteCommand(cmd, cmdModel, uiParam, forceSync))
