@@ -2,6 +2,7 @@
 #!/usr/bin/env python
 ##### System wide lib #####
 from abc import ABCMeta, abstractmethod
+from collections import OrderedDict
 
 ##### Theory lib #####
 
@@ -17,14 +18,38 @@ import evas
 
 ##### Misc #####
 
-__all__ = ("Label", "Frame", "ListValidator", "ListModelValidator", "Genlist", \
-    "Box", "Entry", "Multibuttonentry", "Button", "Icon", "CheckBox", "RadioBox", "SelectBox", \
-    "FileSelector")
+__all__ = ("Label", "Frame", "ListValidator", "ListModelValidator", "Genlist",
+"Box", "Entry", "Multibuttonentry", "Button", "Icon", "CheckBox", "RadioBox",
+"SelectBox", "FileSelector", "getNewUiParam",
+)
 
 EXPAND_BOTH = (evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
 EXPAND_HORIZ = (evas.EVAS_HINT_EXPAND, 0.0)
 FILL_BOTH = (evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
 FILL_HORIZ = (evas.EVAS_HINT_FILL, 0.0)
+
+def getNewUiParam(winTitle=""):
+  win = elementary.Window(winTitle, elementary.ELM_WIN_BASIC)
+  win.autodel = True
+  win.title_set(winTitle)
+  win.autodel_set(True)
+  bg = elementary.Background(win)
+  win.resize_object_add(bg)
+  bg.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+  bg.show()
+
+  bx = elementary.Box(win)
+  win.resize_object_add(bx)
+  bx.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
+  bx.show()
+  win.show()
+
+  return OrderedDict([
+    ("win", win),
+    ("bx", bx),
+    ("unFocusFxn", None),
+    ("cleanUpCrtFxn", lambda x, y: win.delete()),
+    ])
 
 # Honestly, I am not satisfied with the code related to the GUI. So the code
 # related to GUI might have a big change in the future
