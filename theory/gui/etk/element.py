@@ -67,6 +67,7 @@ class E17Widget(object):
         "isFocus": False,
         "isWeightExpand": False,
         "initData": None,
+        "isShrink": False,
     }
 
     if attrs is not None:
@@ -97,15 +98,16 @@ class E17Widget(object):
     #  self.bx.size_hint_weight = EXPAND_BOTH
     #  self.bx.size_hint_align = FILL_BOTH
 
-    if(self.attrs["isWeightExpand"]):
-      self.obj.size_hint_weight = EXPAND_BOTH
-    else:
-      self.obj.size_hint_weight = EXPAND_HORIZ
+    if not self.attrs["isShrink"]:
+      if(self.attrs["isWeightExpand"]):
+        self.obj.size_hint_weight = EXPAND_BOTH
+      else:
+        self.obj.size_hint_weight = EXPAND_HORIZ
 
-    if(self.attrs["isFillAlign"]):
-      self.obj.size_hint_align = FILL_BOTH
-    else:
-      self.obj.size_hint_align = FILL_HORIZ
+      if(self.attrs["isFillAlign"]):
+        self.obj.size_hint_align = FILL_BOTH
+      else:
+        self.obj.size_hint_align = FILL_HORIZ
 
     if(isinstance(self.obj, elementary.Box) and self.attrs.has_key("layout")):
       self.obj.layout_set(self.attrs["layout"])
