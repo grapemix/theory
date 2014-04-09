@@ -171,6 +171,7 @@ class CommandModuleLoader(ModuleLoader):
       "indentFormatFix": ["dev"],
       "theoryFilesSurgeon": ["dev"],
       "modelQuery": ["norm"],
+      "modelSelect": ["norm"],
       "modelTblEdit": ["norm"],
       "modelTblDel": ["norm"],
       "modelUpsert": ["norm"],
