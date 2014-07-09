@@ -264,12 +264,15 @@ class CheckBoxInput(BaseLabelInput):
 
   def _createWidget(self, *args, **kwargs):
     hBox = self._createContainer({"isFillAlign": False, "isWeightExpand": False, "isHorizontal": True, })
-    hBox.bx = self.bx
     hBox.generate()
 
     for v in self.attrs["choices"]:
       (label, value) = v
-      widget = self.widgetClass({"initData": value, })
+      if value in self.attrs["initData"]:
+        widget = self.widgetClass({"initData": True, })
+      else:
+        widget = self.widgetClass()
+      widget.value = value
       widget.win = self.win
       widget.label = str(label)
       hBox.addWidget(widget)
@@ -280,9 +283,10 @@ class CheckBoxInput(BaseLabelInput):
     pass
 
   def updateField(self):
-    choices = {}
+    choices = []
     for child in self.widgetLst[0].widgetChildrenLst:
-      choices[child.label] = child.obj.state
+      if child.obj.state:
+        choices.append(child.value)
     self.fieldSetter({"finalData": choices})
 
 class FileselectInput(BaseLabelInput):
