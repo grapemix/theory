@@ -407,6 +407,35 @@ class SpreadsheetBuilder(MongoModelBSONTblDataHandler):
         kwargsSet.append(kwargs)
     return kwargsSet
 
+  def _queryRowToGtkDataModel(self, queryrow):
+    try:
+      queryrowInJson = jsonLoads(queryrow.to_json())
+    except:
+      queryrow.to_json()
+      pass
+    row = []
+
+    try:
+      id = str(queryrow.id)
+    except AttributeError:
+      # For example, EmbeddedModel does not have an id
+      id = ""
+
+    for fieldName, fieldHandlerFxnLst in self.fieldPropDict.iteritems():
+      if(fieldName=="id"):
+        fieldName="_id"
+      try:
+        result = fieldHandlerFxnLst["dataHandler"](
+            id,
+            fieldName,
+            queryrowInJson[fieldName]
+            )
+      except KeyError:
+        result = fieldHandlerFxnLst["dataHandler"](id, fieldName, None)
+      if(result is not None):
+        row.append(result)
+    return row
+
   def _buildGtkDataModel(self):
     gtkDataModel = []
 
@@ -416,33 +445,7 @@ class SpreadsheetBuilder(MongoModelBSONTblDataHandler):
         break
 
     for queryrow in self.queryset:
-      try:
-        queryrowInJson = jsonLoads(queryrow.to_json())
-      except:
-        queryrow.to_json()
-        pass
-      row = []
-
-      try:
-        id = str(queryrow.id)
-      except AttributeError:
-        # For example, EmbeddedModel does not have an id
-        id = ""
-
-      for fieldName, fieldHandlerFxnLst in self.fieldPropDict.iteritems():
-        if(fieldName=="id"):
-          fieldName="_id"
-        try:
-          result = fieldHandlerFxnLst["dataHandler"](
-              id,
-              fieldName,
-              queryrowInJson[fieldName]
-              )
-        except KeyError:
-          result = fieldHandlerFxnLst["dataHandler"](id, fieldName, None)
-        if(result is not None):
-          row.append(result)
-      gtkDataModel.append(row)
+      gtkDataModel.append(self._queryRowToGtkDataModel(queryrow))
     return gtkDataModel
 
   def _buildListStoreDataType(self):

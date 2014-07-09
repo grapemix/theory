@@ -1657,6 +1657,28 @@ class QuerysetField(Field):
     self.app = app
     self.model = model
 
+  @property
+  def app(self):
+    return self._app
+
+  @app.setter
+  def app(self, app):
+    if(not isclass(self.widget)):
+      # When form level app change, widget's app ref should also be changed
+      self.widget.app = app
+    self._app = app
+
+  @property
+  def model(self):
+    return self._model
+
+  @model.setter
+  def model(self, model):
+    if(not isclass(self.widget)):
+      # When form level model change, widget's model ref should also be changed
+      self.widget.model = model
+    self._model = model
+
   def clean(self, value):
     """
     Validates the given value and returns its "cleaned" value as an
@@ -1679,7 +1701,13 @@ class QuerysetField(Field):
         self.model
         )
       )
-      return dbClass.objects.filter(id__in=[i.id for i in value])
+      # We are not actually return the new queryset, instead, we just check if
+      # the id set is in the given queryset
+      if len(value)!=\
+          dbClass.objects.filter(id__in=[i.id for i in value]).count():
+        raise ValidationError(
+            self.error_messages['dbInvalid'] % {'value': value}
+        )
     except:
       raise ValidationError(
           self.error_messages['dbInvalid'] % {'value': value}
