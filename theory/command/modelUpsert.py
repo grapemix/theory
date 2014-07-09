@@ -7,6 +7,7 @@ from copy import deepcopy
 from theory.conf import settings
 from theory.command.baseCommand import SimpleCommand
 from theory.gui import field
+from theory.gui.etk.element import getNewUiParam
 from theory.gui.etk.form import StepFormBase
 #from theory.gui.model import GuiModelForm
 from theory.gui.model import ModelForm
@@ -48,6 +49,12 @@ class ModelUpsert(SimpleCommand):
         help_text="The instance to be edited",
         isSkipInHistory=True,
         )
+    isInNewWindow = field.BooleanField(
+        label="Is in new window",
+        help_text="Is shown in new window",
+        required=False,
+        initData=False,
+        )
     # Not yet in this version
     #queryset = field.QuerysetField(
     #    required=False,
@@ -60,6 +67,17 @@ class ModelUpsert(SimpleCommand):
     def __init__(self, *args, **kwargs):
       super(SimpleCommand.ParamForm, self).__init__(*args, **kwargs)
       self._preFillFieldProperty()
+
+    def fillInitFields(self, cmdModel, cmdArgs, cmdKwargs):
+      super(ModelUpsert.ParamForm, self).fillInitFields(
+          cmdModel,
+          cmdArgs,
+          cmdKwargs
+          )
+      if len(cmdArgs) == 2:
+        # This is for QuerysetField preset the form for modelSelect
+        appName = self.fields["appName"].initData
+        self.fields["modelName"].choices = self._getModelNameChoices(appName)
 
     def _preFillFieldProperty(self):
       appName = self.fields["appName"].initData
@@ -85,6 +103,9 @@ class ModelUpsert(SimpleCommand):
         model = importPath
     return DynamicModelForm
 
+  def postApplyChange(self):
+    pass
+
   def cleanParamForm(self, btn, dummy):
     if(self.modelForm.is_valid()):
       dataInDict = self.modelForm.clean()
@@ -93,14 +114,18 @@ class ModelUpsert(SimpleCommand):
       for k, v in dataInDict.iteritems():
         setattr(self.instance, k, v)
       self.instance.save()
+      if self.paramForm.clean()["isInNewWindow"]:
+        self._uiParam["cleanUpCrtFxn"](None)
+      self.postApplyChange()
     else:
       # TODO: integrate with std reactor error system
       self.modelForm.showErrInFieldLabel()
 
   def run(self, *args, **kwargs):
-    self._uiParam["bx"].clear()
-
     f = self.paramForm.clean()
+    if not f["isInNewWindow"]:
+      self._uiParam["bx"].clear()
+
     appModel = AppModel.objects.get(app=f["appName"], name=f["modelName"])
     modelFormKlass = self.getModelFormKlass(appModel.importPath)
     self.instance = None
@@ -112,7 +137,10 @@ class ModelUpsert(SimpleCommand):
       self.modelForm = modelFormKlass()
     self.modelForm._nextBtnClick = self.cleanParamForm
 
-    self.modelForm.generateForm(**self.uiParam)
+    if f["isInNewWindow"]:
+      self._uiParam = getNewUiParam()
+
+    self.modelForm.generateForm(**self._uiParam)
     self.modelForm.generateStepControl(
         cleanUpCrtFxn=self._uiParam["cleanUpCrtFxn"]
         )

@@ -68,6 +68,23 @@ class ModelTblFilterBase(SimpleCommand):
     def _preFillFieldProperty(self):
       appName = self.fields["appName"].initData
       self.fields["modelName"].choices = self._getModelNameChoices(appName)
+      if len(self.fields["modelName"].choices) > 0:
+        self.fields["queryset"].app = appName
+        self.fields["queryset"].model = self.fields["modelName"].choices[0][0]
+
+    def fillInitFields(self, cmdModel, cmdArgs, cmdKwargs):
+      super(ModelTblFilterBase.ParamForm, self).fillInitFields(
+          cmdModel,
+          cmdArgs,
+          cmdKwargs
+          )
+      if len(cmdArgs) == 3:
+        # This is for QuerysetField preset the form for modelSelect
+        appName = self.fields["appName"].initData
+        self.fields["modelName"].choices = self._getModelNameChoices(appName)
+        self.fields["queryset"].app = appName
+        self.fields["queryset"].model = self.fields["modelName"].initData
+
 
     def _getModelNameChoices(self, appName):
       return set(
@@ -81,10 +98,12 @@ class ModelTblFilterBase(SimpleCommand):
 
       field = self.fields["modelName"]
       field.choices = self._getModelNameChoices(appName)
+      initChoice = field.choices[0][0]
       field.widget.reset(choices=field.choices)
 
       field = self.fields["queryset"]
       field.app = appName
+      field.model = initChoice
 
     def modelNameFocusChgCallback(self, *args, **kwargs):
       field = self.fields["queryset"]
@@ -132,7 +151,6 @@ class ModelTblFilterBase(SimpleCommand):
       self.queryset = formData["queryset"]
       return True
     else:
-      modelName = formData["modelName"]
       appModel = AppModel.objects.get(
           app=formData["appName"],
           name=formData["modelName"]

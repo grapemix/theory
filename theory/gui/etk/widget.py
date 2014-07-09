@@ -6,7 +6,9 @@ import copy
 import os
 
 ##### Theory lib #####
+from theory.core.bridge import Bridge
 from theory.gui.util import LocalFileObject
+from theory.model import Command
 from theory.utils import datetime_safe, formats
 from theory.utils.importlib import importClass
 
@@ -945,6 +947,79 @@ class QueryIdInput(StringInput):
       s += str(i) + ","
     return s[:-1]
 
+  def refreshData(self, idLst):
+    entryWidget = self.widgetLst[0].widgetChildrenLst[0]
+    finalData = ""
+    for id in idLst:
+      finalData += "," + str(id)
+
+    if entryWidget.finalData is None or entryWidget.finalData == "":
+      finalData = finalData[1:]
+      entryWidget.finalData = finalData
+    else:
+      entryWidget.finalData = entryWidget.finalData + finalData
+
+  def _createInstanceCallback(self, btn, dummy):
+    bridge = Bridge()
+    cmdModel = Command.objects.get(app="theory", name="modelUpsert")
+    cmd = bridge.getCmdComplex(
+        cmdModel,
+        (self.app, self.model),
+        {"isInNewWindow": True,},
+        )
+    cmd.postApplyChange = lambda: self.refreshData([cmd.instance.id,])
+    bridge._execeuteCommand(cmd, cmdModel)
+
+  def _selectInstanceCallback(self, btn, dummy):
+    bridge = Bridge()
+    cmdModel = Command.objects.get(app="theory", name="modelSelect")
+    print self.app, self.model
+    cmd = bridge.getCmdComplex(
+        cmdModel,
+        (self.app, self.model, {}),
+        {},
+        )
+    cmd._applyChangeOnQueryset = lambda: self.refreshData(
+        [model.id for model in cmd.paramForm.clean()["queryset"]]
+        )
+    bridge._execeuteCommand(cmd, cmdModel)
+
+  def _createWidget(self, *args, **kwargs):
+    hBox = self._createContainer(
+        {"isFillAlign": False, "isWeightExpand": False, "isHorizontal": True, }
+        )
+    hBox.generate()
+
+    widget = element.Entry()
+    widget.win = self.win
+    hBox.addWidget(widget)
+
+    vBox = self._createContainer({
+      "isFillAlign": False,
+      "isWeightExpand": False,
+      "isHorizontal": False,
+      "isShrink": True,
+      })
+    vBox.bx = hBox.obj
+    vBox.generate()
+
+    btn = element.Button({"isFillAlign": False, "isWeightExpand": False})
+    btn.win = self.win
+    btn.label = u"+"
+    btn.attrs["isShrink"] = True
+    btn._clicked = self._createInstanceCallback
+    vBox.addWidget(btn)
+
+    btn = element.Button({"isFillAlign": False, "isWeightExpand": False})
+    btn.win = self.win
+    btn.label = u"☷"
+    btn.attrs["isShrink"] = True
+    btn._clicked = self._selectInstanceCallback
+    vBox.addWidget(btn)
+
+    hBox.addWidget(vBox)
+    return (hBox,)
+
   def updateField(self):
     if(self.attrs["app"] is None or self.attrs["model"] is None):
       queryset = self.rawInitData
@@ -954,11 +1029,10 @@ class QueryIdInput(StringInput):
         self.model
         )
       )
-      idInDict = dbClass.objects.in_bulk(
-          [i.id for i in self.widgetLst[0].finalData]
-      )
+      entryWidget = self.widgetLst[0].widgetChildrenLst[0]
+      idInDict = dbClass.objects.in_bulk([i.id for i in entryWidget.finalData])
       queryset = []
-      for i in self.widgetLst[0].finalData:
+      for i in entryWidget.finalData:
         queryset.append(idInDict[i.id])
     self.fieldSetter({"finalData": queryset})
 
