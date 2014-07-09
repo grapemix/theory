@@ -102,6 +102,39 @@ class FlexibleGuiFormBase(GuiFormBase):
             ):
           print formData[combineFieldName], getattr(modelObj, fieldName)
 
+  def modelObjVsRelationToOrderedDict(self, modelObjVsRelation):
+    r = OrderedDict()
+
+    for modelObj, relation in modelObjVsRelation.iteritems():
+      modelName = modelObj.__class__.__name__
+      fieldNameLst = self.modelFieldNameLst[modelName]
+      if(relation is not None):
+        parentModelName, idFieldName = id.split(".")
+        modelRef = r[parentModelName + idFieldName[0].upper() + idFieldName[1:]]
+        self.modelCacheDict[modelName] = modelRef
+
+        if(isinstance(modelRef, (list, tuple))):
+          fieldVal = []
+          for modelChildObj in modelRef:
+            fieldVal.append(getattr(modelChildObj, fieldName))
+          for fieldName in fieldNameLst:
+            combineFieldName = self._generateCombineFieldName(modelName, fieldName)
+            r[combineFieldName] = fieldVal
+        elif(isinstance(modelRef, dict)):
+          pass
+        else:
+          for fieldName in fieldNameLst:
+            combineFieldName = self._generateCombineFieldName(modelName, fieldName)
+            r[combineFieldName] = getattr(modelRef, fieldName)
+      else:
+        self.modelCacheDict[modelName] = modelObj
+        for i, fieldName in enumerate(fieldNameLst):
+          combineFieldName = self._generateCombineFieldName(modelName, fieldName)
+          r[combineFieldName] = getattr(modelObj, fieldName)
+
+    return r
+
+
   def getModelInOrderedDict(self, modelKlassVsId):
     r = OrderedDict()
     for modelKlass, id in modelKlassVsId.iteritems():
@@ -112,6 +145,7 @@ class FlexibleGuiFormBase(GuiFormBase):
         modelRef = r[parentModelName + idFieldName[0].upper() + idFieldName[1:]]
         self.modelCacheDict[modelName] = modelRef
 
+        # some bug in modelRef,
         if(isinstance(modelRef, (list, tuple))):
           fieldVal = []
           for modelObj in modelRef:
