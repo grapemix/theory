@@ -471,7 +471,7 @@ class BaseTemporalField(Field):
 
   def to_python(self, value):
     # Try to coerce the value to unicode.
-    unicode_value = forceUnicode(value, strings_only=True)
+    unicode_value = forceUnicode(value, stringsOnly=True)
     if isinstance(unicode_value, unicode):
       value = unicode_value.strip()
     # If unicode, try to strptime against each input format.
