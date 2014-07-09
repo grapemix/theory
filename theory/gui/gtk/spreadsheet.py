@@ -472,11 +472,16 @@ class SpreadsheetBuilder(MongoModelBSONTblDataHandler):
       elif(fieldHandlerFxn=="enumField"):
         args.append(str)
       elif(fieldHandlerFxn=="intField"):
-        args.append(int)
+        args.append(str)
       elif(fieldHandlerFxn=="boolField"):
         args.append(bool)
       idx += 1
     return args
+
+  def _intFieldDataHandler(self, rowId, fieldName, fieldVal):
+    if(fieldVal is None):
+      return str(0)
+    return str(fieldVal)
 
   def _neglectFieldRenderHandler(self, field):
     pass
@@ -536,8 +541,7 @@ class SpreadsheetBuilder(MongoModelBSONTblDataHandler):
   def _intFieldRenderHandler(self, field):
     return {
         "editable": self.isEditable and True,
-        "step": 1,
-        "fxnName": "renderFloatCol"
+        "fxnName": "renderTextCol"
         }
 
   def _enumFieldRenderHandler(self, field):
