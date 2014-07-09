@@ -44,7 +44,7 @@ class Pim(object):
   _fitWidthByDefault = True
   _fullscreen = True
 
-  def __init__(self):
+  def __init__(self, additionalBinds=[], fileSelectChangeCallbackFxn=None):
     self.slideshow = False
     self.slideshowDelay = 5
     self._fileIndex = 0
@@ -52,7 +52,7 @@ class Pim(object):
     self.fileLst = []
     self._selectedFileDict = {}
 
-    self.binds = (
+    self.binds = [
       #(modifer, key, function, args)
       #supported modifiers: gdk.SHIFT_MASK, gdk.CONTROL_MASK, gdk.MOD1_MASK (alt key)
       (0,              keys.q,     self.quit),
@@ -72,11 +72,11 @@ class Pim(object):
       (0,              keys.e,     self.toggleSlideshow),
       (0,              keys.z,     self.toggleZoomLock),
 
-      (0,              keys._1,    self.zoomTo, 1),
-      (0,              keys._2,    self.zoomTo, 2),
-      (0,              keys._3,    self.zoomTo, 3),
+      (gdk.ModifierType.SHIFT_MASK, keys._1,    self.zoomTo, 1),
+      (gdk.ModifierType.SHIFT_MASK, keys._2,    self.zoomTo, 2),
+      (gdk.ModifierType.SHIFT_MASK, keys._3,    self.zoomTo, 3),
       #back to fullscreen
-      (0,              keys._5,    self.zoomTo, 0),
+      (gdk.ModifierType.SHIFT_MASK, keys._5,    self.zoomTo, 0),
 
       (0,              keys.space, self.toggleFileSelection),
 
@@ -84,7 +84,12 @@ class Pim(object):
       (gdk.ModifierType.SHIFT_MASK, keys.Left, self.moveFileIndex, -1),
       (gdk.ModifierType.SHIFT_MASK, keys.Down,  self.scroll, gtk.ScrollType.PAGE_FORWARD, False),
       (gdk.ModifierType.SHIFT_MASK, keys.Up,    self.scroll, gtk.ScrollType.PAGE_BACKWARD, False),
-      )
+      ]
+    for i in additionalBinds:
+      i[1] = getattr(keys, i[1])
+      self.binds.append(i)
+
+    self.fileSelectChangeCallbackFxn = fileSelectChangeCallbackFxn
 
   @property
   def fitWidthByDefault(self):
@@ -242,6 +247,9 @@ class Pim(object):
 
     self.scroll(gtk.ScrollType.START, False)
     self.scroll(gtk.ScrollType.START, True)
+
+    if self.fileSelectChangeCallbackFxn is not None:
+      self.fileSelectChangeCallbackFxn(self._fileIndex)
 
     return True #for the slideshow
 
