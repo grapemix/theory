@@ -653,9 +653,9 @@ class CheckBox(E17Widget):
     ck = elementary.Check(self.win)
     self.obj = ck
 
-    if(self.label!=None):
+    if(self.label is not None):
       ck.text_set(self.label)
-    if(self.icon!=None):
+    if(self.icon is not None):
       ck.icon_set(ic)
     if(self.attrs["initData"] is not None):
       self.finalData = self.attrs["initData"]
