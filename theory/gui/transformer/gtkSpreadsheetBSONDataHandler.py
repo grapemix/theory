@@ -121,7 +121,7 @@ class GtkSpreadsheetModelBSONDataHandler(MongoModelTblDetectorBase):
     return float(fieldVal)
 
   def _intFieldDataHandler(self, rowId, fieldName, fieldVal):
-    return int(fieldVal)
+    return long(fieldVal)
 
   def _enumFieldDataHandler(self, rowId, fieldName, fieldVal):
     return self.fieldPropDict[fieldName]["reverseChoices"][fieldVal]
