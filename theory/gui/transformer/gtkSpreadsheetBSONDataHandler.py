@@ -100,7 +100,9 @@ class GtkSpreadsheetModelBSONDataHandler(MongoModelTblDetectorBase):
       fieldName,
       fieldVal
       ):
-    return jsonLoads(fieldVal)
+    if fieldVal != "Too much to display......":
+      # when the fieldVal is None, we will not set the field
+      return jsonLoads(fieldVal)
 
   def _listFieldembeddedFieldDataHandler(self, rowId, fieldName, fieldVal):
     pass
