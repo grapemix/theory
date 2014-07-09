@@ -24,6 +24,7 @@ __all__ = (
     "CheckBoxInput", "DateInput", "DateTimeInput", "TimeInput",
     "StringGroupFilterInput", "ModelValidateGroupInput", "FileselectInput",
     "EmbeddedInput", "ListInput", "DictInput", "FilterFormLayout",
+    "FileSizeInput",
     )
 
 # Honestly, I am not satisfied with the code related to the GUI. So the code
@@ -204,6 +205,8 @@ class BaseLabelInput(BaseFieldInput):
 
   def reset(self, **kwargs):
     """ To redraw the element when data got update"""
+    for k, v in kwargs.iteritems():
+      kwargs[k] = self._prepareInitData(v)
     self.widgetLst[0].reset(**kwargs)
 
   def reFillLabel(self, txt):
@@ -250,6 +253,13 @@ class NumericInput(StringInput):
 
   def _prepareInitData(self, initData):
     return str(initData)
+
+class FileSizeInput(NumericInput):
+  def _prepareInitData(self, initData):
+    try:
+      return str(initData>>20) + "MB"
+    except:
+      return None
 
 class SelectBoxInput(BaseLabelInput):
   """Assuming labels are unique."""
