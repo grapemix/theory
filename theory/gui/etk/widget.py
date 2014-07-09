@@ -735,15 +735,15 @@ class ListInput(BaseLabelInput):
       del self.widgetLst[1]
     self.mainContainer.content.removeWidgetLst(1, widgetLstLen)
     widgetLst = self._createWidget()
-    self.widgetLst = widgetLst + self.widgetLst
+    self.widgetLst = list(widgetLst) + self.widgetLst
 
     self.mainContainer.content.insertAndGenerateWidget(1 , widgetLst)
 
     for i, input in enumerate(self._inputLst):
-      if(i>=len(kwargsKeys)):
-        break
       row = {}
       for k in kwargsKeys:
+        if(len(kwargs[k])<=i):
+          continue
         row[k] = kwargs[k][i]
       input.reset(**row)
 
