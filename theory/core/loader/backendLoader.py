@@ -9,7 +9,7 @@ os.environ.setdefault("CELERY_LOADER", "theory.core.loader.celeryLoader.CeleryLo
 
 # Order is important in here
 from celery import current_app
-from celery.bin import celeryd
+from celery.bin.worker import worker
 ##### Theory lib #####
 
 ##### Theory third-party lib #####
@@ -21,11 +21,11 @@ from celery.bin import celeryd
 ##### Misc #####
 
 def startCelery():
-  worker = celeryd.WorkerCommand(app=current_app._get_current_object())
+  workerObj = worker(app=current_app._get_current_object())
   args=[]
   kwargs={}
   kwargs["loglevel"] = "DEBUG"
   # TODO: support autoreload (it is in celery's code though)
   kwargs["autoreload"] = False
-  worker.run(*args, **kwargs)
+  workerObj.run(*args, **kwargs)
 

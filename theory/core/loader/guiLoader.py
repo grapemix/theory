@@ -40,7 +40,10 @@ def wakeup(settings_mod, argv=None):
     for cmd in Command.objects.all():
       importModule(cmd.moduleImportPath)
 
-  gevent.signal(signal.SIGQUIT, gevent.shutdown)
+  # in 0.13.8, it is shutdown
+  #gevent.signal(signal.SIGQUIT, gevent.shutdown)
+  # in 1.0.1
+  gevent.signal(signal.SIGQUIT, gevent.kill)
   gevent.joinall(
       [
         gevent.spawn(reactor.ui.drawAll),
