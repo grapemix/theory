@@ -61,6 +61,8 @@ class MongoModelBSONTblDataHandler(MongoModelTblDetectorBase):
       fieldName,
       fieldVal
       ):
+    if len(fieldVal) > 30:
+      return "Too much to display......"
     return jsonDumps(fieldVal, cls=TheoryJSONEncoder)
 
   def _listFieldembeddedFieldDataHandler(self, rowId, fieldName, fieldVal):
