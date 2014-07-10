@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 ##### System wide lib #####
+import fileinput
 import imp
 import os
+from subprocess import check_output
 import sys
 
 ##### Theory lib #####
@@ -24,7 +26,7 @@ DIR_MODULE = 2
 
 __all__ = ('reprobeAllModule',)
 
-def setup_environ(settings_mod, original_settings_path=None):
+def setupEnviron(settings_mod, original_settings_path=None):
   """
   Configures the runtime environment. This can also be used by external
   scripts wanting to set up a similar environment to manage.py.
@@ -145,12 +147,16 @@ class ModuleLoader(object):
 
     if(path!=None):
       scanManager = self.scanManager()
-      scanManager.paramList = self.postPackFxnForTheory(self.lstPackFxn(fileList, "theory", path))
+      scanManager.paramList = self.postPackFxnForTheory(
+          self.lstPackFxn(fileList, "theory", path)
+          )
 
       for app_name in self.apps:
         try:
           (path, fileList) = findFilesInAppDir(app_name, self.dirName, True)
-          scanManager.paramList.extend(self.postPackFxn(self.lstPackFxn(fileList, app_name, path)))
+          scanManager.paramList.extend(
+              self.postPackFxn(self.lstPackFxn(fileList, app_name, path))
+              )
         except ImportError:
           pass # No module - ignore this app
       scanManager.scan()
@@ -188,6 +194,21 @@ class CommandModuleLoader(ModuleLoader):
         o[-1] = self.moodAppRel[o[0]]
     return lst
 
+def detectScreenResolution(configPath):
+  resolution = []
+  for i in check_output("xrandr").split("\n"):
+    if "*" in i:
+      width, height = i.split()[0].split("x")
+      resolution.append(str((width, height)))
+
+  for line in fileinput.input(configPath, inplace=True):
+    if line.startswith("RESOLUTION"):
+      print "RESOLUTION = ({0})".format(",".join(resolution))
+    elif line == "\n":
+      continue
+    else:
+      print line,
+
 def reprobeAllModule(settings_mod, argv=None):
   """
   Returns a dictionary mapping command names to their callback applications.
@@ -213,8 +234,9 @@ def reprobeAllModule(settings_mod, argv=None):
   calls.
   """
   print "Reprobing all modules"
-  if(settings_mod!=None):
-    setup_environ(settings_mod)
+
+  if settings_mod is not None:
+    setupEnviron(settings_mod)
 
   # Find the installed apps
   try:
@@ -227,7 +249,7 @@ def reprobeAllModule(settings_mod, argv=None):
   try:
     from theory.conf import settings
     module = importModule(settings.SETTINGS_MODULE)
-    project_directory = setup_environ(module, settings.SETTINGS_MODULE)
+    project_directory = setupEnviron(module, settings.SETTINGS_MODULE)
   except (AttributeError, EnvironmentError, ImportError, KeyError):
     project_directory = None
 
@@ -243,6 +265,14 @@ def reprobeAllModule(settings_mod, argv=None):
         moodAppRel[appName] += moodDirName
       else:
         moodAppRel[appName] = [moodDirName]
+
+  detectScreenResolution(
+      os.path.join(
+        settings.MOODS_ROOT,
+        "norm",
+        "config.py"
+        )
+      )
 
   loadMoodData()
 
@@ -262,5 +292,3 @@ def reprobeAllModule(settings_mod, argv=None):
   moduleLoader.lstPackFxn = \
       lambda lst, app_name, path: [".".join([app_name, i]) for i in lst]
   moduleLoader.load()
-
-  return
