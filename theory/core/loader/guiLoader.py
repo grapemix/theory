@@ -31,6 +31,30 @@ def _chkAdapterBuffer():
     gevent.sleep(60)
   return False
 
+def getDimensionHints():
+  resolutionSet = settings.MOOD["RESOLUTION"]
+  maxHeight = maxWidth = 0
+  minHeight = minWidth = 99999999
+
+  for resolution in resolutionSet:
+    width, height = resolution
+    width = int(width)
+    height = int(height)
+    if minWidth > width:
+      minWidth = width
+    if minHeight > height:
+      minHeight = height
+    if maxWidth < width:
+      maxWidth = width
+    if maxHeight < height:
+      maxHeight = height
+  settings.dimensionHints = {
+      "minWidth": minWidth,
+      "minHeight":minHeight,
+      "maxWidth": maxWidth,
+      "maxHeight": maxHeight,
+      }
+
 def wakeup(settings_mod, argv=None):
   if(settings.DEBUG or Command.objects.count()==0):
     from .util import reprobeAllModule
@@ -40,6 +64,7 @@ def wakeup(settings_mod, argv=None):
     for cmd in Command.objects.all():
       importModule(cmd.moduleImportPath)
 
+  getDimensionHints()
   # in 0.13.8, it is shutdown
   #gevent.signal(signal.SIGQUIT, gevent.shutdown)
   # in 1.0.1

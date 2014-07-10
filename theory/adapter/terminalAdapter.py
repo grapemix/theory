@@ -62,3 +62,4 @@ class TerminalAdapter(BaseUIAdapter):
     #o.fields["stdErr"].initData = self.stdErr
     o.generateForm(**kwargs["uiParam"])
     self.terminalForm = o
+    kwargs["stdOutAdjuster"](self.stdOut, "\n")

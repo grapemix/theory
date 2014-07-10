@@ -7,6 +7,7 @@ import os
 import signal
 
 ##### Theory lib #####
+from theory.conf import settings
 
 ##### Theory third-party lib #####
 
@@ -61,6 +62,7 @@ class Terminal(object):
     self._adapter.registerEntrySetterFxn(self._cmdLineEntry.entry_set)
     self._adapter.registerEntrySetAndSelectFxn(self.cmdLineSetter)
     self._adapter.registerCleanUpCrtFxn(self.cleanUpCrt)
+    self._adapter.registerStdOutAdjusterFxn(self.stdOutAdjuster)
 
   def cmdLineSetter(self, txt):
     self._cmdLineEntry.entry_set(txt)
@@ -75,8 +77,28 @@ class Terminal(object):
   def cleanUpCrt(self, *args, **kwargs):
     """To reset to original form."""
     self.bxCrt.clear()
-    self.win.resize(640,30)
+    self.win.resize(self.initCrtSize[0], self.initCrtSize[1])
     self._cmdLineEntry.focus_set(True)
+
+  def stdOutAdjuster(self, txt, crlf=None):
+    if crlf is None:
+      window = len(self.crlf)
+      length = len(txt) - window
+      counter = 0
+      for i in range(length):
+        if txt[i:i+window] == self.crlf:
+          counter += 1
+      height = counter * settings.UI_FONT_HEIGHT_RATIO + 130
+    else:
+      height = txt.count(crlf) * settings.UI_FONT_HEIGHT_RATIO + 130
+    if height > self.maxHeight:
+      height = self.maxHeight
+    self.win.resize(self.initCrtSize[0], height)
+
+  def _getDimensionHints(self):
+    self.initCrtSize = (settings.dimensionHints["minWidth"] * 3 / 4, 30)
+    settings.initCrtSize = self.initCrtSize
+    self.maxHeight = settings.dimensionHints["maxHeight"]
 
   def __init__(self):
     elementary.init()
@@ -102,8 +124,6 @@ class Terminal(object):
     self.bx.show()
     self.drawShellInput()
     self.drawLabel("")
-    self.cleanUpCrt()
-    self.win.show()
 
   def _switchToGeventLoop(self):
     gevent.sleep(0)
@@ -111,6 +131,10 @@ class Terminal(object):
 
   def drawAll(self):
     self._switchToGeventLoop()
+    self._getDimensionHints()
+    self.cleanUpCrt()
+    self.win.show()
+
     elementary.run()
     elementary.shutdown()
     return True
