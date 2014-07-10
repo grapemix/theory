@@ -32,6 +32,7 @@ class ReactorAdapter(object):
     o.fields["stdOut"].initData = txt
     o.generateForm(**self.uiParam)
     self.terminalForm = o
+    self.stdOutAdjuster(txt)
 
   def __init__(self, signal):
     self.signal = signal
@@ -44,6 +45,10 @@ class ReactorAdapter(object):
 
   def registerCleanUpCrtFxn(self, cleanUpCrtFxn):
     self.cleanUpCrt = cleanUpCrtFxn
+
+
+  def registerStdOutAdjusterFxn(self, stdOutAdjusterFxn):
+    self.stdOutAdjuster = stdOutAdjusterFxn
 
   def restoreCmdLine(self):
     self.entrySetterFxn(self.cmdInTxt)

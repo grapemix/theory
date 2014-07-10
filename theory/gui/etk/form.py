@@ -5,6 +5,7 @@
 from collections import OrderedDict
 
 ##### Theory lib #####
+from theory.conf import settings
 from theory.gui.common.baseForm import (
     Form,
     FormBase,
@@ -192,13 +193,13 @@ class SimpleGuiFormBase(GuiFormBase):
     self.firstRequiredInputIdx = -1
 
   def _changeFormWindowHeight(self, maxHeight):
-    # TODO: fix this super ugly hack
     size = self.win.size
-    fieldHeight = len(self.fields) * 100
+    fieldHeight = len(self.fields) * settings.UI_FORM_FIELD_HEIGHT_RATIO
     preferHeight = fieldHeight if(fieldHeight<maxHeight) else maxHeight
 
-    if(size[0]<640 or size[1]<preferHeight):
-      self.win.resize(640, preferHeight)
+    orgWidth = settings.dimensionHints["minWidth"] * 3 / 4
+    self.win.resize(orgWidth, preferHeight)
+    self.win.pos_set(self.win.pos[0], 0)
 
   def _createFormSkeleton(self, win, bx):
     super(SimpleGuiFormBase, self)._createFormSkeleton(win, bx)
@@ -227,7 +228,7 @@ class SimpleGuiFormBase(GuiFormBase):
         self.formBx.addInput(field.widget)
 
     self.formBx.postGenerate()
-    self._changeFormWindowHeight(720)
+    self._changeFormWindowHeight(settings.dimensionHints["maxHeight"] - 200)
 
   def generateFilterForm(self, win, bx, unFocusFxn, **kwargs):
     self.unFocusFxn = unFocusFxn
@@ -266,7 +267,7 @@ class SimpleGuiFormBase(GuiFormBase):
     self.formBx.postGenerate()
     optionalMenu.generate()
     optionalMenu.postGenerate()
-    self._changeFormWindowHeight(960)
+    self._changeFormWindowHeight(settings.dimensionHints["maxHeight"])
 
   def showErrInFieldLabel(self):
     for fieldName, errMsg in self.errors.iteritems():

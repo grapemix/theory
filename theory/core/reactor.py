@@ -231,7 +231,10 @@ class Reactor(object):
     for adapterName, leastDebugLvl in cmd._drums.iteritems():
       if(leastDebugLvl<=debugLvl):
         (adapterModel, drum) = bridge.adaptFromCmd(adapterName, cmd)
-        drum.render(uiParam=self.adapter.uiParam)
+        drum.render(
+            uiParam=self.adapter.uiParam,
+            stdOutAdjuster=self.adapter.stdOutAdjuster
+            )
         self.formHasBeenCleared = True
 
   def reset(self):

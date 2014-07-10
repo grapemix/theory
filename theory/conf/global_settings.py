@@ -156,6 +156,14 @@ UI_TOOLKIT = "etk"
 # Output to use in template system for invalid (e.g. misspelled) variables.
 UI_STRING_IF_INVALID = ''
 
+# The approximate ratio used to project the appropriate height based on numbe of
+# line
+UI_FONT_HEIGHT_RATIO = 15
+
+# The approximate ratio used to project the appropriate height based on numbe of
+# field in the form
+UI_FORM_FIELD_HEIGHT_RATIO = 180
+
 # If this is a admin settings module, this should be a list of
 # settings modules (in the format 'foo.bar.baz') for which this admin
 # is an admin.
