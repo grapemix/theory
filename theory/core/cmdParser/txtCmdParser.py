@@ -83,7 +83,9 @@ class TxtCmdParser(object):
   @property
   def partialInput(self):
     mode = self.mode
-    if(mode==self.MODE_SINGLE_QUOTE \
+    if(mode==self.MODE_ERROR):
+      return (mode, "")
+    elif(mode==self.MODE_SINGLE_QUOTE \
         or mode==self.MODE_DOUBLE_QUOTE \
         or mode==self.MODE_EMPTY \
         ):
@@ -99,7 +101,7 @@ class TxtCmdParser(object):
       return (self.MODE_EMPTY, "")
 
   def __init__(self):
-    self.legitCmdNameRePattern = re.compile("^[A-z]*\w*$")
+    self.legitCmdNameRePattern = re.compile("^[A-z]+\w*$")
     self.initVar()
 
   def initVar(self):
@@ -121,7 +123,11 @@ class TxtCmdParser(object):
     pass
 
   def _buildSpecialCharIdx(self, cmdInTxt):
+    # reset mode and index
     mode = self.MODE_EMPTY
+    self._openParenIdx = []
+    self._closeParenIdx = []
+
     for i in range(len(cmdInTxt)):
       c = cmdInTxt[i]
       if(mode!=self.MODE_SINGLE_QUOTE and c=="\""):

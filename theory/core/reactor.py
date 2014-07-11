@@ -168,7 +168,7 @@ class Reactor(object):
     if(mode==self.parser.MODE_ERROR):
       # Not doing anything in here, but the cleanUpCrt() and initVar() will
       # still be run
-      pass
+      self.adapter.printTxt("Your command is invalid")
     elif(mode==self.parser.MODE_COMMAND):
       (entryOutput, crtOutput)= self._queryCommandAutocomplete(frag)
       entrySetterFxn(entryOutput)
