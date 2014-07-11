@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 ##### System wide lib #####
+import os
 from ludibrio import Stub
 
 ##### Theory lib #####
@@ -163,10 +164,12 @@ class ObjectComparatorTestCase(unittest.TestCase):
         )
     self.assertEqual(
         r,
-        (
-          "/opt/crystal/venv/panel/src/theory/tests/unitTest/test/files"
-          "/util/test_getFilePathForTestcase"
-        )
+        os.path.join(
+          os.path.dirname(os.path.dirname(__file__)),
+          "files",
+          "util",
+          self._testMethodName
+          )
     )
 
   def testSerializeSample(self):
