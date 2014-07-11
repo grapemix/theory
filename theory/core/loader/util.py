@@ -202,8 +202,8 @@ def detectScreenResolution(configPath):
       resolution.append(str((width, height)))
 
   for line in fileinput.input(configPath, inplace=True):
-    if line.startswith("RESOLUTION"):
-      print "RESOLUTION = ({0})".format(",".join(resolution))
+    if line == "RESOLUTION = ()":
+      print "RESOLUTION = ({0},)".format(",".join(resolution))
     elif line == "\n":
       continue
     else:
