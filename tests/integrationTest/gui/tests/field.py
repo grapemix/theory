@@ -203,13 +203,14 @@ class AdapterFieldTestCase(FieldTestCaseBase):
     else:
       self.assertEqual(
           self.field.clean(self.field.finalData)[0].id,
-          list(Adapter.objects.filter(name__in=initData))[0].id
+          Adapter.objects.get(name__in=initData).id
       )
 
   def testEmptyData(self):
     self.field = self.fieldKlass()
     self.field.required = False
     self.renderWidget(self.field)
+    # Note: self.field.clean(self.field.finalData) as mongoengine queryset
     self.assertEqual(list(self.field.clean(self.field.finalData)), [])
 
 class SlugFieldTestCase(FieldTestCaseBase):

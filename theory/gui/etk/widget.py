@@ -270,12 +270,15 @@ class SelectBoxInput(BaseLabelInput):
   def updateField(self):
     self.fieldSetter({"finalData": self.widgetLst[0].finalData})
 
-# TODO: Fix the padding problem
 class CheckBoxInput(BaseLabelInput):
   widgetClass = element.CheckBox
 
   def _createWidget(self, *args, **kwargs):
-    hBox = self._createContainer({"isFillAlign": False, "isWeightExpand": False, "isHorizontal": True, })
+    hBox = self._createContainer({
+      "isFillAlign": False,
+      "isWeightExpand": False,
+      "isHorizontal": True,
+      })
     hBox.generate()
 
     for v in self.attrs["choices"]:

@@ -1393,18 +1393,13 @@ class AdapterField(Field):
   def renderWidget(self, *args, **kwargs):
     if("attrs" not in kwargs):
       kwargs["attrs"] = {}
-    kwargs["attrs"]["choices"] = [
-        (i.name, True if i.name in self.initData else False) \
-            for i in Adapter.objects.all()
-        ]
+
+    kwargs["attrs"]["choices"] = \
+        [(i.name, i.name) for i in Adapter.objects.all()]
     super(AdapterField, self).renderWidget(*args, **kwargs)
 
   def widgetSetter(self, adapterDict):
-    adapterDict = adapterDict["finalData"]
-    nameLst = []
-    for k,v in adapterDict.iteritems():
-      if(v):
-        nameLst.append(k)
+    nameLst = adapterDict["finalData"]
     data = Adapter.objects.filter(name__in=nameLst)
     super(AdapterField, self).widgetSetter({"finalData": data})
 
