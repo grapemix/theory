@@ -93,17 +93,17 @@ class AppCache(object):
     self.nesting_level += 1
     app_module = importModule(app_name)
     try:
-      models = importModule('.models', app_name)
+      model = importModule('.model', app_name)
     except ImportError:
       self.nesting_level -= 1
-      # If the app doesn't have a models module, we can just ignore the
-      # ImportError and return no models for it.
-      if not module_has_submodule(app_module, 'models'):
+      # If the app doesn't have a model module, we can just ignore the
+      # ImportError and return no model for it.
+      if not module_has_submodule(app_module, 'model'):
         return None
-      # But if the app does have a models module, we need to figure out
+      # But if the app does have a model module, we need to figure out
       # whether to suppress or propagate the error. If can_postpone is
       # True then it may be that the package is still being imported by
-      # Python and the models module isn't available yet. So we add the
+      # Python and the model module isn't available yet. So we add the
       # app to the postponed list and we'll try it again after all the
       # recursion has finished (in populate). If can_postpone is False
       # then it's time to raise the ImportError.
@@ -115,10 +115,10 @@ class AppCache(object):
           raise
     self.nesting_level -= 1
 
-    if models not in self.app_store:
-      self.app_store[models] = len(self.app_store)
-      self.app_labels[self._label_for(models)] = models
-    return models
+    if model not in self.app_store:
+      self.app_store[model] = len(self.app_store)
+      self.app_labels[self._label_for(model)] = model
+    return model
 
   def app_cache_ready(self):
     """
