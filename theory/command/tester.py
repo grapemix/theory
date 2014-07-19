@@ -39,15 +39,19 @@ class Tester(SimpleCommand):
     testRunner = field.PythonClassField(label="Test Runner", \
         help_text="The python class of testcase runner being used", \
         initData="", auto_import=True, required=False)
-    testLabel = field.TextField(label="Test Label", \
+    testLabel = field.ListField(
+        field.TextField(max_length=64),
+        label="Test Label",
         help_text="""Labels must be of the form:
      - app.TestClass.test_method
          Run a single specific test method
      - app.TestClass
          Run all the test methods in a given class
      - app
-         Search for doctests and unittests in the named application.""", \
-        max_length=128, initData="", required=False)
+         Search for doctests and unittests in the named application.""",
+        initData=[],
+        required=False
+        )
     testRunnerClassParam = field.DictField(
         field.TextField(),
         field.TextField(),
@@ -61,9 +65,19 @@ class Tester(SimpleCommand):
     if(formData["isTestTheory"]=='1' or formData["isTestTheory"]):
       import imp
       import os
-      theoryTestRoot = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "tests")
+      theoryTestRoot = os.path.join(
+          os.path.dirname(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            ),
+          "tests"
+          )
       (file, filename, data) = imp.find_module("runtests", [theoryTestRoot])
-      thoeryTestCaseClass = imp.load_module("runtests", file, theoryTestRoot, data)
+      thoeryTestCaseClass = imp.load_module(
+          "runtests",
+          file,
+          theoryTestRoot,
+          data
+          )
       thoeryTestCaseClass.registerTestApp()
 
     #testRunnerClass = get_runner(settings, formData["testRunner"])
@@ -71,5 +85,6 @@ class Tester(SimpleCommand):
     #testRunner.run_tests(formData["testLabel"])
 
     testRunnerClass = get_runner(settings, "")
-    testRunner = testRunnerClass(verbosity=0)
-    testRunner.run_tests("")
+    testRunner = testRunnerClass(verbosity=formData["verbosity"])
+    print formData["testLabel"]
+    testRunner.run_tests(formData["testLabel"])
