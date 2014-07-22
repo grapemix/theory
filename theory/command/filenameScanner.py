@@ -123,33 +123,34 @@ class FilenameScanner(SimpleCommand):
       self._excludeDirFxnLst = self._excludeDirFxnLst[:1]
       self._excludeDirFxnLst.extend(excludeDirFxnLst)
 
-  def full_clean(self):
-    super(ParamForm, self).full_clean()
-    if(not self._errors):
-      if(self.cleaned_data["includeFileExtLst"]!=[]):
-        self._includeFileFxnLst[0] = lambda x: os.path.splitext(x)[1] in self.includeFileExtLst
-      else:
-        self._includeFileFxnLst[0] = lambda x: True
+    def full_clean(self):
+      super(SimpleCommand.ParamForm, self).full_clean()
+      if(not self._errors):
+        if(self.cleaned_data["includeFileExtLst"]!=[]):
+          self._includeFileFxnLst[0] = lambda x: \
+            os.path.splitext(x)[1] in self.cleaned_data["includeFileExtLst"]
+        else:
+          self._includeFileFxnLst[0] = lambda x: True
 
-      if(self.cleaned_data["includeDirLst"]!=[]):
-        self._includeDirFxnLst[0] = lambda x: x in self.includeDirLst
-        #self._includeDirFxnLst[0] = lambda x: os.path.split(x)[0] in self.includeDirLst
-      else:
-        self._includeDirFxnLst[0] = lambda x: True
+        if(self.cleaned_data["includeDirLst"]!=[]):
+          self._includeDirFxnLst[0] = lambda x: \
+              x in self.cleaned_data["includeDirLst"]
+        else:
+          self._includeDirFxnLst[0] = lambda x: True
 
-      if(self.cleaned_data["excludeFileExtLst"]!=[]):
-        self._excludeFileFxnLst[0] = lambda x: os.path.splitext(x)[1] in self.excludeFileExtLst
-      else:
-        self._excludeFileFxnLst[0] = lambda x: False
+        if self.cleaned_data["excludeFileExtLst"] == ["*"]:
+          self._excludeFileFxnLst[0] = lambda x: True
+        elif self.cleaned_data["excludeFileExtLst"] != []:
+          self._excludeFileFxnLst[0] = lambda x: \
+                os.path.splitext(x)[1] in self.cleaned_data["excludeFileExtLst"]
+        else:
+          self._excludeFileFxnLst[0] = lambda x: False
 
-      if(self.cleaned_data["excludeDirLst"]!=[]):
-        self._excludeDirFxnLst[0] = lambda x: x in self.excludeDirLst
-        #self._excludeDirFxnLst[0] = lambda x: os.path.split(x)[0] in self.excludeDirLst
-      else:
-        self._excludeDirFxnLst[0] = lambda x: False
-
-  #def __init__(self, *args, **kwargs):
-  #  super(FilenameScanner, self).__init__(*args, **kwargs)
+        if(self.cleaned_data["excludeDirLst"]!=[]):
+          self._excludeDirFxnLst[0] = lambda x: \
+              x in self.cleaned_data["excludeDirLst"]
+        else:
+          self._excludeDirFxnLst[0] = lambda x: False
 
   # Watch out when implementing YIELD_MODE_LINE and YIELD_MODE_CHUNK
   @property
@@ -217,12 +218,10 @@ class FilenameScanner(SimpleCommand):
       for lvlRoot, dirs, files in self._walk(root):
         yield dirs
 
-  def __init__(self, *args, **kwargs):
-    super(FilenameScanner, self).__init__(*args, **kwargs)
+  def run(self):
     self._filenameLst = []
     self._dirnameLst = []
 
-  def run(self):
     for i in self.generateFileLst():
       self._filenameLst.append(i)
 
