@@ -174,8 +174,6 @@ class CommandModuleLoader(ModuleLoader):
       "nextStep": ["norm"],
       "createApp": ["dev"],
       "createCmd": ["dev"],
-      "indentFormatFix": ["dev"],
-      "theoryFilesSurgeon": ["dev"],
       "modelQuery": ["norm"],
       "modelSelect": ["norm"],
       "modelTblEdit": ["norm"],
