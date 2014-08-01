@@ -5,7 +5,8 @@ A class for storing a tree graph. Primarily used for filter constructs in the
 ORM.
 """
 
-from theory.utils.copycompat import deepcopy
+import copy
+
 
 class Node(object):
   """
@@ -21,19 +22,15 @@ class Node(object):
     """
     Constructs a new Node. If no connector is given, the default will be
     used.
-
-    Warning: You probably don't want to pass in the 'negated' parameter. It
-    is NOT the same as constructing a node and calling negate() on the
-    result.
     """
-    self.children = children and children[:] or []
+    self.children = children[:] if children else []
     self.connector = connector or self.default
-    self.subtree_parents = []
     self.negated = negated
 
-  # We need this because of theory.db.models.query_utils.Q. Q. __init__() is
+  # We need this because of theory.db.models.queryUtils.Q. Q. __init__() is
   # problematic, but it is a natural Node subclass in all other respects.
-  def _new_instance(cls, children=None, connector=None, negated=False):
+  @classmethod
+  def _newInstance(cls, children=None, connector=None, negated=False):
     """
     This is called to create a new instance of this class when we need new
     Nodes (or subclasses) in the internal code in this class. Normally, it
@@ -45,7 +42,6 @@ class Node(object):
     obj = Node(children, connector, negated)
     obj.__class__ = cls
     return obj
-  _new_instance = classmethod(_new_instance)
 
   def __str__(self):
     if self.negated:
@@ -54,14 +50,16 @@ class Node(object):
     return '(%s: %s)' % (self.connector, ', '.join([str(c) for c in
         self.children]))
 
+  def __repr__(self):
+    return "<%s: %s>" % (self.__class__.__name__, self)
+
   def __deepcopy__(self, memodict):
     """
     Utility method used by copy.deepcopy().
     """
     obj = Node(connector=self.connector, negated=self.negated)
     obj.__class__ = self.__class__
-    obj.children = deepcopy(self.children, memodict)
-    obj.subtree_parents = deepcopy(self.subtree_parents, memodict)
+    obj.children = copy.deepcopy(self.children, memodict)
     return obj
 
   def __len__(self):
@@ -70,11 +68,14 @@ class Node(object):
     """
     return len(self.children)
 
-  def __nonzero__(self):
+  def __bool__(self):
     """
     For truth value testing.
     """
     return bool(self.children)
+
+  def __nonzero__(self):      # Python 2 compatibility
+    return type(self).__bool__(self)
 
   def __contains__(self, other):
     """
@@ -82,74 +83,60 @@ class Node(object):
     """
     return other in self.children
 
-  def add(self, node, conn_type):
+  def _prepareData(self, data):
     """
-    Adds a new node to the tree. If the conn_type is the same as the root's
-    current connector type, the node is added to the first level.
-    Otherwise, the whole tree is pushed down one level and a new root
-    connector is created, connecting the existing tree and the new node.
+    A subclass hook for doing subclass specific transformations of the
+    given data on combine() or add().
     """
-    if node in self.children and conn_type == self.connector:
-      return
-    if len(self.children) < 2:
-      self.connector = conn_type
-    if self.connector == conn_type:
-      if isinstance(node, Node) and (node.connector == conn_type or
-          len(node) == 1):
-        self.children.extend(node.children)
+    return data
+
+  def add(self, data, connType, squash=True):
+    """
+    Combines this tree and the data represented by data using the
+    connector connType. The combine is done by squashing the node other
+    away if possible.
+
+    This tree (self) will never be pushed to a child node of the
+    combined tree, nor will the connector or negated properties change.
+
+    The function returns a node which can be used in place of data
+    regardless if the node other got squashed or not.
+
+    If `squash` is False the data is prepared and added as a child to
+    this tree without further logic.
+    """
+    if data in self.children:
+      return data
+    data = self._prepareData(data)
+    if not squash:
+      self.children.append(data)
+      return data
+    if self.connector == connType:
+      # We can reuse self.children to append or squash the node other.
+      if (isinstance(data, Node) and not data.negated
+          and (data.connector == connType or len(data) == 1)):
+        # We can squash the other node's children directly into this
+        # node. We are just doing (AB)(CD) == (ABCD) here, with the
+        # addition that if the length of the other node is 1 the
+        # connector doesn't matter. However, for the len(self) == 1
+        # case we don't want to do the squashing, as it would alter
+        # self.connector.
+        self.children.extend(data.children)
+        return self
       else:
-        self.children.append(node)
+        # We could use perhaps additional logic here to see if some
+        # children could be used for pushdown here.
+        self.children.append(data)
+        return data
     else:
-      obj = self._new_instance(self.children, self.connector,
-          self.negated)
-      self.connector = conn_type
-      self.children = [obj, node]
+      obj = self._newInstance(self.children, self.connector,
+                   self.negated)
+      self.connector = connType
+      self.children = [obj, data]
+      return data
 
   def negate(self):
     """
-    Negate the sense of the root connector. This reorganises the children
-    so that the current node has a single child: a negated node containing
-    all the previous children. This slightly odd construction makes adding
-    new children behave more intuitively.
-
-    Interpreting the meaning of this negate is up to client code. This
-    method is useful for implementing "not" arrangements.
+    Negate the sense of the root connector.
     """
-    self.children = [self._new_instance(self.children, self.connector,
-        not self.negated)]
-    self.connector = self.default
-
-  def start_subtree(self, conn_type):
-    """
-    Sets up internal state so that new nodes are added to a subtree of the
-    current node. The conn_type specifies how the sub-tree is joined to the
-    existing children.
-    """
-    if len(self.children) == 1:
-      self.connector = conn_type
-    elif self.connector != conn_type:
-      self.children = [self._new_instance(self.children, self.connector,
-          self.negated)]
-      self.connector = conn_type
-      self.negated = False
-
-    self.subtree_parents.append(self.__class__(self.children,
-        self.connector, self.negated))
-    self.connector = self.default
-    self.negated = False
-    self.children = []
-
-  def end_subtree(self):
-    """
-    Closes off the most recently unmatched start_subtree() call.
-
-    This puts the current state into a node of the parent tree and returns
-    the current instances state to be the parent.
-    """
-    obj = self.subtree_parents.pop()
-    node = self.__class__(self.children, self.connector)
-    self.connector = obj.connector
-    self.negated = obj.negated
-    self.children = obj.children
-    self.children.append(node)
-
+    self.negated = not self.negated

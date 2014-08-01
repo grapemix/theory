@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 ##### System wide lib #####
-#from __future__ import unicodeLiterals
+from __future__ import unicode_literals
 
 ##### Theory lib #####
 from theory.core.exceptions import ValidationError
@@ -85,20 +85,18 @@ class BaseFormSet(object):
     return self.asTable()
 
   def __iter__(self):
-    """Yields the formLst in the order they should be rendered"""
-    return iter(self.formLst)
+    """Yields the forms in the order they should be rendered"""
+    return iter(self.forms)
 
   def __getitem__(self, index):
     """Returns the form at the given index, based on the rendering order"""
-    return self.formLst[index]
+    return self.forms[index]
 
   def __len__(self):
-    return len(self.formLst)
+    return len(self.forms)
 
   def __bool__(self):
-    """
-    All formLstets have a management form which is not included in the length
-    """
+    """All formsets have a management form which is not included in the length"""
     return True
 
   def __nonzero__(self):      # Python 2 compatibility
@@ -165,7 +163,7 @@ class BaseFormSet(object):
 
   def _constructForm(self, i, **kwargs):
     """
-    Instantiates and returns the i-th form instance in a formLstet.
+    Instantiates and returns the i-th form instance in a formstet.
     """
     defaults = {
       'autoId': self.autoId,
@@ -175,13 +173,14 @@ class BaseFormSet(object):
     if self.isBound:
       defaults['data'] = self.data
       defaults['files'] = self.files
-    if self.initial and not 'initial' in kwargs:
+    if self.initial and 'initial' not in kwargs:
       try:
         defaults['initial'] = self.initial[i]
       except IndexError:
         pass
-    # Allow extra formLst to be empty.
-    if i >= self.initialFormCount():
+    # Allow extra formLst to be empty, unless they're part of
+    # the minimum formLst.
+    if i >= self.initialFormCount() and i >= self.minNum:
       defaults['emptyPermitted'] = True
     defaults.update(kwargs)
     form = self.form(**defaults)
@@ -246,10 +245,7 @@ class BaseFormSet(object):
     Raises an AttributeError if ordering is not allowed.
     """
     if not self.isValid() or not self.canOrder:
-      raise AttributeError(
-          "'%s' object has no attribute 'orderedFormLst'" \
-              % self.__class__.__name__
-          )
+      raise AttributeError("'%s' object has no attribute 'orderedForms'" % self.__class__.__name__)
     # Construct _ordering, which is a list of (formIndex, orderFieldValue)
     # tuples. After constructing this list, we'll sort it by orderFieldValue
     # so we have a way to get to the form indexes in the order specified
@@ -287,7 +283,7 @@ class BaseFormSet(object):
   def nonFormErrors(self):
     """
     Returns an ErrorList of errors that aren't associated with a particular
-    form -- i.e., from formLstet.clean(). Returns an empty ErrorList if there
+    form -- i.e., from formset.clean(). Returns an empty ErrorList if there
     are none.
     """
     if self._nonFormErrors is None:
@@ -305,7 +301,7 @@ class BaseFormSet(object):
 
   def totalErrorCount(self):
     """
-    Returns the number of errors across all formLst in the formLstet.
+    Returns the number of errors across all formLst in the formset.
     """
     return len(self.nonFormErrors()) +\
       sum(len(formErrors) for formErrors in self.errors)
@@ -332,10 +328,10 @@ class BaseFormSet(object):
       if self.canDelete:
         if self._shouldDeleteForm(form):
           # This form is going to be deleted so any of its errors
-          # should not cause the entire formLstet to be invalid.
+          # should not cause the entire formset to be invalid.
           continue
       formLstValid &= form.isValid()
-    return formLstValid and not bool(self.nonFormErrors())
+    return formLstValid and not self.nonFormErrors()
 
   def fullClean(self):
     """
@@ -368,14 +364,14 @@ class BaseFormSet(object):
       # Give self.clean() a chance to do cross-form validation.
       self.clean()
     except ValidationError as e:
-      self._nonFormErrors = self.errorClass(e.messages)
+      self._nonFormErrors = self.errorClass(e.errorList)
 
   def clean(self):
     """
-    Hook for doing any extra formLstet-wide cleaning after Form.clean() has
+    Hook for doing any extra formset-wide cleaning after Form.clean() has
     been called on every form. Any ValidationError raised by this method
-    will not be associated with a particular form; it will be accesible
-    via formLstet.nonFormErrors()
+    will not be associated with a particular form; it will be accessible
+    via formset.nonFormErrors()
     """
     pass
 
@@ -411,7 +407,7 @@ class BaseFormSet(object):
 
   def isMultipart(self):
     """
-    Returns True if the formLstet needs to be multipart, i.e. it
+    Returns True if the formset needs to be multipart, i.e. it
     has FileInput. Otherwise, False.
     """
     if self.formLst:
@@ -440,7 +436,6 @@ def formsetFactory(form, formset=BaseFormSet, extra=1, canOrder=False,
   # limit is simply maxNum + DEFAULT_MAX_NUM (which is 2*DEFAULT_MAX_NUM
   # if maxNum is None in the first place)
   absoluteMax = maxNum + DEFAULT_MAX_NUM
-  extra += minNum
   attrs = {'form': form, 'extra': extra,
        'canOrder': canOrder, 'canDelete': canDelete,
        'minNum': minNum, 'maxNum': maxNum,
@@ -456,4 +451,3 @@ def allValid(formsets):
     if not formset.isValid():
       valid = False
   return valid
-

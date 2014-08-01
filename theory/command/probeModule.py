@@ -20,8 +20,14 @@ class ProbeModule(SimpleCommand):
   verboseName = "probeModule"
 
   class ParamForm(SimpleCommand.ParamForm):
-    settingMod = field.TextField(label="Setting Module", \
-        help_text=" The python module being used to setup environment during probing", max_length=64)
+    settingMod = field.TextField(
+        label="Setting Module",
+        helpText=(
+          "The python module being used to setup environment \n",
+          "during probing"
+          ),
+        maxLength=64
+        )
 
   def run(self):
     self._stdOut = "Probing module: %s" %  (self._settingMod,)

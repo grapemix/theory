@@ -13,7 +13,7 @@ from theory.test.util import setup_test_environment, teardown_test_environment
 from theory.test.testcases import TestCase
 from theory.utils import unittest
 from theory.utils.importlib import importModule
-from theory.utils.module_loading import module_has_submodule
+from theory.utils.moduleLoading import moduleHasSubmodule
 
 ##### Theory third-party lib #####
 

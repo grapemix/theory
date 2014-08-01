@@ -21,8 +21,11 @@ __all__ = ("NextStep", )
 
 class ParamForm(SimpleCommand.ParamForm):
   # This form can move to somewhere else if we like
-  commandReady = field.ChoiceField(choices=(),\
-      label="Command Ready", help_text="Select a command ready to be continued")
+  commandReady = field.ChoiceField(
+      choices=(),
+      label="Command Ready",
+      helpText="Select a command ready to be continued"
+      )
 
   def __init__(self, *args, **kwargs):
     super(ParamForm, self).__init__(*args, **kwargs)

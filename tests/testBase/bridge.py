@@ -22,7 +22,7 @@ class Bridge(TheoryBridge):
       paramFormData = json.loads(cmd.paramForm.toJson())
       cmd.run(paramFormData=paramFormData)
     else:
-      if(not cmd.paramForm.is_valid()):
+      if(not cmd.paramForm.isValid()):
         return False
       cmd._uiParam = uiParam
       cmd.run(uiParam)

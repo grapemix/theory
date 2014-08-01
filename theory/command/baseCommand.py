@@ -176,4 +176,4 @@ class AsyncCommand(Task, _BaseCommand):
     self.paramForm = self.ParamForm()
     for k,v in paramFormData.iteritems():
       self.paramForm.fields[k].finalData = v
-    self.paramForm.is_valid()
+    self.paramForm.isValid()

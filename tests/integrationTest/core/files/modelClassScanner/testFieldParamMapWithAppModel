@@ -12,20 +12,20 @@
         "data": "Application name", 
         "isCircular": false, 
         "isField": false, 
-        "name": "help_text"
+        "name": "helpText"
       }, 
       {
         "childParamLst": [], 
         "data": 256, 
         "isCircular": false, 
         "isField": false, 
-        "name": "max_length"
+        "name": "maxLength"
       }, 
       {
         "childParamLst": [], 
         "isCircular": false, 
         "isField": false, 
-        "name": "min_length"
+        "name": "minLength"
       }, 
       {
         "childParamLst": [], 
@@ -45,14 +45,14 @@
         "childParamLst": [], 
         "isCircular": false, 
         "isField": false, 
-        "name": "unique_with"
+        "name": "uniqueWith"
       }, 
       {
         "childParamLst": [], 
         "data": "Application name", 
         "isCircular": false, 
         "isField": false, 
-        "name": "verbose_name"
+        "name": "verboseName"
       }
     ], 
     "data": "StringField", 
@@ -92,7 +92,7 @@
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "help_text"
+            "name": "helpText"
           }, 
           {
             "childParamLst": [], 
@@ -112,13 +112,13 @@
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "unique_with"
+            "name": "uniqueWith"
           }, 
           {
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "verbose_name"
+            "name": "verboseName"
           }
         ], 
         "data": "EmbeddedDocumentField", 
@@ -131,7 +131,7 @@
         "data": "All fields' name and their parameter", 
         "isCircular": false, 
         "isField": false, 
-        "name": "help_text"
+        "name": "helpText"
       }, 
       {
         "childParamLst": [], 
@@ -151,14 +151,14 @@
         "childParamLst": [], 
         "isCircular": false, 
         "isField": false, 
-        "name": "unique_with"
+        "name": "uniqueWith"
       }, 
       {
         "childParamLst": [], 
         "data": "Field name and parameter map", 
         "isCircular": false, 
         "isField": false, 
-        "name": "verbose_name"
+        "name": "verboseName"
       }
     ], 
     "data": "MapField", 
@@ -181,20 +181,20 @@
             "data": "The fields being showed in a form", 
             "isCircular": false, 
             "isField": false, 
-            "name": "help_text"
+            "name": "helpText"
           }, 
           {
             "childParamLst": [], 
             "data": 256, 
             "isCircular": false, 
             "isField": false, 
-            "name": "max_length"
+            "name": "maxLength"
           }, 
           {
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "min_length"
+            "name": "minLength"
           }, 
           {
             "childParamLst": [], 
@@ -214,14 +214,14 @@
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "unique_with"
+            "name": "uniqueWith"
           }, 
           {
             "childParamLst": [], 
             "data": "Form field", 
             "isCircular": false, 
             "isField": false, 
-            "name": "verbose_name"
+            "name": "verboseName"
           }
         ], 
         "isCircular": false, 
@@ -232,7 +232,7 @@
         "childParamLst": [], 
         "isCircular": false, 
         "isField": false, 
-        "name": "help_text"
+        "name": "helpText"
       }, 
       {
         "childParamLst": [], 
@@ -252,13 +252,13 @@
         "childParamLst": [], 
         "isCircular": false, 
         "isField": false, 
-        "name": "unique_with"
+        "name": "uniqueWith"
       }, 
       {
         "childParamLst": [], 
         "isCircular": false, 
         "isField": false, 
-        "name": "verbose_name"
+        "name": "verboseName"
       }
     ], 
     "data": "ListField", 
@@ -278,7 +278,7 @@
         "childParamLst": [], 
         "isCircular": false, 
         "isField": false, 
-        "name": "help_text"
+        "name": "helpText"
       }, 
       {
         "childParamLst": [], 
@@ -298,13 +298,13 @@
         "childParamLst": [], 
         "isCircular": false, 
         "isField": false, 
-        "name": "unique_with"
+        "name": "uniqueWith"
       }, 
       {
         "childParamLst": [], 
         "isCircular": false, 
         "isField": false, 
-        "name": "verbose_name"
+        "name": "verboseName"
       }
     ], 
     "data": "ObjectIdField", 
@@ -325,20 +325,20 @@
         "data": "The path to import the model", 
         "isCircular": false, 
         "isField": false, 
-        "name": "help_text"
+        "name": "helpText"
       }, 
       {
         "childParamLst": [], 
         "data": 256, 
         "isCircular": false, 
         "isField": false, 
-        "name": "max_length"
+        "name": "maxLength"
       }, 
       {
         "childParamLst": [], 
         "isCircular": false, 
         "isField": false, 
-        "name": "min_length"
+        "name": "minLength"
       }, 
       {
         "childParamLst": [], 
@@ -358,14 +358,14 @@
         "childParamLst": [], 
         "isCircular": false, 
         "isField": false, 
-        "name": "unique_with"
+        "name": "uniqueWith"
       }, 
       {
         "childParamLst": [], 
         "data": "Import path", 
         "isCircular": false, 
         "isField": false, 
-        "name": "verbose_name"
+        "name": "verboseName"
       }
     ], 
     "data": "StringField", 
@@ -387,7 +387,7 @@
         "data": "The level of importance of this model to the app. The\n        higher the rating, the more important model to the app.", 
         "isCircular": false, 
         "isField": false, 
-        "name": "help_text"
+        "name": "helpText"
       }, 
       {
         "childParamLst": [], 
@@ -407,14 +407,14 @@
         "childParamLst": [], 
         "isCircular": false, 
         "isField": false, 
-        "name": "unique_with"
+        "name": "uniqueWith"
       }, 
       {
         "childParamLst": [], 
         "data": "importance rating", 
         "isCircular": false, 
         "isField": false, 
-        "name": "verbose_name"
+        "name": "verboseName"
       }
     ], 
     "data": "IntField", 
@@ -435,7 +435,7 @@
         "data": "Is embedded document flag", 
         "isCircular": false, 
         "isField": false, 
-        "name": "help_text"
+        "name": "helpText"
       }, 
       {
         "childParamLst": [], 
@@ -455,14 +455,14 @@
         "childParamLst": [], 
         "isCircular": false, 
         "isField": false, 
-        "name": "unique_with"
+        "name": "uniqueWith"
       }, 
       {
         "childParamLst": [], 
         "data": "Is embedded flag", 
         "isCircular": false, 
         "isField": false, 
-        "name": "verbose_name"
+        "name": "verboseName"
       }
     ], 
     "data": "BooleanField", 
@@ -483,20 +483,20 @@
         "data": "Application model name", 
         "isCircular": false, 
         "isField": false, 
-        "name": "help_text"
+        "name": "helpText"
       }, 
       {
         "childParamLst": [], 
         "data": 256, 
         "isCircular": false, 
         "isField": false, 
-        "name": "max_length"
+        "name": "maxLength"
       }, 
       {
         "childParamLst": [], 
         "isCircular": false, 
         "isField": false, 
-        "name": "min_length"
+        "name": "minLength"
       }, 
       {
         "childParamLst": [], 
@@ -519,14 +519,14 @@
         ], 
         "isCircular": false, 
         "isField": false, 
-        "name": "unique_with"
+        "name": "uniqueWith"
       }, 
       {
         "childParamLst": [], 
         "data": "App model name", 
         "isCircular": false, 
         "isField": false, 
-        "name": "verbose_name"
+        "name": "verboseName"
       }
     ], 
     "data": "StringField", 
@@ -549,20 +549,20 @@
             "data": "The fields being showed in a table", 
             "isCircular": false, 
             "isField": false, 
-            "name": "help_text"
+            "name": "helpText"
           }, 
           {
             "childParamLst": [], 
             "data": 256, 
             "isCircular": false, 
             "isField": false, 
-            "name": "max_length"
+            "name": "maxLength"
           }, 
           {
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "min_length"
+            "name": "minLength"
           }, 
           {
             "childParamLst": [], 
@@ -582,14 +582,14 @@
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "unique_with"
+            "name": "uniqueWith"
           }, 
           {
             "childParamLst": [], 
             "data": "Table field", 
             "isCircular": false, 
             "isField": false, 
-            "name": "verbose_name"
+            "name": "verboseName"
           }
         ], 
         "isCircular": false, 
@@ -600,7 +600,7 @@
         "childParamLst": [], 
         "isCircular": false, 
         "isField": false, 
-        "name": "help_text"
+        "name": "helpText"
       }, 
       {
         "childParamLst": [], 
@@ -620,13 +620,13 @@
         "childParamLst": [], 
         "isCircular": false, 
         "isField": false, 
-        "name": "unique_with"
+        "name": "uniqueWith"
       }, 
       {
         "childParamLst": [], 
         "isCircular": false, 
         "isField": false, 
-        "name": "verbose_name"
+        "name": "verboseName"
       }
     ], 
     "data": "ListField", 

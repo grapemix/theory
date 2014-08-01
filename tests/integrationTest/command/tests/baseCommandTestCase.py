@@ -24,7 +24,7 @@ class BaseCommandTestCase(unittest.TestCase):
         ):
       cmd.delay(paramFormData=cmd.paramForm.toJson())
     else:
-      if(not cmd.paramForm.is_valid()):
+      if(not cmd.paramForm.isValid()):
         return False
       cmd._uiParam = uiParam
       cmd.run()
@@ -32,7 +32,7 @@ class BaseCommandTestCase(unittest.TestCase):
 
   def _validateParamForm(self, cmd):
     self.cmd = cmd
-    self.assertTrue(self.cmd.paramForm.is_valid(), self.cmd.paramForm.errors)
+    self.assertTrue(self.cmd.paramForm.isValid(), self.cmd.paramForm.errors)
     self.cmd.paramForm.clean()
 
   def _getCmd(self, cmdModel, args=[], kwargs={}):

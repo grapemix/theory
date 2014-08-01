@@ -29,7 +29,7 @@ class ListCommand(SimpleCommand):
   class ParamForm(SimpleCommand.ParamForm):
     appName = field.ChoiceField(
         label="Application Name",
-        help_text="Commands provided by this application",
+        helpText="Commands provided by this application",
         choices=(
           set(
             [("all", "all")] + \
@@ -41,7 +41,7 @@ class ListCommand(SimpleCommand):
     )
     mood = field.ChoiceField(
         label="Mood",
-        help_text="Commands provided by this mood",
+        helpText="Commands provided by this mood",
         choices=(
           set(
             [("all", "all")] + \

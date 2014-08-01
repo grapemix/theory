@@ -56,7 +56,7 @@ class QuerysetFieldTestCase(unittest.TestCase):
   def testFinalDataWithWidgetWithImport(self):
     queryset = Command.objects.all()
     f = QuerysetField(
-        auto_import=True,
+        autoImport=True,
         app="theory",
         model="Command",
         initData=queryset
@@ -67,7 +67,7 @@ class QuerysetFieldTestCase(unittest.TestCase):
 
     queryset = ["invalidId", "invalidId2"]
     f = QuerysetField(
-        auto_import=True,
+        autoImport=True,
         app="theory",
         model="Command",
         initData=queryset
@@ -88,7 +88,7 @@ class QuerysetFieldTestCase(unittest.TestCase):
     queryset = Command.objects.all()
 
     f = QuerysetField(
-        auto_import=True,
+        autoImport=True,
         app="theory",
         model="Command",
         initData=queryset
@@ -98,7 +98,7 @@ class QuerysetFieldTestCase(unittest.TestCase):
 
     queryset = ["invalidId", "invalidId2"]
     f = QuerysetField(
-        auto_import=True,
+        autoImport=True,
         app="theory",
         model="Command",
         initData=queryset
@@ -118,7 +118,7 @@ class QuerysetFieldTestCase(unittest.TestCase):
   #def testFinalDataWithWidgetWithImport(self):
   #  idLst = [str(i.id) for i in Command.objects.all()]
   #  f = QuerysetField(
-  #      auto_import=True,
+  #      autoImport=True,
   #      app="theory",
   #      model="Command",
   #      initData=idLst

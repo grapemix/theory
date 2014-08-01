@@ -28,21 +28,27 @@ class Tester(SimpleCommand):
 
   class ParamForm(SimpleCommand.ParamForm):
     #appName = field.TextField(label="Application Name", \
-    #    help_text="The name of application being tested", max_length=32, \
+    #    helpText="The name of application being tested", maxLength=32, \
     #    required=False)
     #testSuite = field.PythonClassField(label="Test Suite", \
-    #    help_text="The python class of testcase suite being used", \
+    #    helpText="The python class of testcase suite being used", \
     #    required=False)
-    isTestTheory = field.BooleanField(label="Is test Theory", \
-        help_text="The testcase of Theory is being runned or not", \
-        initData=1)
-    testRunner = field.PythonClassField(label="Test Runner", \
-        help_text="The python class of testcase runner being used", \
-        initData="", auto_import=True, required=False)
+    isTestTheory = field.BooleanField(
+        label="Is test Theory",
+        helpText="The testcase of Theory is being runned or not",
+        initData=1
+        )
+    testRunner = field.PythonClassField(
+        label="Test Runner",
+        helpText="The python class of testcase runner being used",
+        initData="",
+        autoImport=True,
+        required=False
+        )
     testLabel = field.ListField(
-        field.TextField(max_length=64),
+        field.TextField(maxLength=64),
         label="Test Label",
-        help_text="""Labels must be of the form:
+        helpText="""Labels must be of the form:
      - app.TestClass.test_method
          Run a single specific test method
      - app.TestClass
@@ -56,7 +62,7 @@ class Tester(SimpleCommand):
         field.TextField(),
         field.TextField(),
         label="Test Runner Class Parameter",
-        help_text="The parameter passed to the test runner class constructor",
+        helpText="The parameter passed to the test runner class constructor",
         required=False,
         )
 

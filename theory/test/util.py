@@ -25,7 +25,7 @@ from theory.utils.functional import wraps
 ##### Misc #####
 
 __all__ = (
-  'Approximate', 'ContextList',  'get_runner', 'override_settings',
+  'Approximate', 'ContextList',  'get_runner', 'overrideSettings',
   'setup_test_environment', 'teardown_test_environment', 'ObjectComparator',
 )
 
@@ -117,7 +117,7 @@ def get_runner(settings, test_runner_class=None):
   test_runner = getattr(test_module, test_path[-1])
   return test_runner
 
-class override_settings(object):
+class overrideSettings(object):
   """
   Acts as either a decorator, or a context manager. If it's a decorator it
   takes a function and returns a wrapped function. If it's a contextmanager
@@ -134,11 +134,11 @@ class override_settings(object):
   def __exit__(self, exc_type, exc_value, traceback):
     self.disable()
 
-  def __call__(self, test_func):
-    @wraps(test_func)
+  def __call__(self, testFunc):
+    @wraps(testFunc)
     def inner(*args, **kwargs):
       with self:
-        return test_func(*args, **kwargs)
+        return testFunc(*args, **kwargs)
     return inner
 
   def enable(self):
@@ -218,6 +218,52 @@ class ObjectDumper(object):
     return self.filterNestedDict(
         obj,
         )
+
+class modifySettings(overrideSettings):
+  """
+  Like override_settings, but makes it possible to append, prepend or remove
+  items instead of redefining the entire list.
+  """
+  def __init__(self, *args, **kwargs):
+    if args:
+      # Hack used when instantiating from SimpleTestCase._pre_setup.
+      assert not kwargs
+      self.operations = args[0]
+    else:
+      assert not args
+      self.operations = list(kwargs.items())
+
+  def save_options(self, testFunc):
+    if testFunc._modifiedSettings is None:
+      testFunc._modifiedSettings = self.operations
+    else:
+      # Duplicate list to prevent subclasses from altering their parent.
+      testFunc._modifiedSettings = list(
+        testFunc._modifiedSettings) + self.operations
+
+  def enable(self):
+    self.options = {}
+    for name, operations in self.operations:
+      try:
+        # When called from SimpleTestCase._pre_setup, values may be
+        # overridden several times; cumulate changes.
+        value = self.options[name]
+      except KeyError:
+        value = list(getattr(settings, name, []))
+      for action, items in operations.items():
+        # items my be a single value or an iterable.
+        if isinstance(items, six.string_types):
+          items = [items]
+        if action == 'append':
+          value = value + [item for item in items if item not in value]
+        elif action == 'prepend':
+          value = [item for item in items if item not in value] + value
+        elif action == 'remove':
+          value = [item for item in value if item not in items]
+        else:
+          raise ValueError("Unsupported action: %s" % action)
+      self.options[name] = value
+    super(modify_settings, self).enable()
 
 class ObjectComparator(object):
   def __init__(self, objectDumper):
@@ -364,3 +410,104 @@ class JsonDiff(object):
     if diffMessage not in self.difference:
       self.seen.append(diffMessage)
       self.difference.append((type_, diffMessage))
+
+def compareXml(want, got):
+  """Tries to do a 'xml-comparison' of want and got.  Plain string
+  comparison doesn't always work because, for example, attribute
+  ordering should not be important. Comment nodes are not considered in the
+  comparison.
+
+  Based on http://codespeak.net/svn/lxml/trunk/src/lxml/doctestcompare.py
+  """
+  _normWhitespaceRe = re.compile(r'[ \t\n][ \t\n]+')
+
+  def normWhitespace(v):
+    return _normWhitespaceRe.sub(' ', v)
+
+  def childText(element):
+    return ''.join([c.data for c in element.childNodes
+      if c.nodeType == Node.TEXT_NODE])
+
+  def children(element):
+    return [c for c in element.childNodes
+              if c.nodeType == Node.ELEMENT_NODE]
+
+  def normChildText(element):
+    return normWhitespace(childText(element))
+
+  def attrsDict(element):
+    return dict(element.attributes.items())
+
+  def checkElement(wantElement, gotElement):
+    if wantElement.tagName != gotElement.tagName:
+      return False
+    if normChildText(wantElement) != normChildText(gotElement):
+      return False
+    if attrsDict(wantElement) != attrsDict(gotElement):
+      return False
+    wantChildren = children(wantElement)
+    gotChildren = children(gotElement)
+    if len(wantChildren) != len(gotChildren):
+      return False
+    for want, got in zip(wantChildren, gotChildren):
+      if not checkElement(want, got):
+        return False
+    return True
+
+  def firstNode(document):
+    for node in document.childNodes:
+      if node.nodeType != Node.COMMENT_NODE:
+        return node
+
+  want, got = stripQuotes(want, got)
+  want = want.replace('\\n', '\n')
+  got = got.replace('\\n', '\n')
+
+  # If the string is not a complete xml document, we may need to add a
+  # root element. This allow us to compare fragments, like "<foo/><bar/>"
+  if not want.startswith('<?xml'):
+    wrapper = '<root>%s</root>'
+    want = wrapper % want
+    got = wrapper % got
+
+  # Parse the want and got strings, and compare the parsings.
+  wantRoot = firstNode(parseString(want))
+  gotRoot = firstNode(parseString(got))
+
+  return checkElement(wantRoot, gotRoot)
+
+def stripQuotes(want, got):
+    """
+    Strip quotes of doctests output values:
+
+    >>> stripQuotes("'foo'")
+    "foo"
+    >>> stripQuotes('"foo"')
+    "foo"
+    """
+    def isQuotedString(s):
+        s = s.strip()
+        return (len(s) >= 2
+                and s[0] == s[-1]
+                and s[0] in ('"', "'"))
+
+    def isQuotedUnicode(s):
+        s = s.strip()
+        return (len(s) >= 3
+                and s[0] == 'u'
+                and s[1] == s[-1]
+                and s[1] in ('"', "'"))
+
+    if isQuotedString(want) and isQuotedString(got):
+        want = want.strip()[1:-1]
+        got = got.strip()[1:-1]
+    elif isQuotedUnicode(want) and isQuotedUnicode(got):
+        want = want.strip()[2:-1]
+        got = got.strip()[2:-1]
+    return want, got
+
+
+def strPrefix(s):
+    return s % {'_': '' if six.PY3 else 'u'}
+
+

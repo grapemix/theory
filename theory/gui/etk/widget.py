@@ -9,7 +9,7 @@ import os
 from theory.core.bridge import Bridge
 from theory.gui.util import LocalFileObject
 from theory.model import Command
-from theory.utils import datetime_safe, formats
+from theory.utils import datetimeSafe, formats
 from theory.utils.importlib import importClass
 
 ##### Theory third-party lib #####
@@ -83,7 +83,7 @@ class BasePacker(object):
     memo[id(self)] = obj
     return obj
 
-  def value_from_datadict(self, data, files, name):
+  def valueFromDatadict(self, data, files, name):
     """
     Given a dictionary of data and this widget's name, returns the value
     of this widget. Returns None if it's not provided. Not used in this
@@ -344,14 +344,14 @@ class DateInput(StringInput):
       self.format = format
       self.manualFormat = True
     else:
-      self.format = formats.get_format('DATE_INPUT_FORMATS')[0]
+      self.format = formats.getFormat('DATE_INPUT_FORMATS')[0]
       self.manualFormat = False
 
   def _prepareInitData(self, value):
     if self.isLocalized and not self.manualFormat:
-      return formats.localize_input(value)
+      return formats.localizeInput(value)
     elif hasattr(value, 'strftime'):
-      value = datetime_safe.new_date(value)
+      value = datetimeSafe.newDate(value)
       return value.strftime(self.format)
     return value
 
@@ -373,14 +373,14 @@ class DateTimeInput(StringInput):
       self.format = format
       self.manualFormat = True
     else:
-      self.format = formats.get_format('DATETIME_INPUT_FORMATS')[0]
+      self.format = formats.getFormat('DATETIME_INPUT_FORMATS')[0]
       self.manualFormat = False
 
   def _prepareInitData(self, value):
     if self.isLocalized and not self.manualFormat:
-      return formats.localize_input(value)
+      return formats.localizeInput(value)
     elif hasattr(value, 'strftime'):
-      value = datetime_safe.new_datetime(value)
+      value = datetimeSafe.newDatetime(value)
       return value.strftime(self.format)
     return value
 
@@ -402,12 +402,12 @@ class TimeInput(StringInput):
       self.format = format
       self.manualFormat = True
     else:
-      self.format = formats.get_format('TIME_INPUT_FORMATS')[0]
+      self.format = formats.getFormat('TIME_INPUT_FORMATS')[0]
       self.manualFormat = False
 
   def _prepareInitData(self, value):
     if self.isLocalized and not self.manualFormat:
-      return formats.localize_input(value)
+      return formats.localizeInput(value)
     elif hasattr(value, 'strftime'):
       return value.strftime(self.format)
     return value
@@ -575,8 +575,8 @@ class ListInput(BaseLabelInput):
     self.widgetClass = childFieldTemplate.widget.widgetClass
 
     if(self.widgetClass==StringInput.widgetClass):
-      if(hasattr(childFieldTemplate, "max_length") \
-          and childFieldTemplate.max_length>20):
+      if(hasattr(childFieldTemplate, "maxLength") \
+          and childFieldTemplate.maxLength>20):
         self.widgetClass = TextInput.widgetClass
         self._createWidget = self._createLongStringWidget
         self.lineBreak = childFieldTemplate.lineBreak

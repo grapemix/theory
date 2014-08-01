@@ -41,44 +41,44 @@ class FilenameScanner(SimpleCommand):
     )
 
     rootLst = field.ListField(
-        field.TextField(max_length=512),
+        field.TextField(maxLength=512),
         label="Root Directory List"
     )
     yieldMethod = field.ChoiceField(
         label="Yield Method",
-        help_text="how to send the filename in each iteration",
+        helpText="how to send the filename in each iteration",
+        required=False,
         choices=YIELD_METHOD_CHOICES,
         initData=YIELD_MODE_ALL,
-        required=False
     )
     depth = field.IntegerField(
         label="Depth",
         initData=0,
         required=False,
-        help_text="The recursion level. (0 = not recursive, -1 = recursive infinitely)"
+        helpText="The recursion level. (0 = not recursive, -1 = recursive infinitely)"
     )
     includeFileExtLst = field.ListField(
-        field.TextField(max_length=10),
+        field.TextField(maxLength=10),
         label="The list of file extension being included",
-        help_text="File extenstion being included",
+        helpText="File extenstion being included",
         required=False
     )
     excludeFileExtLst = field.ListField(
-        field.TextField(max_length=10),
+        field.TextField(maxLength=10),
         label="The list of file extension being excluded",
-        help_text="File extenstion being excluded",
+        helpText="File extenstion being excluded",
         required=False
     )
     includeDirLst = field.ListField(
-        field.TextField(max_length=512),
+        field.TextField(maxLength=512),
         label="The list of directory being included",
-        help_text="Directory being included",
+        helpText="Directory being included",
         required=False
     )
     excludeDirLst = field.ListField(
-        field.TextField(max_length=512),
+        field.TextField(maxLength=512),
         label="The list of directory being excluded",
-        help_text="Directory being excluded",
+        helpText="Directory being excluded",
         required=False
     )
 
@@ -123,32 +123,32 @@ class FilenameScanner(SimpleCommand):
       self._excludeDirFxnLst = self._excludeDirFxnLst[:1]
       self._excludeDirFxnLst.extend(excludeDirFxnLst)
 
-    def full_clean(self):
-      super(SimpleCommand.ParamForm, self).full_clean()
+    def fullClean(self):
+      super(SimpleCommand.ParamForm, self).fullClean()
       if(not self._errors):
-        if(self.cleaned_data["includeFileExtLst"]!=[]):
+        if(self.cleanedData["includeFileExtLst"]!=[]):
           self._includeFileFxnLst[0] = lambda x: \
-            os.path.splitext(x)[1] in self.cleaned_data["includeFileExtLst"]
+            os.path.splitext(x)[1] in self.cleanedData["includeFileExtLst"]
         else:
           self._includeFileFxnLst[0] = lambda x: True
 
-        if(self.cleaned_data["includeDirLst"]!=[]):
+        if(self.cleanedData["includeDirLst"]!=[]):
           self._includeDirFxnLst[0] = lambda x: \
-              x in self.cleaned_data["includeDirLst"]
+              x in self.cleanedData["includeDirLst"]
         else:
           self._includeDirFxnLst[0] = lambda x: True
 
-        if self.cleaned_data["excludeFileExtLst"] == ["*"]:
+        if self.cleanedData["excludeFileExtLst"] == ["*"]:
           self._excludeFileFxnLst[0] = lambda x: True
-        elif self.cleaned_data["excludeFileExtLst"] != []:
+        elif self.cleanedData["excludeFileExtLst"] != []:
           self._excludeFileFxnLst[0] = lambda x: \
-                os.path.splitext(x)[1] in self.cleaned_data["excludeFileExtLst"]
+                os.path.splitext(x)[1] in self.cleanedData["excludeFileExtLst"]
         else:
           self._excludeFileFxnLst[0] = lambda x: False
 
-        if(self.cleaned_data["excludeDirLst"]!=[]):
+        if(self.cleanedData["excludeDirLst"]!=[]):
           self._excludeDirFxnLst[0] = lambda x: \
-              x in self.cleaned_data["excludeDirLst"]
+              x in self.cleanedData["excludeDirLst"]
         else:
           self._excludeDirFxnLst[0] = lambda x: False
 
@@ -201,8 +201,8 @@ class FilenameScanner(SimpleCommand):
     return newDirPath
 
   def generateFileLst(self):
-    yieldMethod = int(self.paramForm.cleaned_data["yieldMethod"])
-    for root in self.paramForm.cleaned_data["rootLst"]:
+    yieldMethod = int(self.paramForm.cleanedData["yieldMethod"])
+    for root in self.paramForm.cleanedData["rootLst"]:
       for lvlRoot, dirs, files in self._walk(root):
         for file in files:
           if(yieldMethod==self.paramForm.YIELD_MODE_FILE \
@@ -214,7 +214,7 @@ class FilenameScanner(SimpleCommand):
             raise Error
 
   def generateDirLst(self):
-    for root in self.paramForm.cleaned_data["rootLst"]:
+    for root in self.paramForm.cleanedData["rootLst"]:
       for lvlRoot, dirs, files in self._walk(root):
         yield dirs
 
@@ -244,8 +244,8 @@ class FilenameScanner(SimpleCommand):
       dirs[:] = self._filterByDirFxns(lvlRoot, dirs)
       yield lvlRoot, dirs, files
       thisLvl = lvlRoot.count(os.path.sep)
-      if(self.paramForm.cleaned_data["depth"]!=-1 \
-          and numSep + self.paramForm.cleaned_data["depth"] <= thisLvl):
+      if(self.paramForm.cleanedData["depth"]!=-1 \
+          and numSep + self.paramForm.cleanedData["depth"] <= thisLvl):
         del dirs[:]
 
   @property
