@@ -169,13 +169,13 @@ class MongoModelFormDetector(object):
   def _convertKwargsName(self, kwargs):
     """To convert the mongoengine field keyword to theory field keyword"""
     newNameDict= {
-        "verbose_name": "label",
-        "help_text": "help_text",
+        "verboseName": "label",
+        "helpText": "helpText",
         "choices": "choices",
         "default": "initData",
         "required": "required",
-        "max_length": "max_length",
-        "min_length": "min_length",
+        "maxLength": "maxLength",
+        "minLength": "minLength",
         "app": "app",
         "model": "model",
       }

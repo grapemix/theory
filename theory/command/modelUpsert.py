@@ -33,25 +33,25 @@ class ModelUpsert(SimpleCommand):
 
   class ParamForm(SimpleCommand.ParamForm):
     appName = field.ChoiceField(label="Application Name",
-        help_text="The name of applications to be listed",
+        helpText="The name of applications to be listed",
         initData="theory",
         choices=(set([("theory", "theory")] +
           [(settings.INSTALLED_APPS[i], settings.INSTALLED_APPS[i])
             for i in range(len(settings.INSTALLED_APPS))])),
         )
     modelName = field.ChoiceField(label="Model Name",
-        help_text="The name of models to be listed",
+        helpText="The name of models to be listed",
         )
     instanceId = field.TextField(
-        max_length=50,
+        maxLength=50,
         required=False,
         label="instance id",
-        help_text="The instance to be edited",
+        helpText="The instance to be edited",
         isSkipInHistory=True,
         )
     isInNewWindow = field.BooleanField(
         label="Is in new window",
-        help_text="Is shown in new window",
+        helpText="Is shown in new window",
         required=False,
         initData=False,
         )
@@ -59,7 +59,7 @@ class ModelUpsert(SimpleCommand):
     #queryset = field.QuerysetField(
     #    required=False,
     #    label="Queryset",
-    #    help_text="The queryset to be processed",
+    #    helpText="The queryset to be processed",
     #    initData=[],
     #    isSkipInHistory=True,
     #    )
@@ -107,7 +107,7 @@ class ModelUpsert(SimpleCommand):
     pass
 
   def cleanParamForm(self, btn, dummy):
-    if(self.modelForm.is_valid()):
+    if(self.modelForm.isValid()):
       dataInDict = self.modelForm.clean()
       if self.instance is None:
         self.instance = self.modelForm.instance

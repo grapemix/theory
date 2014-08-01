@@ -23,8 +23,9 @@ class CreateCmd(SimpleCommand):
   _drums = {"Terminal": 1, }
 
   class ParamForm(SimpleCommand.ParamForm):
-    appName = field.ChoiceField(label="Application Name",
-        help_text="The name of application being used",
+    appName = field.ChoiceField(
+        label="Application Name",
+        helpText="The name of application being used",
         choices=(
           set(
             [("theory", "theory")] + \
@@ -34,11 +35,12 @@ class CreateCmd(SimpleCommand):
     )
     cmdName = field.TextField(
         label="Command Name",
-        help_text=" The name of command being created in lowercase.",
-        max_length=32
+        helpText=" The name of command being created in lowercase.",
+        maxLength=32
     )
-    cmdType = field.ChoiceField(label="Command Type",
-        help_text="The name of application being used",
+    cmdType = field.ChoiceField(
+        label="Command Type",
+        helpText="The name of application being used",
         initData="SimpleCommand",
         choices=(
           set((
@@ -47,9 +49,10 @@ class CreateCmd(SimpleCommand):
           ))
         )
     )
-    propertyNameLst = field.ListField(field.TextField(max_length=96),
+    propertyNameLst = field.ListField(
+        field.TextField(maxLength=96),
         label="Property Name List",
-        help_text=" The name list of property being created",
+        helpText=" The name list of property being created",
         required=False,
     )
 

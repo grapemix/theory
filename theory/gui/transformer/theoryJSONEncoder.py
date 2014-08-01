@@ -11,7 +11,7 @@ from uuid import UUID
 
 ##### Theory lib #####
 from theory.db.models import QuerySet
-from theory.utils.timezone import is_aware
+from theory.utils.timezone import isAware
 
 ##### Theory third-party lib #####
 

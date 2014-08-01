@@ -71,7 +71,7 @@ class Bridge(object):
     cmdParamForm = importClass(cmdModel.classImportPath).ParamForm
     cmd.paramForm = cmdParamForm()
     cmd.paramForm.fillInitFields(cmdModel, args, kwargs)
-    cmd.paramForm.is_valid()
+    cmd.paramForm.isValid()
     return cmd
 
   # TODO: should be replaced later on. At least inheritance case should be
@@ -226,7 +226,7 @@ class Bridge(object):
   def _assignAdapterPropertiesFromCmd(self, properties, adapter, cmd):
     """This fxn """
     form = cmd.paramForm
-    if(form.is_valid()):
+    if(form.isValid()):
       formData = form.clean()
       for property in properties:
         try:
@@ -247,11 +247,11 @@ class Bridge(object):
   def _execeuteCommand(self, cmd, cmdModel, uiParam={}, forceSync=False):
     if(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC):
       if(forceSync):
-        cmd.run(paramFormData=cmd.paramForm.toPython())
+        cmd.run(paramFormData=cmd.paramForm.to_python())
       else:
-        cmd.delay(paramFormData=cmd.paramForm.toPython())
+        cmd.delay(paramFormData=cmd.paramForm.to_python())
     else:
-      if(not cmd.paramForm.is_valid()):
+      if(not cmd.paramForm.isValid()):
         return False
       cmd._uiParam = uiParam
       cmd.run()

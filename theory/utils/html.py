@@ -2,193 +2,272 @@
 #!/usr/bin/env python
 """HTML utilities suitable for global use."""
 
-import re
-import string
+from __future__ import unicode_literals
 
-from theory.utils.safestring import SafeData, markSafe
-from theory.utils.encoding import forceUnicode
+import re
+import sys
+
+from theory.utils.encoding import forceText, forceStr
 from theory.utils.functional import allowLazy
-from theory.utils.http import urlquote
+from theory.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
+from theory.utils.safestring import SafeData, markSafe
+from theory.utils import six
+from theory.utils.six.moves.urllib.parse import quote, unquote, urlsplit, urlunsplit
+from theory.utils.text import normalizeNewlines
 
 # Configuration for urlize() function.
-LEADING_PUNCTUATION  = ['(', '<', '&lt;']
-TRAILING_PUNCTUATION = ['.', ',', ')', '>', '\n', '&gt;']
+TRAILING_PUNCTUATION = ['.', ',', ':', ';', '.)', '"', '\'']
+WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('[', ']'), ('&lt;', '&gt;'), ('"', '"'), ('\'', '\'')]
 
 # List of possible strings used for bullets in bulleted lists.
-DOTS = ['&middot;', '*', '\xe2\x80\xa2', '&#149;', '&bull;', '&#8226;']
+DOTS = ['&middot;', '*', '\u2022', '&#149;', '&bull;', '&#8226;']
 
-unencoded_ampersands_re = re.compile(r'&(?!(\w+|#\d+);)')
-word_split_re = re.compile(r'(\s+)')
-punctuation_re = re.compile('^(?P<lead>(?:%s)*)(?P<middle>.*?)(?P<trail>(?:%s)*)$' % \
-  ('|'.join([re.escape(x) for x in LEADING_PUNCTUATION]),
-  '|'.join([re.escape(x) for x in TRAILING_PUNCTUATION])))
-simple_email_re = re.compile(r'^\S+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+$')
-link_target_attribute_re = re.compile(r'(<a [^>]*?)target=[^\s>]+')
-html_gunk_re = re.compile(r'(?:<br clear="all">|<i><\/i>|<b><\/b>|<em><\/em>|<strong><\/strong>|<\/?smallcaps>|<\/?uppercase>)', re.IGNORECASE)
-hard_coded_bullets_re = re.compile(r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|'.join([re.escape(x) for x in DOTS]), re.DOTALL)
-trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\Z')
-del x # Temporary variable
+unencodedAmpersandsRe = re.compile(r'&(?!(\w+|#\d+);)')
+wordSplitRe = re.compile(r'(\s+)')
+simpleUrlRe = re.compile(r'^https?://\[?\w', re.IGNORECASE)
+simpleUrl2_re = re.compile(r'^www\.|^(?!http)\w[^@]+\.(com|edu|gov|int|mil|net|org)($|/.*)$', re.IGNORECASE)
+simpleEmailRe = re.compile(r'^\S+@\S+\.\S+$')
+linkTargetAttributeRe = re.compile(r'(<a [^>]*?)target=[^\s>]+')
+htmlGunkRe = re.compile(r'(?:<br clear="all">|<i><\/i>|<b><\/b>|<em><\/em>|<strong><\/strong>|<\/?smallcaps>|<\/?uppercase>)', re.IGNORECASE)
+hardCodedBulletsRe = re.compile(r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|'.join(re.escape(x) for x in DOTS), re.DOTALL)
+trailingEmptyContentRe = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\Z')
 
-def escape(html):
+
+def escape(text):
   """
-  Returns the given HTML with ampersands, quotes and angle brackets encoded.
+  Returns the given text with ampersands, quotes and angle brackets encoded for use in HTML.
   """
-  return mark_safe(forceUnicode(html).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
-escape = allowLazy(escape, unicode)
+  return markSafe(forceText(text).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
+escape = allowLazy(escape, six.textType)
 
-_base_js_escapes = (
-  ('\\', r'\u005C'),
-  ('\'', r'\u0027'),
-  ('"', r'\u0022'),
-  ('>', r'\u003E'),
-  ('<', r'\u003C'),
-  ('&', r'\u0026'),
-  ('=', r'\u003D'),
-  ('-', r'\u002D'),
-  (';', r'\u003B'),
-  (u'\u2028', r'\u2028'),
-  (u'\u2029', r'\u2029')
-)
+_jsEscapes = {
+  ord('\\'): '\\u005C',
+  ord('\''): '\\u0027',
+  ord('"'): '\\u0022',
+  ord('>'): '\\u003E',
+  ord('<'): '\\u003C',
+  ord('&'): '\\u0026',
+  ord('='): '\\u003D',
+  ord('-'): '\\u002D',
+  ord(';'): '\\u003B',
+  ord('\u2028'): '\\u2028',
+  ord('\u2029'): '\\u2029'
+}
 
 # Escape every ASCII character with a value less than 32.
-_js_escapes = (_base_js_escapes +
-        tuple([('%c' % z, '\\u%04X' % z) for z in range(32)]))
+_jsEscapes.update((ord('%c' % z), '\\u%04X' % z) for z in range(32))
+
 
 def escapejs(value):
   """Hex encodes characters for use in JavaScript strings."""
-  for bad, good in _js_escapes:
-    value = mark_safe(forceUnicode(value).replace(bad, good))
-  return value
-escapejs = allowLazy(escapejs, unicode)
+  return markSafe(forceText(value).translate(_jsEscapes))
+escapejs = allowLazy(escapejs, six.textType)
 
-def conditional_escape(html):
+
+def conditionalEscape(text):
   """
   Similar to escape(), except that it doesn't operate on pre-escaped strings.
   """
-  if isinstance(html, SafeData):
-    return html
+  if hasattr(text, '__html__'):
+    return text.__html__()
   else:
-    return escape(html)
+    return escape(text)
+
+
+def formatHtml(formatString, *args, **kwargs):
+  """
+  Similar to str.format, but passes all arguments through conditionalEscape,
+  and calls 'markSafe' on the result. This function should be used instead
+  of str.format or % interpolation to build up small HTML fragments.
+  """
+  argsSafe = map(conditionalEscape, args)
+  kwargsSafe = dict((k, conditionalEscape(v)) for (k, v) in six.iteritems(kwargs))
+  return markSafe(formatString.format(*argsSafe, **kwargsSafe))
+
+
+def formatHtmlJoin(sep, formatString, argsGenerator):
+  """
+  A wrapper of formatHtml, for the common case of a group of arguments that
+  need to be formatted using the same format string, and then joined using
+  'sep'. 'sep' is also passed through conditionalEscape.
+
+  'argsGenerator' should be an iterator that returns the sequence of 'args'
+  that will be passed to formatHtml.
+
+  Example:
+
+   formatHtmlJoin('\n', "<li>{0} {1}</li>", ((u.firstName, u.lastName)
+                         for u in users))
+
+  """
+  return markSafe(conditionalEscape(sep).join(
+    formatHtml(formatString, *tuple(args))
+    for args in argsGenerator))
+
 
 def linebreaks(value, autoescape=False):
   """Converts newlines into <p> and <br />s."""
-  value = re.sub(r'\r\n|\r|\n', '\n', forceUnicode(value)) # normalize newlines
+  value = normalizeNewlines(value)
   paras = re.split('\n{2,}', value)
   if autoescape:
-    paras = [u'<p>%s</p>' % escape(p).replace('\n', '<br />') for p in paras]
+    paras = ['<p>%s</p>' % escape(p).replace('\n', '<br />') for p in paras]
   else:
-    paras = [u'<p>%s</p>' % p.replace('\n', '<br />') for p in paras]
-  return u'\n\n'.join(paras)
-linebreaks = allowLazy(linebreaks, unicode)
+    paras = ['<p>%s</p>' % p.replace('\n', '<br />') for p in paras]
+  return '\n\n'.join(paras)
+linebreaks = allowLazy(linebreaks, six.textType)
 
-def strip_tags(value):
+def _stripOnce(value):
+  """
+  Internal tag stripping utility used by stripTags.
+  """
+  s = MLStripper()
+  try:
+    s.feed(value)
+  except HTMLParseError:
+    return value
+  s.close()
+
+def stripTags(value):
   """Returns the given HTML with all tags stripped."""
-  return re.sub(r'<[^>]*?>', '', forceUnicode(value))
-strip_tags = allowLazy(strip_tags)
+  # Note: in typical case this loop executes _stripOnce once. Loop condition
+  # is redundant, but helps to reduce number of executions of _stripOnce.
+  while '<' in value and '>' in value:
+    newValue = _stripOnce(value)
+    if newValue == value:
+      # _stripOnce was not able to detect more tags
+      break
+    value = newValue
+  return value
+stripTags = allowLazy(stripTags)
 
-def strip_spaces_between_tags(value):
+
+def removeTags(html, tags):
+  """Returns the given HTML with given tags removed."""
+  tags = [re.escape(tag) for tag in tags.split()]
+  tagsRe = '(%s)' % '|'.join(tags)
+  starttagRe = re.compile(r'<%s(/?>|(\s+[^>]*>))' % tagsRe, re.U)
+  endtagRe = re.compile('</%s>' % tagsRe)
+  html = starttagRe.sub('', html)
+  html = endtagRe.sub('', html)
+  return html
+removeTags = allowLazy(removeTags, six.textType)
+
+
+def stripSpacesBetweenTags(value):
   """Returns the given HTML with spaces between tags removed."""
-  return re.sub(r'>\s+<', '><', forceUnicode(value))
-strip_spaces_between_tags = allowLazy(strip_spaces_between_tags, unicode)
+  return re.sub(r'>\s+<', '><', forceText(value))
+stripSpacesBetweenTags = allowLazy(stripSpacesBetweenTags, six.textType)
 
-def strip_entities(value):
+
+def stripEntities(value):
   """Returns the given HTML with all entities (&something;) stripped."""
-  return re.sub(r'&(?:\w+|#\d+);', '', forceUnicode(value))
-strip_entities = allowLazy(strip_entities, unicode)
+  return re.sub(r'&(?:\w+|#\d+);', '', forceText(value))
+stripEntities = allowLazy(stripEntities, six.textType)
 
-def fix_ampersands(value):
-  """Returns the given HTML with all unencoded ampersands encoded correctly."""
-  return unencoded_ampersands_re.sub('&amp;', forceUnicode(value))
-fix_ampersands = allowLazy(fix_ampersands, unicode)
 
-def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
+def smartUrlquote(url):
+  "Quotes a URL if it isn't already quoted."
+  # Handle IDN before quoting.
+  try:
+    scheme, netloc, path, query, fragment = urlsplit(url)
+    try:
+      netloc = netloc.encode('idna').decode('ascii')  # IDN -> ACE
+    except UnicodeError:  # invalid domain part
+      pass
+    else:
+      url = urlunsplit((scheme, netloc, path, query, fragment))
+  except ValueError:
+    # invalid IPv6 URL (normally square brackets in hostname part).
+    pass
+
+  url = unquote(forceStr(url))
+  # See http://bugs.python.org/issue2637
+  url = quote(url, safe=RFC3986_SUBDELIMS + RFC3986_GENDELIMS + str('~'))
+
+  return forceText(url)
+
+
+def urlize(text, trimUrlLimit=None, nofollow=False, autoescape=False):
   """
   Converts any URLs in text into clickable links.
 
-  Works on http://, https://, www. links and links ending in .org, .net or
-  .com. Links can have trailing punctuation (periods, commas, close-parens)
-  and leading punctuation (opening parens) and it'll still do the right
-  thing.
+  Works on http://, https://, www. links, and also on links ending in one of
+  the original seven gTLDs (.com, .edu, .gov, .int, .mil, .net, and .org).
+  Links can have trailing punctuation (periods, commas, close-parens) and
+  leading punctuation (opening parens) and it'll still do the right thing.
 
-  If trim_url_limit is not None, the URLs in link text longer than this limit
-  will truncated to trim_url_limit-3 characters and appended with an elipsis.
+  If trimUrlLimit is not None, the URLs in the link text longer than this
+  limit will be truncated to trimUrlLimit-3 characters and appended with
+  an ellipsis.
 
-  If nofollow is True, the URLs in link text will get a rel="nofollow"
-  attribute.
+  If nofollow is True, the links will get a rel="nofollow" attribute.
 
-  If autoescape is True, the link text and URLs will get autoescaped.
+  If autoescape is True, the link text and URLs will be autoescaped.
   """
-  trim_url = lambda x, limit=trim_url_limit: limit is not None and (len(x) > limit and ('%s...' % x[:max(0, limit - 3)])) or x
-  safe_input = isinstance(text, SafeData)
-  words = word_split_re.split(forceUnicode(text))
-  nofollow_attr = nofollow and ' rel="nofollow"' or ''
+  def trimUrl(x, limit=trimUrlLimit):
+    if limit is None or len(x) <= limit:
+      return x
+    return '%s...' % x[:max(0, limit - 3)]
+  safeInput = isinstance(text, SafeData)
+  words = wordSplitRe.split(forceText(text))
   for i, word in enumerate(words):
-    match = None
     if '.' in word or '@' in word or ':' in word:
-      match = punctuation_re.match(word)
-    if match:
-      lead, middle, trail = match.groups()
+      # Deal with punctuation.
+      lead, middle, trail = '', word, ''
+      for punctuation in TRAILING_PUNCTUATION:
+        if middle.endswith(punctuation):
+          middle = middle[:-len(punctuation)]
+          trail = punctuation + trail
+      for opening, closing in WRAPPING_PUNCTUATION:
+        if middle.startswith(opening):
+          middle = middle[len(opening):]
+          lead = lead + opening
+        # Keep parentheses at the end only if they're balanced.
+        if (middle.endswith(closing)
+            and middle.count(closing) == middle.count(opening) + 1):
+          middle = middle[:-len(closing)]
+          trail = closing + trail
+
       # Make URL we want to point to.
       url = None
-      if middle.startswith('http://') or middle.startswith('https://'):
-        url = urlquote(middle, safe='/&=:;#?+*')
-      elif middle.startswith('www.') or ('@' not in middle and \
-          middle and middle[0] in string.ascii_letters + string.digits and \
-          (middle.endswith('.org') or middle.endswith('.net') or middle.endswith('.com'))):
-        url = urlquote('http://%s' % middle, safe='/&=:;#?+*')
-      elif '@' in middle and not ':' in middle and simple_email_re.match(middle):
-        url = 'mailto:%s' % middle
-        nofollow_attr = ''
+      nofollowAttr = ' rel="nofollow"' if nofollow else ''
+      if simpleUrlRe.match(middle):
+        url = smartUrlquote(middle)
+      elif simpleUrl2_re.match(middle):
+        url = smartUrlquote('http://%s' % middle)
+      elif ':' not in middle and simpleEmailRe.match(middle):
+        local, domain = middle.rsplit('@', 1)
+        try:
+          domain = domain.encode('idna').decode('ascii')
+        except UnicodeError:
+          continue
+        url = 'mailto:%s@%s' % (local, domain)
+        nofollowAttr = ''
+
       # Make link.
       if url:
-        trimmed = trim_url(middle)
-        if autoescape and not safe_input:
+        trimmed = trimUrl(middle)
+        if autoescape and not safeInput:
           lead, trail = escape(lead), escape(trail)
           url, trimmed = escape(url), escape(trimmed)
-        middle = '<a href="%s"%s>%s</a>' % (url, nofollow_attr, trimmed)
-        words[i] = mark_safe('%s%s%s' % (lead, middle, trail))
+        middle = '<a href="%s"%s>%s</a>' % (url, nofollowAttr, trimmed)
+        words[i] = markSafe('%s%s%s' % (lead, middle, trail))
       else:
-        if safe_input:
-          words[i] = mark_safe(word)
+        if safeInput:
+          words[i] = markSafe(word)
         elif autoescape:
           words[i] = escape(word)
-    elif safe_input:
-      words[i] = mark_safe(word)
+    elif safeInput:
+      words[i] = markSafe(word)
     elif autoescape:
       words[i] = escape(word)
-  return u''.join(words)
-urlize = allowLazy(urlize, unicode)
+  return ''.join(words)
+urlize = allowLazy(urlize, six.textType)
 
-def clean_html(text):
+
+def avoidWrapping(value):
   """
-  Clean the given HTML.  Specifically, do the following:
-    * Convert <b> and <i> to <strong> and <em>.
-    * Encode all ampersands correctly.
-    * Remove all "target" attributes from <a> tags.
-    * Remove extraneous HTML, such as presentational tags that open and
-     immediately close and <br clear="all">.
-    * Convert hard-coded bullets into HTML unordered lists.
-    * Remove stuff like "<p>&nbsp;&nbsp;</p>", but only if it's at the
-     bottom of the text.
+  Avoid text wrapping in the middle of a phrase by adding non-breaking
+  spaces where there previously were normal spaces.
   """
-  from theory.utils.text import normalize_newlines
-  text = normalize_newlines(forceUnicode(text))
-  text = re.sub(r'<(/?)\s*b\s*>', '<\\1strong>', text)
-  text = re.sub(r'<(/?)\s*i\s*>', '<\\1em>', text)
-  text = fix_ampersands(text)
-  # Remove all target="" attributes from <a> tags.
-  text = link_target_attribute_re.sub('\\1', text)
-  # Trim stupid HTML such as <br clear="all">.
-  text = html_gunk_re.sub('', text)
-  # Convert hard-coded bullets into HTML unordered lists.
-  def replace_p_tags(match):
-    s = match.group().replace('</p>', '</li>')
-    for d in DOTS:
-      s = s.replace('<p>%s' % d, '<li>')
-    return u'<ul>\n%s\n</ul>' % s
-  text = hard_coded_bullets_re.sub(replace_p_tags, text)
-  # Remove stuff like "<p>&nbsp;&nbsp;</p>", but only if it's at the bottom
-  # of the text.
-  text = trailing_empty_content_re.sub('', text)
-  return text
-clean_html = allowLazy(clean_html, unicode)
+  return value.replace(" ", "\xa0")

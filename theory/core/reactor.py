@@ -186,8 +186,8 @@ class Reactor(object):
     self.parser.initVar()
 
   def cleanParamForm(self, btn, dummy):
-    self.paramForm.full_clean()
-    if(self.paramForm.is_valid()):
+    self.paramForm.fullClean()
+    if(self.paramForm.isValid()):
       self.run()
     else:
       # TODO: integrate with std reactor error system

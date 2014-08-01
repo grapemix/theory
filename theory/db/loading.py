@@ -9,7 +9,7 @@ from theory.conf import settings
 from theory.core.exceptions import ImproperlyConfigured
 from theory.utils.datastructures import SortedDict
 from theory.utils.importlib import importModule
-from theory.utils.module_loading import module_has_submodule
+from theory.utils.moduleLoading import moduleHasSubmodule
 
 ##### Theory third-party lib #####
 

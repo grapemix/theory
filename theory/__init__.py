@@ -1,18 +1,21 @@
-# -*- coding: utf-8 -*-
-#!/usr/bin/env python
 VERSION = (0, 0, 1, 'alpha', 0)
 
-def get_version():
-    version = '%s.%s' % (VERSION[0], VERSION[1])
-    if VERSION[2]:
-        version = '%s.%s' % (version, VERSION[2])
-    if VERSION[3:] == ('alpha', 0):
-        version = '%s pre-alpha' % version
-    else:
-        if VERSION[3] != 'final':
-            version = '%s %s %s' % (version, VERSION[3], VERSION[4])
-    from theory.utils.version import get_svn_revision
-    svn_rev = get_svn_revision()
-    if svn_rev != u'SVN-unknown':
-        version = "%s %s" % (version, svn_rev)
-    return version
+
+def getVersion(*args, **kwargs):
+  # Don't litter theory/__init__.py with all the getVersion stuff.
+  # Only import if it's actually called.
+  from theory.utils.version import getVersion
+  return getVersion(*args, **kwargs)
+
+
+def setup():
+  """
+  Configure the settings (this happens as a side effect of accessing the
+  first setting), configure logging and populate the app registry.
+  """
+  from theory.apps import apps
+  from theory.conf import settings
+  from theory.utils.log import configureLogging
+
+  configureLogging(settings.LOGGING_CONFIG, settings.LOGGING)
+  apps.populate(settings.INSTALLED_APPS)

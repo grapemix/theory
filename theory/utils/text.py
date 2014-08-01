@@ -1,10 +1,12 @@
-#from __future__ import unicodeLiterals
+from __future__ import unicode_literals
 
 import re
 import unicodedata
 from gzip import GzipFile
 from io import BytesIO
+import warnings
 
+from theory.utils.deprecation import RemovedInTheory19Warning
 from theory.utils.encoding import forceText
 from theory.utils.functional import allowLazy, SimpleLazyObject
 from theory.utils import six
@@ -15,44 +17,52 @@ from theory.utils.safestring import markSafe
 if six.PY2:
   # Import forceUnicode even though this module doesn't use it, because some
   # people rely on it being here.
-  from theory.utils.encoding import forceUnicode
+  from theory.utils.encoding import forceUnicode  # NOQA
+
 
 # Capitalizes the first letter of a string.
 capfirst = lambda x: x and forceText(x)[0].upper() + forceText(x)[1:]
-capfirst = allowLazy(capfirst, six.text_type)
+capfirst = allowLazy(capfirst, six.textType)
 
 # Set up regular expressions
-reWords = re.compile(r'&.*?;|<.*?>|(\w[\w-]*)', re.U|re.S)
+reWords = re.compile(r'<.*?>|((?:\w[-\w]*|&.*?;)+)', re.U | re.S)
+reChars = re.compile(r'<.*?>|(.)', re.U | re.S)
 reTag = re.compile(r'<(/)?([^ ]+?)(?:(\s*/)| .*?)?>', re.S)
+reNewlines = re.compile(r'\r\n|\r')  # Used in normalizeNewlines
+reCamelCase = re.compile(r'(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))')
 
 
 def wrap(text, width):
   """
-  A word-wrap function that preserves existing line breaks and most spaces in
-  the text. Expects that existing line breaks are posix newlines.
+  A word-wrap function that preserves existing line breaks. Expects that
+  existing line breaks are posix newlines.
+
+  All white space is preserved except added line breaks consume the space on
+  which they break the line.
+
+  Long words are not wrapped, so the output text may have lines longer than
+  ``width``.
   """
   text = forceText(text)
+
   def _generator():
-    it = iter(text.split(' '))
-    word = next(it)
-    yield word
-    pos = len(word) - word.rfind('\n') - 1
-    for word in it:
-      if "\n" in word:
-        lines = word.split('\n')
-      else:
-        lines = (word,)
-      pos += len(lines[0]) + 1
-      if pos > width:
-        yield '\n'
-        pos = len(lines[-1])
-      else:
-        yield ' '
-        if len(lines) > 1:
-          pos = len(lines[-1])
-      yield word
+    for line in text.splitlines(True):  # True keeps trailing linebreaks
+      maxWidth = min((line.endswith('\n') and width + 1 or width), width)
+      while len(line) > maxWidth:
+        space = line[:maxWidth + 1].rfind(' ') + 1
+        if space == 0:
+          space = line.find(' ') + 1
+          if space == 0:
+            yield line
+            line = ''
+            break
+        yield '%s\n' % line[:space - 1]
+        line = line[space:]
+        maxWidth = min((line.endswith('\n') and width + 1 or width), width)
+      if line:
+        yield line
   return ''.join(_generator())
-wrap = allowLazy(wrap, six.text_type)
+wrap = allowLazy(wrap, six.textType)
 
 
 class Truncator(SimpleLazyObject):
@@ -78,7 +88,7 @@ class Truncator(SimpleLazyObject):
       return text
     return '%s%s' % (text, truncate)
 
-  def chars(self, num, truncate=None):
+  def chars(self, num, truncate=None, html=False):
     """
     Returns the text truncated to be no longer than the specified number
     of characters.
@@ -97,7 +107,15 @@ class Truncator(SimpleLazyObject):
         truncateLen -= 1
         if truncateLen == 0:
           break
+    if html:
+      return self._truncateHtml(length, truncate, text, truncateLen, False)
+    return self._textChars(length, truncate, text, truncateLen)
+  chars = allowLazy(chars)
 
+  def _textChars(self, length, truncate, text, truncateLen):
+    """
+    Truncates a string after a certain number of chars.
+    """
     sLen = 0
     endIndex = None
     for i, char in enumerate(text):
@@ -115,7 +133,6 @@ class Truncator(SimpleLazyObject):
 
     # Return the original string since no truncation was necessary
     return text
-  chars = allowLazy(chars)
 
   def words(self, num, truncate=None, html=False):
     """
@@ -125,7 +142,7 @@ class Truncator(SimpleLazyObject):
     """
     length = int(num)
     if html:
-      return self._htmlWords(length, truncate)
+      return self._truncateHtml(length, truncate, self._wrapped, length, True)
     return self._textWords(length, truncate)
   words = allowLazy(words)
 
@@ -141,40 +158,45 @@ class Truncator(SimpleLazyObject):
       return self.addTruncationText(' '.join(words), truncate)
     return ' '.join(words)
 
-  def _htmlWords(self, length, truncate):
+  def _truncateHtml(self, length, truncate, text, truncateLen, words):
     """
-    Truncates HTML to a certain number of words (not counting tags and
-    comments). Closes opened tags if they were correctly closed in the
-    given HTML.
+    Truncates HTML to a certain number of chars (not counting tags and
+    comments), or, if words is True, then to a certain number of words.
+    Closes opened tags if they were correctly closed in the given HTML.
 
     Newlines in the HTML are preserved.
     """
-    if length <= 0:
+    if words and length <= 0:
       return ''
+
     html4Singlets = (
       'br', 'col', 'link', 'base', 'img',
       'param', 'area', 'hr', 'input'
     )
-    # Count non-HTML words and keep note of open tags
+
+    # Count non-HTML chars/words and keep note of open tags
     pos = 0
     endTextPos = 0
-    words = 0
+    currentLen = 0
     openTags = []
-    while words <= length:
-      m = reWords.search(self._wrapped, pos)
+
+    regex = reWords if words else reChars
+
+    while currentLen <= length:
+      m = regex.search(text, pos)
       if not m:
         # Checked through whole string
         break
       pos = m.end(0)
       if m.group(1):
-        # It's an actual non-HTML word
-        words += 1
-        if words == length:
+        # It's an actual non-HTML word or char
+        currentLen += 1
+        if currentLen == truncateLen:
           endTextPos = pos
         continue
       # Check for tag
       tag = reTag.match(m.group(0))
-      if not tag or endTextPos:
+      if not tag or currentLen >= truncateLen:
         # Don't worry about non tags or tags after our truncate point
         continue
       closingTag, tagname, selfClosing = tag.groups()
@@ -195,10 +217,10 @@ class Truncator(SimpleLazyObject):
       else:
         # Add it to the start of the open tags list
         openTags.insert(0, tagname)
-    if words <= length:
-      # Don't try to close tags if we don't need to truncate
-      return self._wrapped
-    out = self._wrapped[:endTextPos]
+
+    if currentLen <= length:
+      return text
+    out = text[:endTextPos]
     truncateText = self.addTruncationText('', truncate)
     if truncateText:
       out += truncateText
@@ -207,6 +229,7 @@ class Truncator(SimpleLazyObject):
       out += '</%s>' % tag
     # Return string
     return out
+
 
 def getValidFilename(s):
   """
@@ -219,7 +242,8 @@ def getValidFilename(s):
   """
   s = forceText(s).strip().replace(' ', '_')
   return re.sub(r'(?u)[^-\w.]', '', s)
-getValidFilename = allowLazy(getValidFilename, six.text_type)
+getValidFilename = allowLazy(getValidFilename, six.textType)
+
 
 def getTextList(list_, lastWord=ugettextLazy('or')):
   """
@@ -234,35 +258,33 @@ def getTextList(list_, lastWord=ugettextLazy('or')):
   >>> getTextList([])
   ''
   """
-  if len(list_) == 0: return ''
-  if len(list_) == 1: return forceText(list_[0])
+  if len(list_) == 0:
+    return ''
+  if len(list_) == 1:
+    return forceText(list_[0])
   return '%s %s %s' % (
     # Translators: This string is used as a separator between list elements
-    _(', ').join([forceText(i) for i in list_][:-1]),
+    _(', ').join(forceText(i) for i in list_[:-1]),
     forceText(lastWord), forceText(list_[-1]))
-getTextList = allowLazy(getTextList, six.text_type)
+getTextList = allowLazy(getTextList, six.textType)
+
 
 def normalizeNewlines(text):
-  return forceText(re.sub(r'\r\n|\r|\n', '\n', text))
-normalizeNewlines = allowLazy(normalizeNewlines, six.text_type)
+  """Normalizes CRLF and CR newlines to just LF."""
+  text = forceText(text)
+  return reNewlines.sub('\n', text)
+normalizeNewlines = allowLazy(normalizeNewlines, six.textType)
 
-def recapitalize(text):
-  "Recapitalizes text, placing caps after end-of-sentence punctuation."
-  text = forceText(text).lower()
-  capsRE = re.compile(r'(?:^|(?<=[\.\?\!] ))([a-z])')
-  text = capsRE.sub(lambda x: x.group(1).upper(), text)
-  return text
-recapitalize = allowLazy(recapitalize)
 
 def phone2numeric(phone):
-  "Converts a phone number with letters into its numeric equivalent."
+  """Converts a phone number with letters into its numeric equivalent."""
   char2number = {'a': '2', 'b': '2', 'c': '2', 'd': '3', 'e': '3', 'f': '3',
      'g': '4', 'h': '4', 'i': '4', 'j': '5', 'k': '5', 'l': '5', 'm': '6',
      'n': '6', 'o': '6', 'p': '7', 'q': '7', 'r': '7', 's': '7', 't': '8',
-     'u': '8', 'v': '8', 'w': '9', 'x': '9', 'y': '9', 'z': '9',
-    }
+     'u': '8', 'v': '8', 'w': '9', 'x': '9', 'y': '9', 'z': '9'}
   return ''.join(char2number.get(c, c) for c in phone.lower())
 phone2numeric = allowLazy(phone2numeric)
+
 
 # From http://www.xhaus.com/alan/python/httpcomp.html#gzip
 # Used with permission.
@@ -272,6 +294,7 @@ def compressString(s):
   zfile.write(s)
   zfile.close()
   return zbuf.getvalue()
+
 
 class StreamingBuffer(object):
   def __init__(self):
@@ -291,6 +314,7 @@ class StreamingBuffer(object):
   def close(self):
     return
 
+
 # Like compressString, but for iterators of strings.
 def compressSequence(sequence):
   buf = StreamingBuffer()
@@ -306,24 +330,31 @@ def compressSequence(sequence):
 
 ustringRe = re.compile("([\u0080-\uffff])")
 
+
 def javascriptQuote(s, quoteDoubleQuotes=False):
+  msg = (
+    "theory.utils.text.javascriptQuote() is deprecated. "
+    "Use theory.utils.html.escapejs() instead."
+  )
+  warnings.warn(msg, RemovedInTheory19Warning, stacklevel=2)
 
   def fix(match):
     return "\\u%04x" % ord(match.group(1))
 
   if type(s) == bytes:
     s = s.decode('utf-8')
-  elif type(s) != six.text_type:
+  elif type(s) != six.textType:
     raise TypeError(s)
   s = s.replace('\\', '\\\\')
   s = s.replace('\r', '\\r')
   s = s.replace('\n', '\\n')
   s = s.replace('\t', '\\t')
   s = s.replace("'", "\\'")
+  s = s.replace('</', '<\\/')
   if quoteDoubleQuotes:
     s = s.replace('"', '&quot;')
-  return str(ustringRe.sub(fix, s))
-javascriptQuote = allowLazy(javascriptQuote, six.text_type)
+  return ustringRe.sub(fix, s)
+javascriptQuote = allowLazy(javascriptQuote, six.textType)
 
 # Expression to match someToken and someToken="with spaces" (and similarly
 # for single-quoted strings).
@@ -336,6 +367,7 @@ smartSplitRe = re.compile(r"""
     )+
   ) | \S+)
 """, re.VERBOSE)
+
 
 def smartSplit(text):
   r"""
@@ -355,6 +387,7 @@ def smartSplit(text):
   text = forceText(text)
   for bit in smartSplitRe.finditer(text):
     yield bit.group(0)
+
 
 def _replaceEntity(match):
   text = match.group(1)
@@ -376,9 +409,11 @@ def _replaceEntity(match):
 
 _entityRe = re.compile(r"&(#?[xX]?(?:[0-9a-fA-F]+|\w{1,8}));")
 
+
 def unescapeEntities(text):
   return _entityRe.sub(_replaceEntity, text)
-unescapeEntities = allowLazy(unescapeEntities, six.text_type)
+unescapeEntities = allowLazy(unescapeEntities, six.textType)
+
 
 def unescapeStringLiteral(s):
   r"""
@@ -400,6 +435,7 @@ def unescapeStringLiteral(s):
   return s[1:-1].replace(r'\%s' % quote, quote).replace(r'\\', '\\')
 unescapeStringLiteral = allowLazy(unescapeStringLiteral)
 
+
 def slugify(value):
   """
   Converts to lowercase, removes non-word characters (alphanumerics and
@@ -409,4 +445,12 @@ def slugify(value):
   value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
   value = re.sub('[^\w\s-]', '', value).strip().lower()
   return markSafe(re.sub('[-\s]+', '-', value))
-slugify = allowLazy(slugify, six.text_type)
+slugify = allowLazy(slugify, six.textType)
+
+
+def camelCaseToSpaces(value):
+  """
+  Splits CamelCase and converts to lower case. Also strips leading and
+  trailing whitespace.
+  """
+  return reCamelCase.sub(r' \1', value).strip().lower()

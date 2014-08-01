@@ -2,51 +2,54 @@
 # Copyright 2007 Google Inc. http://code.google.com/p/ipaddr-py/
 # Licensed under the Apache License, Version 2.0 (the "License").
 from theory.core.exceptions import ValidationError
+from theory.utils.translation import ugettextLazy as _
+from theory.utils.six.moves import xrange
 
-def clean_ipv6_address(ip_str, unpack_ipv4=False,
-      error_message="This is not a valid IPv6 address."):
+
+def cleanIpv6Address(ipStr, unpackIpv4=False,
+    errorMessage=_("This is not a valid IPv6 address.")):
   """
-  Cleans a IPv6 address string.
+  Cleans an IPv6 address string.
 
-  Validity is checked by calling is_valid_ipv6_address() - if an
+  Validity is checked by calling isValidIpv6Address() - if an
   invalid address is passed, ValidationError is raised.
 
-  Replaces the longest continious zero-sequence with "::" and
+  Replaces the longest continuous zero-sequence with "::" and
   removes leading zeroes and makes sure all hextets are lowercase.
 
   Args:
-    ip_str: A valid IPv6 address.
-    unpack_ipv4: if an IPv4-mapped address is found,
+    ipStr: A valid IPv6 address.
+    unpackIpv4: if an IPv4-mapped address is found,
     return the plain IPv4 address (default=False).
-    error_message: A error message for in the ValidationError.
+    errorMessage: A error message for in the ValidationError.
 
   Returns:
     A compressed IPv6 address, or the same value
 
   """
-  best_doublecolon_start = -1
-  best_doublecolon_len = 0
-  doublecolon_start = -1
-  doublecolon_len = 0
+  bestDoublecolonStart = -1
+  bestDoublecolonLen = 0
+  doublecolonStart = -1
+  doublecolonLen = 0
 
-  if not is_valid_ipv6_address(ip_str):
-    raise ValidationError(error_message)
+  if not isValidIpv6Address(ipStr):
+    raise ValidationError(errorMessage, code='invalid')
 
   # This algorithm can only handle fully exploded
   # IP strings
-  ip_str = _explode_shorthand_ip_string(ip_str)
+  ipStr = _explodeShorthandIpString(ipStr)
 
-  ip_str = _sanitize_ipv4_mapping(ip_str)
+  ipStr = _sanitizeIpv4Mapping(ipStr)
 
   # If needed, unpack the IPv4 and return straight away
   # - no need in running the rest of the algorithm
-  if unpack_ipv4:
-    ipv4_unpacked = _unpack_ipv4(ip_str)
+  if unpackIpv4:
+    ipv4Unpacked = _unpackIpv4(ipStr)
 
-    if ipv4_unpacked:
-      return ipv4_unpacked
+    if ipv4Unpacked:
+      return ipv4Unpacked
 
-  hextets = ip_str.split(":")
+  hextets = ipStr.split(":")
 
   for index in range(len(hextets)):
     # Remove leading zeroes
@@ -56,28 +59,28 @@ def clean_ipv6_address(ip_str, unpack_ipv4=False,
 
     # Determine best hextet to compress
     if hextets[index] == '0':
-      doublecolon_len += 1
-      if doublecolon_start == -1:
+      doublecolonLen += 1
+      if doublecolonStart == -1:
         # Start of a sequence of zeros.
-        doublecolon_start = index
-      if doublecolon_len > best_doublecolon_len:
+        doublecolonStart = index
+      if doublecolonLen > bestDoublecolonLen:
         # This is the longest sequence of zeros so far.
-        best_doublecolon_len = doublecolon_len
-        best_doublecolon_start = doublecolon_start
+        bestDoublecolonLen = doublecolonLen
+        bestDoublecolonStart = doublecolonStart
     else:
-      doublecolon_len = 0
-      doublecolon_start = -1
+      doublecolonLen = 0
+      doublecolonStart = -1
 
   # Compress the most suitable hextet
-  if best_doublecolon_len > 1:
-    best_doublecolon_end = (best_doublecolon_start +
-                            best_doublecolon_len)
+  if bestDoublecolonLen > 1:
+    bestDoublecolonEnd = (bestDoublecolonStart +
+                bestDoublecolonLen)
     # For zeros at the end of the address.
-    if best_doublecolon_end == len(hextets):
+    if bestDoublecolonEnd == len(hextets):
       hextets += ['']
-    hextets[best_doublecolon_start:best_doublecolon_end] = ['']
+    hextets[bestDoublecolonStart:bestDoublecolonEnd] = ['']
     # For zeros at the beginning of the address.
-    if best_doublecolon_start == 0:
+    if bestDoublecolonStart == 0:
       hextets = [''] + hextets
 
   result = ":".join(hextets)
@@ -85,31 +88,31 @@ def clean_ipv6_address(ip_str, unpack_ipv4=False,
   return result.lower()
 
 
-def _sanitize_ipv4_mapping(ip_str):
+def _sanitizeIpv4Mapping(ipStr):
   """
-  Sanitize IPv4 mapping in a expanded IPv6 address.
+  Sanitize IPv4 mapping in an expanded IPv6 address.
 
   This converts ::ffff:0a0a:0a0a to ::ffff:10.10.10.10.
   If there is nothing to sanitize, returns an unchanged
   string.
 
   Args:
-    ip_str: A string, the expanded IPv6 address.
+    ipStr: A string, the expanded IPv6 address.
 
   Returns:
     The sanitized output string, if applicable.
   """
-  if not ip_str.lower().startswith('0000:0000:0000:0000:0000:ffff:'):
+  if not ipStr.lower().startswith('0000:0000:0000:0000:0000:ffff:'):
     # not an ipv4 mapping
-    return ip_str
+    return ipStr
 
-  hextets = ip_str.split(':')
+  hextets = ipStr.split(':')
 
   if '.' in hextets[-1]:
     # already sanitized
-    return ip_str
+    return ipStr
 
-  ipv4_address = "%d.%d.%d.%d" % (
+  ipv4Address = "%d.%d.%d.%d" % (
     int(hextets[6][0:2], 16),
     int(hextets[6][2:4], 16),
     int(hextets[7][0:2], 16),
@@ -117,11 +120,12 @@ def _sanitize_ipv4_mapping(ip_str):
   )
 
   result = ':'.join(hextets[0:6])
-  result += ':' + ipv4_address
+  result += ':' + ipv4Address
 
   return result
 
-def _unpack_ipv4(ip_str):
+
+def _unpackIpv4(ipStr):
   """
   Unpack an IPv4 address that was mapped in a compressed IPv6 address.
 
@@ -129,69 +133,69 @@ def _unpack_ipv4(ip_str):
   If there is nothing to sanitize, returns None.
 
   Args:
-    ip_str: A string, the expanded IPv6 address.
+    ipStr: A string, the expanded IPv6 address.
 
   Returns:
     The unpacked IPv4 address, or None if there was nothing to unpack.
   """
-  if not ip_str.lower().startswith('0000:0000:0000:0000:0000:ffff:'):
+  if not ipStr.lower().startswith('0000:0000:0000:0000:0000:ffff:'):
     return None
 
-  hextets = ip_str.split(':')
-  return hextets[-1]
+  return ipStr.rsplit(':', 1)[1]
 
-def is_valid_ipv6_address(ip_str):
+
+def isValidIpv6Address(ipStr):
   """
   Ensure we have a valid IPv6 address.
 
   Args:
-    ip_str: A string, the IPv6 address.
+    ipStr: A string, the IPv6 address.
 
   Returns:
     A boolean, True if this is a valid IPv6 address.
 
   """
-  from theory.core.validators import validate_ipv4_address
+  from theory.core.validators import validateIpv4Address
 
   # We need to have at least one ':'.
-  if ':' not in ip_str:
+  if ':' not in ipStr:
     return False
 
   # We can only have one '::' shortener.
-  if ip_str.count('::') > 1:
+  if ipStr.count('::') > 1:
     return False
 
   # '::' should be encompassed by start, digits or end.
-  if ':::' in ip_str:
+  if ':::' in ipStr:
     return False
 
   # A single colon can neither start nor end an address.
-  if ((ip_str.startswith(':') and not ip_str.startswith('::')) or
-        (ip_str.endswith(':') and not ip_str.endswith('::'))):
+  if ((ipStr.startswith(':') and not ipStr.startswith('::')) or
+      (ipStr.endswith(':') and not ipStr.endswith('::'))):
     return False
 
   # We can never have more than 7 ':' (1::2:3:4:5:6:7:8 is invalid)
-  if ip_str.count(':') > 7:
+  if ipStr.count(':') > 7:
     return False
 
   # If we have no concatenation, we need to have 8 fields with 7 ':'.
-  if '::' not in ip_str and ip_str.count(':') != 7:
+  if '::' not in ipStr and ipStr.count(':') != 7:
     # We might have an IPv4 mapped address.
-    if ip_str.count('.') != 3:
+    if ipStr.count('.') != 3:
       return False
 
-  ip_str = _explode_shorthand_ip_string(ip_str)
+  ipStr = _explodeShorthandIpString(ipStr)
 
   # Now that we have that all squared away, let's check that each of the
   # hextets are between 0x0 and 0xFFFF.
-  for hextet in ip_str.split(':'):
+  for hextet in ipStr.split(':'):
     if hextet.count('.') == 3:
       # If we have an IPv4 mapped address, the IPv4 portion has to
       # be at the end of the IPv6 portion.
-      if not ip_str.split(':')[-1] == hextet:
+      if not ipStr.split(':')[-1] == hextet:
         return False
       try:
-        validate_ipv4_address(hextet)
+        validateIpv4Address(hextet)
       except ValidationError:
         return False
     else:
@@ -205,63 +209,63 @@ def is_valid_ipv6_address(ip_str):
   return True
 
 
-def _explode_shorthand_ip_string(ip_str):
+def _explodeShorthandIpString(ipStr):
   """
   Expand a shortened IPv6 address.
 
   Args:
-    ip_str: A string, the IPv6 address.
+    ipStr: A string, the IPv6 address.
 
   Returns:
     A string, the expanded IPv6 address.
 
   """
-  if not _is_shorthand_ip(ip_str):
-    # We've already got a longhand ip_str.
-    return ip_str
+  if not _isShorthandIp(ipStr):
+    # We've already got a longhand ipStr.
+    return ipStr
 
-  new_ip = []
-  hextet = ip_str.split('::')
+  newIp = []
+  hextet = ipStr.split('::')
 
   # If there is a ::, we need to expand it with zeroes
   # to get to 8 hextets - unless there is a dot in the last hextet,
   # meaning we're doing v4-mapping
-  if '.' in ip_str.split(':')[-1]:
-    fill_to = 7
+  if '.' in ipStr.split(':')[-1]:
+    fillTo = 7
   else:
-    fill_to = 8
+    fillTo = 8
 
   if len(hextet) > 1:
     sep = len(hextet[0].split(':')) + len(hextet[1].split(':'))
-    new_ip = hextet[0].split(':')
+    newIp = hextet[0].split(':')
 
-    for _ in xrange(fill_to - sep):
-      new_ip.append('0000')
-    new_ip += hextet[1].split(':')
+    for __ in xrange(fillTo - sep):
+      newIp.append('0000')
+    newIp += hextet[1].split(':')
 
   else:
-    new_ip = ip_str.split(':')
+    newIp = ipStr.split(':')
 
   # Now need to make sure every hextet is 4 lower case characters.
   # If a hextet is < 4 characters, we've got missing leading 0's.
-  ret_ip = []
-  for hextet in new_ip:
-    ret_ip.append(('0' * (4 - len(hextet)) + hextet).lower())
-  return ':'.join(ret_ip)
+  retIp = []
+  for hextet in newIp:
+    retIp.append(('0' * (4 - len(hextet)) + hextet).lower())
+  return ':'.join(retIp)
 
 
-def _is_shorthand_ip(ip_str):
+def _isShorthandIp(ipStr):
   """Determine if the address is shortened.
 
   Args:
-    ip_str: A string, the IPv6 address.
+    ipStr: A string, the IPv6 address.
 
   Returns:
     A boolean, True if the address is shortened.
 
   """
-  if ip_str.count('::') == 1:
+  if ipStr.count('::') == 1:
     return True
-  if any(len(x) < 4 for x in ip_str.split(':')):
+  if any(len(x) < 4 for x in ipStr.split(':')):
     return True
   return False

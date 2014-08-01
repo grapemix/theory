@@ -27,8 +27,11 @@ class CreateApp(SimpleCommand):
   _drums = {"Terminal": 1, }
 
   class ParamForm(SimpleCommand.ParamForm):
-    appName = field.TextField(label="Application Name", \
-        help_text=" The name of application being created", max_length=32)
+    appName = field.TextField(
+        label="Application Name",
+        helpText=" The name of application being created",
+        maxLength=32
+        )
 
   def run(self):
     fromPath = os.path.join(os.path.dirname(os.path.dirname(__file__)),

@@ -57,7 +57,7 @@ class ModelTblFilterBaseTestCase(BaseCommandTestCase):
     self.cmd.paramForm = DummyModelTblFilter.ParamForm()
     self.cmd.paramForm.fields["appName"].initData = "theory"
     self.cmd.paramForm.fields["modelName"].initData = "Command"
-    self.cmd.paramForm.is_valid()
+    self.cmd.paramForm.isValid()
 
   def testRun(self):
     self._validateParamForm(self.cmd)

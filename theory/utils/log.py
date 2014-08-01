@@ -2,103 +2,168 @@
 #!/usr/bin/env python
 import logging
 import sys
-# TODO: to change another default way to send message
+import warnings
+
+from theory.conf import settings
 #from theory.core import mail
+#from theory.core.mail import getConnection
+from theory.utils.deprecation import RemovedInNextVersionWarning
+from theory.utils.moduleLoading import importString
+#from theory.views.debug import ExceptionReporter, getExceptionReporterFilter
 
-# Make sure a NullHandler is available
-# This was added in Python 2.7/3.2
-try:
-  from logging import NullHandler
-except ImportError:
-  class NullHandler(logging.Handler):
-    def emit(self, record):
-      pass
+# Imports kept for backwards-compatibility in Theory 1.7.
+from logging import NullHandler  # NOQA
+from logging.config import dictConfig  # NOQA
 
-# Make sure that dictConfig is available
-# This was added in Python 2.7/3.2
-try:
-  from logging.config import dictConfig
-except ImportError:
-  from theory.utils.dictconfig import dictConfig
+getLogger = logging.getLogger
 
-if sys.version_info < (2, 5):
-  class LoggerCompat(object):
-    def __init__(self, logger):
-      self._logger = logger
+# Default logging for Theory. This sends an email to the site admins on every
+# HTTP 500 error. Depending on DEBUG, all other log records are either sent to
+# the console (DEBUG=True) or discarded by mean of the NullHandler (DEBUG=False).
+DEFAULT_LOGGING = {
+  'version': 1,
+  'disableExistingLoggers': False,
+  'filters': {
+    'requireDebugFalse': {
+      '()': 'theory.utils.log.RequireDebugFalse',
+    },
+    'requireDebugTrue': {
+      '()': 'theory.utils.log.RequireDebugTrue',
+    },
+  },
+  'handlers': {
+    'console': {
+      'level': 'INFO',
+      'filters': ['requireDebugTrue'],
+      'class': 'logging.StreamHandler',
+    },
+    'null': {
+      'class': 'logging.NullHandler',
+    },
+    'mailAdmins': {
+      'level': 'ERROR',
+      'filters': ['requireDebugFalse'],
+      'class': 'theory.utils.log.AdminEmailHandler'
+    }
+  },
+  'loggers': {
+    'theory': {
+      'handlers': ['console'],
+    },
+    'theory.request': {
+      'handlers': ['mailAdmins'],
+      'level': 'ERROR',
+      'propagate': False,
+    },
+    'theory.security': {
+      'handlers': ['mailAdmins'],
+      'level': 'ERROR',
+      'propagate': False,
+    },
+    'py.warnings': {
+      'handlers': ['console'],
+    },
+  }
+}
 
-    def __getattr__(self, name):
-      val = getattr(self._logger, name)
-      if callable(val):
-        def _wrapper(*args, **kwargs):
-          # Python 2.4 logging module doesn't support 'extra' parameter to
-          # methods of Logger
-          kwargs.pop('extra', None)
-          return val(*args, **kwargs)
-        return _wrapper
-      else:
-        return val
 
-  def getLogger(name=None):
-    return LoggerCompat(logging.getLogger(name=name))
-else:
-  getLogger = logging.getLogger
+def configureLogging(loggingConfig, loggingSettings):
+  if not sys.warnoptions:
+    # Route warnings through python logging
+    logging.captureWarnings(True)
+    # RemovedInNextVersionWarning is a subclass of DeprecationWarning which
+    # is hidden by default, hence we force the "default" behavior
+    warnings.simplefilter("default", RemovedInNextVersionWarning)
 
-# Ensure the creation of the Theory logger
-# with a null handler. This ensures we don't get any
-# 'No handlers could be found for logger "theory"' messages
-logger = getLogger('theory')
-if not logger.handlers:
-  logger.addHandler(NullHandler())
+  if loggingConfig:
+    # First find the logging configuration function ...
+    loggingConfigFunc = importString(loggingConfig)
 
-class AdminEmailHandler(logging.Handler):
-  def __init__(self, include_html=False):
-    logging.Handler.__init__(self)
-    self.include_html = include_html
+    loggingConfigFunc(DEFAULT_LOGGING)
 
-  """An exception log handler that e-mails log entries to site admins.
+    # ... then invoke it with the logging settings
+    if loggingSettings:
+      loggingConfigFunc(loggingSettings)
 
-  If the request is passed as the first argument to the log record,
-  request data will be provided in the
+
+#class AdminEmailHandler(logging.Handler):
+#  """An exception log handler that emails log entries to site admins.
+#
+#  If the request is passed as the first argument to the log record,
+#  request data will be provided in the email report.
+#  """
+#
+#  def __init__(self, includeHtml=False, emailBackend=None):
+#    logging.Handler.__init__(self)
+#    self.includeHtml = includeHtml
+#    self.emailBackend = emailBackend
+#
+#  def emit(self, record):
+#    try:
+#      request = record.request
+#      subject = '%s (%s IP): %s' % (
+#        record.levelname,
+#        ('internal' if request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS
+#         else 'EXTERNAL'),
+#        record.getMessage()
+#      )
+#      filter = getExceptionReporterFilter(request)
+#      requestRepr = '\n{0}'.format(filter.getRequestRepr(request))
+#    except Exception:
+#      subject = '%s: %s' % (
+#        record.levelname,
+#        record.getMessage()
+#      )
+#      request = None
+#      requestRepr = "unavailable"
+#    subject = self.formatSubject(subject)
+#
+#    if record.excInfo:
+#      excInfo = record.excInfo
+#    else:
+#      excInfo = (None, record.getMessage(), None)
+#
+#    message = "%s\n\nRequest repr(): %s" % (self.format(record), requestRepr)
+#    reporter = ExceptionReporter(request, isEmail=True, *excInfo)
+#    htmlMessage = reporter.getTracebackHtml() if self.includeHtml else None
+#    mail.mailAdmins(subject, message, failSilently=True,
+#             htmlMessage=htmlMessage,
+#             connection=self.connection())
+#
+#  def connection(self):
+#    return getConnection(backend=self.emailBackend, failSilently=True)
+#
+#  def formatSubject(self, subject):
+#    """
+#    Escape CR and LF characters, and limit length.
+#    RFC 2822's hard limit is 998 characters per line. So, minus "Subject: "
+#    the actual subject must be no longer than 989 characters.
+#    """
+#    formattedSubject = subject.replace('\n', '\\n').replace('\r', '\\r')
+#    return formattedSubject[:989]
+
+
+class CallbackFilter(logging.Filter):
   """
-  def emit(self, record):
-    import traceback
-    from theory.conf import settings
-    from theory.views.debug import ExceptionReporter
+  A logging filter that checks the return value of a given callable (which
+  takes the record-to-be-logged as its only parameter) to decide whether to
+  log a record.
 
-    try:
-      if sys.version_info < (2,5):
-        # A nasty workaround required because Python 2.4's logging
-        # module doesn't support passing in extra context.
-        # For this handler, the only extra data we need is the
-        # request, and that's in the top stack frame.
-        request = record.exc_info[2].tb_frame.f_locals['request']
-      else:
-        request = record.request
+  """
+  def __init__(self, callback):
+    self.callback = callback
 
-      subject = '%s (%s IP): %s' % (
-        record.levelname,
-        (request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS and 'internal' or 'EXTERNAL'),
-        record.msg
-      )
-      request_repr = repr(request)
-    except:
-      subject = '%s: %s' % (
-        record.levelname,
-        record.msg
-      )
+  def filter(self, record):
+    if self.callback(record):
+      return 1
+    return 0
 
-      request = None
-      request_repr = "Request repr() unavailable"
 
-    if record.exc_info:
-      exc_info = record.exc_info
-      stack_trace = '\n'.join(traceback.format_exception(*record.exc_info))
-    else:
-      exc_info = (None, record.msg, None)
-      stack_trace = 'No stack trace available'
+class RequireDebugFalse(logging.Filter):
+  def filter(self, record):
+    return not settings.DEBUG
 
-    message = "%s\n\n%s" % (stack_trace, request_repr)
-    reporter = ExceptionReporter(request, is_email=True, *exc_info)
-    html_message = self.include_html and reporter.get_traceback_html() or None
-    #mail.mail_admins(subject, message, fail_silently=True,
-    #         html_message=html_message)
+
+class RequireDebugTrue(logging.Filter):
+  def filter(self, record):
+    return settings.DEBUG

@@ -28,8 +28,8 @@ class ModelClassScanner(BaseClassScanner):
   """This class is mongoengine specific"""
   _modelLst = []
 
-  fieldKwargsLst = ("default", "verbose_name", "help_text", "choices",
-      "unique_with", "unique", "required", "max_length", "min_length",
+  fieldKwargsLst = ("default", "verboseName", "helpText", "choices",
+      "uniqueWith", "unique", "required", "maxLength", "minLength",
       "field",
       )
 

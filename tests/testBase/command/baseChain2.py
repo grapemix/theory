@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 ##### System wide lib #####
 
 ##### Theory lib #####
@@ -23,7 +24,7 @@ class BaseChain2(BaseChain):
   _propertyForTesting = ""
 
   class ParamForm(SimpleCommand.ParamForm):
-    stdIn = field.TextField(label="Std In", help_text="Standard Input")
+    stdIn = field.TextField(label="Std In", helpText="Standard Input")
     customField = field.TextField(required=False) # unused
 
   @classmethod

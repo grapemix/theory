@@ -38,7 +38,7 @@ class FormBaseTestCase(unittest.TestCase):
   To test the FormBase.
   """
   class TestForm(StepForm):
-    initField = field.TextField(initData="test", max_length=5)
+    initField = field.TextField(initData="test", maxLength=5)
     emptyField = field.TextField()
 
 
@@ -56,7 +56,7 @@ class FormBaseTestCase(unittest.TestCase):
 
   def testFullCleanInLazyMode(self):
     self.form.generateForm(*self.uiParam.values())
-    self.assertFalse(self.form.is_valid())
+    self.assertFalse(self.form.isValid())
     self.assertEqual(
         self.form.errors,
         {"emptyField": ["This field is required."]}
@@ -64,15 +64,15 @@ class FormBaseTestCase(unittest.TestCase):
     self.assertEqual(self.form.fields["emptyField"]._finalData, None)
     self.form.fields["emptyField"].widget.reset(finalData="test")
     self.form.fields["initField"].widget.reset(finalData="test2")
-    self.form.full_clean()
-    self.assertTrue(self.form.is_valid())
+    self.form.fullClean()
+    self.assertTrue(self.form.isValid())
     self.assertEqual(self.form.clean()["emptyField"], "test")
     self.assertEqual(self.form.clean()["initField"], "test")
 
   def testFullCleanInNonLazyMode(self):
     self.form.generateForm(*self.uiParam.values())
     self.form.isLazy = False
-    self.assertFalse(self.form.is_valid())
+    self.assertFalse(self.form.isValid())
     self.assertEqual(
         self.form.errors,
         {"emptyField": ["This field is required."]}
@@ -80,8 +80,8 @@ class FormBaseTestCase(unittest.TestCase):
     self.assertEqual(self.form.fields["emptyField"]._finalData, "")
     self.form.fields["emptyField"].widget.reset(finalData="test")
     self.form.fields["initField"].widget.reset(finalData="test2")
-    self.form.full_clean()
-    self.assertTrue(self.form.is_valid())
+    self.form.fullClean()
+    self.assertTrue(self.form.isValid())
     self.assertEqual(self.form.clean()["emptyField"], "test")
     self.assertEqual(self.form.clean()["initField"], "test2")
 
@@ -89,15 +89,15 @@ class FormBaseTestCase(unittest.TestCase):
     self.form.generateForm(*self.uiParam.values())
     self.form.fields["initField"].widget.reset(finalData="test22")
     self.form.fields["emptyField"].widget.reset(finalData="test")
-    self.form.full_clean()
-    self.assertFalse(self.form.is_valid())
+    self.form.fullClean()
+    self.assertFalse(self.form.isValid())
     self.assertEqual(self.form.fields["initField"]._finalData, None)
     self.form.fields["initField"].widget.reset(finalData="test2")
-    self.form.full_clean()
-    self.assertTrue(self.form.is_valid())
+    self.form.fullClean()
+    self.assertTrue(self.form.isValid())
 
   def testFullCleanInLazyModeWithoutWidget(self):
-    self.assertFalse(self.form.is_valid())
+    self.assertFalse(self.form.isValid())
     self.assertEqual(
         self.form.errors,
         {"emptyField": ["This field is required."]}
@@ -105,8 +105,8 @@ class FormBaseTestCase(unittest.TestCase):
     self.assertEqual(self.form.fields["emptyField"].finalData, None)
     self.form.fields["emptyField"].finalData = "test"
     self.form.fields["initField"].widget.finalData = "test2"
-    self.form.full_clean()
-    self.assertTrue(self.form.is_valid())
+    self.form.fullClean()
+    self.assertTrue(self.form.isValid())
     self.assertEqual(self.form.clean()["emptyField"], "test")
     self.assertEqual(self.form.clean()["initField"], "test")
 
@@ -130,7 +130,7 @@ class StepFormTestCase(unittest.TestCase):
     self.uiParam["bx"].clear()
 
   def btnCallback(self, btn):
-    if(self.testForm.is_valid()):
+    if(self.testForm.isValid()):
       print self.testForm.clean()["d"]
 
   def _renderForm(self, *args, **kwargs):

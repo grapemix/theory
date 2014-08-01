@@ -1,26 +1,14 @@
-# -*- coding: utf-8 -*-
-#!/usr/bin/env python
-##### System wide lib #####
-#from __future__ import unicodeLiterals
+from __future__ import unicode_literals
 
 import codecs
 import datetime
 from decimal import Decimal
 import locale
-import warnings
 
-##### Theory lib #####
 from theory.utils.functional import Promise
 from theory.utils import six
 from theory.utils.six.moves.urllib.parse import quote
 
-##### Theory third-party lib #####
-
-##### Local app #####
-
-##### Theory app #####
-
-##### Misc #####
 
 class TheoryUnicodeDecodeError(UnicodeDecodeError):
   def __init__(self, obj, *args):
@@ -32,28 +20,6 @@ class TheoryUnicodeDecodeError(UnicodeDecodeError):
     return '%s. You passed in %r (%s)' % (original, self.obj,
         type(self.obj))
 
-class StrAndUnicode(object):
-  """
-  A class that derives __str__ from __unicode__.
-
-  On Python 2, __str__ returns the output of __unicode__ encoded as a UTF-8
-  bytestring. On Python 3, __str__ returns the output of __unicode__.
-
-  Useful as a mix-in. If you support Python 2 and 3 with a single code base,
-  you can inherit this mix-in and just define __unicode__.
-  """
-  def __init__(self, *args, **kwargs):
-    warnings.warn("StrAndUnicode is deprecated. Define a __str__ method "
-           "and apply the @python2_unicodeCompatible decorator "
-           "instead.", DeprecationWarning, stacklevel=2)
-    super(StrAndUnicode, self).__init__(*args, **kwargs)
-
-  if six.PY3:
-    def __str__(self):
-      return self.__unicode__()
-  else:
-    def __str__(self):
-      return self.__unicode__().encode('utf-8')
 
 def python2UnicodeCompatible(klass):
   """
@@ -72,6 +38,7 @@ def python2UnicodeCompatible(klass):
     klass.__str__ = lambda self: self.__unicode__().encode('utf-8')
   return klass
 
+
 def smartText(s, encoding='utf-8', stringsOnly=False, errors='strict'):
   """
   Returns a text object representing 's' -- unicode on Python 2 and str on
@@ -84,14 +51,19 @@ def smartText(s, encoding='utf-8', stringsOnly=False, errors='strict'):
     return s
   return forceText(s, encoding, stringsOnly, errors)
 
+
+_PROTECTED_TYPES = six.integerTypes + (type(None), float, Decimal,
+  datetime.datetime, datetime.date, datetime.time)
+
+
 def isProtectedType(obj):
   """Determine if the object instance is of a protected type.
 
   Objects of protected types are preserved as-is when passed to
   forceText(stringsOnly=True).
   """
-  return isinstance(obj, six.integerTypes + (type(None), float, Decimal,
-    datetime.datetime, datetime.date, datetime.time))
+  return isinstance(obj, _PROTECTED_TYPES)
+
 
 def forceText(s, encoding='utf-8', stringsOnly=False, errors='strict'):
   """
@@ -100,26 +72,24 @@ def forceText(s, encoding='utf-8', stringsOnly=False, errors='strict'):
 
   If stringsOnly is True, don't convert (some) non-string-like objects.
   """
-  # Handle the common case first, saves 30-40% when s is an instance of
-  # six.text_type. This function gets called often in that setting.
-  if isinstance(s, six.text_type):
+  # Handle the common case first for performance reasons.
+  if isinstance(s, six.textType):
     return s
   if stringsOnly and isProtectedType(s):
     return s
   try:
-    if not isinstance(s, six.string_types):
-      if hasattr(s, '__unicode__'):
-        s = s.__unicode__()
-      else:
-        if six.PY3:
-          if isinstance(s, bytes):
-            s = six.text_type(s, encoding, errors)
-          else:
-            s = six.text_type(s)
+    if not isinstance(s, six.stringTypes):
+      if six.PY3:
+        if isinstance(s, bytes):
+          s = six.textType(s, encoding, errors)
         else:
-          s = six.text_type(bytes(s), encoding, errors)
+          s = six.textType(s)
+      elif hasattr(s, '__unicode__'):
+        s = six.textType(s)
+      else:
+        s = six.textType(bytes(s), encoding, errors)
     else:
-      # Note: We use .decode() here, instead of six.text_type(s, encoding,
+      # Note: We use .decode() here, instead of six.textType(s, encoding,
       # errors), so that if s is a SafeBytes, it ends up being a
       # SafeText at the end.
       s = s.decode(encoding, errors)
@@ -135,6 +105,7 @@ def forceText(s, encoding='utf-8', stringsOnly=False, errors='strict'):
       s = ' '.join([forceText(arg, encoding, stringsOnly,
           errors) for arg in s])
   return s
+
 
 def smartBytes(s, encoding='utf-8', stringsOnly=False, errors='strict'):
   """
@@ -155,21 +126,22 @@ def forceBytes(s, encoding='utf-8', stringsOnly=False, errors='strict'):
 
   If stringsOnly is True, don't convert (some) non-string-like objects.
   """
-  if isinstance(s, six.memoryview):
-    s = bytes(s)
+  # Handle the common case first for performance reasons.
   if isinstance(s, bytes):
     if encoding == 'utf-8':
       return s
     else:
       return s.decode('utf-8', errors).encode(encoding, errors)
-  if stringsOnly and (s is None or isinstance(s, int)):
+  if stringsOnly and isProtectedType(s):
     return s
+  if isinstance(s, six.memoryview):
+    return bytes(s)
   if isinstance(s, Promise):
-    return six.text_type(s).encode(encoding, errors)
-  if not isinstance(s, six.string_types):
+    return six.textType(s).encode(encoding, errors)
+  if not isinstance(s, six.stringTypes):
     try:
       if six.PY3:
-        return six.text_type(s).encode(encoding)
+        return six.textType(s).encode(encoding)
       else:
         return bytes(s)
     except UnicodeEncodeError:
@@ -179,7 +151,7 @@ def forceBytes(s, encoding='utf-8', stringsOnly=False, errors='strict'):
         # further exception.
         return b' '.join([forceBytes(arg, encoding, stringsOnly,
             errors) for arg in s])
-      return six.text_type(s).encode(encoding, errors)
+      return six.textType(s).encode(encoding, errors)
   else:
     return s.encode(encoding, errors)
 
@@ -193,15 +165,16 @@ else:
   smartUnicode = smartText
   forceUnicode = forceText
 
-smartStr.__doc__ = """\
+smartStr.__doc__ = """
 Apply smartText in Python 3 and smartBytes in Python 2.
 
 This is suitable for writing to sys.stdout (for instance).
 """
 
-forceStr.__doc__ = """\
+forceStr.__doc__ = """
 Apply forceText in Python 3 and forceBytes in Python 2.
 """
+
 
 def iriToUri(iri):
   """
@@ -230,6 +203,7 @@ def iriToUri(iri):
     return iri
   return quote(forceBytes(iri), safe=b"/#%[]=:;$&()+,!?*@'~")
 
+
 def filepathToUri(path):
   """Convert a file system path to a URI portion that is suitable for
   inclusion in a URL.
@@ -248,6 +222,7 @@ def filepathToUri(path):
   # I know about `os.sep` and `os.altsep` but I want to leave
   # some flexibility for hardcoding separators.
   return quote(forceBytes(path).replace(b"\\", b"/"), safe=b"/~!*()'")
+
 
 def getSystemEncoding():
   """

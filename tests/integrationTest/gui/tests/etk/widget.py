@@ -232,7 +232,7 @@ class ModelValidateGroupFieldWidgetTestCase(
 class ListFieldWidgetTestCase(ListFieldTestCase, FieldWidgetTestCaseBase):
   def testTextWidget(self):
     param = {
-        "field": self._getFieldKlass("TextFieldTestCase")(max_length=200),
+        "field": self._getFieldKlass("TextFieldTestCase")(maxLength=200),
         "initData": ["aa", "bb"]
     }
     self.field = self.fieldKlass(**param)
@@ -244,7 +244,7 @@ class ListFieldWidgetTestCase(ListFieldTestCase, FieldWidgetTestCaseBase):
 
   def testTextWidgetWithShortString(self):
     param = {
-        "field": self._getFieldKlass("TextFieldTestCase")(max_length=2),
+        "field": self._getFieldKlass("TextFieldTestCase")(maxLength=2),
         "initData": ["aa", "bb"]
         }
     self.field = self.fieldKlass(**param)

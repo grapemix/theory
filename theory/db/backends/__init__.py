@@ -6,7 +6,7 @@
 from theory.conf import settings
 from theory.db import DEFAULT_DB_ALIAS
 from theory.db.utils import DatabaseError
-from theory.utils.timezone import is_aware
+from theory.utils.timezone import isAware
 
 ##### Theory third-party lib #####
 

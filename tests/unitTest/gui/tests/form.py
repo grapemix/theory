@@ -29,7 +29,7 @@ class FormBaseTestCase(unittest.TestCase):
 
   #def testPlainFormIsValid(self):
   #  form = FormBase()
-  #  form.is_valid()
+  #  form.isValid()
 
   #def testPlainFormHasChanged(self):
   #  form = FormBase()
@@ -45,10 +45,10 @@ class CombinatoryFormTestCase(unittest.TestCase):
     self.form = self.factory.getCombinatoryFormWithDefaultValue()
 
   def testFormValidateWithDefaultValue(self):
-    self.assertTrue(self.form.is_valid(), self.form._errors)
+    self.assertTrue(self.form.isValid(), self.form._errors)
 
   def testFormToJson(self):
-    self.form.is_valid()
+    self.form.isValid()
     # Just to see if toJson throw errors, should compare the result in the
     # future
     self.form.toJson()

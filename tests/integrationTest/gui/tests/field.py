@@ -261,14 +261,14 @@ class FileFieldTestCase(FieldTestCaseBase):
     initData=os.path.join(self.testCaseFileAbsPath, "jpeg.jpg")
     self.field = self.fieldKlass(
         initData=initData,
-        max_length=1,
+        maxLength=1,
         )
     self.renderWidget(self.field)
 
     with self.assertRaises(ValidationError):
       self.assertEqual(self.field.clean(self.field.finalData), {})
 
-    self.field.max_length = 99999
+    self.field.maxLength = 99999
     self.assertEqual(
         self.field.clean(self.field.finalData).filepath,
         LocalFileObject(initData).filepath
@@ -305,14 +305,14 @@ class FilePathFieldTestCase(FieldTestCaseBase):
     initData=os.path.join(self.testCaseFileAbsPath, "jpeg.jpg")
     self.field = self.fieldKlass(
         initData=initData,
-        max_length=1,
+        maxLength=1,
         )
     self.renderWidget(self.field)
 
     with self.assertRaises(ValidationError):
       self.assertEqual(self.field.clean(self.field.finalData), {})
 
-    self.field.max_length = 99999
+    self.field.maxLength = 99999
     self.assertEqual(
         self.field.clean(self.field.finalData).filepath,
         LocalFileObject(initData).filepath
@@ -396,10 +396,10 @@ class ListFieldTestCase(FieldTestCaseBase):
   def testEmptyFinalValue(self):
     self.field = self.fieldKlass(**self.extraInitParam())
     self.renderWidget(self.field)
-    self.field.min_length = 5
+    self.field.minLength = 5
     with self.assertRaises(ValidationError):
       self.assertEqual(self.field.clean(self.field.finalData), [])
-    self.field.min_length = 0
+    self.field.minLength = 0
     self.assertEqual(self.field.clean(self.field.finalData), [])
 
   def testSingleElementInitValue(self):
@@ -438,10 +438,10 @@ class DictFieldTestCase(FieldTestCaseBase):
   def testEmptyFinalValue(self):
     self.field = self.fieldKlass(**self.extraInitParam())
     self.renderWidget(self.field)
-    self.field.min_length = 5
+    self.field.minLength = 5
     with self.assertRaises(ValidationError):
       self.field.clean(self.field.finalData)
-    self.field.min_length = 0
+    self.field.minLength = 0
     self.assertEqual(self.field.clean(self.field.finalData), {})
 
 class PythonModuleFieldTestCase(FieldTestCaseBase):
@@ -451,11 +451,11 @@ class PythonModuleFieldTestCase(FieldTestCaseBase):
     return None
 
   def setUp(self):
-    self.field = self.fieldKlass(auto_import=True)
+    self.field = self.fieldKlass(autoImport=True)
     self.renderWidget(self.field)
 
   def testValidatePlain(self):
-    self.field.auto_import = False
+    self.field.autoImport = False
     self.assertEqual(self.field.validate("anything"), "anything")
 
   def testValidateAutoImport(self):
@@ -472,11 +472,11 @@ class PythonClassFieldTestCase(FieldTestCaseBase):
     return None
 
   def setUp(self):
-    self.field = self.fieldKlass(auto_import=True)
+    self.field = self.fieldKlass(autoImport=True)
     self.renderWidget(self.field)
 
   def testValidatePlain(self):
-    self.field.auto_import = False
+    self.field.autoImport = False
     self.assertEqual(self.field.validate("anything"), "anything")
 
   def testValidateAutoImport(self):
@@ -497,7 +497,7 @@ class QuerysetFieldTestCase(FieldTestCaseBase):
 
   def setUp(self):
     initParam = self.extraInitParam()
-    initParam.update({"initData": self.getInitData(), "auto_import": True})
+    initParam.update({"initData": self.getInitData(), "autoImport": True})
 
     self.field = self.fieldKlass(**initParam)
     self.renderWidget(self.field)
@@ -524,7 +524,7 @@ class QuerysetFieldTestCase(FieldTestCaseBase):
 
     initParam = self.extraInitParam()
     initData = Adapter.objects.all()
-    initParam.update({"initData": initData, "auto_import": True})
+    initParam.update({"initData": initData, "autoImport": True})
 
     self.field = self.fieldKlass(**initParam)
 
@@ -533,26 +533,26 @@ class QuerysetFieldTestCase(FieldTestCaseBase):
       self.assertEqual(self.field.clean(self.field.finalData), initData)
 
   def testEmptyDataWithFalseAutoImport(self):
-    self.field.auto_import = False
+    self.field.autoImport = False
     self.field.required = False
     self.assertEqual(self.field.clean(self.field.finalData), [])
 
   def testValidDataWithFalseAutoImport(self):
     data = Adapter.objects.all()
     self.field.finalData = data
-    self.field.auto_import = False
+    self.field.autoImport = False
     self.assertEqual(self.field.clean(self.field.finalData), data)
 
   def testValidDataWithFalseAutoImportRequired(self):
     self.field.finalData = []
-    self.field.auto_import = False
+    self.field.autoImport = False
     self.field.required = True
     with self.assertRaises(ValidationError):
       self.assertEqual(self.field.clean(self.field.finalData), [])
 
   def testEmptyDataWithAppAndModelWithFalseAutoImport(self):
     self.field.required = False
-    self.field.auto_import = False
+    self.field.autoImport = False
     self.field.app = "anything"
     self.field.model = "anything"
 
@@ -564,7 +564,7 @@ class QuerysetFieldTestCase(FieldTestCaseBase):
     initParam.update(
         {
           "initData": initData,
-          "auto_import": True
+          "autoImport": True
         })
 
     self.field = self.fieldKlass(**initParam)
@@ -588,7 +588,7 @@ class QuerysetFieldTestCase(FieldTestCaseBase):
     initParam.update(
         {
           "initData": initData,
-          "auto_import": True
+          "autoImport": True
         })
 
     self.field = self.fieldKlass(**initParam)
@@ -603,7 +603,7 @@ class QuerysetFieldTestCase(FieldTestCaseBase):
     with self.assertRaises(ValidationError):
       self.assertEqual(self.field.clean(self.field.finalData), initData)
 
-    self.field.auto_import = False
+    self.field.autoImport = False
     self.field.app = None
     self.field.model = None
     self.assertEqual(self.field.clean(self.field.finalData), initData)

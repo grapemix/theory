@@ -1,8 +1,8 @@
 """
 Internationalization support.
 """
-#from __future__ import unicodeLiterals
-
+from __future__ import unicode_literals
+import re
 from theory.utils.encoding import forceText
 from theory.utils.functional import lazy
 from theory.utils import six
@@ -10,7 +10,7 @@ from theory.utils import six
 
 __all__ = [
   'activate', 'deactivate', 'override', 'deactivateAll',
-  'getLanguage',  'getLanguageFromRequest',
+  'getLanguage', 'getLanguageFromRequest',
   'getLanguageInfo', 'getLanguageBidi',
   'checkForLanguage', 'toLocale', 'templatize', 'stringConcat',
   'gettext', 'gettextLazy', 'gettextNoop',
@@ -19,7 +19,10 @@ __all__ = [
   'ungettext', 'ungettextLazy',
   'pgettext', 'pgettextLazy',
   'npgettext', 'npgettextLazy',
+  'LANGUAGE_SESSION_KEY',
 ]
+
+LANGUAGE_SESSION_KEY = '_language'
 
 
 class TranslatorCommentWarning(SyntaxWarning):
@@ -61,32 +64,40 @@ _trans = Trans()
 # The Trans class is no more needed, so remove it from the namespace.
 del Trans
 
+
 def gettextNoop(message):
   return _trans.gettextNoop(message)
 
 ugettextNoop = gettextNoop
 
+
 def gettext(message):
   return _trans.gettext(message)
+
 
 def ngettext(singular, plural, number):
   return _trans.ngettext(singular, plural, number)
 
+
 def ugettext(message):
   return _trans.ugettext(message)
+
 
 def ungettext(singular, plural, number):
   return _trans.ungettext(singular, plural, number)
 
+
 def pgettext(context, message):
   return _trans.pgettext(context, message)
+
 
 def npgettext(context, singular, plural, number):
   return _trans.npgettext(context, singular, plural, number)
 
 gettextLazy = lazy(gettext, str)
-ugettextLazy = lazy(ugettext, six.text_type)
-pgettextLazy = lazy(pgettext, six.text_type)
+ugettextLazy = lazy(ugettext, six.textType)
+pgettextLazy = lazy(pgettext, six.textType)
+
 
 def lazyNumber(func, resultclass, number=None, **kwargs):
   if isinstance(number, int):
@@ -117,20 +128,26 @@ def lazyNumber(func, resultclass, number=None, **kwargs):
     proxy = lazy(lambda **kwargs: NumberAwareString(), NumberAwareString)(**kwargs)
   return proxy
 
+
 def ngettextLazy(singular, plural, number=None):
   return lazyNumber(ngettext, str, singular=singular, plural=plural, number=number)
 
+
 def ungettextLazy(singular, plural, number=None):
-  return lazyNumber(ungettext, six.text_type, singular=singular, plural=plural, number=number)
+  return lazyNumber(ungettext, six.textType, singular=singular, plural=plural, number=number)
+
 
 def npgettextLazy(context, singular, plural, number=None):
-  return lazyNumber(npgettext, six.text_type, context=context, singular=singular, plural=plural, number=number)
+  return lazyNumber(npgettext, six.textType, context=context, singular=singular, plural=plural, number=number)
+
 
 def activate(language):
   return _trans.activate(language)
 
+
 def deactivate():
   return _trans.deactivate()
+
 
 class override(object):
   def __init__(self, language, deactivate=False):
@@ -150,42 +167,55 @@ class override(object):
     else:
       activate(self.oldLanguage)
 
+
 def getLanguage():
   return _trans.getLanguage()
+
 
 def getLanguageBidi():
   return _trans.getLanguageBidi()
 
+
 def checkForLanguage(langCode):
   return _trans.checkForLanguage(langCode)
+
 
 def toLocale(language):
   return _trans.toLocale(language)
 
+
 def getLanguageFromRequest(request, checkPath=False):
   return _trans.getLanguageFromRequest(request, checkPath)
 
-def getLanguageFromPath(path, supported=None):
-  return _trans.getLanguageFromPath(path, supported=supported)
+
+def getLanguageFromPath(path):
+  return _trans.getLanguageFromPath(path)
+
 
 def templatize(src, origin=None):
   return _trans.templatize(src, origin)
 
+
 def deactivateAll():
   return _trans.deactivateAll()
+
 
 def _stringConcat(*strings):
   """
   Lazy variant of string concatenation, needed for translations that are
   constructed from multiple parts.
   """
-  return ''.join([forceText(s) for s in strings])
-stringConcat = lazy(_stringConcat, six.text_type)
+  return ''.join(forceText(s) for s in strings)
+stringConcat = lazy(_stringConcat, six.textType)
+
 
 def getLanguageInfo(langCode):
   from theory.conf.locale import LANG_INFO
   try:
-    return LANG_INFO[langCode]
+    langInfo = LANG_INFO[langCode]
+    if 'fallback' in langInfo and 'name' not in langInfo:
+      return getLanguageInfo(langInfo['fallback'][0])
+    return langInfo
   except KeyError:
     if '-' not in langCode:
       raise KeyError("Unknown language code %s." % langCode)
@@ -194,3 +224,9 @@ def getLanguageInfo(langCode):
       return LANG_INFO[genericLangCode]
     except KeyError:
       raise KeyError("Unknown language code %s and %s." % (langCode, genericLangCode))
+
+trimWhitespaceRe = re.compile('\s*\n\s*')
+
+
+def trimWhitespace(s):
+  return trimWhitespaceRe.sub(' ', s.strip())

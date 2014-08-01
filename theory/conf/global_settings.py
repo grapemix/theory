@@ -271,8 +271,8 @@ THOUSAND_SEPARATOR = ','
 
 # The User-Agent string to use when checking for URL validity through the
 # isExistingURL validator.
-from theory import get_version
-URL_VALIDATOR_USER_AGENT = "Theory/%s (https://www.theoryproject.com)" % get_version()
+from theory import getVersion
+URL_VALIDATOR_USER_AGENT = "Theory/%s (https://www.theoryproject.com)" % getVersion()
 
 # The tablespaces to use for each model when not specified otherwise.
 DEFAULT_TABLESPACE = ''

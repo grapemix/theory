@@ -36,7 +36,7 @@ class BridgeTestCase(unittest.TestCase):
     firstCmd = AsyncChain1()
     firstCmd.paramForm = firstCmd.ParamForm()
     firstCmd.paramForm.fields["verbosity"].finalData = 1
-    self.assertTrue(firstCmd.paramForm.is_valid())
+    self.assertTrue(firstCmd.paramForm.isValid())
     firstCmd.run(paramFormData={"verbosity": 1})
 
     self.assertEqual(firstCmd.paramForm.clean()["verbosity"], 1)
@@ -45,7 +45,7 @@ class BridgeTestCase(unittest.TestCase):
     # test param form non existed here
     firstCmd.paramForm = firstCmd.ParamForm()
     firstCmd.paramForm.fields["verbosity"].finalData = 2
-    self.assertTrue(firstCmd.paramForm.is_valid())
+    self.assertTrue(firstCmd.paramForm.isValid())
     firstCmd.run(paramFormData={"verbosity": 2})
 
     self.assertEqual(firstCmd.paramForm.clean()["verbosity"], 2)
@@ -99,7 +99,7 @@ class BridgeTestCase(unittest.TestCase):
         thirdpartyObj.cmd.paramForm.fields['stdIn'].finalData,
         u'asyncChain1')
     self.assertEqual(
-        thirdpartyObj.cmd.paramForm.cleaned_data['stdIn'],
+        thirdpartyObj.cmd.paramForm.cleanedData['stdIn'],
         u'asyncChain1')
 
   def test_execeuteCommand(self):
@@ -111,10 +111,10 @@ class BridgeTestCase(unittest.TestCase):
     firstCmd.paramForm = firstCmd.ParamForm()
     self.bridge._execeuteCommand(firstCmd, self.asyncChain1CommandModel)
     self.assertEqual(firstCmd._stdOut, "asyncChain1")
-    self.assertTrue(firstCmd.paramForm.is_valid())
+    self.assertTrue(firstCmd.paramForm.isValid())
 
     cmdModel = SimpleChain1.getCmdModel()
     firstCmd = SimpleChain1()
     firstCmd.paramForm = firstCmd.ParamForm()
     self.bridge._execeuteCommand(firstCmd, cmdModel)
-    self.assertTrue(firstCmd.paramForm.is_valid())
+    self.assertTrue(firstCmd.paramForm.isValid())

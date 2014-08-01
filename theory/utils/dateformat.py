@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#!/usr/bin/env python
 """
 PHP date() style date formatting
 See http://www.php.net/date for format strings
@@ -8,35 +6,52 @@ Usage:
 >>> import datetime
 >>> d = datetime.datetime.now()
 >>> df = DateFormat(d)
->>> print df.format('jS F Y H:i')
+>>> print(df.format('jS F Y H:i'))
 7th October 2003 11:39
 >>>
 """
+from __future__ import unicode_literals
 
 import re
 import time
 import calendar
-from theory.utils.dates import MONTHS, MONTHS_3, MONTHS_ALT, MONTHS_AP, WEEKDAYS, WEEKDAYS_ABBR
-from theory.utils.tzinfo import LocalTimezone
-from theory.utils.translation import ugettext as _
-from theory.utils.encoding import forceUnicode
+import datetime
 
-re_formatchars = re.compile(r'(?<!\\)([aAbBcdDEfFgGhHiIjlLmMnNOPrsStTUuwWyYzZ])')
-re_escaped = re.compile(r'\\(.)')
+from theory.utils.dates import MONTHS, MONTHS_3, MONTHS_ALT, MONTHS_AP, WEEKDAYS, WEEKDAYS_ABBR
+from theory.utils.translation import ugettext as _
+from theory.utils.encoding import forceText
+from theory.utils import six
+from theory.utils.timezone import getDefaultTimezone, isAware, isNaive
+
+reFormatchars = re.compile(r'(?<!\\)([aAbBcdDeEfFgGhHiIjlLmMnNoOPrsStTUuwWyYzZ])')
+reEscaped = re.compile(r'\\(.)')
+
 
 class Formatter(object):
   def format(self, formatstr):
     pieces = []
-    for i, piece in enumerate(re_formatchars.split(forceUnicode(formatstr))):
+    for i, piece in enumerate(reFormatchars.split(forceText(formatstr))):
       if i % 2:
-        pieces.append(forceUnicode(getattr(self, piece)()))
+        pieces.append(forceText(getattr(self, piece)()))
       elif piece:
-        pieces.append(re_escaped.sub(r'\1', piece))
-    return u''.join(pieces)
+        pieces.append(reEscaped.sub(r'\1', piece))
+    return ''.join(pieces)
+
 
 class TimeFormat(Formatter):
-  def __init__(self, t):
-    self.data = t
+
+  def __init__(self, obj):
+    self.data = obj
+    self.timezone = None
+
+    # We only support timezone when formatting datetime objects,
+    # not date objects (timezone information not appropriate),
+    # or time objects (against established theory policy).
+    if isinstance(obj, datetime.datetime):
+      if isNaive(obj):
+        self.timezone = getDefaultTimezone()
+      else:
+        self.timezone = obj.tzinfo
 
   def a(self):
     "'a.m.' or 'p.m.'"
@@ -52,7 +67,26 @@ class TimeFormat(Formatter):
 
   def B(self):
     "Swatch Internet time"
-    raise NotImplementedError
+    raise NotImplementedError('may be implemented in a future release')
+
+  def e(self):
+    """
+    Timezone name.
+
+    If timezone information is not available, this method returns
+    an empty string.
+    """
+    if not self.timezone:
+      return ""
+
+    try:
+      if hasattr(self.data, 'tzinfo') and self.data.tzinfo:
+        # Have to use tzinfo.tzname and not datetime.tzname
+        # because datatime.tzname does not expect Unicode
+        return self.data.tzinfo.tzname(self.data) or ""
+    except NotImplementedError:
+      pass
+    return ""
 
   def f(self):
     """
@@ -63,7 +97,7 @@ class TimeFormat(Formatter):
     """
     if self.data.minute == 0:
       return self.g()
-    return u'%s:%s' % (self.g(), self.i())
+    return '%s:%s' % (self.g(), self.i())
 
   def g(self):
     "Hour, 12-hour format without leading zeros; i.e. '1' to '12'"
@@ -79,15 +113,30 @@ class TimeFormat(Formatter):
 
   def h(self):
     "Hour, 12-hour format; i.e. '01' to '12'"
-    return u'%02d' % self.g()
+    return '%02d' % self.g()
 
   def H(self):
     "Hour, 24-hour format; i.e. '00' to '23'"
-    return u'%02d' % self.G()
+    return '%02d' % self.G()
 
   def i(self):
     "Minutes; i.e. '00' to '59'"
-    return u'%02d' % self.data.minute
+    return '%02d' % self.data.minute
+
+  def O(self):
+    """
+    Difference to Greenwich time in hours; e.g. '+0200', '-0430'.
+
+    If timezone information is not available, this method returns
+    an empty string.
+    """
+    if not self.timezone:
+      return ""
+
+    seconds = self.Z()
+    sign = '-' if seconds < 0 else '+'
+    seconds = abs(seconds)
+    return "%s%02d%02d" % (sign, seconds // 3600, (seconds // 60) % 60)
 
   def P(self):
     """
@@ -100,26 +149,53 @@ class TimeFormat(Formatter):
       return _('midnight')
     if self.data.minute == 0 and self.data.hour == 12:
       return _('noon')
-    return u'%s %s' % (self.f(), self.a())
+    return '%s %s' % (self.f(), self.a())
 
   def s(self):
     "Seconds; i.e. '00' to '59'"
-    return u'%02d' % self.data.second
+    return '%02d' % self.data.second
+
+  def T(self):
+    """
+    Time zone of this machine; e.g. 'EST' or 'MDT'.
+
+    If timezone information is not available, this method returns
+    an empty string.
+    """
+    if not self.timezone:
+      return ""
+
+    name = self.timezone.tzname(self.data) if self.timezone else None
+    if name is None:
+      name = self.format('O')
+    return six.textType(name)
 
   def u(self):
-    "Microseconds"
-    return self.data.microsecond
+    "Microseconds; i.e. '000000' to '999999'"
+    return '%06d' % self.data.microsecond
+
+  def Z(self):
+    """
+    Time zone offset in seconds (i.e. '-43200' to '43200'). The offset for
+    timezones west of UTC is always negative, and for those east of UTC is
+    always positive.
+
+    If timezone information is not available, this method returns
+    an empty string.
+    """
+    if not self.timezone:
+      return ""
+
+    offset = self.timezone.utcoffset(self.data)
+    # `offset` is a datetime.timedelta. For negative values (to the west of
+    # UTC) only days can be negative (days=-1) and seconds are always
+    # positive. e.g. UTC-1 -> timedelta(days=-1, seconds=82800, microseconds=0)
+    # Positive offsets have days=0
+    return offset.days * 86400 + offset.seconds
 
 
 class DateFormat(TimeFormat):
-  year_days = [None, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334]
-
-  def __init__(self, dt):
-    # Accepts either a datetime or date object.
-    self.data = dt
-    self.timezone = getattr(dt, 'tzinfo', None)
-    if hasattr(self.data, 'hour') and not self.timezone:
-      self.timezone = LocalTimezone(dt)
+  yearDays = [None, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334]
 
   def b(self):
     "Month, textual, 3 letters, lowercase; e.g. 'jan'"
@@ -134,7 +210,7 @@ class DateFormat(TimeFormat):
 
   def d(self):
     "Day of the month, 2 digits with leading zeros; i.e. '01' to '31'"
-    return u'%02d' % self.data.day
+    return '%02d' % self.data.day
 
   def D(self):
     "Day of the week, textual, 3 letters; e.g. 'Fri'"
@@ -151,9 +227,9 @@ class DateFormat(TimeFormat):
   def I(self):
     "'1' if Daylight Savings Time, '0' otherwise."
     if self.timezone and self.timezone.dst(self.data):
-      return u'1'
+      return '1'
     else:
-      return u'0'
+      return '0'
 
   def j(self):
     "Day of the month without leading zeros; i.e. '1' to '31'"
@@ -169,7 +245,7 @@ class DateFormat(TimeFormat):
 
   def m(self):
     "Month; i.e. '01' to '12'"
-    return u'%02d' % self.data.month
+    return '%02d' % self.data.month
 
   def M(self):
     "Month, textual, 3 letters; e.g. 'Jan'"
@@ -183,10 +259,9 @@ class DateFormat(TimeFormat):
     "Month abbreviation in Associated Press style. Proprietary extension."
     return MONTHS_AP[self.data.month]
 
-  def O(self):
-    "Difference to Greenwich time in hours; e.g. '+0200'"
-    seconds = self.Z()
-    return u"%+03d%02d" % (seconds // 3600, (seconds // 60) % 60)
+  def o(self):
+    "ISO 8601 year number matching the ISO week number (W)"
+    return self.data.isocalendar()[0]
 
   def r(self):
     "RFC 2822 formatted date; e.g. 'Thu, 21 Dec 2000 16:01:07 +0200'"
@@ -194,31 +269,24 @@ class DateFormat(TimeFormat):
 
   def S(self):
     "English ordinal suffix for the day of the month, 2 characters; i.e. 'st', 'nd', 'rd' or 'th'"
-    if self.data.day in (11, 12, 13): # Special case
-      return u'th'
+    if self.data.day in (11, 12, 13):  # Special case
+      return 'th'
     last = self.data.day % 10
     if last == 1:
-      return u'st'
+      return 'st'
     if last == 2:
-      return u'nd'
+      return 'nd'
     if last == 3:
-      return u'rd'
-    return u'th'
+      return 'rd'
+    return 'th'
 
   def t(self):
     "Number of days in the given month; i.e. '28' to '31'"
-    return u'%02d' % calendar.monthrange(self.data.year, self.data.month)[1]
-
-  def T(self):
-    "Time zone of this machine; e.g. 'EST' or 'MDT'"
-    name = self.timezone and self.timezone.tzname(self.data) or None
-    if name is None:
-      name = self.format('O')
-    return unicode(name)
+    return '%02d' % calendar.monthrange(self.data.year, self.data.month)[1]
 
   def U(self):
     "Seconds since the Unix epoch (January 1 1970 00:00:00 GMT)"
-    if getattr(self.data, 'tzinfo', None):
+    if isinstance(self.data, datetime.datetime) and isAware(self.data):
       return int(calendar.timegm(self.data.utctimetuple()))
     else:
       return int(time.mktime(self.data.timetuple()))
@@ -230,32 +298,32 @@ class DateFormat(TimeFormat):
   def W(self):
     "ISO-8601 week number of year, weeks starting on Monday"
     # Algorithm from http://www.personal.ecu.edu/mccartyr/ISOwdALG.txt
-    week_number = None
-    jan1_weekday = self.data.replace(month=1, day=1).weekday() + 1
+    weekNumber = None
+    jan1Weekday = self.data.replace(month=1, day=1).weekday() + 1
     weekday = self.data.weekday() + 1
-    day_of_year = self.z()
-    if day_of_year <= (8 - jan1_weekday) and jan1_weekday > 4:
-      if jan1_weekday == 5 or (jan1_weekday == 6 and calendar.isleap(self.data.year-1)):
-        week_number = 53
+    dayOfYear = self.z()
+    if dayOfYear <= (8 - jan1Weekday) and jan1Weekday > 4:
+      if jan1Weekday == 5 or (jan1Weekday == 6 and calendar.isleap(self.data.year - 1)):
+        weekNumber = 53
       else:
-        week_number = 52
+        weekNumber = 52
     else:
       if calendar.isleap(self.data.year):
         i = 366
       else:
         i = 365
-      if (i - day_of_year) < (4 - weekday):
-        week_number = 1
+      if (i - dayOfYear) < (4 - weekday):
+        weekNumber = 1
       else:
-        j = day_of_year + (7 - weekday) + (jan1_weekday - 1)
-        week_number = j // 7
-        if jan1_weekday > 4:
-          week_number -= 1
-    return week_number
+        j = dayOfYear + (7 - weekday) + (jan1Weekday - 1)
+        weekNumber = j // 7
+        if jan1Weekday > 4:
+          weekNumber -= 1
+    return weekNumber
 
   def y(self):
     "Year, 2 digits; e.g. '99'"
-    return unicode(self.data.year)[2:]
+    return six.textType(self.data.year)[2:]
 
   def Y(self):
     "Year, 4 digits; e.g. '1999'"
@@ -263,30 +331,19 @@ class DateFormat(TimeFormat):
 
   def z(self):
     "Day of the year; i.e. '0' to '365'"
-    doy = self.year_days[self.data.month] + self.data.day
+    doy = self.yearDays[self.data.month] + self.data.day
     if self.L() and self.data.month > 2:
       doy += 1
     return doy
 
-  def Z(self):
-    """
-    Time zone offset in seconds (i.e. '-43200' to '43200'). The offset for
-    timezones west of UTC is always negative, and for those east of UTC is
-    always positive.
-    """
-    if not self.timezone:
-      return 0
-    offset = self.timezone.utcoffset(self.data)
-    # Only days can be negative, so negative offsets have days=-1 and
-    # seconds positive. Positive offsets have days=0
-    return offset.days * 86400 + offset.seconds
 
-def format(value, format_string):
+def format(value, formatString):
   "Convenience function"
   df = DateFormat(value)
-  return df.format(format_string)
+  return df.format(formatString)
 
-def time_format(value, format_string):
+
+def timeFormat(value, formatString):
   "Convenience function"
   tf = TimeFormat(value)
-  return tf.format(format_string)
+  return tf.format(formatString)

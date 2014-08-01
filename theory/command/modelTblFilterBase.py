@@ -31,19 +31,19 @@ class ModelTblFilterBase(SimpleCommand):
 
   class ParamForm(SimpleCommand.ParamForm):
     appName = field.ChoiceField(label="Application Name",
-        help_text="The name of applications to be listed",
+        helpText="The name of applications to be listed",
         initData="theory",
         choices=(set([("theory", "theory")] +
           [(settings.INSTALLED_APPS[i], settings.INSTALLED_APPS[i])
             for i in range(len(settings.INSTALLED_APPS))])),
         )
     modelName = field.ChoiceField(label="Model Name",
-        help_text="The name of models to be listed",
+        helpText="The name of models to be listed",
         )
     queryset = field.QuerysetField(
         required=False,
         label="Queryset",
-        help_text="The queryset to be processed",
+        helpText="The queryset to be processed",
         initData=[],
         isSkipInHistory=True,
         )
@@ -52,7 +52,7 @@ class ModelTblFilterBase(SimpleCommand):
         field.TextField(),
         label="QueryFilter",
         initData={},
-        help_text="The simple filter being applied to the query"
+        helpText="The simple filter being applied to the query"
         )
     # Not yet in this version
     #pagination = field.IntegerField(label="pagination",
@@ -139,7 +139,7 @@ class ModelTblFilterBase(SimpleCommand):
       bridge = Bridge()
       (delMe, newParamForm) = bridge.bridgeToSelf(self)
       self.paramForm = newParamForm
-      self.paramForm.full_clean()
+      self.paramForm.fullClean()
       self._applyChangeOnQueryset()
     else:
       self._stdOut += "No data found."
