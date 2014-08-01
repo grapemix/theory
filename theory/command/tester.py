@@ -92,5 +92,4 @@ class Tester(SimpleCommand):
 
     testRunnerClass = get_runner(settings, "")
     testRunner = testRunnerClass(verbosity=formData["verbosity"])
-    print formData["testLabel"]
     testRunner.run_tests(formData["testLabel"])

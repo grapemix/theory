@@ -61,14 +61,7 @@ def constructInstance(form, instance, fields=None, exclude=None):
 
   cleanedData = form.cleanedData
   fileFieldList = []
-  print opts
-  print dir(opts)
-  print fields
-  print dir(instance)
-  print dir(form)
   for f in form.baseFields.values():
-    print f
-    print dir(f)
     if not f.editable or isinstance(f, models.AutoField) \
         or f.name not in cleanedData:
       continue
@@ -309,7 +302,7 @@ class ModelFormBase(FormBase):
     # It is False by default so overriding self.clean() and failing to call
     # super will stop validateUnique from being called.
     self._validateUnique = False
-    super(ModelFormBase, self).__init__(data, 
+    super(ModelFormBase, self).__init__(data,
                       errorClass, emptyPermitted)
     # Apply ``limitChoicesTo`` to each field.
     for fieldName in self.fields:
