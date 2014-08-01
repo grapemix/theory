@@ -218,7 +218,7 @@ class TheoryTestSuiteRunner(object):
     unittest.installHandler()
 
   def build_suite(self, test_labels, extra_tests=None, **kwargs):
-    if(self.suite==None):
+    if(self.suite is None):
       suite = unittest.TestSuite()
     else:
       suite = self.suite

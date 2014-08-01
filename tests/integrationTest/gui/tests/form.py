@@ -131,7 +131,7 @@ class StepFormTestCase(unittest.TestCase):
 
   def btnCallback(self, btn):
     if(self.testForm.isValid()):
-      print self.testForm.clean()["d"]
+      pass
 
   def _renderForm(self, *args, **kwargs):
     o = self.formCombinator.genOneFieldForm()()

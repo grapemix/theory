@@ -37,7 +37,7 @@ class TheoryJSONEncoder(json.JSONEncoder):
     elif isinstance(o, dt.date):
       return o.isoformat()
     elif isinstance(o, dt.time):
-      if is_aware(o):
+      if isAware(o):
         raise ValueError("JSON can't represent timezone-aware times.")
       r = o.isoformat()
       if o.microsecond:
