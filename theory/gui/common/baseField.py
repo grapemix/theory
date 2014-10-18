@@ -14,14 +14,12 @@ import os
 import re
 import sys
 import warnings
-from decimal import Decimal, DecimalException
 from io import BytesIO
 
 ##### Theory lib #####
 from theory.conf import settings
 from theory.core import validators
 from theory.core.exceptions import ValidationError
-from theory.model import AppModel, Adapter
 from theory.gui.util import (
     ErrorList,
     fromCurrentTimezone,
@@ -64,8 +62,8 @@ __all__ = (
   'FloatField', 'DecimalField', 'IPAddressField', 'GenericIPAddressField',
   'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField',
   'StringGroupFilterField', 'ModelValidateGroupField', 'PythonModuleField',
-  'PythonClassField', 'QuerysetField', 'ModelField', 'EmbeddedField',
-  'ObjectIdField', 'BinaryField', 'GeoPointField',
+  'PythonClassField', 'QuerysetField', 'ModelField', 'ObjectIdField',
+  'BinaryField', 'GeoPointField',
 )
 
 FILE_INPUT_CONTRADICTION = object()
@@ -358,8 +356,11 @@ class TextField(Field):
 
   @initData.setter
   def initData(self, initData=""):
-    if(self.lineBreak!="\n" and initData!=None):
+    if self.lineBreak!="\n" and isinstance(initData, basestring):
       self._initData = initData.replace("\n", self.lineBreak)
+    elif isinstance(initData, (list, tuple)):
+      print initData
+      self._initData = "\n".join(initData)
     else:
       self._initData = initData
 
@@ -904,7 +905,8 @@ class BooleanField(Field):
     return super(BooleanField, self).to_python(value)
 
   def validate(self, value):
-    if not value and self.required:
+    if value is not True and value is not False and self.required:
+    #if not value and self.required:
       raise ValidationError(self.errorMessages['required'], code='required')
 
   def _hasChanged(self, initial, data):
@@ -1502,6 +1504,8 @@ class AdapterField(Field):
     self.initData = [] if self.initData is None else self.initData
 
   def renderWidget(self, *args, **kwargs):
+    # To avoid circular dependency
+    from theory.apps.model import Adapter
     if("attrs" not in kwargs):
       kwargs["attrs"] = {}
 
@@ -1510,6 +1514,8 @@ class AdapterField(Field):
     super(AdapterField, self).renderWidget(*args, **kwargs)
 
   def widgetSetter(self, adapterDict):
+    # To avoid circular dependency
+    from theory.apps.model import Adapter
     nameLst = adapterDict["finalData"]
     data = Adapter.objects.filter(name__in=nameLst)
     super(AdapterField, self).widgetSetter({"finalData": data})
@@ -1905,45 +1911,6 @@ class ModelField(Field):
     #  fieldType = self.modelConfigModel.fieldNameTypeMap[fieldName]
 
     super(ModelField, self).__init__(*args, **kwargs)
-
-class EmbeddedField(Field):
-  widget = EmbeddedInput
-
-  def __init__(self, appName, embeddedModelName, *args, **kwargs):
-    # To avoid circular dependency
-    from theory.gui.model import fieldsForModel
-    from theory.gui.transformer.mongoModelFormDetector import \
-        MongoModelFormDetector
-    self.embeddedConfigModel = AppModel.objects.get(
-        isEmbedded=True,
-        app=appName,
-        name=embeddedModelName
-        )
-
-    detector = MongoModelFormDetector()
-    self.embeddedFieldDict = fieldsForModel(
-        detector.run(appModelObj=self.embeddedConfigModel)
-        )
-    super(EmbeddedField, self).__init__(*args, **kwargs)
-
-  def renderWidget(self, *args, **kwargs):
-    # widget -- A Widget class, or instance of a Widget class, that should
-    #           be used for this Field when displaying it. Each Field has a
-    #           default Widget that it'll use if you don't specify this. In
-    #           most cases, the default widget is TextInput.
-    #widget = widget or self.widget
-    widget = self.widget
-    # For some widget which is unable to display e.x: binary data
-    if(self.embeddedFieldDict == {}):
-      self.widget = None
-    elif(isclass(widget)):
-      self.widget = widget(
-          self.widgetSetter,
-          self.widgetGetter,
-          self.embeddedFieldDict,
-          *args, **kwargs)
-      self.widget.setupInstructionComponent()
-      super(EmbeddedField, self).renderWidget(*args, **kwargs)
 
 class ObjectIdField(Field):
   @property

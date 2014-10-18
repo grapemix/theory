@@ -3,7 +3,7 @@
 ##### System wide lib #####
 
 ##### Theory lib #####
-from theory.adapter.querysetAsSpreadsheetAdapter import \
+from theory.apps.adapter.querysetAsSpreadsheetAdapter import \
     QuerysetAsSpreadsheetAdapter
 from theory.gui.gtk.spreadsheet import SpreadsheetBuilder
 

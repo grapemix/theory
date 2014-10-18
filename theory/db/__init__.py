@@ -1,33 +1,29 @@
-# -*- coding: utf-8 -*-
-#!/usr/bin/env python
-##### System wide lib #####
+import warnings
 
-##### Theory lib #####
-from theory.conf import settings
-#from theory.core import signals
-from theory.core.exceptions import ImproperlyConfigured
-from theory.db.utils import (ConnectionHandler, ConnectionRouter,
-    load_backend, DEFAULT_DB_ALIAS, DatabaseError, IntegrityError)
+from theory.core import signals
+from theory.db.utils import (DEFAULT_DB_ALIAS, DataError, OperationalError,
+  IntegrityError, InternalError, ProgrammingError, NotSupportedError,
+  DatabaseError, InterfaceError, Error, loadBackend,
+  ConnectionHandler, ConnectionRouter)
+from theory.utils.deprecation import RemovedInTheory20Warning
+from theory.utils.functional import cachedProperty
 
-##### Theory third-party lib #####
 
-##### Local app #####
+__all__ = [
+  'backend', 'connection', 'connections', 'router', 'DatabaseError',
+  'IntegrityError', 'InternalError', 'ProgrammingError', 'DataError',
+  'NotSupportedError', 'Error', 'InterfaceError', 'OperationalError',
+  'DEFAULT_DB_ALIAS'
+]
 
-##### Theory app #####
+connections = ConnectionHandler()
 
-##### Misc #####
+router = ConnectionRouter()
 
-__all__ = ('backend', 'connection', 'connections', 'router', 'DatabaseError',
-   'IntegrityError', 'DEFAULT_DB_ALIAS')
-
-if DEFAULT_DB_ALIAS not in settings.DATABASES:
-    raise ImproperlyConfigured("You must define a '%s' database" % DEFAULT_DB_ALIAS)
-
-connections = ConnectionHandler(settings.DATABASES)
-router = ConnectionRouter(settings.DATABASE_ROUTERS)
 
 # `connection`, `DatabaseError` and `IntegrityError` are convenient aliases
 # for backend bits.
+
 # DatabaseWrapper.__init__() takes a dictionary, not a settings module, so
 # we manually create the dictionary from the settings, passing only the
 # settings that the database backends care about. Note that TIME_ZONE is used
@@ -42,22 +38,75 @@ class DefaultConnectionProxy(object):
   """
   def __getattr__(self, item):
     return getattr(connections[DEFAULT_DB_ALIAS], item)
+
   def __setattr__(self, name, value):
     return setattr(connections[DEFAULT_DB_ALIAS], name, value)
 
+  def __delattr__(self, name):
+    return delattr(connections[DEFAULT_DB_ALIAS], name)
+
+  def __eq__(self, other):
+    return connections[DEFAULT_DB_ALIAS] == other
+
+  def __ne__(self, other):
+    return connections[DEFAULT_DB_ALIAS] != other
+
 connection = DefaultConnectionProxy()
-backend = load_backend(connection.settings_dict['ENGINE'])
 
-# Register an event that closes the database connection
-# when a Django request is finished.
-def close_connection(**kwargs):
-  for conn in connections.all():
-    conn.close()
-#signals.request_finished.connect(close_connection)
 
-# Register an event that resets connection.queries
-# when a Django request is started.
-def reset_queries(**kwargs):
+class DefaultBackendProxy(object):
+  """
+  Temporary proxy class used during deprecation period of the `backend` module
+  variable.
+  """
+  @cachedProperty
+  def _backend(self):
+    warnings.warn("Accessing theory.db.backend is deprecated.",
+      RemovedInTheory20Warning, stacklevel=2)
+    return loadBackend(connections[DEFAULT_DB_ALIAS].settingsDict['ENGINE'])
+
+  def __getattr__(self, item):
+    return getattr(self._backend, item)
+
+  def __setattr__(self, name, value):
+    return setattr(self._backend, name, value)
+
+  def __delattr__(self, name):
+    return delattr(self._backend, name)
+
+backend = DefaultBackendProxy()
+
+
+def closeConnection(**kwargs):
+  warnings.warn(
+    "closeConnection is superseded by closeOldConnections.",
+    RemovedInTheory20Warning, stacklevel=2)
+  # Avoid circular imports
+  from theory.db import transaction
+  for conn in connections:
+    # If an error happens here the connection will be left in broken
+    # state. Once a good db connection is again available, the
+    # connection state will be cleaned up.
+    transaction.abort(conn)
+    connections[conn].close()
+
+
+# Register an event to reset saved queries when a Theory request is started.
+def resetQueries(**kwargs):
   for conn in connections.all():
     conn.queries = []
-#signals.request_started.connect(reset_queries)
+signals.requestStarted.connect(resetQueries)
+
+
+# Register an event to reset transaction state and close connections past
+# their lifetime. NB: abort() doesn't do anything outside of a transaction.
+def closeOldConnections(**kwargs):
+  for conn in connections.all():
+    # Remove this when the legacy transaction management goes away.
+    try:
+      conn.abort()
+    except DatabaseError:
+      pass
+    conn.closeIfUnusableOrObsolete()
+signals.requestStarted.connect(closeOldConnections)
+signals.requestFinished.connect(closeOldConnections)

@@ -77,7 +77,7 @@ def lazy(func, *resultclasses):
   function is evaluated on every access.
   """
 
-  @total_ordering
+  @totalOrdering
   class __proxy__(Promise):
     """
     Encapsulate a function call and act as a proxy for methods that are
@@ -414,7 +414,7 @@ def partition(predicate, values):
   return results
 
 if sys.version_info >= (2, 7, 2):
-  from functools import total_ordering
+  from functools import total_ordering as totalOrdering
 else:
   # For Python < 2.7.2. totalOrdering in versions prior to 2.7.2 is buggy.
   # See http://bugs.python.org/issue10042 for details. For these versions use

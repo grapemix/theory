@@ -5,7 +5,7 @@ import codecs
 
 ##### Theory lib #####
 from theory.conf import settings
-from theory.model import Command, Parameter
+from theory.apps.model import Command, Parameter
 
 ##### Theory third-party lib #####
 
@@ -36,16 +36,22 @@ class ParamScanner(object):
     self._filePath = filePath
 
   def _loadCommandClassFile(self):
-    lines = codecs.open(self._filePath, encoding='utf-8').read().split("\n")
+    lines = codecs.open(
+        self._filePath,
+        encoding='utf-8'
+        ).read().split("\n")
     return lines
 
   def saveModel(self):
-    if(self._cmdModel!=None):
+    if(self._cmdModel is not None):
       self._cmdModel.save()
 
   def scan(self):
     sourceLines = self._loadCommandClassFile()
-    paramLabelDict = dict([(self.paramModelLst[i].name, self.paramModelLst[i]) for i in range(len(self.paramModelLst))])
+    paramLabelDict = dict([
+      (self.paramModelLst[i].name, self.paramModelLst[i]) \
+          for i in range(len(self.paramModelLst))
+          ])
 
     isParamComment = False
     isParamBlock = False
@@ -55,12 +61,17 @@ class ParamScanner(object):
         paramLabelDict[paramLabel].comment = l.split(":")[2].strip(" ")
       elif(isParamBlock and l.startswith(":type")):
         paramLabelDict[paramLabel].type = l.split(":")[2].strip(" ")
-        paramLabelDict[paramLabel].type = paramLabelDict[paramLabel].type[0].upper() + paramLabelDict[paramLabel].type[1:]
+        paramLabelDict[paramLabel].type = \
+            paramLabelDict[paramLabel].type[0].upper() \
+            + paramLabelDict[paramLabel].type[1:]
         isParamBlock = False
-      if((l.startswith("@") and l.endswith(".setter")) or
-          l=="@property"):
+      if (
+          (l.startswith("@") and l.endswith(".setter")) \
+          or l=="@property"
+          ):
         try:
-          paramLabel = sourceLines[lineNum+1].strip(" ").split(" ")[1].split("(")[0]
+          paramLabel = sourceLines[lineNum+1].strip(" ")\
+              .split(" ")[1].split("(")[0]
         except (IndexError, KeyError), e:
           continue
         if(not paramLabelDict.has_key(paramLabel)):

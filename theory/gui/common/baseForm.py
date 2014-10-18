@@ -11,11 +11,14 @@ import datetime
 import warnings
 
 ##### Theory lib #####
-from theory.core.exceptions import CommandSyntaxError, ValidationError
-from theory.gui import field as FormField
+from theory.core.exceptions import (
+    CommandSyntaxError,
+    ValidationError,
+    NON_FIELD_ERRORS
+    )
+from theory.gui.etk import field as FormField
 from theory.gui.util import flatatt, ErrorDict, ErrorList
 from theory.gui.transformer.theoryJSONEncoder import TheoryJSONEncoder
-from theory.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from theory.utils.deprecation import RemovedInTheory19Warning
 from theory.utils.encoding import smartText, forceText, python2UnicodeCompatible
 from theory.utils.html import conditionalEscape, formatHtml
@@ -128,7 +131,13 @@ class FormBase(object):
   # fullClean() has been called. The lazy mode will only update the error field
   # while the not lazy mode will update every field.
   isLazy = True
-  def __init__(self, initData=None, errorClass=ErrorList, emptyPermitted=False):
+  def __init__(
+      self,
+      initData=None,
+      autoId='id_%s',
+      errorClass=ErrorList,
+      emptyPermitted=False
+      ):
 
     self.isBound = True
     self.errorClass = errorClass
@@ -311,7 +320,6 @@ class FormBase(object):
           value = getattr(self, 'clean_%s' % name)()
           self.cleanedData[name] = value
       except ValidationError as e:
-
         if(self.isLazy):
           field.finalData = None
         self.addError(name, e)
@@ -381,7 +389,7 @@ class FormBase(object):
     return self._changedData
 
   def fillInitFields(self, cmdModel, args, kwargs):
-    cmdArgs = [i for i in cmdModel.param if(not i.isOptional)]
+    cmdArgs = [i for i in cmdModel.parameterSet.all() if(not i.isOptional)]
     if(args!=[]):
       for i in range(len(cmdArgs)):
         try:
@@ -422,7 +430,7 @@ class FormBase(object):
       return self.jsonData
 
 
-class Form(six.with_metaclass(DeclarativeFieldsMetaclass, FormBase)):
+class Form(six.withMetaclass(DeclarativeFieldsMetaclass, FormBase)):
   """A collection of Fields, plus their associated data."""
   # This is a separate class from BaseForm in order to abstract the way
   # self.fields is specified. This class (Form) is the one that does the

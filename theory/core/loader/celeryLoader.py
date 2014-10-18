@@ -4,7 +4,7 @@
 from celery.loaders.base import BaseLoader
 
 ##### Theory lib #####
-from theory.model import Command
+from theory.apps.model import Command
 from theory.utils import timezone
 from theory.utils.importlib import importModule
 from theory.utils.mood import loadMoodData

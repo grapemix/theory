@@ -1,59 +1,108 @@
-# -*- coding: utf-8 -*-
-#!/usr/bin/env python
 """
 Serialize data to/from JSON
 """
 
+# Avoid shadowing the standard library json module
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import datetime
 import decimal
-from StringIO import StringIO
+import json
+import sys
 
+from theory.core.serializers.base import DeserializationError
 from theory.core.serializers.python import Serializer as PythonSerializer
 from theory.core.serializers.python import Deserializer as PythonDeserializer
-from theory.utils import datetime_safe
-from theory.utils import simplejson
+from theory.utils import six
+from theory.utils.timezone import isAware
+
 
 class Serializer(PythonSerializer):
   """
   Convert a queryset to JSON.
   """
-  internal_use_only = False
+  internalUseOnly = False
 
-  def end_serialization(self):
-    simplejson.dump(self.objects, self.stream, cls=TheoryJSONEncoder, **self.options)
+  def startSerialization(self):
+    if json.__version__.split('.') >= ['2', '1', '3']:
+      # Use JS strings to represent Python Decimal instances (ticket #16850)
+      self.options.update({'useDecimal': False})
+    self._current = None
+    self.jsonKwargs = self.options.copy()
+    self.jsonKwargs.pop('stream', None)
+    self.jsonKwargs.pop('fields', None)
+    if self.options.get('indent'):
+      # Prevent trailing spaces
+      self.jsonKwargs['separators'] = (',', ': ')
+    self.stream.write("[")
+
+  def endSerialization(self):
+    if self.options.get("indent"):
+      self.stream.write("\n")
+    self.stream.write("]")
+    if self.options.get("indent"):
+      self.stream.write("\n")
+
+  def endObject(self, obj):
+    # self._current has the field data
+    indent = self.options.get("indent")
+    if not self.first:
+      self.stream.write(",")
+      if not indent:
+        self.stream.write(" ")
+    if indent:
+      self.stream.write("\n")
+    json.dump(self.getDumpObject(obj), self.stream,
+         cls=TheoryJSONEncoder, **self.jsonKwargs)
+    self._current = None
 
   def getvalue(self):
-    if callable(getattr(self.stream, 'getvalue', None)):
-      return self.stream.getvalue()
+    # Grand-parent super
+    return super(PythonSerializer, self).getvalue()
 
-def Deserializer(stream_or_string, **options):
+
+def Deserializer(streamOrString, **options):
   """
   Deserialize a stream or string of JSON data.
   """
-  if isinstance(stream_or_string, basestring):
-    stream = StringIO(stream_or_string)
-  else:
-    stream = stream_or_string
-  for obj in PythonDeserializer(simplejson.load(stream), **options):
-    yield obj
+  if not isinstance(streamOrString, (bytes, six.stringTypes)):
+    streamOrString = streamOrString.read()
+  if isinstance(streamOrString, bytes):
+    streamOrString = streamOrString.decode('utf-8')
+  try:
+    objects = json.loads(streamOrString)
+    for obj in PythonDeserializer(objects, **options):
+      yield obj
+  except GeneratorExit:
+    raise
+  except Exception as e:
+    # Map to deserializer error
+    six.reraise(DeserializationError, DeserializationError(e), sys.exc_info()[2])
 
-class TheoryJSONEncoder(simplejson.JSONEncoder):
+
+class TheoryJSONEncoder(json.JSONEncoder):
   """
   JSONEncoder subclass that knows how to encode date/time and decimal types.
   """
-
-  DATE_FORMAT = "%Y-%m-%d"
-  TIME_FORMAT = "%H:%M:%S"
-
   def default(self, o):
+    # See "Date Time String Format" in the ECMA-262 specification.
     if isinstance(o, datetime.datetime):
-      d = datetime_safe.new_datetime(o)
-      return d.strftime("%s %s" % (self.DATE_FORMAT, self.TIME_FORMAT))
+      r = o.isoformat()
+      if o.microsecond:
+        r = r[:23] + r[26:]
+      if r.endswith('+00:00'):
+        r = r[:-6] + 'Z'
+      return r
     elif isinstance(o, datetime.date):
-      d = datetime_safe.new_date(o)
-      return d.strftime(self.DATE_FORMAT)
+      return o.isoformat()
     elif isinstance(o, datetime.time):
-      return o.strftime(self.TIME_FORMAT)
+      if isAware(o):
+        raise ValueError("JSON can't represent timezone-aware times.")
+      r = o.isoformat()
+      if o.microsecond:
+        r = r[:12]
+      return r
     elif isinstance(o, decimal.Decimal):
       return str(o)
     else:

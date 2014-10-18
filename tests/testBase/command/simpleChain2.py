@@ -4,7 +4,7 @@
 ##### Theory lib #####
 
 ##### Theory third-party lib #####
-from theory.command.baseCommand import SimpleCommand
+from theory.apps.command.baseCommand import SimpleCommand
 
 ##### Local app #####
 from .baseChain2 import BaseChain2

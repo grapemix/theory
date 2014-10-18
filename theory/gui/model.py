@@ -1,50 +1,36 @@
-from __future__ import unicode_literals
-
-from collections import OrderedDict
-import warnings
-
-##### Theory lib #####
-from theory.core.exceptions import ValidationError, NON_FIELD_ERRORS, FieldError, ImproperlyConfigured
-from theory.gui.common.baseForm import (
-    DeclarativeFieldsMetaclass,
-    FormBase,
-    getDeclaredFields
-    )
-from theory.gui.field import Field, ChoiceField
-from theory.gui.etk.form import StepFormBase
-from theory.gui.formset import BaseFormSet, formsetFactory
-from theory.gui.util import ErrorList
-from theory.gui.transformer.mongoModelFormDetector import MongoModelFormDetector
-from theory.gui.widget import (
-    HiddenInput,
-    )
-from theory.model import AppModel
-from theory.utils import six
-from theory.utils.deprecation import RemovedInTheory19Warning
-from theory.utils.encoding import smartText, forceText
-from theory.utils.datastructures import SortedDict
-from theory.utils.importlib import importClass
-from theory.utils.text import getTextList, capfirst
-from theory.utils.translation import ugettextLazy as _, ugettext
-
-
-##### Theory third-party lib #####
-
-##### Local app #####
-
-##### Theory app #####
-
-##### Misc #####
-
 """
 Helper functions for creating Form classes from Theory models
 and database field objects.
 """
 
+from __future__ import unicode_literals
+
+from collections import OrderedDict
+import warnings
+
+from theory.core.exceptions import (
+  ImproperlyConfigured, ValidationError, NON_FIELD_ERRORS, FieldError)
+from theory.gui.field import Field, ChoiceField
+from theory.gui.common.baseForm import DeclarativeFieldsMetaclass, FormBase
+from theory.gui.formset import BaseFormSet, formsetFactory
+from theory.gui.util import ErrorList
+from theory.gui.widget import (
+    CheckBoxInput,
+    HiddenInput,
+    #MultipleHiddenInput
+    )
+from theory.utils import six
+from theory.utils.deprecation import RemovedInTheory19Warning
+from theory.utils.encoding import smartText, forceText
+from theory.utils.text import getTextList, capfirst
+from theory.utils.translation import ugettextLazy as _, ugettext
+
+
 __all__ = (
-  'ModelForm', 'ModelFormBase', 'fieldsForModel',
+  'ModelForm', 'BaseModelForm', 'modelToDict', 'fieldsForModel',
   'saveInstance', 'ModelChoiceField', 'ModelMultipleChoiceField',
-  'ALL_FIELDS',
+  'ALL_FIELDS', 'BaseModelFormSet', 'modelformsetFactory',
+  'BaseInlineFormSet', 'inlineformsetFactory',
 )
 
 ALL_FIELDS = '__all__'
@@ -61,7 +47,7 @@ def constructInstance(form, instance, fields=None, exclude=None):
 
   cleanedData = form.cleanedData
   fileFieldList = []
-  for f in form.baseFields.values():
+  for f in opts.fields:
     if not f.editable or isinstance(f, models.AutoField) \
         or f.name not in cleanedData:
       continue
@@ -127,11 +113,53 @@ def saveInstance(form, instance, fields=None, failMessage='saved',
 
 
 # ModelForms #################################################################
-def fieldsForModel(fieldDict, fields=None, exclude=None, widgets=None,
+
+def modelToDict(instance, fields=None, exclude=None):
+  """
+  Returns a dict containing the data in ``instance`` suitable for passing as
+  a Form's ``initial`` keyword argument.
+
+  ``fields`` is an optional list of field names. If provided, only the named
+  fields will be included in the returned dict.
+
+  ``exclude`` is an optional list of field names. If provided, the named
+  fields will be excluded from the returned dict, even if they are listed in
+  the ``fields`` argument.
+  """
+  # avoid a circular import
+  from theory.db.models.fields.related import ManyToManyField
+  opts = instance._meta
+  data = {}
+  for f in opts.concreteFields + opts.virtualFields + opts.manyToMany:
+    if not getattr(f, 'editable', False):
+      continue
+    if fields and f.name not in fields:
+      continue
+    if exclude and f.name in exclude:
+      continue
+    if isinstance(f, ManyToManyField):
+      # If the object doesn't have a primary key yet, just use an empty
+      # list for its m2m fields. Calling f.valueFromObject will raise
+      # an exception.
+      if instance.pk is None:
+        data[f.name] = []
+      else:
+        # MultipleChoiceWidget needs a list of pks, not object instances.
+        qs = f.valueFromObject(instance)
+        if qs._resultCache is not None:
+          data[f.name] = [item.pk for item in qs]
+        else:
+          data[f.name] = list(qs.valuesList('pk', flat=True))
+    else:
+      data[f.name] = f.valueFromObject(instance)
+  return data
+
+
+def fieldsForModel(model, fields=None, exclude=None, widgets=None,
            formfieldCallback=None, localizedFields=None,
            labels=None, helpTexts=None, errorMessages=None):
   """
-  Returns a ``SortedDict`` containing form fields for the given model.
+  Returns a ``OrderedDict`` containing form fields for the given model.
 
   ``fields`` is an optional list of field names. If provided, only the named
   fields will be included in the returned fields.
@@ -156,46 +184,47 @@ def fieldsForModel(fieldDict, fields=None, exclude=None, widgets=None,
   """
   fieldList = []
   ignored = []
-  for fieldName, fieldComplex in fieldDict.iteritems():
-    (fieldKlass, args, kwargs) = fieldComplex
-    if fields is not None and not fieldName in fields:
+  opts = model._meta
+  # Avoid circular import
+  from theory.db.model.fields import Field as ModelField
+  sortableVirtualFields = [f for f in opts.virtualFields
+                if isinstance(f, ModelField)]
+  for f in sorted(opts.concreteFields + sortableVirtualFields + opts.manyToMany):
+    if not getattr(f, 'editable', False):
       continue
-    if exclude and fieldName in exclude:
+    if fields is not None and f.name not in fields:
+      continue
+    if exclude and f.name in exclude:
       continue
 
-    if widgets and fieldName in widgets:
-      kwargs['widget'] = widgets[fieldName]
-    if localizedFields == ALL_FIELDS \
-        or (localizedFields and fieldKlass.name in localizedFields):
+    kwargs = {}
+    if widgets and f.name in widgets:
+      kwargs['widget'] = widgets[f.name]
+    if localizedFields == ALL_FIELDS or (localizedFields and f.name in localizedFields):
       kwargs['localize'] = True
-    kwargs['label'] = fieldName
+    if labels and f.name in labels:
+      kwargs['label'] = labels[f.name]
     if helpTexts and f.name in helpTexts:
-      kwargs['helpText'] = helpTexts[fieldName]
-    if errorMessages and fieldKlass.name in errorMessages:
-      kwargs['errorMessages'] = errorMessages[fieldName]
+      kwargs['helpText'] = helpTexts[f.name]
+    if errorMessages and f.name in errorMessages:
+      kwargs['errorMessages'] = errorMessages[f.name]
 
     if formfieldCallback is None:
-      formfield = fieldKlass(*args, **kwargs)
+      formfield = f.formfield(**kwargs)
     elif not callable(formfieldCallback):
       raise TypeError('formfieldCallback must be a function or callable')
     else:
-      formfield = formfieldCallback(fieldName, **kwargs)
+      formfield = formfieldCallback(f, **kwargs)
 
     if formfield:
-      fieldDict[fieldName] = formfield
+      fieldList.append((f.name, formfield))
     else:
-      ignored.append(fieldName)
-
-  for i in ignored:
-    del fieldDict[i]
-
+      ignored.append(f.name)
+  fieldDict = OrderedDict(fieldList)
   if fields:
-    fieldDict = SortedDict(
+    fieldDict = OrderedDict(
       [(f, fieldDict.get(f)) for f in fields
-        if ((not exclude) \
-            or (exclude and f not in exclude)) \
-            and (f not in ignored)
-      ]
+        if ((not exclude) or (exclude and f not in exclude)) and (f not in ignored)]
     )
   return fieldDict
 
@@ -212,21 +241,13 @@ class ModelFormOptions(object):
     self.errorMessages = getattr(options, 'errorMessages', None)
 
 
-#class ModelFormMetaclass(DeclarativeFieldsMetaclass):
-class ModelFormMetaclass(type):
+class ModelFormMetaclass(DeclarativeFieldsMetaclass):
   def __new__(mcs, name, bases, attrs):
     formfieldCallback = attrs.pop('formfieldCallback', None)
 
-    try:
-      parents = [b for b in bases if issubclass(b, ModelForm)]
-    except NameError:
-      # We are defining ModelForm itself.
-      parents = None
-    declaredFields = getDeclaredFields(bases, attrs, False)
     newClass = super(ModelFormMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
-    #if bases == (ModelFormBase,):
-    if not parents:
+    if bases == (BaseModelForm,):
       return newClass
 
     opts = newClass._meta = ModelFormOptions(getattr(newClass, 'Meta', None))
@@ -248,25 +269,26 @@ class ModelFormMetaclass(type):
     if opts.model:
       # If a model is defined, extract form fields from it.
       if opts.fields is None and opts.exclude is None:
-        # It is ok for me
-        pass
+        raise ImproperlyConfigured(
+          "Creating a ModelForm without either the 'fields' attribute "
+          "or the 'exclude' attribute is prohibited; form %s "
+          "needs updating." % name
+        )
 
       if opts.fields == ALL_FIELDS:
         # Sentinel for fieldsForModel to indicate "get the list of
         # fields from the model"
         opts.fields = None
 
-      fieldDict = MongoModelFormDetector().run(modelImportPath=opts.model)
-      fields = fieldsForModel(fieldDict, opts.fields, opts.exclude,
+      fields = fieldsForModel(opts.model, opts.fields, opts.exclude,
                    opts.widgets, formfieldCallback,
                    opts.localizedFields, opts.labels,
                    opts.helpTexts, opts.errorMessages)
-      opts.model = importClass(opts.model)
 
       # make sure opts.fields doesn't specify an invalid field
       noneModelFields = [k for k, v in six.iteritems(fields) if not v]
-      missingFields = set(noneModelFields) - \
-               set(declaredFields.keys())
+      missingFields = (set(noneModelFields) -
+               set(newClass.declaredFields.keys()))
       if missingFields:
         message = 'Unknown field(s) (%s) specified for %s'
         message = message % (', '.join(missingFields),
@@ -274,36 +296,41 @@ class ModelFormMetaclass(type):
         raise FieldError(message)
       # Override default model fields with any custom declared ones
       # (plus, include all the other declared fields).
-      fields.update(declaredFields)
+      fields.update(newClass.declaredFields)
     else:
-      fields = declaredFields
-    newClass.declaredFields = declaredFields
+      fields = newClass.declaredFields
+
     newClass.baseFields = fields
 
     return newClass
 
 
-class ModelFormBase(FormBase):
-  def __init__(self, data=None, files=None, autoId='id_%s', prefix=None,
-         initial=None, errorClass=ErrorList, labelSuffix=None,
-         emptyPermitted=False, instance=None):
+class BaseModelForm(FormBase):
+  def __init__(self, initData=None, autoId='id_%s',
+         errorClass=ErrorList, emptyPermitted=False, instance=None):
     opts = self._meta
     if opts.model is None:
       raise ValueError('ModelForm has no model class specified.')
     if instance is None:
       # if we didn't get an instance, instantiate a new one
       self.instance = opts.model()
-      del self.baseFields["id"]
+      objectData = {}
     else:
       self.instance = instance
-    for fieldName in self.baseFields.keys():
-      self.baseFields[fieldName].initData = getattr(self.instance, fieldName)
+      objectData = modelToDict(instance, opts.fields, opts.exclude)
+    # if initial was provided, it should override the values from instance
+    if initData is not None:
+      objectData.update(initData)
     # self._validateUnique will be set to True by BaseModelForm.clean().
     # It is False by default so overriding self.clean() and failing to call
     # super will stop validateUnique from being called.
     self._validateUnique = False
-    super(ModelFormBase, self).__init__(data,
-                      errorClass, emptyPermitted)
+    super(BaseModelForm, self).__init__(
+        initData=objectData,
+        autoId=autoId,
+        errorClass=errorClass,
+        emptyPermitted=emptyPermitted
+        )
     # Apply ``limitChoicesTo`` to each field.
     for fieldName in self.fields:
       formfield = self.fields[fieldName]
@@ -321,7 +348,6 @@ class ModelFormBase(FormBase):
     details: #12507, #12521, #12553
     """
     exclude = []
-    return exclude
     # Build up a list of fields that should be excluded from model field
     # validation and unique checks.
     for f in self.instance._meta.fields:
@@ -383,13 +409,6 @@ class ModelFormBase(FormBase):
 
   def _postClean(self):
     opts = self._meta
-    # Update the model instance with self.cleanedData.
-    #self.instance = constructInstance(
-    #    self,
-    #    self.instance,
-    #    opts.fields,
-    #    opts.exclude
-    #    )
 
     exclude = self._getValidationExclusions()
     # a subset of `exclude` which won't have the InlineForeignKeyField
@@ -406,12 +425,12 @@ class ModelFormBase(FormBase):
     # so this can't be part of _getValidationExclusions().
     for name, field in self.fields.items():
       if isinstance(field, InlineForeignKeyField):
-        #if self.cleanedData.get(name) is not None and self.cleanedData[name]._state.adding:
-        #  constructInstanceExclude.append(name)
+        if self.cleanedData.get(name) is not None and self.cleanedData[name]._state.adding:
+          constructInstanceExclude.append(name)
         exclude.append(name)
 
     # Update the model instance with self.cleanedData.
-    #self.instance = constructInstance(self, self.instance, opts.fields, constructInstanceExclude)
+    self.instance = constructInstance(self, self.instance, opts.fields, constructInstanceExclude)
 
     try:
       self.instance.fullClean(exclude=exclude, validateUnique=False)
@@ -452,7 +471,7 @@ class ModelFormBase(FormBase):
   save.altersData = True
 
 
-class ModelForm(six.with_metaclass(ModelFormMetaclass, ModelFormBase)):
+class ModelForm(six.withMetaclass(ModelFormMetaclass, BaseModelForm)):
   pass
 
 
@@ -566,13 +585,10 @@ class BaseModelFormSet(BaseFormSet):
     """
     while field.rel is not None:
       field = field.rel.getRelatedField()
-    return field.to_python
+    return field.toPython
 
   def _constructForm(self, i, **kwargs):
     if self.isBound and i < self.initialFormCount():
-      # Import goes here instead of module-level because importing
-      # theory.db has side effects.
-      from theory.db import connections
       pkKey = "%s-%s" % (self.addPrefix(i), self.model._meta.pk.name)
       pk = self.data[pkKey]
       pkField = self.model._meta.pk
@@ -1104,9 +1120,11 @@ class ModelChoiceField(ChoiceField):
       cacheChoices = False
     self.cacheChoices = cacheChoices
 
+    if not kwargs.has_key("widget"):
+      kwargs["widget"] = widget
     # Call Field instead of ChoiceField __init__() because we don't need
     # ChoiceField.__init__().
-    Field.__init__(self, required, widget, label, initial, helpText,
+    Field.__init__(self, required, label, initial, helpText,
             *args, **kwargs)
     self.queryset = queryset
     self.limitChoicesTo = limitChoicesTo   # limit the queryset later.
@@ -1163,7 +1181,7 @@ class ModelChoiceField(ChoiceField):
         return value.pk
     return super(ModelChoiceField, self).prepareValue(value)
 
-  def to_python(self, value):
+  def toPython(self, value):
     if value in self.emptyValues:
       return None
     try:
@@ -1184,7 +1202,7 @@ class ModelChoiceField(ChoiceField):
 
 class ModelMultipleChoiceField(ModelChoiceField):
   """A MultipleChoiceField whose choices are a model QuerySet."""
-  #widget = SelectMultiple
+  widget = CheckBoxInput
   #hiddenWidget = MultipleHiddenInput
   defaultErrorMessages = {
     'list': _('Enter a list of values.'),
@@ -1200,10 +1218,10 @@ class ModelMultipleChoiceField(ModelChoiceField):
       cacheChoices, required, widget, label, initial, helpText,
       *args, **kwargs)
 
-  def to_python(self, value):
+  def toPython(self, value):
     if not value:
       return []
-    toPy = super(ModelMultipleChoiceField, self).to_python
+    toPy = super(ModelMultipleChoiceField, self).toPython
     return [toPy(val) for val in value]
 
   def clean(self, value):

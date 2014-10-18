@@ -1,0 +1,2345 @@
+[
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 1,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 1
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "database",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 1,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 2
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isLoadInitData",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 1,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 3
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isResetSequence",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 1,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 4
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isAllowCascade",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 1,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 5
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isInhibitPostMigrate",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 1,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 6
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 2,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 7
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "appName",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 2,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 8
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "modelName",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 2,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 9
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "queryset",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 2,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 10
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "queryFilter",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 2,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 11
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 3,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 12
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "appName",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 3,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 13
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "modelName",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 3,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 14
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "queryset",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 3,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 15
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "queryFilter",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 3,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 16
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 4,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 17
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "commandReady",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 4,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 18
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 5,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 19
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "fixtureLabelLst",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 5,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 20
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "database",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 5,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 21
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "appLabel",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 5,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 22
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isIgnorenonexistent",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 5,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 23
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isHideEmpty",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 5,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 24
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 6,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 25
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "rootLst",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 6,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 26
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "yieldMethod",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 6,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 27
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "depth",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 6,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 28
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "includeFileExtLst",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 6,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 29
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "excludeFileExtLst",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 6,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 30
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "includeDirLst",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 6,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 31
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "excludeDirLst",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 6,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 32
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "stdout",
+    "isOptional": true,
+    "isReadOnly": true,
+    "command": 6,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 33
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "dirnameLst",
+    "isOptional": true,
+    "isReadOnly": true,
+    "command": 6,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 34
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "filenameLst",
+    "isOptional": true,
+    "isReadOnly": true,
+    "command": 6,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 35
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 7,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 36
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "appLabelLst",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 7,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 37
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isDryRun",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 7,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 38
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isMerge",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 7,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 39
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isEmpty",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 7,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 40
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 8,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 41
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "appLabelLst",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 8,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 42
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "format",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 8,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 43
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "indent",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 8,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 44
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "database",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 8,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 45
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "excludeLst",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 8,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 46
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isNature",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 8,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 47
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isNatureForeign",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 8,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 48
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isNaturePrimary",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 8,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 49
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isUseBaseManager",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 8,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 50
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "primaryKeyLst",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 8,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 51
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "output",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 8,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 52
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isShowTraceback",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 8,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 53
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 9,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 54
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "appName",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 9,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 55
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 10,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 56
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "appName",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 10,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 57
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "mood",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 10,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 58
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "stdOut",
+    "isOptional": true,
+    "isReadOnly": true,
+    "command": 10,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 59
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "query",
+    "isOptional": true,
+    "isReadOnly": true,
+    "command": 10,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 60
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 11,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 61
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "appLabel",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 11,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 62
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isInitialData",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 11,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 63
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "database",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 11,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 64
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "migrationName",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 11,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 65
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isFake",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 11,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 66
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isList",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 11,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 67
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isShowTraceback",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 11,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 68
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isTestDatabase",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 11,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 69
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isTestFlush",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 11,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 70
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 12,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 71
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "appName",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 12,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 72
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "modelName",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 12,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 73
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "instanceId",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 12,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 74
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isInNewWindow",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 12,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 75
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 13,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 76
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "moodName",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 13,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 77
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 14,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 78
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "settingMod",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 14,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 79
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 15,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 80
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "appName",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 15,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 81
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "cmdName",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 15,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 82
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "cmdType",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 15,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 83
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "propertyNameLst",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 15,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 84
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 16,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 85
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isTestTheory",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 16,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 86
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "testRunner",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 16,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 87
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "testLabel",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 16,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 88
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "testRunnerClassParam",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 16,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 89
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 17,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 90
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "appName",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 17,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 91
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "modelName",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 17,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 92
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "queryset",
+    "isOptional": true,
+    "isReadOnly": false,
+    "command": 17,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 93
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "queryFilter",
+    "isOptional": false,
+    "isReadOnly": false,
+    "command": 17,
+    "type": ""
+  },
+  "model": "apps.parameter",
+  "pk": 94
+},
+{
+  "fields": {
+    "name": "lost"
+  },
+  "model": "apps.mood",
+  "pk": 1
+},
+{
+  "fields": {
+    "name": "norm"
+  },
+  "model": "apps.mood",
+  "pk": 2
+},
+{
+  "fields": {
+    "name": "dev"
+  },
+  "model": "apps.mood",
+  "pk": 3
+},
+{
+  "fields": {
+    "comment": null,
+    "name": "flush",
+    "nextAvblCmd": [],
+    "app": "theory.apps",
+    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/flush.py",
+    "moodSet": [
+      1
+    ],
+    "runMode": 1
+  },
+  "model": "apps.command",
+  "pk": 1
+},
+{
+  "fields": {
+    "comment": null,
+    "name": "modelSelect",
+    "nextAvblCmd": [],
+    "app": "theory.apps",
+    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/modelSelect.py",
+    "moodSet": [
+      2
+    ],
+    "runMode": 1
+  },
+  "model": "apps.command",
+  "pk": 2
+},
+{
+  "fields": {
+    "comment": null,
+    "name": "modelTblDel",
+    "nextAvblCmd": [],
+    "app": "theory.apps",
+    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/modelTblDel.py",
+    "moodSet": [
+      2
+    ],
+    "runMode": 1
+  },
+  "model": "apps.command",
+  "pk": 3
+},
+{
+  "fields": {
+    "comment": null,
+    "name": "nextStep",
+    "nextAvblCmd": [],
+    "app": "theory.apps",
+    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/nextStep.py",
+    "moodSet": [
+      2
+    ],
+    "runMode": 1
+  },
+  "model": "apps.command",
+  "pk": 4
+},
+{
+  "fields": {
+    "comment": null,
+    "name": "loaddata",
+    "nextAvblCmd": [],
+    "app": "theory.apps",
+    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/loaddata.py",
+    "moodSet": [
+      1
+    ],
+    "runMode": 1
+  },
+  "model": "apps.command",
+  "pk": 5
+},
+{
+  "fields": {
+    "comment": null,
+    "name": "filenameScanner",
+    "nextAvblCmd": [],
+    "app": "theory.apps",
+    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/filenameScanner.py",
+    "moodSet": [
+      2
+    ],
+    "runMode": 1
+  },
+  "model": "apps.command",
+  "pk": 6
+},
+{
+  "fields": {
+    "comment": null,
+    "name": "makeMigration",
+    "nextAvblCmd": [],
+    "app": "theory.apps",
+    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/makeMigration.py",
+    "moodSet": [
+      1
+    ],
+    "runMode": 1
+  },
+  "model": "apps.command",
+  "pk": 7
+},
+{
+  "fields": {
+    "comment": null,
+    "name": "dumpdata",
+    "nextAvblCmd": [],
+    "app": "theory.apps",
+    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/dumpdata.py",
+    "moodSet": [
+      2
+    ],
+    "runMode": 1
+  },
+  "model": "apps.command",
+  "pk": 8
+},
+{
+  "fields": {
+    "comment": null,
+    "name": "createApp",
+    "nextAvblCmd": [],
+    "app": "theory.apps",
+    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/createApp.py",
+    "moodSet": [
+      3
+    ],
+    "runMode": 1
+  },
+  "model": "apps.command",
+  "pk": 9
+},
+{
+  "fields": {
+    "comment": null,
+    "name": "listCommand",
+    "nextAvblCmd": [],
+    "app": "theory.apps",
+    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/listCommand.py",
+    "moodSet": [
+      2
+    ],
+    "runMode": 1
+  },
+  "model": "apps.command",
+  "pk": 10
+},
+{
+  "fields": {
+    "comment": null,
+    "name": "migrate",
+    "nextAvblCmd": [],
+    "app": "theory.apps",
+    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/migrate.py",
+    "moodSet": [
+      1
+    ],
+    "runMode": 1
+  },
+  "model": "apps.command",
+  "pk": 11
+},
+{
+  "fields": {
+    "comment": null,
+    "name": "modelUpsert",
+    "nextAvblCmd": [],
+    "app": "theory.apps",
+    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/modelUpsert.py",
+    "moodSet": [
+      2
+    ],
+    "runMode": 1
+  },
+  "model": "apps.command",
+  "pk": 12
+},
+{
+  "fields": {
+    "comment": null,
+    "name": "switchMood",
+    "nextAvblCmd": [],
+    "app": "theory.apps",
+    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/switchMood.py",
+    "moodSet": [
+      2
+    ],
+    "runMode": 1
+  },
+  "model": "apps.command",
+  "pk": 13
+},
+{
+  "fields": {
+    "comment": null,
+    "name": "probeModule",
+    "nextAvblCmd": [],
+    "app": "theory.apps",
+    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/probeModule.py",
+    "moodSet": [
+      2
+    ],
+    "runMode": 1
+  },
+  "model": "apps.command",
+  "pk": 14
+},
+{
+  "fields": {
+    "comment": null,
+    "name": "createCmd",
+    "nextAvblCmd": [],
+    "app": "theory.apps",
+    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/createCmd.py",
+    "moodSet": [
+      3
+    ],
+    "runMode": 1
+  },
+  "model": "apps.command",
+  "pk": 15
+},
+{
+  "fields": {
+    "comment": null,
+    "name": "tester",
+    "nextAvblCmd": [],
+    "app": "theory.apps",
+    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/tester.py",
+    "moodSet": [
+      2
+    ],
+    "runMode": 1
+  },
+  "model": "apps.command",
+  "pk": 16
+},
+{
+  "fields": {
+    "comment": null,
+    "name": "modelTblEdit",
+    "nextAvblCmd": [],
+    "app": "theory.apps",
+    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/modelTblEdit.py",
+    "moodSet": [
+      2
+    ],
+    "runMode": 1
+  },
+  "model": "apps.command",
+  "pk": 17
+},
+{
+  "fields": {
+    "importPath": "theory.apps.adapter.terminalAdapter.TerminalAdapter",
+    "propertyLst": "[\"stdErr\", \"stdOut\"]",
+    "name": "Terminal"
+  },
+  "model": "apps.adapter",
+  "pk": 1
+},
+{
+  "fields": {
+    "importPath": "theory.apps.adapter.dummyAdapter.DummyAdapter",
+    "propertyLst": "[]",
+    "name": "Dummy"
+  },
+  "model": "apps.adapter",
+  "pk": 2
+},
+{
+  "fields": {
+    "importPath": "theory.adapter.apps.BaseAdapter",
+    "propertyLst": "[]",
+    "name": "Base"
+  },
+  "model": "apps.adapter",
+  "pk": 3
+},
+{
+  "fields": {
+    "importPath": "theory.adapter.apps.BaseUIAdapter",
+    "propertyLst": "[]",
+    "name": "BaseUI"
+  },
+  "model": "apps.adapter",
+  "pk": 4
+},
+{
+  "fields": {
+    "importPath": "theory.apps.adapter.filenameListAdapter.FilenameListAdapter",
+    "propertyLst": "[\"files\", \"stdErr\", \"stdOut\"]",
+    "name": "FilenameList"
+  },
+  "model": "apps.adapter",
+  "pk": 5
+},
+{
+  "fields": {
+    "importPath": "theory.apps.adapter.stdPipeAdapter.StdPipeAdapter",
+    "propertyLst": "[\"stdErr\", \"stdIn\", \"stdOut\"]",
+    "name": "StdPipe"
+  },
+  "model": "apps.adapter",
+  "pk": 6
+},
+{
+  "fields": {
+    "importPath": "theory.apps.adapter.querysetAsSpreadsheetAdapter.QuerysetAsSpreadsheetAdapter",
+    "propertyLst": "[\"appModel\", \"isEditable\", \"queryset\"]",
+    "name": "QuerysetAsSpreadsheet"
+  },
+  "model": "apps.adapter",
+  "pk": 7
+},
+{
+  "fields": {
+    "appModel": 1,
+    "name": "id",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "AutoField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 1
+},
+{
+  "fields": {
+    "appModel": 1,
+    "name": "name",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "CharField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 2
+},
+{
+  "fields": {
+    "appModel": 1,
+    "name": "importPath",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "CharField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 3
+},
+{
+  "fields": {
+    "appModel": 2,
+    "name": "fromCmd",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "ForeignKey"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 4
+},
+{
+  "fields": {
+    "appModel": 2,
+    "name": "foreignApp",
+    "parent": 4,
+    "isField": false,
+    "isCircular": false,
+    "data": "('theory.apps',)"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 5
+},
+{
+  "fields": {
+    "appModel": 2,
+    "name": "foreignModel",
+    "parent": 4,
+    "isField": false,
+    "isCircular": false,
+    "data": "Command"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 6
+},
+{
+  "fields": {
+    "appModel": 2,
+    "name": "toCmd",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "ForeignKey"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 7
+},
+{
+  "fields": {
+    "appModel": 2,
+    "name": "foreignApp",
+    "parent": 7,
+    "isField": false,
+    "isCircular": false,
+    "data": "('theory.apps',)"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 8
+},
+{
+  "fields": {
+    "appModel": 2,
+    "name": "foreignModel",
+    "parent": 7,
+    "isField": false,
+    "isCircular": false,
+    "data": "Command"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 9
+},
+{
+  "fields": {
+    "appModel": 2,
+    "name": "adapter",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "ForeignKey"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 10
+},
+{
+  "fields": {
+    "appModel": 2,
+    "name": "foreignApp",
+    "parent": 10,
+    "isField": false,
+    "isCircular": false,
+    "data": "('theory.apps',)"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 11
+},
+{
+  "fields": {
+    "appModel": 2,
+    "name": "foreignModel",
+    "parent": 10,
+    "isField": false,
+    "isCircular": false,
+    "data": "Adapter"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 12
+},
+{
+  "fields": {
+    "appModel": 2,
+    "name": "id",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "AutoField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 13
+},
+{
+  "fields": {
+    "appModel": 2,
+    "name": "data",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "TextField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 14
+},
+{
+  "fields": {
+    "appModel": 2,
+    "name": "created",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "DateTimeField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 15
+},
+{
+  "fields": {
+    "appModel": 3,
+    "name": "id",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "AutoField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 16
+},
+{
+  "fields": {
+    "appModel": 3,
+    "name": "name",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "CharField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 17
+},
+{
+  "fields": {
+    "appModel": 3,
+    "name": "app",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "CharField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 18
+},
+{
+  "fields": {
+    "appModel": 3,
+    "name": "importPath",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "CharField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 19
+},
+{
+  "fields": {
+    "appModel": 3,
+    "name": "importanceRating",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "IntegerField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 20
+},
+{
+  "fields": {
+    "appModel": 4,
+    "name": "id",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "AutoField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 21
+},
+{
+  "fields": {
+    "appModel": 4,
+    "name": "ref",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "IntegerField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 22
+},
+{
+  "fields": {
+    "appModel": 5,
+    "name": "moodSet",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "ManyToManyField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 23
+},
+{
+  "fields": {
+    "appModel": 5,
+    "name": "foreignApp",
+    "parent": 23,
+    "isField": false,
+    "isCircular": false,
+    "data": "('theory.apps',)"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 24
+},
+{
+  "fields": {
+    "appModel": 5,
+    "name": "foreignModel",
+    "parent": 23,
+    "isField": false,
+    "isCircular": false,
+    "data": "Mood"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 25
+},
+{
+  "fields": {
+    "appModel": 5,
+    "name": "nextAvblCmd",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "ManyToManyField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 26
+},
+{
+  "fields": {
+    "appModel": 5,
+    "name": "foreignApp",
+    "parent": 26,
+    "isField": false,
+    "isCircular": false,
+    "data": "('theory.apps',)"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 27
+},
+{
+  "fields": {
+    "appModel": 5,
+    "name": "foreignModel",
+    "parent": 26,
+    "isField": false,
+    "isCircular": false,
+    "data": "Command"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 28
+},
+{
+  "fields": {
+    "appModel": 5,
+    "name": "id",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "AutoField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 29
+},
+{
+  "fields": {
+    "appModel": 5,
+    "name": "name",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "CharField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 30
+},
+{
+  "fields": {
+    "appModel": 5,
+    "name": "app",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "CharField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 31
+},
+{
+  "fields": {
+    "appModel": 5,
+    "name": "sourceFile",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "CharField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 32
+},
+{
+  "fields": {
+    "appModel": 5,
+    "name": "comment",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "TextField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 33
+},
+{
+  "fields": {
+    "appModel": 5,
+    "name": "runMode",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "IntegerField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 34
+},
+{
+  "fields": {
+    "appModel": 6,
+    "name": "parent",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "ForeignKey"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 35
+},
+{
+  "fields": {
+    "appModel": 6,
+    "name": "foreignApp",
+    "parent": 35,
+    "isField": false,
+    "isCircular": false,
+    "data": "('theory.apps',)"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 36
+},
+{
+  "fields": {
+    "appModel": 6,
+    "name": "foreignModel",
+    "parent": 35,
+    "isField": false,
+    "isCircular": false,
+    "data": "FieldParameter"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 37
+},
+{
+  "fields": {
+    "appModel": 6,
+    "name": "appModel",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "ForeignKey"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 38
+},
+{
+  "fields": {
+    "appModel": 6,
+    "name": "foreignApp",
+    "parent": 38,
+    "isField": false,
+    "isCircular": false,
+    "data": "('theory.apps',)"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 39
+},
+{
+  "fields": {
+    "appModel": 6,
+    "name": "foreignModel",
+    "parent": 38,
+    "isField": false,
+    "isCircular": false,
+    "data": "AppModel"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 40
+},
+{
+  "fields": {
+    "appModel": 6,
+    "name": "id",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "AutoField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 41
+},
+{
+  "fields": {
+    "appModel": 6,
+    "name": "name",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "CharField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 42
+},
+{
+  "fields": {
+    "appModel": 6,
+    "name": "data",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "TextField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 43
+},
+{
+  "fields": {
+    "appModel": 6,
+    "name": "isField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "BooleanField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 44
+},
+{
+  "fields": {
+    "appModel": 6,
+    "name": "isCircular",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "BooleanField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 45
+},
+{
+  "fields": {
+    "appModel": 7,
+    "name": "moodSet",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "ManyToManyField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 46
+},
+{
+  "fields": {
+    "appModel": 7,
+    "name": "foreignApp",
+    "parent": 46,
+    "isField": false,
+    "isCircular": false,
+    "data": "('theory.apps',)"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 47
+},
+{
+  "fields": {
+    "appModel": 7,
+    "name": "foreignModel",
+    "parent": 46,
+    "isField": false,
+    "isCircular": false,
+    "data": "Mood"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 48
+},
+{
+  "fields": {
+    "appModel": 7,
+    "name": "id",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "AutoField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 49
+},
+{
+  "fields": {
+    "appModel": 7,
+    "name": "commandName",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "CharField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 50
+},
+{
+  "fields": {
+    "appModel": 7,
+    "name": "jsonData",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "TextField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 51
+},
+{
+  "fields": {
+    "appModel": 7,
+    "name": "touched",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "DateTimeField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 52
+},
+{
+  "fields": {
+    "appModel": 7,
+    "name": "repeated",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "IntegerField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 53
+},
+{
+  "fields": {
+    "appModel": 8,
+    "name": "id",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "AutoField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 54
+},
+{
+  "fields": {
+    "appModel": 8,
+    "name": "name",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "CharField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 55
+},
+{
+  "fields": {
+    "appModel": 9,
+    "name": "command",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "ForeignKey"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 56
+},
+{
+  "fields": {
+    "appModel": 9,
+    "name": "foreignApp",
+    "parent": 56,
+    "isField": false,
+    "isCircular": false,
+    "data": "('theory.apps',)"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 57
+},
+{
+  "fields": {
+    "appModel": 9,
+    "name": "foreignModel",
+    "parent": 56,
+    "isField": false,
+    "isCircular": false,
+    "data": "Command"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 58
+},
+{
+  "fields": {
+    "appModel": 9,
+    "name": "id",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "AutoField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 59
+},
+{
+  "fields": {
+    "appModel": 9,
+    "name": "name",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "CharField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 60
+},
+{
+  "fields": {
+    "appModel": 9,
+    "name": "type",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "CharField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 61
+},
+{
+  "fields": {
+    "appModel": 9,
+    "name": "isOptional",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "BooleanField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 62
+},
+{
+  "fields": {
+    "appModel": 9,
+    "name": "isReadOnly",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "BooleanField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 63
+},
+{
+  "fields": {
+    "appModel": 9,
+    "name": "comment",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "TextField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 64
+},
+{
+  "fields": {
+    "name": "Adapter",
+    "app": "theory.apps",
+    "formField": "[\"id\", \"name\", \"importPath\", \"propertyLst\"]",
+    "importPath": "theory.apps.model.Adapter",
+    "tblField": "[\"id\", \"name\", \"importPath\", \"propertyLst\"]",
+    "importanceRating": 0
+  },
+  "model": "apps.appmodel",
+  "pk": 1
+},
+{
+  "fields": {
+    "name": "AdapterBuffer",
+    "app": "theory.apps",
+    "formField": "[\"id\", \"fromCmd\", \"toCmd\", \"adapter\", \"data\", \"created\"]",
+    "importPath": "theory.apps.model.AdapterBuffer",
+    "tblField": "[\"id\", \"fromCmd\", \"toCmd\", \"adapter\", \"data\", \"created\"]",
+    "importanceRating": 0
+  },
+  "model": "apps.appmodel",
+  "pk": 2
+},
+{
+  "fields": {
+    "name": "AppModel",
+    "app": "theory.apps",
+    "formField": "[\"id\", \"name\", \"app\", \"tblField\", \"formField\", \"importPath\", \"importanceRating\"]",
+    "importPath": "theory.apps.model.AppModel",
+    "tblField": "[\"id\", \"name\", \"app\", \"tblField\", \"formField\", \"importPath\", \"importanceRating\"]",
+    "importanceRating": 0
+  },
+  "model": "apps.appmodel",
+  "pk": 3
+},
+{
+  "fields": {
+    "name": "BinaryClassifierHistory",
+    "app": "theory.apps",
+    "formField": "[\"id\", \"ref\", \"initState\", \"finalState\"]",
+    "importPath": "theory.apps.model.BinaryClassifierHistory",
+    "tblField": "[\"id\", \"ref\", \"initState\", \"finalState\"]",
+    "importanceRating": 0
+  },
+  "model": "apps.appmodel",
+  "pk": 4
+},
+{
+  "fields": {
+    "name": "Command",
+    "app": "theory.apps",
+    "formField": "[\"id\", \"name\", \"app\", \"sourceFile\", \"comment\", \"runMode\"]",
+    "importPath": "theory.apps.model.Command",
+    "tblField": "[\"id\", \"name\", \"app\", \"sourceFile\", \"comment\", \"runMode\"]",
+    "importanceRating": 0
+  },
+  "model": "apps.appmodel",
+  "pk": 5
+},
+{
+  "fields": {
+    "name": "FieldParameter",
+    "app": "theory.apps",
+    "formField": "[\"id\", \"name\", \"data\", \"isField\", \"isCircular\", \"parent\", \"appModel\"]",
+    "importPath": "theory.apps.model.FieldParameter",
+    "tblField": "[\"id\", \"name\", \"data\", \"isField\", \"isCircular\", \"parent\", \"appModel\"]",
+    "importanceRating": 0
+  },
+  "model": "apps.appmodel",
+  "pk": 6
+},
+{
+  "fields": {
+    "name": "History",
+    "app": "theory.apps",
+    "formField": "[\"id\", \"commandName\", \"jsonData\", \"touched\", \"repeated\"]",
+    "importPath": "theory.apps.model.History",
+    "tblField": "[\"id\", \"commandName\", \"jsonData\", \"touched\", \"repeated\"]",
+    "importanceRating": 0
+  },
+  "model": "apps.appmodel",
+  "pk": 7
+},
+{
+  "fields": {
+    "name": "Mood",
+    "app": "theory.apps",
+    "formField": "[\"id\", \"name\"]",
+    "importPath": "theory.apps.model.Mood",
+    "tblField": "[\"id\", \"name\"]",
+    "importanceRating": 0
+  },
+  "model": "apps.appmodel",
+  "pk": 8
+},
+{
+  "fields": {
+    "name": "Parameter",
+    "app": "theory.apps",
+    "formField": "[\"id\", \"name\", \"type\", \"command\", \"isOptional\", \"isReadOnly\", \"comment\"]",
+    "importPath": "theory.apps.model.Parameter",
+    "tblField": "[\"id\", \"name\", \"type\", \"command\", \"isOptional\", \"isReadOnly\", \"comment\"]",
+    "importanceRating": 0
+  },
+  "model": "apps.appmodel",
+  "pk": 9
+}
+]

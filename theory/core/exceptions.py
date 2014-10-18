@@ -175,3 +175,8 @@ class CommandSyntaxError(Exception):
   """The syntax of requested command has error"""
   pass
 
+class CommandError(Exception):
+  """The requested command has error"""
+  pass
+
+

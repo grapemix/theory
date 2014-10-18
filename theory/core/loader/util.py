@@ -11,7 +11,6 @@ import sys
 #from theory.command import filenameScanner
 from theory.core.resourceScan import *
 from theory.utils.importlib import importModule
-from theory.utils.mood import loadMoodData
 
 ##### Theory third-party lib #####
 
@@ -69,6 +68,21 @@ def setupEnviron(settings_mod, original_settings_path=None):
 
   return mood_directory
 
+def detectScreenResolution(configPath):
+  resolution = []
+  for i in check_output("xrandr").split("\n"):
+    if "*" in i:
+      width, height = i.split()[0].split("x")
+      resolution.append(str((width, height)))
+
+  for line in fileinput.input(configPath, inplace=True):
+    if line == "RESOLUTION = ()":
+      print "RESOLUTION = ({0},)".format(",".join(resolution))
+    elif line == "\n":
+      continue
+    else:
+      print line,
+
 def checkModuleType(path):
   if(os.path.isfile(path)):
     return FILE_MODULE
@@ -108,13 +122,11 @@ def findFilesInAppDir(app_name, dirName, isIncludeInit=False):
     filterFxn = lambda i: i.endswith(".py")
   else:
     filterFxn = lambda i: i.endswith(".py") and i!="__init__.py"
-  #return (path, [i[:-3] for i in os.listdir(path) if(filterFxn(i))])
   try:
     r = (path, [i[:-3] for i in os.listdir(path) if(filterFxn(i))])
   except OSError, e:
     if(checkModuleType(path)==FILE_MODULE):
       return ("/".join(path.split("/")[:-1]), ["__init__"])
-      #return (None, None)
     else:
       raise e
   return r
@@ -143,12 +155,12 @@ class ModuleLoader(object):
     return lst
 
   def load(self):
-    (path, fileList) = findFilesInAppDir("theory", self.dirName, True)
+    (path, fileList) = findFilesInAppDir("theory.apps", self.dirName, True)
 
-    if(path!=None):
+    if(path is not None):
       scanManager = self.scanManager()
       scanManager.paramList = self.postPackFxnForTheory(
-          self.lstPackFxn(fileList, "theory", path)
+          self.lstPackFxn(fileList, "theory.apps", path)
           )
 
       for app_name in self.apps:
@@ -179,6 +191,7 @@ class CommandModuleLoader(ModuleLoader):
       "modelTblEdit": ["norm"],
       "modelTblDel": ["norm"],
       "modelUpsert": ["norm"],
+      "dumpdata": ["norm"],
       "infect": ["dev"],
     }
     for o in lst:
@@ -191,21 +204,6 @@ class CommandModuleLoader(ModuleLoader):
      if(self.moodAppRel.has_key(o[0])):
         o[-1] = self.moodAppRel[o[0]]
     return lst
-
-def detectScreenResolution(configPath):
-  resolution = []
-  for i in check_output("xrandr").split("\n"):
-    if "*" in i:
-      width, height = i.split()[0].split("x")
-      resolution.append(str((width, height)))
-
-  for line in fileinput.input(configPath, inplace=True):
-    if line == "RESOLUTION = ()":
-      print "RESOLUTION = ({0},)".format(",".join(resolution))
-    elif line == "\n":
-      continue
-    else:
-      print line,
 
 def reprobeAllModule(settings_mod, argv=None):
   """
@@ -243,13 +241,14 @@ def reprobeAllModule(settings_mod, argv=None):
   except (AttributeError, EnvironmentError, ImportError):
     apps = []
 
-  # Find the project directory
-  try:
-    from theory.conf import settings
-    module = importModule(settings.SETTINGS_MODULE)
-    project_directory = setupEnviron(module, settings.SETTINGS_MODULE)
-  except (AttributeError, EnvironmentError, ImportError, KeyError):
-    project_directory = None
+  # Find all mood directory
+  detectScreenResolution(
+      os.path.join(
+        settings.MOODS_ROOT,
+        "norm",
+        "config.py"
+        )
+      )
 
   # Find all mood directory
   moodAppRel = {}
@@ -264,15 +263,10 @@ def reprobeAllModule(settings_mod, argv=None):
       else:
         moodAppRel[appName] = [moodDirName]
 
-  detectScreenResolution(
-      os.path.join(
-        settings.MOODS_ROOT,
-        "norm",
-        "config.py"
-        )
-      )
-
-  loadMoodData()
+  moduleLoader = ModuleLoader(ModelScanManager, "model", apps)
+  moduleLoader.lstPackFxn = \
+      lambda lst, app_name, path: [".".join([app_name, i]) for i in lst]
+  moduleLoader.load()
 
   moduleLoader = ModuleLoader(AdapterScanManager, "adapter", apps)
   moduleLoader.lstPackFxn = \
@@ -284,9 +278,4 @@ def reprobeAllModule(settings_mod, argv=None):
   moduleLoader.lstPackFxn = \
       lambda lst, app_name, path:\
         [[app_name, i, os.path.join(path, i + ".py"), ["lost"]] for i in lst]
-  moduleLoader.load()
-
-  moduleLoader = ModuleLoader(ModelScanManager, "model", apps)
-  moduleLoader.lstPackFxn = \
-      lambda lst, app_name, path: [".".join([app_name, i]) for i in lst]
   moduleLoader.load()

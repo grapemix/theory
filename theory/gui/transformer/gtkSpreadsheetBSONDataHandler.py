@@ -10,12 +10,12 @@ from json import loads as jsonLoads
 ##### Local app #####
 
 ##### Theory app #####
-from theory.gui.transformer.mongoModelTblDetectorBase \
-    import MongoModelTblDetectorBase
+from theory.gui.transformer.theoryModelTblDetectorBase \
+    import TheoryModelTblDetectorBase
 
 ##### Misc #####
 
-class GtkSpreadsheetModelBSONDataHandler(MongoModelTblDetectorBase):
+class GtkSpreadsheetModelBSONDataHandler(TheoryModelTblDetectorBase):
   """This class handle the data conversion from Gtk spreadsheet model. In this
   handler, because of the limitation of gtkListModel, only modified rows are
   able to be notified, instead of modified rows and modified fields."""

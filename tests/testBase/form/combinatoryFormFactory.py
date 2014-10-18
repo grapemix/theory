@@ -5,9 +5,9 @@ from datetime import datetime
 import os
 
 ##### Theory lib #####
+from theory.apps.model import Command
 from theory.gui import field
 from theory.gui.form import Form
-from theory.model import Command
 
 ##### Theory third-party lib #####
 
@@ -179,8 +179,6 @@ class CombinatoryFormWithDefaultValue(Form):
   dateTimeField = field.DateTimeField(initData=defaultValueSet1["DateTime"])
   timeField = field.TimeField(initData=defaultValueSet1["Time"])
   #geoPointField = field.GeoPointField(initData=defaultValueSet1["GeoPoint"])
-
-  embeddedField = field.EmbeddedField("theory", "Parameter", required=False)
 
   __name__ = "CombinatoryFormWithDefaultValueForm"
 

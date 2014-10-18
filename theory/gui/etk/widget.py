@@ -6,9 +6,7 @@ import copy
 import os
 
 ##### Theory lib #####
-from theory.core.bridge import Bridge
 from theory.gui.util import LocalFileObject
-from theory.model import Command
 from theory.utils import datetimeSafe, formats
 from theory.utils.importlib import importClass
 
@@ -283,7 +281,8 @@ class CheckBoxInput(BaseLabelInput):
 
     for v in self.attrs["choices"]:
       (label, value) = v
-      if value in self.attrs["initData"]:
+      if self.attrs["initData"] is not None \
+          and value in self.attrs["initData"]:
         widget = self.widgetClass({"initData": True, })
       else:
         widget = self.widgetClass()
@@ -963,6 +962,8 @@ class QueryIdInput(StringInput):
       entryWidget.finalData = entryWidget.finalData + finalData
 
   def _createInstanceCallback(self, btn, dummy):
+    from theory.core.bridge import Bridge
+    from theory.model import Command
     bridge = Bridge()
     cmdModel = Command.objects.get(app="theory", name="modelUpsert")
     cmd = bridge.getCmdComplex(
@@ -974,6 +975,8 @@ class QueryIdInput(StringInput):
     bridge._execeuteCommand(cmd, cmdModel)
 
   def _selectInstanceCallback(self, btn, dummy):
+    from theory.core.bridge import Bridge
+    from theory.model import Command
     bridge = Bridge()
     cmdModel = Command.objects.get(app="theory", name="modelSelect")
     print self.app, self.model
@@ -1028,12 +1031,12 @@ class QueryIdInput(StringInput):
       queryset = self.rawInitData
     else:
       dbClass = importClass('{0}.model.{1}'.format(
-        self.app,
-        self.model
+        self.attrs["app"],
+        self.attrs["model"]
         )
       )
       entryWidget = self.widgetLst[0].widgetChildrenLst[0]
-      idInDict = dbClass.objects.in_bulk([i.id for i in entryWidget.finalData])
+      idInDict = dbClass.objects.inBulk([i.id for i in entryWidget.finalData])
       queryset = []
       for i in entryWidget.finalData:
         queryset.append(idInDict[i.id])

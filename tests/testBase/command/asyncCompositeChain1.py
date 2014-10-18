@@ -2,7 +2,7 @@
 ##### System wide lib #####
 
 ##### Theory lib #####
-from theory.command.baseCommand import AsyncCommand
+from theory.apps.command.baseCommand import AsyncCommand
 from theory.core.bridge import Bridge
 from theory.gui import field
 

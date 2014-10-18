@@ -4,9 +4,9 @@
 from mongoengine import *
 
 ##### Theory lib #####
-from theory.command.baseCommand import SimpleCommand, AsyncCommand
+from theory.apps.command.baseCommand import SimpleCommand, AsyncCommand
 from theory.conf import settings
-from theory.model import Command, Parameter
+from theory.apps.model import Command, Parameter
 
 ##### Theory third-party lib #####
 
@@ -42,7 +42,9 @@ class CommandClassScanner(BaseClassScanner):
 
   def scan(self):
     cmdFileClass = self._loadCommandClass()
-    if(hasattr(cmdFileClass, "ABCMeta") or hasattr(cmdFileClass, "abstract")):
+    if (hasattr(cmdFileClass, "ABCMeta")
+        or hasattr(cmdFileClass, "abstract")
+        ):
       self._cmdModel = None
       return
     try:
@@ -57,25 +59,26 @@ class CommandClassScanner(BaseClassScanner):
     elif(not issubclass(cmdClass, SimpleCommand)):
       self.cmdModel.runMode = self.cmdModel.RUN_MODE_SIMPLE
 
+    self.cmdModel.save()
     # Get the fields in the paramForm first. All fields in the paramForm
     # are able to pass to adapter. Only the order of the required fields
     # are important.
     for paramName, param in cmdClass.ParamForm.baseFields.iteritems():
       if(param.required):
-        parameter = Parameter(name=paramName, isOptional = False)
+        parameter = Parameter(name=paramName, isOptional=False)
       else:
         parameter = Parameter(name=paramName)
-      self.cmdModel.param.append(parameter)
+      self.cmdModel.parameterSet.add(parameter)
 
     # Class properties will be able to be captured and passed to adapter
     for k,v in cmdClass.__dict__.iteritems():
       if(isinstance(v, property)):
         param = Parameter(name=k)
-        if(getattr(getattr(cmdClass, k), "fset")==None):
+        if(getattr(getattr(cmdClass, k), "fset") is None):
           param.isReadOnly = True
-        self.cmdModel.param.append(param)
+        self.cmdModel.parameterSet.add(param)
 
     paramScanner = ParamScanner()
     paramScanner.filePath = self.cmdModel.sourceFile
-    paramScanner.paramModelLst = self.cmdModel.param
+    paramScanner.paramModelLst = self.cmdModel.parameterSet.all()
     paramScanner.scan()

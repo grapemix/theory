@@ -1,0 +1,326 @@
+[
+{
+  "fields": {
+    "appModel": 2,
+    "name": "id",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "AutoField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 6
+},
+{
+  "fields": {
+    "appModel": 2,
+    "name": "binaryField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "BinaryField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 7
+},
+{
+  "fields": {
+    "appModel": 2,
+    "name": "booleanField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "BooleanField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 8
+},
+{
+  "fields": {
+    "appModel": 2,
+    "name": "dateTimeField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "DateTimeField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 9
+},
+{
+  "fields": {
+    "appModel": 2,
+    "name": "decimalField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "DecimalField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 10
+},
+{
+  "fields": {
+    "appModel": 2,
+    "name": "floatField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "FloatField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 11
+},
+{
+  "fields": {
+    "appModel": 2,
+    "name": "intField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "IntegerField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 12
+},
+{
+  "fields": {
+    "appModel": 2,
+    "name": "stringField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "TextField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 13
+},
+{
+  "fields": {
+    "appModel": 2,
+    "name": "emailField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "EmailField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 14
+},
+{
+  "fields": {
+    "appModel": 2,
+    "name": "uRLField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "URLField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 15
+},
+{
+  "fields": {
+    "appModel": 2,
+    "name": "choiceField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "IntegerField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 16
+},
+{
+  "fields": {
+    "appModel": 3,
+    "name": "referenceField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "ForeignKey"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 17
+},
+{
+  "fields": {
+    "appModel": 3,
+    "name": "foreignApp",
+    "parent": 17,
+    "isField": false,
+    "isCircular": false,
+    "data": "('testBase',)"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 18
+},
+{
+  "fields": {
+    "appModel": 3,
+    "name": "foreignModel",
+    "parent": 17,
+    "isField": false,
+    "isCircular": false,
+    "data": "CombinatoryModelLiteWithDefaultValue"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 19
+},
+{
+  "fields": {
+    "appModel": 3,
+    "name": "id",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "AutoField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 20
+},
+{
+  "fields": {
+    "appModel": 3,
+    "name": "binaryField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "BinaryField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 21
+},
+{
+  "fields": {
+    "appModel": 3,
+    "name": "booleanField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "BooleanField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 22
+},
+{
+  "fields": {
+    "appModel": 3,
+    "name": "dateTimeField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "DateTimeField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 23
+},
+{
+  "fields": {
+    "appModel": 3,
+    "name": "decimalField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "DecimalField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 24
+},
+{
+  "fields": {
+    "appModel": 3,
+    "name": "floatField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "FloatField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 25
+},
+{
+  "fields": {
+    "appModel": 3,
+    "name": "intField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "IntegerField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 26
+},
+{
+  "fields": {
+    "appModel": 3,
+    "name": "stringField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "TextField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 27
+},
+{
+  "fields": {
+    "appModel": 3,
+    "name": "emailField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "EmailField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 28
+},
+{
+  "fields": {
+    "appModel": 3,
+    "name": "uRLField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "URLField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 29
+},
+{
+  "fields": {
+    "appModel": 3,
+    "name": "choiceField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "IntegerField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 30
+},
+{
+  "fields": {
+    "name": "CombinatoryModelLiteWithDefaultValue",
+    "app": "testBase",
+    "formField": "[\"AutoField\", \"BinaryField\", \"BooleanField\", \"DateTimeField\", \"DecimalField\", \"FloatField\", \"IntegerField\", \"TextField\", \"EmailField\", \"URLField\", \"IntegerField\", \"ArrayField\", \"ArrayField\", \"ArrayField\", \"ArrayField\", \"ArrayField\", \"ArrayField\", \"ArrayField\", \"ArrayField\"]",
+    "importPath": "testBase.model.CombinatoryModelLiteWithDefaultValue",
+    "tblField": "[\"AutoField\", \"BinaryField\", \"BooleanField\", \"DateTimeField\", \"DecimalField\", \"FloatField\", \"IntegerField\", \"TextField\", \"EmailField\", \"URLField\", \"IntegerField\", \"ArrayField\", \"ArrayField\", \"ArrayField\", \"ArrayField\", \"ArrayField\", \"ArrayField\", \"ArrayField\", \"ArrayField\"]",
+    "importanceRating": 0
+  },
+  "model": "apps.appmodel",
+  "pk": 2
+},
+{
+  "fields": {
+    "name": "CombinatoryModelWithDefaultValue",
+    "app": "testBase",
+    "formField": "[\"AutoField\", \"BinaryField\", \"BooleanField\", \"DateTimeField\", \"DecimalField\", \"FloatField\", \"IntegerField\", \"TextField\", \"EmailField\", \"URLField\", \"IntegerField\", \"ForeignKey\", \"ArrayField\", \"ArrayField\", \"ArrayField\", \"ArrayField\", \"ArrayField\", \"ArrayField\", \"ArrayField\", \"ArrayField\"]",
+    "importPath": "testBase.model.CombinatoryModelWithDefaultValue",
+    "tblField": "[\"AutoField\", \"BinaryField\", \"BooleanField\", \"DateTimeField\", \"DecimalField\", \"FloatField\", \"IntegerField\", \"TextField\", \"EmailField\", \"URLField\", \"IntegerField\", \"ForeignKey\", \"ArrayField\", \"ArrayField\", \"ArrayField\", \"ArrayField\", \"ArrayField\", \"ArrayField\", \"ArrayField\", \"ArrayField\"]",
+    "importanceRating": 0
+  },
+  "model": "apps.appmodel",
+  "pk": 3
+}
+]
