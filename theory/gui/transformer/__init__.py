@@ -13,16 +13,16 @@ from theory.gui.transformer.gtkSpreadsheetDataHandler \
     import GtkSpreadsheetModelDataHandler
 from theory.gui.transformer.gtkSpreadsheetBSONDataHandler \
     import GtkSpreadsheetModelBSONDataHandler
-from theory.gui.transformer.mongoModelTblDataHandler \
-    import MongoModelTblDataHandler
-from theory.gui.transformer.mongoModelBSONTblDataHandler \
-    import MongoModelBSONTblDataHandler
+from theory.gui.transformer.theoryModelTblDataHandler \
+    import TheoryModelTblDataHandler
+from theory.gui.transformer.theoryModelBSONTblDataHandler \
+    import TheoryModelBSONTblDataHandler
 
 ##### Misc #####
 
 __all__ = (
-    "MongoModelTblDataHandler",
-    "MongoModelBSONTblDataHandler",
+    "TheoryModelTblDataHandler",
+    "TheoryModelBSONTblDataHandler",
     "GtkSpreadsheetModelDataHandler",
     "GtkSpreadsheetModelBSONDataHandler",
     )

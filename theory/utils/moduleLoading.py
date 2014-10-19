@@ -22,16 +22,16 @@ def importString(dottedPath):
     modulePath, className = dottedPath.rsplit('.', 1)
   except ValueError:
     msg = "%s doesn't look like a module path" % dottedPath
-    six.reraise(ImportError, ImportError(msg), sys.excInfo()[2])
+    six.reraise(ImportError, ImportError(msg), sys.exc_info()[2])
 
-  module = importModule(modulePath)
+  module = import_module(modulePath)
 
   try:
     return getattr(module, className)
   except AttributeError:
     msg = 'Module "%s" does not define a "%s" attribute/class' % (
       dottedPath, className)
-    six.reraise(ImportError, ImportError(msg), sys.excInfo()[2])
+    six.reraise(ImportError, ImportError(msg), sys.exc_info()[2])
 
 
 def importByPath(dottedPath, errorPrefix=''):
@@ -48,7 +48,7 @@ def importByPath(dottedPath, errorPrefix=''):
     msg = '%sError importing module %s: "%s"' % (
       errorPrefix, dottedPath, e)
     six.reraise(ImproperlyConfigured, ImproperlyConfigured(msg),
-          sys.excInfo()[2])
+          sys.exc_info()[2])
   return attr
 
 
@@ -72,7 +72,7 @@ def autodiscoverModules(*args, **kwargs):
         beforeImportRegistry = copy.copy(registerTo._registry)
 
       for moduleToSearch in args:
-        importModule('%s.%s' % (appConfig.name, moduleToSearch))
+        import_module('%s.%s' % (appConfig.name, moduleToSearch))
     except:
       # Reset the model registry to the state before the last import as
       # this import will have to reoccur on the next request and this
@@ -123,34 +123,34 @@ else:
       # Since the remainder of this function assumes that we're dealing with
       # a package (module with a __path__), so if it's not, then bail here.
       return False
-    for finder in sys.metaPath:
-      if finder.findModule(name, packagePath):
+    for finder in sys.meta_path:
+      if finder.find_module(name, packagePath):
         return True
     for entry in packagePath:
       try:
         # Try the cached finder.
-        finder = sys.pathImporterCache[entry]
+        finder = sys.path_importer_cache[entry]
         if finder is None:
           # Implicit import machinery should be used.
           try:
-            file_, _, _ = imp.findModule(moduleName, [entry])
+            file_, _, _ = imp.find_module(moduleName, [entry])
             if file_:
               file_.close()
             return True
           except ImportError:
             continue
         # Else see if the finder knows of a loader.
-        elif finder.findModule(name):
+        elif finder.find_module(name):
           return True
         else:
           continue
       except KeyError:
         # No cached finder, so try and make one.
-        for hook in sys.pathHooks:
+        for hook in sys.path_hooks:
           try:
             finder = hook(entry)
-            # XXX Could cache in sys.pathImporterCache
-            if finder.findModule(name):
+            # XXX Could cache in sys.path_importer_cache
+            if finder.find_module(name):
               return True
             else:
               # Once a finder is found, stop the search.
@@ -163,7 +163,7 @@ else:
           # Try the implicit import machinery if searching a directory.
           if os.path.isdir(entry):
             try:
-              file_, _, _ = imp.findModule(moduleName, [entry])
+              file_, _, _ = imp.find_module(moduleName, [entry])
               if file_:
                 file_.close()
               return True

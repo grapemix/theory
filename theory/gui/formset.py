@@ -1,11 +1,7 @@
-# -*- coding: utf-8 -*-
-#!/usr/bin/env python
-##### System wide lib #####
 from __future__ import unicode_literals
 
-##### Theory lib #####
 from theory.core.exceptions import ValidationError
-from theory.gui.form import Form
+from theory.gui.common.baseForm import Form
 from theory.gui.field import IntegerField, BooleanField
 from theory.gui.util import ErrorList
 from theory.gui.widget import HiddenInput
@@ -16,13 +12,6 @@ from theory.utils import six
 from theory.utils.six.moves import xrange
 from theory.utils.translation import ungettext, ugettext as _
 
-##### Theory third-party lib #####
-
-##### Local app #####
-
-##### Theory app #####
-
-##### Misc #####
 
 __all__ = ('BaseFormSet', 'formsetFactory', 'allValid')
 
@@ -53,14 +42,8 @@ class ManagementForm(Form):
     # MIN_NUM_FORM_COUNT and MAX_NUM_FORM_COUNT are output with the rest of
     # the management form, but only for the convenience of client-side
     # code. The POST value of them returned from the client is not checked.
-    self.baseFields[MIN_NUM_FORM_COUNT] = IntegerField(
-        required=False,
-        widget=HiddenInput
-        )
-    self.baseFields[MAX_NUM_FORM_COUNT] = IntegerField(
-        required=False,
-        widget=HiddenInput
-        )
+    self.baseFields[MIN_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
+    self.baseFields[MAX_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
     super(ManagementForm, self).__init__(*args, **kwargs)
 
 
@@ -122,48 +105,45 @@ class BaseFormSet(object):
     return form
 
   def totalFormCount(self):
-    """Returns the total number of formLst in this FormSet."""
+    """Returns the total number of forms in this FormSet."""
     if self.isBound:
       # return absoluteMax if it is lower than the actual total form
       # count in the data; this is DoS protection to prevent clients
       # from forcing the server to instantiate arbitrary numbers of
-      # formLst
-      return min(
-          self.managementForm.cleanedData[TOTAL_FORM_COUNT],
-          self.absoluteMax
-          )
+      # forms
+      return min(self.managementForm.cleanedData[TOTAL_FORM_COUNT], self.absoluteMax)
     else:
-      initialFormLst = self.initialFormCount()
-      totalFormLst = initialFormLst + self.extra
+      initialForms = self.initialFormCount()
+      totalForms = max(initialForms, self.minNum) + self.extra
       # Allow all existing related objects/inlines to be displayed,
       # but don't allow extra beyond maxNum.
-      if initialFormLst > self.maxNum >= 0:
-        totalFormLst = initialFormLst
-      elif totalFormLst > self.maxNum >= 0:
-        totalFormLst = self.maxNum
-    return totalFormLst
+      if initialForms > self.maxNum >= 0:
+        totalForms = initialForms
+      elif totalForms > self.maxNum >= 0:
+        totalForms = self.maxNum
+    return totalForms
 
   def initialFormCount(self):
-    """Returns the number of formLst that are required in this FormSet."""
+    """Returns the number of forms that are required in this FormSet."""
     if self.isBound:
       return self.managementForm.cleanedData[INITIAL_FORM_COUNT]
     else:
       # Use the length of the initial data if it's there, 0 otherwise.
-      initialFormLst = len(self.initial) if self.initial else 0
-    return initialFormLst
+      initialForms = len(self.initial) if self.initial else 0
+    return initialForms
 
   @cachedProperty
-  def formLst(self):
+  def forms(self):
     """
-    Instantiate formLst at first property access.
+    Instantiate forms at first property access.
     """
     # DoS protection is included in totalFormCount()
-    formLst = [self._constructForm(i) for i in xrange(self.totalFormCount())]
-    return formLst
+    forms = [self._constructForm(i) for i in xrange(self.totalFormCount())]
+    return forms
 
   def _constructForm(self, i, **kwargs):
     """
-    Instantiates and returns the i-th form instance in a formstet.
+    Instantiates and returns the i-th form instance in a formset.
     """
     defaults = {
       'autoId': self.autoId,
@@ -178,8 +158,8 @@ class BaseFormSet(object):
         defaults['initial'] = self.initial[i]
       except IndexError:
         pass
-    # Allow extra formLst to be empty, unless they're part of
-    # the minimum formLst.
+    # Allow extra forms to be empty, unless they're part of
+    # the minimum forms.
     if i >= self.initialFormCount() and i >= self.minNum:
       defaults['emptyPermitted'] = True
     defaults.update(kwargs)
@@ -188,14 +168,14 @@ class BaseFormSet(object):
     return form
 
   @property
-  def initialFormLst(self):
-    """Return a list of all the initial formLst in this formLstet."""
-    return self.formLst[:self.initialFormCount()]
+  def initialForms(self):
+    """Return a list of all the initial forms in this formset."""
+    return self.forms[:self.initialFormCount()]
 
   @property
-  def extraFormLst(self):
-    """Return a list of all the extra formLst in this formLstet."""
-    return self.formLst[self.initialFormCount():]
+  def extraForms(self):
+    """Return a list of all the extra forms in this formset."""
+    return self.forms[self.initialFormCount():]
 
   @property
   def emptyForm(self):
@@ -210,18 +190,16 @@ class BaseFormSet(object):
   @property
   def cleanedData(self):
     """
-    Returns a list of form.cleanedData dicts for every form in self.formLst.
+    Returns a list of form.cleanedData dicts for every form in self.forms.
     """
     if not self.isValid():
-      raise AttributeError(
-          "'%s' object has no attribute 'cleanedData'" % self.__class__.__name__
-          )
-    return [form.cleanedData for form in self.formLst]
+      raise AttributeError("'%s' object has no attribute 'cleanedData'" % self.__class__.__name__)
+    return [form.cleanedData for form in self.forms]
 
   @property
-  def deletedFormLst(self):
+  def deletedForms(self):
     """
-    Returns a list of formLst that have been marked for deletion.
+    Returns a list of forms that have been marked for deletion.
     """
     if not self.isValid() or not self.canDelete:
       return []
@@ -230,16 +208,16 @@ class BaseFormSet(object):
     if not hasattr(self, '_deletedFormIndexes'):
       self._deletedFormIndexes = []
       for i in range(0, self.totalFormCount()):
-        form = self.formLst[i]
+        form = self.forms[i]
         # if this is an extra form and hasn't changed, don't consider it
         if i >= self.initialFormCount() and not form.hasChanged():
           continue
         if self._shouldDeleteForm(form):
           self._deletedFormIndexes.append(i)
-    return [self.formLst[i] for i in self._deletedFormIndexes]
+    return [self.forms[i] for i in self._deletedFormIndexes]
 
   @property
-  def orderedFormLst(self):
+  def orderedForms(self):
     """
     Returns a list of form in the order specified by the incoming data.
     Raises an AttributeError if ordering is not allowed.
@@ -253,7 +231,7 @@ class BaseFormSet(object):
     if not hasattr(self, '_ordering'):
       self._ordering = []
       for i in range(0, self.totalFormCount()):
-        form = self.formLst[i]
+        form = self.forms[i]
         # if this is an extra form and hasn't changed, don't consider it
         if i >= self.initialFormCount() and not form.hasChanged():
           continue
@@ -274,7 +252,7 @@ class BaseFormSet(object):
       self._ordering.sort(key=compareOrderingKey)
     # Return a list of form.cleanedData dicts in the order specified by
     # the form data.
-    return [self.formLst[i[0]] for i in self._ordering]
+    return [self.forms[i[0]] for i in self._ordering]
 
   @classmethod
   def getDefaultPrefix(cls):
@@ -293,7 +271,7 @@ class BaseFormSet(object):
   @property
   def errors(self):
     """
-    Returns a list of form.errors for every form in self.formLst.
+    Returns a list of form.errors for every form in self.forms.
     """
     if self._errors is None:
       self.fullClean()
@@ -301,7 +279,7 @@ class BaseFormSet(object):
 
   def totalErrorCount(self):
     """
-    Returns the number of errors across all formLst in the formset.
+    Returns the number of errors across all forms in the formset.
     """
     return len(self.nonFormErrors()) +\
       sum(len(formErrors) for formErrors in self.errors)
@@ -314,24 +292,24 @@ class BaseFormSet(object):
 
   def isValid(self):
     """
-    Returns True if every form in self.formLst is valid.
+    Returns True if every form in self.forms is valid.
     """
     if not self.isBound:
       return False
     # We loop over every form.errors here rather than short circuiting on the
     # first failure to make sure validation gets triggered for every form.
-    formLstValid = True
+    formsValid = True
     # This triggers a full clean.
     self.errors
     for i in range(0, self.totalFormCount()):
-      form = self.formLst[i]
+      form = self.forms[i]
       if self.canDelete:
         if self._shouldDeleteForm(form):
           # This form is going to be deleted so any of its errors
           # should not cause the entire formset to be invalid.
           continue
-      formLstValid &= form.isValid()
-    return formLstValid and not self.nonFormErrors()
+      formsValid &= form.isValid()
+    return formsValid and not self.nonFormErrors()
 
   def fullClean(self):
     """
@@ -344,23 +322,23 @@ class BaseFormSet(object):
     if not self.isBound:  # Stop further processing.
       return
     for i in range(0, self.totalFormCount()):
-      form = self.formLst[i]
+      form = self.forms[i]
       self._errors.append(form.errors)
     try:
       if (self.validateMax and
-          self.totalFormCount() - len(self.deletedFormLst) > self.maxNum) or \
+          self.totalFormCount() - len(self.deletedForms) > self.maxNum) or \
           self.managementForm.cleanedData[TOTAL_FORM_COUNT] > self.absoluteMax:
         raise ValidationError(ungettext(
-          "Please submit %d or fewer formLst.",
-          "Please submit %d or fewer formLst.", self.maxNum) % self.maxNum,
-          code='tooManyFormLst',
+          "Please submit %d or fewer forms.",
+          "Please submit %d or fewer forms.", self.maxNum) % self.maxNum,
+          code='tooManyForms',
         )
       if (self.validateMin and
-          self.totalFormCount() - len(self.deletedFormLst) < self.minNum):
+          self.totalFormCount() - len(self.deletedForms) < self.minNum):
         raise ValidationError(ungettext(
-          "Please submit %d or more formLst.",
-          "Please submit %d or more formLst.", self.minNum) % self.minNum,
-          code='tooFewFormLst')
+          "Please submit %d or more forms.",
+          "Please submit %d or more forms.", self.minNum) % self.minNum,
+          code='tooFewForms')
       # Give self.clean() a chance to do cross-form validation.
       self.clean()
     except ValidationError as e:
@@ -384,23 +362,13 @@ class BaseFormSet(object):
   def addFields(self, form, index):
     """A hook for adding extra fields on to each form instance."""
     if self.canOrder:
-      # Only pre-fill the ordering field for initial formLst.
+      # Only pre-fill the ordering field for initial forms.
       if index is not None and index < self.initialFormCount():
-        form.fields[ORDERING_FIELD_NAME] = IntegerField(
-            label=_('Order'),
-            initial=index + 1,
-            required=False
-            )
+        form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_('Order'), initial=index + 1, required=False)
       else:
-        form.fields[ORDERING_FIELD_NAME] = IntegerField(
-            label=_('Order'),
-            required=False
-            )
+        form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_('Order'), required=False)
     if self.canDelete:
-      form.fields[DELETION_FIELD_NAME] = BooleanField(
-          label=_('Delete'),
-          required=False
-          )
+      form.fields[DELETION_FIELD_NAME] = BooleanField(label=_('Delete'), required=False)
 
   def addPrefix(self, index):
     return '%s-%s' % (self.prefix, index)
@@ -410,19 +378,38 @@ class BaseFormSet(object):
     Returns True if the formset needs to be multipart, i.e. it
     has FileInput. Otherwise, False.
     """
-    if self.formLst:
-      return self.formLst[0].isMultipart()
+    if self.forms:
+      return self.forms[0].isMultipart()
     else:
       return self.emptyForm.isMultipart()
 
   @property
   def media(self):
-    # All the formLst on a FormSet are the same, so you only need to
+    # All the forms on a FormSet are the same, so you only need to
     # interrogate the first form for media.
-    if self.formLst:
-      return self.formLst[0].media
+    if self.forms:
+      return self.forms[0].media
     else:
       return self.emptyForm.media
+
+  def asTable(self):
+    "Returns this formset rendered as HTML <tr>s -- excluding the <table></table>."
+    # XXX: there is no semantic division between forms here, there
+    # probably should be. It might make sense to render each form as a
+    # table row with each field as a td.
+    forms = ' '.join(form.asTable() for form in self)
+    return markSafe('\n'.join([six.textType(self.managementForm), forms]))
+
+  def asP(self):
+    "Returns this formset rendered as HTML <p>s."
+    forms = ' '.join(form.asP() for form in self)
+    return markSafe('\n'.join([six.textType(self.managementForm), forms]))
+
+  def asUl(self):
+    "Returns this formset rendered as HTML <li>s."
+    forms = ' '.join(form.asUl() for form in self)
+    return markSafe('\n'.join([six.textType(self.managementForm), forms]))
+
 
 def formsetFactory(form, formset=BaseFormSet, extra=1, canOrder=False,
           canDelete=False, maxNum=None, validateMax=False,

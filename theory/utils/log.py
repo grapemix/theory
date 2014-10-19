@@ -40,23 +40,18 @@ DEFAULT_LOGGING = {
     'null': {
       'class': 'logging.NullHandler',
     },
-    'mailAdmins': {
-      'level': 'ERROR',
-      'filters': ['requireDebugFalse'],
-      'class': 'theory.utils.log.AdminEmailHandler'
-    }
   },
   'loggers': {
     'theory': {
       'handlers': ['console'],
     },
     'theory.request': {
-      'handlers': ['mailAdmins'],
+      'handlers': [],
       'level': 'ERROR',
       'propagate': False,
     },
     'theory.security': {
-      'handlers': ['mailAdmins'],
+      'handlers': [],
       'level': 'ERROR',
       'propagate': False,
     },

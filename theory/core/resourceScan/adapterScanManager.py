@@ -6,7 +6,7 @@ from mongoengine import *
 ##### Theory lib #####
 from theory.conf import settings
 from theory.core.resourceScan.adapterClassScanner import AdapterClassScanner
-from theory.model import Adapter
+from theory.apps.model import Adapter
 
 ##### Theory third-party lib #####
 

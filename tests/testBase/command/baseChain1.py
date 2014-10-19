@@ -2,9 +2,9 @@
 ##### System wide lib #####
 
 ##### Theory lib #####
-from theory.command.baseCommand import SimpleCommand
+from theory.apps.command.baseCommand import SimpleCommand
+from theory.apps.model import Command, Mood
 from theory.gui import field
-from theory.model import Command
 
 ##### Theory third-party lib #####
 
@@ -27,7 +27,9 @@ class BaseChain1(BaseChain):
     cmdModel = Command(
         name=cls.name,
         app="tests.testBase",
-        mood=["test",],
         runMode=cls.runMode
         )
+    cmdModel.save()
+    moodModel, created = Mood.objects.getOrCreate(name="test")
+    cmdModel.moodSet.add(moodModel)
     return cmdModel

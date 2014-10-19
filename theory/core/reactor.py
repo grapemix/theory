@@ -3,16 +3,17 @@
 ##### System wide lib #####
 from datetime import datetime
 import json
-from mongoengine import Q
+#from mongoengine import Q
 import sys
 
 ##### Theory lib #####
-from theory.adapter.reactorAdapter import ReactorAdapter
+from theory.apps.adapter.reactorAdapter import ReactorAdapter
+from theory.apps.model import Command, Adapter, History, Mood
 from theory.core.bridge import Bridge
 from theory.core.cmdParser.txtCmdParser import TxtCmdParser
 from theory.conf import settings
+from theory.db.model import Q
 from theory.gui.terminal import Terminal
-from theory.model import Command, Adapter, History
 from theory.utils.importlib import importClass
 
 ##### Theory third-party lib #####
@@ -54,10 +55,10 @@ class Reactor(object):
 
   @property
   def avblCmd(self):
-    if(self._avblCmd!=None):
+    if(self._avblCmd is not None):
       return self._avblCmd
     else:
-      self._avblCmd = Command.objects.filter(mood=self.mood,)
+      self._avblCmd = Command.objects.filter(moodSet=self.mood,)
     return self._avblCmd
 
   def __init__(self):
@@ -90,7 +91,7 @@ class Reactor(object):
       self.originalQuest = ""
 
     cmdModelQuery = Command.objects.filter(
-        Q(name__startswith=frag) & (Q(mood=self.mood) | Q(mood="norm"))
+        Q(name__startswith=frag) & (Q(moodSet__name=self.mood) | Q(moodSet__name="norm"))
         )
     cmdModelQueryNum = cmdModelQuery.count()
     if(cmdModelQueryNum==0):
@@ -125,7 +126,7 @@ class Reactor(object):
       self.parser.cmdInTxt = commandName
       try:
         self.cmdModel = Command.objects.get(
-            Q(name=commandName) & (Q(mood=self.mood) | Q(mood="norm"))
+            Q(name=commandName) & (Q(moodSet=self.mood) | Q(moodSet="norm"))
             )
       except Command.DoesNotExist as errMsg:
         getNotify(
@@ -148,7 +149,7 @@ class Reactor(object):
       self.adapter.entrySetAndSelectFxn(commandName)
       self.parser.cmdInTxt = commandName
       self.cmdModel = Command.objects.get(
-          Q(name=commandName) & (Q(mood=self.mood) | Q(mood="norm"))
+          Q(name=commandName) & (Q(moodSet=self.mood) | Q(moodSet="norm"))
           )
 
       self._buildParamForm(
@@ -258,7 +259,7 @@ class Reactor(object):
     try:
       self.cmdModel = Command.objects.get(
           Q(name=cmdName)
-          & (Q(mood=self.mood) | Q(mood="norm"))
+          & (Q(moodSet__name=self.mood) | Q(moodSet__name="norm"))
       )
       self.parser.cmdInTxt = self.cmdModel.name
     except Command.DoesNotExist:
@@ -274,16 +275,41 @@ class Reactor(object):
     # reverse_delete_rule of the command field is cascade, all history record
     # will be lost. This field should re-enable in the future.
     #History(commandName=self.parser.cmdInTxt, command=self.cmdModel,
+    from theory.db.model import F
 
-    History.objects(
+    #History.objects(
+    #    commandName=self.parser.cmdInTxt,
+    #    moodSet=self.mood,
+    #    jsonData=jsonData,
+    #    ).update_one(
+    #        inc__repeated=1,
+    #        set__touched=datetime.utcnow(),
+    #        upsert=True
+    #        )
+    #History.objects.updateOrCreate(
+    #    commandName=self.parser.cmdInTxt,
+    #    #moodSet=Mood.objects.get(name=self.mood),
+    #    jsonData=jsonData,
+    #    defaults={
+    #      "touched": datetime.utcnow(),
+    #      "repeated": F("repeated") + 1,
+    #      }
+    #    )
+    historyQuery = History.objects.filter(
         commandName=self.parser.cmdInTxt,
-        mood=self.mood,
-        jsonData=jsonData,
-        ).update_one(
-            inc__repeated=1,
-            set__touched=datetime.utcnow(),
-            upsert=True
-            )
+        )
+    if len(historyQuery) > 0:
+      historyQuery[0].touched = datetime.utcnow()
+      historyQuery[0].repeated += 1
+      historyQuery[0].save()
+    else:
+      h = History(
+          commandName=self.parser.cmdInTxt,
+          #moodSet=Mood.objects.filter(name=self.mood),
+          jsonData=jsonData,
+          )
+      h.save()
+      h.moodSet.add(Mood.objects.get(name=self.mood))
 
     self.historyModel = History.objects.all()
     self.historyLen = len(self.historyModel)

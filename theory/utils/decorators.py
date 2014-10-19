@@ -1,6 +1,6 @@
 "Functions that help with dynamically creating decorators for views."
 
-from functools import wraps, updateWrapper, WRAPPER_ASSIGNMENTS
+from functools import wraps, update_wrapper, WRAPPER_ASSIGNMENTS
 
 from theory.utils import six
 
@@ -34,13 +34,13 @@ def methodDecorator(decorator):
     @decorator
     def dummy(*args, **kwargs):
       pass
-    updateWrapper(_wrapper, dummy)
+    update_wrapper(_wrapper, dummy)
     # Need to preserve any existing attributes of 'func', including the name.
-    updateWrapper(_wrapper, func)
+    update_wrapper(_wrapper, func)
 
     return _wrapper
 
-  updateWrapper(_dec, decorator, assigned=availableAttrs(decorator))
+  update_wrapper(_dec, decorator, assigned=availableAttrs(decorator))
   # Change the name to aid debugging.
   if hasattr(decorator, '__name__'):
     _dec.__name__ = 'methodDecorator(%s)' % decorator.__name__

@@ -269,6 +269,10 @@ NUMBER_GROUPING = 0
 # Thousand separator symbol
 THOUSAND_SEPARATOR = ','
 
+# Do you want to manage transactions manually?
+# Hint: you really don't!
+TRANSACTIONS_MANAGED = False
+
 # The User-Agent string to use when checking for URL validity through the
 # isExistingURL validator.
 from theory import getVersion
@@ -288,6 +292,32 @@ DEFAULT_INDEX_TABLESPACE = ''
 MIDDLEWARE_CLASSES = (
 )
 
+##################
+# AUTHENTICATION #
+##################
+
+AUTH_USER_MODEL = 'auth.User'
+
+AUTHENTICATION_BACKENDS = ('theory.contrib.auth.backends.ModelBackend',)
+
+# The number of days a password reset link is valid for
+PASSWORD_RESET_TIMEOUT_DAYS = 3
+
+# the first hasher in this list is the preferred algorithm.  any
+# password using different algorithms will be converted automatically
+# upon login
+PASSWORD_HASHERS = (
+    'theory.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'theory.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'theory.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+    'theory.contrib.auth.hashers.BCryptPasswordHasher',
+    'theory.contrib.auth.hashers.SHA1PasswordHasher',
+    'theory.contrib.auth.hashers.MD5PasswordHasher',
+    'theory.contrib.auth.hashers.UnsaltedSHA1PasswordHasher',
+    'theory.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
+    'theory.contrib.auth.hashers.CryptPasswordHasher',
+)
+
 ###########
 # LOGGING #
 ###########
@@ -302,14 +332,10 @@ LOGGING = {
   'version': 1,
   'disable_existing_loggers': False,
   'handlers': {
-    'mail_admins': {
-      'level': 'ERROR',
-      'class': 'theory.utils.log.AdminEmailHandler'
-    }
   },
   'loggers': {
     'theory.request': {
-      'handlers': ['mail_admins'],
+      'handlers': [],
       'level': 'ERROR',
       'propagate': True,
     },
@@ -321,18 +347,11 @@ LOGGING = {
 ###########
 
 # The name of the class to use to run the test suite
-TEST_RUNNER = 'theory.test.simple.TheoryTestSuiteRunner'
+TEST_RUNNER = 'theory.test.runner.DiscoverRunner'
 
-# The name of the database to use for testing purposes.
-# If None, a name of 'test_' + DATABASE_NAME will be assumed
-TEST_DATABASE_NAME = None
-
-# Strings used to set the character set and collation order for the test
-# database. These values are passed literally to the server, so they are
-# backend-dependent. If None, no special settings are sent (system defaults are
-# used).
-TEST_DATABASE_CHARSET = None
-TEST_DATABASE_COLLATION = None
+# Apps that don't need to be serialized at test database creation time
+# (only apps with migrations are to start with)
+TEST_NON_SERIALIZED_APPS = []
 
 ############
 # FIXTURES #
@@ -340,5 +359,12 @@ TEST_DATABASE_COLLATION = None
 
 # The list of directories to search for fixtures
 FIXTURE_DIRS = ()
+
+##############
+# MIGRATIONS #
+##############
+
+# Migration module overrides for apps, by app label.
+MIGRATION_MODULES = {}
 
 MOOD = {}

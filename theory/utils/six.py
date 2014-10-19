@@ -626,7 +626,7 @@ if print_ is None:
 _add_doc(reraise, """Reraise an exception.""")
 
 
-def with_metaclass(meta, *bases):
+def withMetaclass(meta, *bases):
   """Create a base class with a metaclass."""
   # This requires a bit of explanation: the basic idea is to make a
   # dummy metaclass for one level of class instantiation that replaces

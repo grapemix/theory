@@ -5,10 +5,9 @@
 ##### Theory lib #####
 
 ##### Theory third-party lib #####
-from theory.command.baseCommand import SimpleCommand
+from theory.apps.command.baseCommand import SimpleCommand
+from theory.apps.model import Parameter
 from theory.gui import field
-from theory.model import *
-from theory.model import Parameter
 
 ##### Local app #####
 from .baseChain import BaseChain

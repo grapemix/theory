@@ -15,7 +15,6 @@ from abc import ABCMeta, abstractmethod
 
 class BaseScanManager(object):
   __metaclass__ = ABCMeta
-  _paramList = []
 
   @property
   def paramList(self):
@@ -28,3 +27,6 @@ class BaseScanManager(object):
   @abstractmethod
   def scan(self, *args, **kwargs):
     pass
+
+  def __init__(self):
+    self._paramList = []

@@ -6,9 +6,9 @@ from copy import deepcopy
 from mongoengine import *
 
 ##### Theory lib #####
-from theory.adapter import BaseAdapter
+from theory.apps.adapter import BaseAdapter
 from theory.conf import settings
-from theory.model import Command, Parameter
+from theory.apps.model import Command, Parameter
 
 ##### Theory third-party lib #####
 
@@ -83,6 +83,7 @@ class AdapterClassScanner(BaseClassScanner):
       elif(adapter.importPath.endswith("theory")):
         adapter.importPath += ".adapter." + adapterClassName
 
+      buffer = [] # del me when arrayField is supported
       # Don't use __dict__.iteritems() which unable to retrieve property
       # inheritate from parents
       for k in dir(adapterClass):
@@ -90,7 +91,8 @@ class AdapterClassScanner(BaseClassScanner):
         if(isinstance(v, property)):
           # propert without setting won't be counted
           if(getattr(getattr(adapterClass, k), "fset")!=None):
-            adapter.property.append(k)
+            buffer.append(k)
+      adapter.propertyLst = buffer
       self._adapterLst.append(adapter)
 
   '''

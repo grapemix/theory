@@ -5,7 +5,7 @@ import warnings
 
 from theory.conf import settings
 from theory.db import connections
-from theory.dispatch import Signal
+from theory.dispatch import receiver, Signal
 from theory.utils import timezone
 from theory.utils.functional import empty
 
@@ -76,3 +76,59 @@ def updateConnectionsTimeZone(**kwargs):
     if tzSql:
       conn.cursor().execute(tzSql, [tz])
 
+
+@receiver(settingChanged)
+def clearContextProcessorsCache(**kwargs):
+  if kwargs['setting'] == 'TEMPLATE_CONTEXT_PROCESSORS':
+    from theory.template import context
+    context._standardContextProcessors = None
+
+
+@receiver(settingChanged)
+def clearTemplateLoadersCache(**kwargs):
+  if kwargs['setting'] == 'TEMPLATE_LOADERS':
+    from theory.template import loader
+    loader.templateSourceLoaders = None
+
+
+@receiver(settingChanged)
+def clearSerializersCache(**kwargs):
+  if kwargs['setting'] == 'SERIALIZATION_MODULES':
+    from theory.core import serializers
+    serializers._serializers = {}
+
+
+@receiver(settingChanged)
+def languageChanged(**kwargs):
+  if kwargs['setting'] in {'LANGUAGES', 'LANGUAGE_CODE', 'LOCALE_PATHS'}:
+    from theory.utils.translation import transReal
+    transReal._default = None
+    transReal._active = threading.local()
+  if kwargs['setting'] in {'LANGUAGES', 'LOCALE_PATHS'}:
+    from theory.utils.translation import transReal
+    transReal._translations = {}
+    transReal.checkForLanguage.cacheClear()
+
+
+@receiver(settingChanged)
+def fileStorageChanged(**kwargs):
+  if kwargs['setting'] in ('MEDIA_ROOT', 'DEFAULT_FILE_STORAGE'):
+    from theory.core.files.storage import defaultStorage
+    defaultStorage._wrapped = empty
+
+
+@receiver(settingChanged)
+def complexSettingChanged(**kwargs):
+  if kwargs['enter'] and kwargs['setting'] in COMPLEX_OVERRIDE_SETTINGS:
+    # Considering the current implementation of the signals framework,
+    # stacklevel=5 shows the line containing the overrideSettings call.
+    warnings.warn("Overriding setting %s can lead to unexpected behavior."
+           % kwargs['setting'], stacklevel=5)
+
+
+@receiver(settingChanged)
+def rootUrlconfChanged(**kwargs):
+  if kwargs['setting'] == 'ROOT_URLCONF':
+    from theory.core.urlresolvers import clearUrlCaches, setUrlconf
+    clearUrlCaches()
+    setUrlconf(None)

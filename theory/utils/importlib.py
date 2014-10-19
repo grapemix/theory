@@ -63,7 +63,8 @@ def importClass(name, package=None):
     return getattr(sys.modules[moduleName], klassName)
 
   module = importModule(moduleName, package)
-  del sys.modules[moduleName]
+  # Cause problem
+  #del sys.modules[moduleName]
 
   return getattr(module, klassName)
 

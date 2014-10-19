@@ -2,7 +2,7 @@
 ##### System wide lib #####
 
 ##### Theory lib #####
-from theory.command.baseCommand import SimpleCommand
+from theory.apps.command.baseCommand import SimpleCommand
 
 ##### Theory third-party lib #####
 
