@@ -2288,13 +2288,13 @@ class ManyToManyField(RelatedField):
       'queryset': self.rel.to._defaultManager.using(db),
     }
     defaults.update(kwargs)
-    # If initial is passed in, it's a list of related objects, but the
+    # If initData is passed in, it's a list of related objects, but the
     # MultipleChoiceField takes a list of IDs.
-    if defaults.get('initial') is not None:
-      initial = defaults['initial']
-      if callable(initial):
-        initial = initial()
-      defaults['initial'] = [i._getPkVal() for i in initial]
+    if defaults.get('initData') is not None:
+      initData = defaults['initData']
+      if callable(initData):
+        initData = initData()
+      defaults['initData'] = [i._getPkVal() for i in initData]
     return super(ManyToManyField, self).formfield(**defaults)
 
   def dbType(self, connection):
