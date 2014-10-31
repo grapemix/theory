@@ -147,6 +147,7 @@ class FormBase(object):
     self._changedData = None
     self.jsonData = None
     self.initData = initData or {}
+    self.emptyForgivenLst = []
 
     # The baseFields class attribute is the *class-wide* definition of
     # fields. Because a particular *instance* of the class might want to
@@ -275,6 +276,9 @@ class FormBase(object):
           return True
     return False
 
+  def _validateNonSingularField(self):
+    pass
+
   def fullClean(self):
     """
     Cleans all of self.data and populates self._errors and
@@ -292,9 +296,10 @@ class FormBase(object):
     if self.emptyPermitted and not self.hasChanged():
       return
 
+    self._validateNonSingularField()
     self._cleanFields()
     self._cleanForm()
-    #self._postClean()
+    self._postClean()
 
   def _cleanFields(self):
     for name, field in self.fields.items():
@@ -310,11 +315,12 @@ class FormBase(object):
       value = field.finalData
       #value = field.widget.valueFromDatadict(self.data, self.files, self.addPrefix(name))
       try:
+        isEmptyForgiven = True if name in self.emptyForgivenLst else False
         if isinstance(field, FormField.FileField):
           initData = self.initData.get(name, field.initData)
-          value = field.clean(value, initData)
+          value = field.clean(value, initData, isEmptyForgiven)
         else:
-          value = field.clean(value)
+          value = field.clean(value, isEmptyForgiven)
         self.cleanedData[name] = value
         if hasattr(self, 'clean_%s' % name):
           value = getattr(self, 'clean_%s' % name)()
