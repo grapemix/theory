@@ -28,3 +28,6 @@ class ModelTblEdit(ModelTblFilterBase):
     self._stdOut += "{0} model has been saved."\
         .format(len(self.paramForm.clean()["queryset"]))
 
+  def _fetchQueryset(self):
+    super(ModelTblEdit, self)._fetchQueryset()
+    return True

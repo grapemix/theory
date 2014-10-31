@@ -364,11 +364,18 @@ class SpreadsheetBuilder(TheoryModelBSONTblDataHandler):
     buf = self.appConfigModel.fieldParamMap.filter(
         parent__name=self.modelFieldnameMap[colIdx]
         )
-    appName = buf[0].data
-    modelName = buf[1].data
+    for i in buf:
+      if i.name == "foreignApp":
+        appName = buf[0].data
+      elif i.name == "foreignModel":
+        modelName = buf[1].data
+
+    print appName, modelName
     appConfigModel = AppModel.objects.get(app=appName, name=modelName)
     clone = SpreadsheetBuilder()
-    clone.run(queryset, appConfigModel, self.isEditable, False)
+    # We don't assume modifying the stack data is possible, so we can
+    # treat the pre-selected item list as empty
+    clone.run(queryset, appConfigModel, self.isEditable, [], False)
     self.spreadsheet.childSpreadSheetLst.append(clone.spreadsheet)
 
   def getSelectedRow(self):

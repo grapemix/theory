@@ -43,7 +43,7 @@ class ModelTblFilterBase(SimpleCommand):
         helpText="The name of models to be listed",
         )
     queryset = ModelMultipleChoiceField(
-        queryset=AppModel.objects.none(),
+        queryset=AppModel.objects.all(),
         required=False,
         label="Queryset",
         helpText="The queryset to be processed",
@@ -143,6 +143,8 @@ class ModelTblFilterBase(SimpleCommand):
           )
 
     def modelNameFocusChgCallback(self, *args, **kwargs):
+      field = self.fields["appName"]
+      appName = field.clean(field.finalData)
       field = self.fields["queryset"]
       self.fields["modelName"].finalData = None
       field.model = self.fields["modelName"].clean(
@@ -150,7 +152,7 @@ class ModelTblFilterBase(SimpleCommand):
           )
 
       field.queryset = self._getQuerysetByAppAndModel(
-          field.appName,
+          appName,
           self.fields["modelName"].finalData
           )
 
