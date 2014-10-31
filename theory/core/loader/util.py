@@ -192,6 +192,10 @@ class CommandModuleLoader(ModuleLoader):
       "modelTblDel": ["norm"],
       "modelUpsert": ["norm"],
       "dumpdata": ["norm"],
+      "loaddata": ["norm"],
+      "flush": ["norm"],
+      "makeMigration": ["norm"],
+      "migrate": ["norm"],
       "infect": ["dev"],
     }
     for o in lst:
