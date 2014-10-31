@@ -55,10 +55,10 @@ class ModelUpsertTestCase(BaseCommandTestCase):
     self.assertEqual(
         self.cmd.modelForm.errors,
         {
-          u"app": [u"This field is required.",],
-          u"moodSet": [u"This field is required.",],
-          u"name": [u"This field is required.",],
-          u"sourceFile": [u"This field is required.",],
+          "app": [u"This field is required.",],
+          "moodSet": [u"This field is required.",],
+          "name": [u"This field is required.",],
+          "sourceFile": [u"This field is required.",],
           }
         )
 
@@ -67,16 +67,86 @@ class ModelUpsertTestCase(BaseCommandTestCase):
     self.cmd.paramForm._nextBtnClick()
 
     self.cmd.modelForm.fields["app"].finalData = "testBase"
-    self.cmd.modelForm.fields["name"].finalData = "testCmd"
-    self.cmd.modelForm.fields["moodSet"].finalData = [1,]
+    self.cmd.modelForm.fields["name"].finalData = "testCmd2"
+    self.cmd.modelForm.fields["moodSet"].finalData = [1,2,]
     self.cmd.modelForm.fields["sourceFile"].finalData = \
         "testBase.command.testCmd"
 
     self.cmd.modelForm._nextBtnClick(None, None)
     self.assertEqual(self.cmd.modelForm.errors, {})
+    self.assertEqual(Command.objects.filter(name="testCmd2").count(), 1)
+
+    self.assertEqual(
+        list(Command.objects.get(name="testCmd2").moodSet.valuesList(
+          "id",
+          flat=True
+          )),
+        [1,2]
+        )
 
   def testAsEditing(self):
+    self.assertEqual(
+        list(Command.objects.get(pk=1).moodSet.valuesList(
+          "id",
+          flat=True
+          )),
+        [1]
+        )
+    # getCmdComplex will validate the form automatically
+    self.cmd = self._getCmd(
+        self.cmdModel,
+        kwargs={
+          "appName": "theory.apps",
+          "modelName": "Command",
+          "queryset": ["1",],
+          }
+        )
+    self._validateParamForm(self.cmd)
+
     self._execeuteCommand(self.cmd, self.cmdModel, uiParam=self.uiParam)
+    self.cmd.paramForm._nextBtnClick()
+
+    self.assertEqual(self.cmd.modelForm.instance.pk, 1)
+    self.cmd.modelForm.fields["moodSet"].finalData = [1,2]
+    self.cmd.modelForm.fields["comment"].finalData = "new comment"
+    self.cmd.cleanParamForm(None, None)
+    self.assertEqual(self.cmd.modelForm.errors, {})
+
+    self.assertEqual(
+        list(Command.objects.get(pk=1).moodSet.valuesList(
+          "id",
+          flat=True
+          )),
+        [1,2]
+        )
+
+    self.assertEqual(
+        Command.objects.get(pk=1).comment,
+        "new comment"
+        )
+
+  def testPureSaving(self):
+    self._execeuteCommand(self.cmd, self.cmdModel, uiParam=self.uiParam)
+    self.cmd.paramForm._nextBtnClick()
+
+    self.cmd.modelForm.fields["app"].finalData = "testBase"
+    self.cmd.modelForm.fields["name"].finalData = "testCmd2"
+    self.cmd.modelForm.fields["moodSet"].finalData = [1,2]
+    self.cmd.modelForm.fields["sourceFile"].finalData = \
+        "testBase.command.testCmd"
+
+    self.cmd.cleanParamForm(None, None)
+    self.assertEqual(self.cmd.modelForm.errors, {})
+
+    self.assertEqual(Command.objects.filter(name="testCmd2").count(), 1)
+
+    self.assertEqual(
+        list(Command.objects.get(name="testCmd2").moodSet.valuesList(
+          "id",
+          flat=True
+          )),
+        [1,2]
+        )
 
 if __name__ == '__main__':
   unittest.main()

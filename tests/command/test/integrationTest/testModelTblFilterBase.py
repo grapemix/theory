@@ -14,7 +14,10 @@ from .baseCommandTestCase import BaseCommandTestCase
 
 ##### Misc #####
 from gui.test.integrationTest.etk.testDummyEnv import getDummyEnv
-from testBase.model import DummyAppModelManager
+from testBase.model import (
+    CombinatoryModelWithDefaultValue,
+    DummyAppModelManager
+    )
 
 __all__ = ('ModelTblFilterBaseTestCase',)
 
@@ -52,32 +55,27 @@ class ModelTblFilterBaseTestCase(BaseCommandTestCase):
     self.cmd.paramForm = DummyModelTblFilter.ParamForm()
     self.cmd.paramForm.fillInitFields(
         cmdModel,
-        #[{}, "CombinatoryModelWithDefaultValue", "testBase"],
         [],
         {
           "appName": "testBase",
           "modelName": "CombinatoryModelWithDefaultValue",
-          "queryset": {},
         },
     )
 
   def testRun(self):
+    self.cmd.modelKlass = CombinatoryModelWithDefaultValue
     self.cmd.paramForm.isValid()
     self._validateParamForm(self.cmd)
-    self.cmd.appModel = AppModel.objects.get(
-        app="testBase", name="CombinatoryModelWithDefaultValue")
     self._execeuteCommand(self.cmd, None, uiParam=self.uiParam)
     self.cmd.paramForm._nextBtnClick()
 
   def testRunWithWidget(self):
     manager = DummyAppModelManager()
     manager.getCombinatoryModelWithDefaultValue()
+    self.cmd.modelKlass = CombinatoryModelWithDefaultValue
     self.cmd.paramForm.fields["queryset"].finalData = \
         manager.getQuerySet()
     self.cmd.paramForm.isValid()
-
-    self.cmd.appModel = AppModel.objects.get(
-        app="testBase", name="CombinatoryModelWithDefaultValue")
 
     self._validateParamForm(self.cmd)
     self._execeuteCommand(self.cmd, None, uiParam=self.uiParam)

@@ -13,6 +13,7 @@ from theory.conf import settings
 from theory.core.exceptions import ValidationError
 from theory.gui import field
 from theory.gui import widget
+from theory.gui.model import ModelChoiceField, ModelMultipleChoiceField
 from theory.gui.form import *
 from theory.gui.util import LocalFileObject
 from theory.test.testcases import TestCase
@@ -36,7 +37,8 @@ __all__ = ('AdapterFieldTestCase', 'BooleanFieldTestCase',
     'StringGroupFilterFieldTestCase', 'TextFieldTestCase',
     'TypedChoiceFieldTestCase', 'TypedMultipleChoiceFieldTestCase',
     'URLFieldTestCase', 'PythonModuleFieldTestCase',
-    'PythonClassFieldTestCase', 'QuerysetFieldTestCase',
+    'PythonClassFieldTestCase', 'ModelChoiceFieldTestCase',
+    'ModelMultipleChoiceFieldTestCase',
     )
 
 class FieldTestCaseBase(object):
@@ -487,17 +489,144 @@ class PythonClassFieldTestCase(FieldTestCaseBase, TestCase):
       self.field.validate("theory.apps.command.blah")
     self.assertEqual(self.field.validate("theory.apps.command.listCommand.ListCommand"), expectedKlass)
 
-class QuerysetFieldTestCase(FieldTestCaseBase, TestCase):
-  fieldKlass = field.QuerysetField
+#class QuerysetFieldTestCase(FieldTestCaseBase, TestCase):
+#  fieldKlass = field.QuerysetField
+#
+#  def getInitData(self):
+#    return []
+#
+#  def setUp(self):
+#    initParam = self.extraInitParam()
+#    initParam.update({"initData": self.getInitData(), "autoImport": True})
+#
+#    self.field = self.fieldKlass(**initParam)
+#    self.renderWidget(self.field)
+#
+#  def testValidData(self):
+#    data = Adapter.objects.all()
+#    self.field.finalData = data
+#    self.assertEqual(self.field.finalData, data)
+#
+#    with self.assertRaises(ValidationError):
+#      self.assertEqual(self.field.clean(self.field.finalData), data)
+#
+#  def testEmptyData(self):
+#    self.field.required = False
+#    self.assertEqual(self.field.finalData, [])
+#
+#    self.assertEqual(self.field.clean(self.field.finalData), [])
+#
+#  def testEmptyDataWithRequired(self):
+#    with self.assertRaises(ValidationError):
+#      self.assertEqual(self.field.clean(self.field.finalData), [])
+#
+#  def testValidDataWithNoAppAndNoModel(self):
+#
+#    initParam = self.extraInitParam()
+#    initData = Adapter.objects.all()
+#    initParam.update({"initData": initData, "autoImport": True})
+#
+#    self.field = self.fieldKlass(**initParam)
+#
+#    self.field.required = False
+#    with self.assertRaises(ValidationError):
+#      self.assertEqual(self.field.clean(self.field.finalData), initData)
+#
+#  def testEmptyDataWithFalseAutoImport(self):
+#    self.field.autoImport = False
+#    self.field.required = False
+#    self.assertEqual(self.field.clean(self.field.finalData), [])
+#
+#  def testValidDataWithFalseAutoImport(self):
+#    data = Adapter.objects.all()
+#    self.field.finalData = data
+#    self.field.autoImport = False
+#    self.assertEqual(self.field.clean(self.field.finalData), data)
+#
+#  def testValidDataWithFalseAutoImportRequired(self):
+#    self.field.finalData = []
+#    self.field.autoImport = False
+#    self.field.required = True
+#    with self.assertRaises(ValidationError):
+#      self.assertEqual(self.field.clean(self.field.finalData), [])
+#
+#  def testEmptyDataWithAppAndModelWithFalseAutoImport(self):
+#    self.field.required = False
+#    self.field.autoImport = False
+#    self.field.app = "anything"
+#    self.field.model = "anything"
+#
+#    self.assertEqual(self.field.clean(self.field.finalData), [])
+#
+#  def testValidInitData(self):
+#    initData = Adapter.objects.all()
+#    initParam = self.extraInitParam()
+#    initParam.update(
+#        {
+#          "initData": initData,
+#          "autoImport": True
+#        })
+#
+#    self.field = self.fieldKlass(**initParam)
+#    self.renderWidget(self.field)
+#    self.assertEqual(self.field.finalData, initData)
+#
+#    with self.assertRaises(ValidationError):
+#      self.assertEqual(self.field.clean(self.field.finalData), initData)
+#
+#    self.field.app = "theory.apps"
+#    self.field.model = "Adapter"
+#    # Mongoengine does not allow direct queryset comparison
+#    self.assertEqual(
+#        [i.id for i in self.field.clean(self.field.finalData)],
+#        [i.id for i in initData],
+#        )
+#
+#  def testInvalidInitData(self):
+#    initData = [1234, 2345]
+#    initParam = self.extraInitParam()
+#    initParam.update(
+#        {
+#          "initData": initData,
+#          "autoImport": True
+#        })
+#
+#    self.field = self.fieldKlass(**initParam)
+#    self.renderWidget(self.field)
+#    self.assertEqual(
+#        self.field.finalData,
+#        initData
+#        #[unicode(i) for i in initData]
+#        )
+#
+#    with self.assertRaises(ValidationError):
+#     self.assertEqual(self.field.clean(self.field.finalData), initData)
+#
+#    self.field.app = "theory"
+#    self.field.model = "Adapter"
+#    with self.assertRaises(ValidationError):
+#      self.assertEqual(self.field.clean(self.field.finalData), initData)
+#
+#    self.field.autoImport = False
+#    self.field.app = None
+#    self.field.model = None
+#    self.assertEqual(self.field.clean(self.field.finalData), initData)
+
+class ModelChoiceFieldTestCase(FieldTestCaseBase, TestCase):
+  # will NOT validate invalid data
+  fieldKlass = ModelChoiceField
 
   def getInitData(self):
     return []
 
+  def testInitDataInOneLine(self):
+    pass
+
   def setUp(self):
     initParam = self.extraInitParam()
-    initParam.update({"initData": self.getInitData(), "autoImport": True})
 
-    self.field = self.fieldKlass(**initParam)
+    queryset = Adapter.objects.all()
+    self.field = self.fieldKlass(queryset, **initParam)
     self.renderWidget(self.field)
 
   def testValidData(self):
@@ -505,103 +634,92 @@ class QuerysetFieldTestCase(FieldTestCaseBase, TestCase):
     self.field.finalData = data
     self.assertEqual(self.field.finalData, data)
 
-    with self.assertRaises(ValidationError):
-      self.assertEqual(self.field.clean(self.field.finalData), data)
-
   def testEmptyData(self):
+    # The field will be returned as None and modelTblFilterBase should
+    # change it as []
     self.field.required = False
-    self.assertEqual(self.field.finalData, [])
+    self.assertEqual(self.field.finalData, None)
 
-    self.assertEqual(self.field.clean(self.field.finalData), [])
+    self.assertEqual(self.field.clean(self.field.finalData), None)
 
   def testEmptyDataWithRequired(self):
     with self.assertRaises(ValidationError):
       self.assertEqual(self.field.clean(self.field.finalData), [])
 
-  def testValidDataWithNoAppAndNoModel(self):
-
-    initParam = self.extraInitParam()
-    initData = Adapter.objects.all()
-    initParam.update({"initData": initData, "autoImport": True})
-
-    self.field = self.fieldKlass(**initParam)
-
-    self.field.required = False
-    with self.assertRaises(ValidationError):
-      self.assertEqual(self.field.clean(self.field.finalData), initData)
-
-  def testEmptyDataWithFalseAutoImport(self):
-    self.field.autoImport = False
-    self.field.required = False
-    self.assertEqual(self.field.clean(self.field.finalData), [])
-
-  def testValidDataWithFalseAutoImport(self):
-    data = Adapter.objects.all()
-    self.field.finalData = data
-    self.field.autoImport = False
-    self.assertEqual(self.field.clean(self.field.finalData), data)
-
-  def testValidDataWithFalseAutoImportRequired(self):
-    self.field.finalData = []
-    self.field.autoImport = False
-    self.field.required = True
-    with self.assertRaises(ValidationError):
-      self.assertEqual(self.field.clean(self.field.finalData), [])
-
-  def testEmptyDataWithAppAndModelWithFalseAutoImport(self):
-    self.field.required = False
-    self.field.autoImport = False
-    self.field.app = "anything"
-    self.field.model = "anything"
-
-    self.assertEqual(self.field.clean(self.field.finalData), [])
-
   def testValidInitData(self):
-    initData = Adapter.objects.all()
+    queryset = Adapter.objects.all()
+    initData = list(queryset.valuesList('pk', flat=True))
     initParam = self.extraInitParam()
     initParam.update(
         {
           "initData": initData,
-          "autoImport": True
+          "queryset": queryset,
         })
 
     self.field = self.fieldKlass(**initParam)
     self.renderWidget(self.field)
+
+    # Note: the finalData can be a id list or queryset
     self.assertEqual(self.field.finalData, initData)
 
-    with self.assertRaises(ValidationError):
-      self.assertEqual(self.field.clean(self.field.finalData), initData)
+    self.assertEqual(self.field.queryset, queryset)
 
-    self.field.app = "theory.apps"
-    self.field.model = "Adapter"
-    # Mongoengine does not allow direct queryset comparison
+class ModelMultipleChoiceFieldTestCase(FieldTestCaseBase, TestCase):
+  fieldKlass = ModelMultipleChoiceField
+
+  def getInitData(self):
+    return []
+
+  def testInitDataInOneLine(self):
+    pass
+
+  def setUp(self):
+    initParam = self.extraInitParam()
+
+    self.queryset = Adapter.objects.all()
+    self.field = self.fieldKlass(self.queryset, **initParam)
+    self.renderWidget(self.field)
+
+  def testValidData(self):
+    data = list(self.queryset.valuesList('pk', flat=True))
+    self.field.finalData = data
+    self.assertEqual(self.field.finalData, data)
+
+    # will return queryset. The only way to compare queryset is compared as
+    # list
     self.assertEqual(
-        [i.id for i in self.field.clean(self.field.finalData)],
-        [i.id for i in initData],
+        list(self.field.clean(self.field.finalData)),
+        list(self.queryset)
         )
 
+  def testEmptyData(self):
+    # The field will be returned as None and modelTblFilterBase should
+    # change it as []
+    self.field.required = False
+    self.assertEqual(self.field.finalData, None)
+
+    self.assertEqual(
+        # Is similar to Adapter.objects.none()
+        list(self.field.clean(self.field.finalData)),
+        []
+        )
+
+  def testEmptyDataWithRequired(self):
+    with self.assertRaises(ValidationError):
+        self.assertEqual(self.field.clean(self.field.finalData), [])
+
   def testInvalidInitData(self):
-    initData = [1234, 2345]
+    initData = [999, 1000, 1001]
     initParam = self.extraInitParam()
     initParam.update(
         {
           "initData": initData,
-          "autoImport": True
+          "queryset": self.queryset,
         })
 
     self.field = self.fieldKlass(**initParam)
     self.renderWidget(self.field)
+
     self.assertEqual(self.field.finalData, initData)
-
-    with self.assertRaises(ValidationError):
-     self.assertEqual(self.field.clean(self.field.finalData), initData)
-
-    self.field.app = "theory"
-    self.field.model = "Adapter"
     with self.assertRaises(ValidationError):
       self.assertEqual(self.field.clean(self.field.finalData), initData)
-
-    self.field.autoImport = False
-    self.field.app = None
-    self.field.model = None
-    self.assertEqual(self.field.clean(self.field.finalData), initData)
