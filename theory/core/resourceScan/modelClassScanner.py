@@ -326,6 +326,7 @@ class ModelClassScanner(BaseClassScanner):
           meta = fieldType.relatedFields[0][1].modal._meta
           try:
             appName = meta.appConfig.module.__name__,
+            appName = appName[0]
           except AttributeError:
             appName = meta.appLabel
 
@@ -358,6 +359,7 @@ class ModelClassScanner(BaseClassScanner):
           meta = fieldType.related.parentModel._meta
           try:
             appName = meta.appConfig.module.__name__,
+            appName = appName[0]
           except AttributeError:
             appName = meta.appLabel
 
