@@ -8,7 +8,9 @@ from theory.apps.command.baseCommand import SimpleCommand
 from theory.apps.model import AppModel
 from theory.conf import settings
 from theory.core.bridge import Bridge
+from theory.core.exceptions import CommandError
 from theory.gui import field
+from theory.gui.model import ModelMultipleChoiceField
 from theory.utils.importlib import importClass
 
 ##### Theory third-party lib #####
@@ -40,7 +42,8 @@ class ModelTblFilterBase(SimpleCommand):
     modelName = field.ChoiceField(label="Model Name",
         helpText="The name of models to be listed",
         )
-    queryset = field.QuerysetField(
+    queryset = ModelMultipleChoiceField(
+        queryset=AppModel.objects.none(),
         required=False,
         label="Queryset",
         helpText="The queryset to be processed",
@@ -65,12 +68,32 @@ class ModelTblFilterBase(SimpleCommand):
       super(SimpleCommand.ParamForm, self).__init__(*args, **kwargs)
       self._preFillFieldProperty()
 
+    #def _validateNonSingularField(self):
+    #  # Not being used for now since we can only allow to key in id list,
+    #  # but not queryset. In that way, we cannot extract appName and
+    #  # modelName from the id list. So in the widget level, we still
+    #  # have to treat appName and modelName as required, even though
+    #  # appName and modelName are not neccessary required in the field level
+    #  try:
+    #    field = self.fields["queryset"]
+    #    if(not self.isLazy):
+    #      field.forceUpdate()
+    #    value = field.finalData
+    #    value = field.clean(value)
+    #    self.emptyForgivenLst = ["appName", "modelName"]
+    #  except:
+    #    pass
+
+    def _getQuerysetByAppAndModel(self, appName, modelName):
+      appModel = AppModel.objects.get(
+          app=appName,
+          name=modelName
+          )
+      return importClass(appModel.importPath).objects.all()
+
     def _preFillFieldProperty(self):
       appName = self.fields["appName"].initData
       self.fields["modelName"].choices = self._getModelNameChoices(appName)
-      if len(self.fields["modelName"].choices) > 0:
-        self.fields["queryset"].app = appName
-        self.fields["queryset"].model = self.fields["modelName"].choices[0][0]
 
     def fillInitFields(self, cmdModel, cmdArgs, cmdKwargs):
       super(ModelTblFilterBase.ParamForm, self).fillInitFields(
@@ -85,8 +108,14 @@ class ModelTblFilterBase(SimpleCommand):
         # This is for QuerysetField preset the form for modelSelect
         appName = self.fields["appName"].initData
         self.fields["modelName"].choices = self._getModelNameChoices(appName)
-        self.fields["queryset"].app = appName
-        self.fields["queryset"].model = self.fields["modelName"].initData
+        modelName = self.fields["modelName"].initData
+        self.fields["queryset"].appName = appName
+        self.fields["queryset"].modelName = modelName
+        self.fields["queryset"].queryset = \
+            self._getQuerysetByAppAndModel(
+                appName,
+                modelName
+                )
 
 
     def _getModelNameChoices(self, appName):
@@ -105,8 +134,13 @@ class ModelTblFilterBase(SimpleCommand):
       field.widget.reset(choices=field.choices)
 
       field = self.fields["queryset"]
-      field.app = appName
-      field.model = initChoice
+      field.appName = appName
+      field.modelName = initChoice
+
+      field.queryset = self._getQuerysetByAppAndModel(
+          appName,
+          initChoice
+          )
 
     def modelNameFocusChgCallback(self, *args, **kwargs):
       field = self.fields["queryset"]
@@ -115,13 +149,35 @@ class ModelTblFilterBase(SimpleCommand):
           self.fields["modelName"].finalData
           )
 
-  @property
-  def queryset(self):
-    return self._queryset
+      field.queryset = self._getQuerysetByAppAndModel(
+          field.appName,
+          self.fields["modelName"].finalData
+          )
 
-  @queryset.setter
-  def queryset(self, queryset):
-    self._queryset = queryset
+  @property
+  def queryIdSet(self):
+    # Since the ModelChoiceField will accept queryset and id as list,
+    # we need a convenience way to extract all id list. Also, we don't
+    # want to validate the whole form, as we might change the queryset
+    # in the future, we don't want to cache the old data.
+    field = self.paramForm.fields["queryset"]
+    value = field.finalData
+    try:
+      value = field.clean(value, True)
+    except ValidationError:
+      return []
+    try:
+      return [model.id for model in value]
+    except AttributeError:
+      return value
+
+  @property
+  def selectedIdLst(self):
+    return self._selectedIdLst
+
+  @selectedIdLst.setter
+  def selectedIdLst(self, selectedIdLst):
+    self._selectedIdLst = selectedIdLst
 
   @property
   def appModelFieldParamMap(self):
@@ -144,26 +200,45 @@ class ModelTblFilterBase(SimpleCommand):
       self.paramForm = newParamForm
       self.paramForm.fullClean()
       self._applyChangeOnQueryset()
+      del self.appModel
     else:
       self._stdOut += "No data found."
 
   def _fetchQueryset(self):
     formData = self.paramForm.clean()
 
-    if(len(formData["queryset"]) > 0):
-      self.queryset = formData["queryset"]
-      return True
-    else:
+    if(not hasattr(self, "appModel")):
       appModel = AppModel.objects.get(
           app=formData["appName"],
           name=formData["modelName"]
           )
       self.modelKlass = importClass(appModel.importPath)
-      #self.appModelFieldParamMap = appModel.fieldParamMap
       self.appModel = appModel
-      self.queryset = self.modelKlass.objects.filter(
-          **dict(formData["queryFilter"])
-          )
-      if(len(self.queryset)>0):
-        return True
+    if formData["queryset"] is None:
+      # For ModelChoiceField
+      formData["queryset"] = []
+    try:
+      # Queryset can be passed as id list
+      self.selectedIdLst = \
+          self.paramForm.fields["queryset"].initData.valuesList(
+              'id',
+              flat=True
+              )
+    except AttributeError:
+      self.selectedIdLst = self.paramForm.fields["queryset"].initData
+
+    # The field queryset stored three type of data
+    # 1) queryset: as the available choices
+    # 2) initData: as the pre-selected choices (often seen in instance)
+    # 3) finalData: as the user-selected choices
+    # However, adapter only accept finalData. So we create
+    # self.selectedIdLst to pass initData and use
+    # fields["queryset"].finalData to pass queryset. After bridgeToSelf,
+    # adapter will pass the user-selected choices as queryset's finalData.
+    self.paramForm.cleanedData["queryset"] = \
+        self.paramForm.fields["queryset"].queryset.filter(
+            **dict(formData["queryFilter"])
+            )
+    if(len(self.paramForm.cleanedData["queryset"])>0):
+      return True
     return False

@@ -942,12 +942,14 @@ class DictInput(ListInput):
 class QueryIdInput(StringInput):
   def _prepareInitData(self, initData):
     self.rawInitData = initData
-    if(len(initData)==0):
+    if initData is None or len(initData)==0:
+      self.finalData = ""
       return ""
     s = ""
     for i in initData:
       s += str(i) + ","
-    return s[:-1]
+    self.finalData = s[:-1]
+    return self.finalData
 
   def refreshData(self, idLst):
     entryWidget = self.widgetLst[0].widgetChildrenLst[0]
@@ -955,38 +957,43 @@ class QueryIdInput(StringInput):
     for id in idLst:
       finalData += "," + str(id)
 
-    if entryWidget.finalData is None or entryWidget.finalData == "":
-      finalData = finalData[1:]
-      entryWidget.finalData = finalData
-    else:
-      entryWidget.finalData = entryWidget.finalData + finalData
+    self.finalData = finalData[1:]
+    entryWidget.finalData = self.finalData
 
   def _createInstanceCallback(self, btn, dummy):
     from theory.core.bridge import Bridge
-    from theory.model import Command
+    from theory.apps.model import Command
     bridge = Bridge()
-    cmdModel = Command.objects.get(app="theory", name="modelUpsert")
+    cmdModel = Command.objects.get(app="theory.apps", name="modelUpsert")
     cmd = bridge.getCmdComplex(
         cmdModel,
         (self.app, self.model),
         {"isInNewWindow": True,},
         )
-    cmd.postApplyChange = lambda: self.refreshData([cmd.instance.id,])
+    cmd.postApplyChange = lambda: self.refreshData(
+        self.finalData.split(",") + [cmd.modelForm.instance.id,]
+        )
     bridge._execeuteCommand(cmd, cmdModel)
 
   def _selectInstanceCallback(self, btn, dummy):
     from theory.core.bridge import Bridge
-    from theory.model import Command
+    from theory.apps.model import Command
     bridge = Bridge()
-    cmdModel = Command.objects.get(app="theory", name="modelSelect")
-    print self.app, self.model
+    cmdModel = Command.objects.get(app="theory.apps", name="modelSelect")
+
+    kwargs = {
+        "appName": self.app,
+        "modelName": self.model,
+        "queryset": \
+            self.finalData.split(",") if self.finalData != "" else []
+        }
     cmd = bridge.getCmdComplex(
         cmdModel,
-        (self.app, self.model, {}),
-        {},
+        [],
+        kwargs
         )
     cmd._applyChangeOnQueryset = lambda: self.refreshData(
-        [model.id for model in cmd.paramForm.clean()["queryset"]]
+        cmd.queryIdSet
         )
     bridge._execeuteCommand(cmd, cmdModel)
 
@@ -998,6 +1005,7 @@ class QueryIdInput(StringInput):
 
     widget = element.Entry()
     widget.win = self.win
+    widget.attrs["initData"] = self.initData
     hBox.addWidget(widget)
 
     vBox = self._createContainer({
@@ -1027,19 +1035,14 @@ class QueryIdInput(StringInput):
     return (hBox,)
 
   def updateField(self):
-    if(self.attrs["app"] is None or self.attrs["model"] is None):
-      queryset = self.rawInitData
-    else:
-      dbClass = importClass('{0}.model.{1}'.format(
-        self.attrs["app"],
-        self.attrs["model"]
-        )
-      )
+    try:
       entryWidget = self.widgetLst[0].widgetChildrenLst[0]
-      idInDict = dbClass.objects.inBulk([i.id for i in entryWidget.finalData])
-      queryset = []
-      for i in entryWidget.finalData:
-        queryset.append(idInDict[i.id])
+      if entryWidget.finalData != "":
+        queryset = [int(i) for i in entryWidget.finalData.split(",")]
+      else:
+        queryset = None
+    except AttributeError, KeyError:
+      queryset = self.rawInitData
     self.fieldSetter({"finalData": queryset})
 
 class FilterFormLayout(BasePacker):

@@ -289,7 +289,7 @@ class PythonClassFieldWidgetTestCase(
   pass
 
 class QuerysetFieldWidgetTestCase(
-    QuerysetFieldTestCase,
+    ModelChoiceFieldTestCase,
     FieldWidgetTestCaseBase
     ):
   pass

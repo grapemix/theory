@@ -1460,7 +1460,7 @@
 {
   "fields": {
     "importPath": "theory.apps.adapter.querysetAsSpreadsheetAdapter.QuerysetAsSpreadsheetAdapter",
-    "propertyLst": "[\"appModel\", \"isEditable\", \"queryset\"]",
+    "propertyLst": "[\"appModel\", \"isEditable\", \"queryset\", \" selectedIdLst\"]",
     "name": "QuerysetAsSpreadsheet"
   },
   "model": "apps.adapter",

@@ -1,5 +1,5 @@
 """
-Helper functions for creating Form classes from Theory models
+Helper functions for creating Form classes from Theory model
 and database field objects.
 """
 
@@ -10,14 +10,13 @@ import warnings
 
 from theory.core.exceptions import (
   ImproperlyConfigured, ValidationError, NON_FIELD_ERRORS, FieldError)
-from theory.gui.field import Field, ChoiceField
+from theory.gui.field import Field, QuerysetField
 from theory.gui.common.baseForm import DeclarativeFieldsMetaclass, FormBase
 from theory.gui.formset import BaseFormSet, formsetFactory
 from theory.gui.util import ErrorList
 from theory.gui.widget import (
-    CheckBoxInput,
+    QueryIdInput,
     HiddenInput,
-    #MultipleHiddenInput
     )
 from theory.utils import six
 from theory.utils.deprecation import RemovedInTheory19Warning
@@ -42,13 +41,13 @@ def constructInstance(form, instance, fields=None, exclude=None):
   ``cleanedData``, but does not save the returned instance to the
   database.
   """
-  from theory.db import models
+  from theory.db import model
   opts = instance._meta
 
   cleanedData = form.cleanedData
   fileFieldList = []
   for f in opts.fields:
-    if not f.editable or isinstance(f, models.AutoField) \
+    if not f.editable or isinstance(f, model.AutoField) \
         or f.name not in cleanedData:
       continue
     if fields is not None and f.name not in fields:
@@ -57,7 +56,7 @@ def constructInstance(form, instance, fields=None, exclude=None):
       continue
     # Defer saving file-type fields until after the other fields, so a
     # callable uploadTo can use the values from other fields.
-    if isinstance(f, models.FileField):
+    if isinstance(f, model.FileField):
       fileFieldList.append(f)
     else:
       f.saveFormData(instance, cleanedData[f.name])
@@ -117,7 +116,7 @@ def saveInstance(form, instance, fields=None, failMessage='saved',
 def modelToDict(instance, fields=None, exclude=None):
   """
   Returns a dict containing the data in ``instance`` suitable for passing as
-  a Form's ``initial`` keyword argument.
+  a Form's ``initData`` keyword argument.
 
   ``fields`` is an optional list of field names. If provided, only the named
   fields will be included in the returned dict.
@@ -127,7 +126,7 @@ def modelToDict(instance, fields=None, exclude=None):
   the ``fields`` argument.
   """
   # avoid a circular import
-  from theory.db.models.fields.related import ManyToManyField
+  from theory.db.model.fields.related import ManyToManyField
   opts = instance._meta
   data = {}
   for f in opts.concreteFields + opts.virtualFields + opts.manyToMany:
@@ -280,10 +279,17 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
         # fields from the model"
         opts.fields = None
 
-      fields = fieldsForModel(opts.model, opts.fields, opts.exclude,
-                   opts.widgets, formfieldCallback,
-                   opts.localizedFields, opts.labels,
-                   opts.helpTexts, opts.errorMessages)
+      fields = fieldsForModel(
+          opts.model,
+          fields=opts.fields,
+          exclude=opts.exclude,
+          widgets=opts.widgets,
+          formfieldCallback=formfieldCallback,
+          localizedFields=opts.localizedFields,
+          labels=opts.labels,
+          helpTexts=opts.helpTexts,
+          errorMessages=opts.errorMessages
+          )
 
       # make sure opts.fields doesn't specify an invalid field
       noneModelFields = [k for k, v in six.iteritems(fields) if not v]
@@ -318,7 +324,7 @@ class BaseModelForm(FormBase):
     else:
       self.instance = instance
       objectData = modelToDict(instance, opts.fields, opts.exclude)
-    # if initial was provided, it should override the values from instance
+    # if initData was provided, it should override the values from instance
     if initData is not None:
       objectData.update(initData)
     # self._validateUnique will be set to True by BaseModelForm.clean().
@@ -334,6 +340,10 @@ class BaseModelForm(FormBase):
     # Apply ``limitChoicesTo`` to each field.
     for fieldName in self.fields:
       formfield = self.fields[fieldName]
+      try:
+        formfield.initData = objectData[fieldName]
+      except KeyError:
+        pass
       if hasattr(formfield, 'queryset'):
         limitChoicesTo = formfield.limitChoicesTo
         if limitChoicesTo is not None:
@@ -562,16 +572,16 @@ class BaseModelFormSet(BaseFormSet):
   def __init__(self, data=None, files=None, autoId='id_%s', prefix=None,
          queryset=None, **kwargs):
     self.queryset = queryset
-    self.initialExtra = kwargs.pop('initial', None)
+    self.initDataExtra = kwargs.pop('initData', None)
     defaults = {'data': data, 'files': files, 'autoId': autoId, 'prefix': prefix}
     defaults.update(kwargs)
     super(BaseModelFormSet, self).__init__(**defaults)
 
-  def initialFormCount(self):
+  def initDataFormCount(self):
     """Returns the number of forms that are required in this FormSet."""
     if not (self.data or self.files):
       return len(self.getQueryset())
-    return super(BaseModelFormSet, self).initialFormCount()
+    return super(BaseModelFormSet, self).initDataFormCount()
 
   def _existingObject(self, pk):
     if not hasattr(self, '_objectDict'):
@@ -588,19 +598,19 @@ class BaseModelFormSet(BaseFormSet):
     return field.toPython
 
   def _constructForm(self, i, **kwargs):
-    if self.isBound and i < self.initialFormCount():
+    if self.isBound and i < self.initDataFormCount():
       pkKey = "%s-%s" % (self.addPrefix(i), self.model._meta.pk.name)
       pk = self.data[pkKey]
       pkField = self.model._meta.pk
       toPython = self._getToPython(pkField)
       pk = toPython(pk)
       kwargs['instance'] = self._existingObject(pk)
-    if i < self.initialFormCount() and 'instance' not in kwargs:
+    if i < self.initDataFormCount() and 'instance' not in kwargs:
       kwargs['instance'] = self.getQueryset()[i]
-    if i >= self.initialFormCount() and self.initialExtra:
-      # Set initial values for extra forms
+    if i >= self.initDataFormCount() and self.initDataExtra:
+      # Set initData values for extra forms
       try:
-        kwargs['initial'] = self.initialExtra[i - self.initialFormCount()]
+        kwargs['initData'] = self.initDataExtra[i - self.initDataFormCount()]
       except IndexError:
         pass
     return super(BaseModelFormSet, self)._constructForm(i, **kwargs)
@@ -742,12 +752,12 @@ class BaseModelFormSet(BaseFormSet):
   def saveExistingObjects(self, commit=True):
     self.changedObjects = []
     self.deletedObjects = []
-    if not self.initialForms:
+    if not self.initDataForms:
       return []
 
     savedInstances = []
     formsToDelete = self.deletedForms
-    for form in self.initialForms:
+    for form in self.initDataForms:
       obj = form.instance
       if form in formsToDelete:
         # If the pk is None, it means that the object can't be
@@ -781,7 +791,7 @@ class BaseModelFormSet(BaseFormSet):
 
   def addFields(self, form, index):
     """Add a hidden field for the object's primary key."""
-    from theory.db.models import AutoField, OneToOneField, ForeignKey
+    from theory.db.model import AutoField, OneToOneField, ForeignKey
     self._pkField = pk = self.model._meta.pk
     # If a pk isn't editable, then it won't be on the form, so we need to
     # add it here so we can tell which object is which when we get the
@@ -812,7 +822,7 @@ class BaseModelFormSet(BaseFormSet):
         widget = form._meta.widgets.get(self._pkField.name, HiddenInput)
       else:
         widget = HiddenInput
-      form.fields[self._pkField.name] = ModelChoiceField(qs, initial=pkValue, required=False, widget=widget)
+      form.fields[self._pkField.name] = ModelChoiceField(qs, initData=pkValue, required=False, widget=widget)
     super(BaseModelFormSet, self).addFields(form, index)
 
 
@@ -866,10 +876,10 @@ class BaseInlineFormSet(BaseModelFormSet):
     super(BaseInlineFormSet, self).__init__(data, files, prefix=prefix,
                         queryset=qs, **kwargs)
 
-  def initialFormCount(self):
+  def initDataFormCount(self):
     if self.saveAsNew:
       return 0
-    return super(BaseInlineFormSet, self).initialFormCount()
+    return super(BaseInlineFormSet, self).initDataFormCount()
 
   def _constructForm(self, i, **kwargs):
     form = super(BaseInlineFormSet, self)._constructForm(i, **kwargs)
@@ -891,7 +901,7 @@ class BaseInlineFormSet(BaseModelFormSet):
 
   @classmethod
   def getDefaultPrefix(cls):
-    from theory.db.models.fields.related import RelatedObject
+    from theory.db.model.fields.related import RelatedObject
     return RelatedObject(cls.fk.rel.to, cls.model, cls.fk).getAccessorName().replace('+', '')
 
   def saveNew(self, form, commit=True):
@@ -945,7 +955,7 @@ def _getForeignKey(parentModel, model, fkName=None, canFail=False):
   parentModel.
   """
   # avoid circular import
-  from theory.db.models import ForeignKey
+  from theory.db.model import ForeignKey
   opts = model._meta
   if fkName:
     fksToParent = [f for f in opts.fields if f.name == fkName]
@@ -1043,13 +1053,13 @@ class InlineForeignKeyField(Field):
     self.toField = kwargs.pop("toField", None)
     if self.parentInstance is not None:
       if self.toField:
-        kwargs["initial"] = getattr(self.parentInstance, self.toField)
+        kwargs["initData"] = getattr(self.parentInstance, self.toField)
       else:
-        kwargs["initial"] = self.parentInstance.pk
+        kwargs["initData"] = self.parentInstance.pk
     kwargs["required"] = False
     super(InlineForeignKeyField, self).__init__(*args, **kwargs)
 
-  def clean(self, value):
+  def clean(self, value, isEmptyForgiven=False):
     if value in self.emptyValues:
       if self.pkField:
         return None
@@ -1064,18 +1074,17 @@ class InlineForeignKeyField(Field):
       raise ValidationError(self.errorMessages['invalidChoice'], code='invalidChoice')
     return self.parentInstance
 
-  def _hasChanged(self, initial, data):
+  def _hasChanged(self, initData, data):
     return False
 
 
 class ModelChoiceIterator(object):
+  # We might use it in the future
   def __init__(self, field):
     self.field = field
     self.queryset = field.queryset
 
   def __iter__(self):
-    if self.field.emptyLabel is not None:
-      yield ("", self.field.emptyLabel)
     if self.field.cacheChoices:
       if self.field.choiceCache is None:
         self.field.choiceCache = [
@@ -1088,14 +1097,13 @@ class ModelChoiceIterator(object):
         yield self.choice(obj)
 
   def __len__(self):
-    return (len(self.queryset) +
-      (1 if self.field.emptyLabel is not None else 0))
+    return len(self.queryset)
 
   def choice(self, obj):
     return (self.field.prepareValue(obj), self.field.labelFromInstance(obj))
 
 
-class ModelChoiceField(ChoiceField):
+class ModelChoiceField(Field):
   """A ChoiceField whose choices are a model QuerySet."""
   # This class is a subclass of ChoiceField for purity, but it doesn't
   # actually use any of ChoiceField's implementation.
@@ -1103,15 +1111,12 @@ class ModelChoiceField(ChoiceField):
     'invalidChoice': _('Select a valid choice. That choice is not one of'
               ' the available choices.'),
   }
+  widget = QueryIdInput
 
-  def __init__(self, queryset, emptyLabel="---------", cacheChoices=None,
-         required=True, widget=None, label=None, initial=None,
+  def __init__(self, queryset, cacheChoices=None,
+         required=True, widget=None, label=None, initData=None,
          helpText='', toFieldName=None, limitChoicesTo=None,
          *args, **kwargs):
-    if required and (initial is not None):
-      self.emptyLabel = None
-    else:
-      self.emptyLabel = emptyLabel
     if cacheChoices is not None:
       warnings.warn("cacheChoices has been deprecated and will be "
         "removed in Theory 1.9.",
@@ -1121,28 +1126,51 @@ class ModelChoiceField(ChoiceField):
     self.cacheChoices = cacheChoices
 
     if not kwargs.has_key("widget"):
-      kwargs["widget"] = widget
+      kwargs["widget"] = self.widget
     # Call Field instead of ChoiceField __init__() because we don't need
     # ChoiceField.__init__().
-    Field.__init__(self, required, label, initial, helpText,
+    Field.__init__(self, required, label, initData, helpText,
             *args, **kwargs)
     self.queryset = queryset
     self.limitChoicesTo = limitChoicesTo   # limit the queryset later.
     self.choiceCache = None
     self.toFieldName = toFieldName
 
-  def __deepcopy__(self, memo):
-    result = super(ChoiceField, self).__deepcopy__(memo)
-    # Need to force a new ModelChoiceIterator to be created, bug #11183
-    result.queryset = result.queryset
-    return result
+  def renderWidget(self, *args, **kwargs):
+    if("attrs" not in kwargs):
+      kwargs["attrs"] = {}
+    module = self.queryset.modal.__module__
+    appName = module[:module.find(".model")]
+    kwargs["initData"] = self.initData
+
+    # queryset in here means all objects in db
+    kwargs["attrs"].update({
+      "appName": appName,
+      "modelName": self.queryset.modal.__name__,
+      "queryset": self.initData,
+      })
+    super(ModelChoiceField, self).renderWidget(*args, **kwargs)
+    self.widget.queryset = self.queryset
+    self.widget.app = appName
+    self.widget.model = self.queryset.modal.__name__
+
+  #def __deepcopy__(self, memo):
+  #  result = super(ChoiceField, self).__deepcopy__(memo)
+  #  # Need to force a new ModelChoiceIterator to be created, bug #11183
+  #  result.queryset = result.queryset
+  #  return result
 
   def _getQueryset(self):
     return self._queryset
 
   def _setQueryset(self, queryset):
     self._queryset = queryset
-    self.widget.choices = self.choices
+    self.widget.queryset = queryset
+    module = queryset.modal.__module__
+    appName = module[:module.find(".model")]
+    self.widget.app = appName
+    self.widget.model = queryset.modal.__name__
+    #self.widget.choices = self.choices
 
   queryset = property(_getQueryset, _setQueryset)
 
@@ -1171,7 +1199,7 @@ class ModelChoiceField(ChoiceField):
     # the queryset.
     return ModelChoiceIterator(self)
 
-  choices = property(_getChoices, ChoiceField._setChoices)
+  #choices = property(_getChoices, ChoiceField._setChoices)
 
   def prepareValue(self, value):
     if hasattr(value, '_meta'):
@@ -1194,16 +1222,15 @@ class ModelChoiceField(ChoiceField):
   def validate(self, value):
     return Field.validate(self, value)
 
-  def _hasChanged(self, initial, data):
-    initialValue = initial if initial is not None else ''
+  def _hasChanged(self, initData, data):
+    initDataValue = initData if initData is not None else ''
     dataValue = data if data is not None else ''
-    return forceText(self.prepareValue(initialValue)) != forceText(dataValue)
+    return forceText(self.prepareValue(initDataValue)) != forceText(dataValue)
 
 
 class ModelMultipleChoiceField(ModelChoiceField):
   """A MultipleChoiceField whose choices are a model QuerySet."""
-  widget = CheckBoxInput
-  #hiddenWidget = MultipleHiddenInput
+  widget =  QueryIdInput
   defaultErrorMessages = {
     'list': _('Enter a list of values.'),
     'invalidChoice': _('Select a valid choice. %(value)s is not one of the'
@@ -1212,10 +1239,10 @@ class ModelMultipleChoiceField(ModelChoiceField):
   }
 
   def __init__(self, queryset, cacheChoices=None, required=True,
-         widget=None, label=None, initial=None,
+         widget=None, label=None, initData=None,
          helpText='', *args, **kwargs):
-    super(ModelMultipleChoiceField, self).__init__(queryset, None,
-      cacheChoices, required, widget, label, initial, helpText,
+    super(ModelMultipleChoiceField, self).__init__(queryset,
+      cacheChoices, required, widget, label, initData, helpText,
       *args, **kwargs)
 
   def toPython(self, value):
@@ -1224,11 +1251,13 @@ class ModelMultipleChoiceField(ModelChoiceField):
     toPy = super(ModelMultipleChoiceField, self).toPython
     return [toPy(val) for val in value]
 
-  def clean(self, value):
+  def clean(self, value, isEmptyForgiven=False):
     if self.required and not value:
       raise ValidationError(self.errorMessages['required'], code='required')
     elif not self.required and not value:
       return self.queryset.none()
+    elif type(value).__name__=="QuerySet":
+      return value
     if not isinstance(value, (list, tuple)):
       raise ValidationError(self.errorMessages['list'], code='list')
     key = self.toFieldName or 'pk'
@@ -1262,16 +1291,16 @@ class ModelMultipleChoiceField(ModelChoiceField):
       return [super(ModelMultipleChoiceField, self).prepareValue(v) for v in value]
     return super(ModelMultipleChoiceField, self).prepareValue(value)
 
-  def _hasChanged(self, initial, data):
-    if initial is None:
-      initial = []
+  def _hasChanged(self, initData, data):
+    if initData is None:
+      initData = []
     if data is None:
       data = []
-    if len(initial) != len(data):
+    if len(initData) != len(data):
       return True
-    initialSet = set(forceText(value) for value in self.prepareValue(initial))
+    initDataSet = set(forceText(value) for value in self.prepareValue(initData))
     dataSet = set(forceText(value) for value in data)
-    return dataSet != initialSet
+    return dataSet != initDataSet
 
 
 def modelformDefinesFields(formClass):

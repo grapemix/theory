@@ -21,8 +21,16 @@ from gi.repository import GObject as gobject
 __all__ = ("SpreadsheetBuilder",)
 
 class Spreadsheet(object):
-  def __init__(self, title, listStoreDataType, model,
-      renderKwargsSet, showStackDataFxn):
+  def __init__(
+      self,
+      title,
+      listStoreDataType,
+      model,
+      renderKwargsSet,
+      selectedIdLst,
+      idLabelIdx,
+      showStackDataFxn
+      ):
     self.window = gtk.Window()
     self.title = title
     self.window.set_title(title)
@@ -43,7 +51,10 @@ class Spreadsheet(object):
     self.model = gtk.ListStore(*listStoreDataType)
 
     for i in model:
-      self.model.append(i + [False, False])
+      if i[idLabelIdx] in selectedIdLst:
+        self.model.append(i + [False, True])
+      else:
+        self.model.append(i + [False, False])
 
     self._switchToGeventLoop()
 
@@ -281,14 +292,16 @@ class SpreadsheetBuilder(TheoryModelBSONTblDataHandler):
       queryset,
       appConfigModel,
       isEditable=False,
+      selectedIdLst=[],
       isMainSpreadsheet=True
       ):
+    self.idLabelIdx = None
+    self.selectedIdLst = selectedIdLst
     if(len(queryset)>0):
       self.modelKlass = queryset[0].__class__
       self.modelKlassName = self.modelKlass.__class__.__name__
 
       # We need this to find rowData in queryset
-      self.idLabelIdx = None
 
       self.isEditable = isEditable
       self.appConfigModel = appConfigModel
@@ -325,6 +338,8 @@ class SpreadsheetBuilder(TheoryModelBSONTblDataHandler):
         listStoreDataType,
         gtkDataModel,
         renderKwargsSet,
+        self.selectedIdLst,
+        self.idLabelIdx,
         self.showStackData,
         )
     if(isMainSpreadsheet):

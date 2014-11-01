@@ -11,7 +11,7 @@ from theory.gui import field
 from theory.gui.etk.element import getNewUiParam
 from theory.gui.etk.form import StepFormBase
 #from theory.gui.model import GuiModelForm
-from theory.gui.model import ModelForm
+from theory.gui.model import ModelForm, ModelChoiceField
 from theory.utils.importlib import importClass
 
 ##### Theory third-party lib #####
@@ -42,13 +42,15 @@ class ModelUpsert(SimpleCommand):
     modelName = field.ChoiceField(label="Model Name",
         helpText="The name of models to be listed",
         )
-    instanceId = field.TextField(
-        maxLength=50,
+    queryset = ModelChoiceField(
+        queryset=AppModel.objects.none(),
         required=False,
         label="instance id",
         helpText="The instance to be edited",
+        initData=None,
         isSkipInHistory=True,
         )
+
     isInNewWindow = field.BooleanField(
         label="Is in new window",
         helpText="Is shown in new window",
@@ -68,6 +70,13 @@ class ModelUpsert(SimpleCommand):
       super(SimpleCommand.ParamForm, self).__init__(*args, **kwargs)
       self._preFillFieldProperty()
 
+    def _getQuerysetByAppAndModel(self, appName, modelName):
+      appModel = AppModel.objects.get(
+          app=appName,
+          name=modelName
+          )
+      return importClass(appModel.importPath).objects.all()
+
     def fillInitFields(self, cmdModel, cmdArgs, cmdKwargs):
       super(ModelUpsert.ParamForm, self).fillInitFields(
           cmdModel,
@@ -82,6 +91,11 @@ class ModelUpsert(SimpleCommand):
         # For perseting by kwargs
         self.fields["modelName"].choices = \
             self._getModelNameChoices(cmdKwargs["appName"])
+      self.fields["queryset"].queryset = \
+          self._getQuerysetByAppAndModel(
+              self.fields["appName"].finalData,
+              self.fields["modelName"].finalData
+              )
 
     def _preFillFieldProperty(self):
       appName = self.fields["appName"].initData
@@ -99,7 +113,27 @@ class ModelUpsert(SimpleCommand):
 
       field = self.fields["modelName"]
       field.choices = self._getModelNameChoices(appName)
+      modelName = field.choices[0][0]
       field.widget.reset(choices=field.choices)
+
+      field.queryset = \
+          self._getQuerysetByAppAndModel(
+              appName,
+              modelName
+              )
+
+    def modelNameFocusChgCallback(self, *args, **kwargs):
+      field = self.fields["queryset"]
+      self.fields["modelName"].finalData = None
+      field.model = self.fields["modelName"].clean(
+          self.fields["modelName"].finalData
+          )
+
+      field.queryset = self._getQuerysetByAppAndModel(
+          self.fields["appName"].finalData,
+          self.fields["modelName"].finalData
+          )
+
 
   def getModelFormKlass(self, appModel, modelKlass):
     class DynamicModelForm(ModelForm, StepFormBase):
@@ -116,7 +150,7 @@ class ModelUpsert(SimpleCommand):
     if(self.modelForm.isValid()):
       self.modelForm.save()
       if self.paramForm.clean()["isInNewWindow"]:
-        self._uiParam["cleanUpCrtFxn"](None)
+        self._uiParam["cleanUpCrtFxn"](None, None)
       self.postApplyChange()
     else:
       # TODO: integrate with std reactor error system
@@ -131,8 +165,8 @@ class ModelUpsert(SimpleCommand):
     self.modelKlass = importClass(appModel.importPath)
     modelFormKlass = self.getModelFormKlass(appModel, self.modelKlass)
     self.instance = None
-    if(f["instanceId"]!=""):
-      self.instance = self.modelKlass.objects.get(id=f["instanceId"])
+    if(f["queryset"] is not None and len(f["queryset"])>0):
+      self.instance = self.modelKlass.objects.get(id=f["queryset"][0])
       self.modelForm = modelFormKlass(instance=self.instance)
     else:
       self.modelForm = modelFormKlass()
