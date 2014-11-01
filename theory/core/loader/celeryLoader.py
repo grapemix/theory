@@ -4,6 +4,7 @@
 from celery.loaders.base import BaseLoader
 
 ##### Theory lib #####
+from theory.apps import apps
 from theory.apps.model import Command
 from theory.utils import timezone
 from theory.utils.importlib import importModule
@@ -50,15 +51,20 @@ class CeleryLoader(BaseLoader):
     self.autodiscover()
 
   def autodiscover(self):
-    cmdImportPath = [cmd.moduleImportPath for cmd in Command.objects.filter(runMode=Command.RUN_MODE_ASYNC)]
+    apps.populate(["theory.apps",])
+    cmdImportPath = [
+        cmd.moduleImportPath for cmd in \
+            Command.objects.only('app', 'name').
+            filter(runMode=Command.RUN_MODE_ASYNC)
+            ]
     for path in cmdImportPath:
       importModule(path)
 
     # TODO: should be support individual commands define themselves as
     # celery task instead using the default task wrapper. In that case,
     # all those celery task command should be added in here
-    import theory.command.baseCommand
-    self.task_modules.update(["theory.command.baseCommand"])
+    import theory.apps.command.baseCommand
+    self.task_modules.update(["theory.apps.command.baseCommand"])
 
   # TODO: fix mail
   #def mail_admins(self, subject, body, fail_silently=False, **kwargs):
