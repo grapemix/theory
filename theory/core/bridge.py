@@ -234,8 +234,12 @@ class Bridge(object):
       formData = form.clean()
       for property in properties:
         try:
-          setattr(adapter, property, cmd.paramForm.clean_data[property])
-        except AttributeError:
+          setattr(
+              adapter,
+              property,
+              cmd.paramForm.cleanedData[property]
+              )
+        except KeyError:
           try:
             setattr(adapter, property, getattr(cmd, property))
           except AttributeError:
