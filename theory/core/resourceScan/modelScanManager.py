@@ -40,6 +40,14 @@ class ModelScanManager(BaseScanManager):
     else:
       return False
 
+  def drop(self, app=None):
+    if app is None:
+      AppModel.objects.all().delete()
+    else:
+      AppModel.objects.filter(
+          app=app
+          ).delete()
+
   def scan(self):
     self.modelDepMap = defaultdict(list)
 
