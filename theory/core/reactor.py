@@ -126,7 +126,7 @@ class Reactor(object):
       self.parser.cmdInTxt = commandName
       try:
         self.cmdModel = Command.objects.get(
-            Q(name=commandName) & (Q(moodSet=self.mood) | Q(moodSet="norm"))
+            Q(name=commandName) & (Q(moodSet__name=self.mood) | Q(moodSet__name="norm"))
             )
       except Command.DoesNotExist as errMsg:
         getNotify(
