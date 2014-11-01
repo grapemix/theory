@@ -264,9 +264,9 @@ class Bridge(object):
       runMode = cmdModel.runMode
     if(runMode==Command.RUN_MODE_ASYNC):
       if(forceSync):
-        cmd.run(paramFormData=cmd.paramForm.to_python())
+        cmd.run(paramFormData=cmd.paramForm.toPython())
       else:
-        cmd.delay(paramFormData=cmd.paramForm.to_python())
+        cmd.delay(paramFormData=cmd.paramForm.toPython())
     else:
       if(not cmd.paramForm.isValid()):
         return False
