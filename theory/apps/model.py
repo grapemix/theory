@@ -117,7 +117,7 @@ class Command(model.Model):
     comment = lambda x: x if(x) else "No comment"
     hints = "%s -- %s%sParameters:" % (self.name, comment(self.comment), crlf)
 
-    for i in self.param:
+    for i in self.parameterSet.all():
       if(i.isOptional):
         hints += crlf + "(%s) [%s]: %s" % (i.type, i.name, comment(i.comment))
       else:

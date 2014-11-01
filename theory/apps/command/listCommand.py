@@ -82,7 +82,7 @@ class ListCommand(SimpleCommand):
     for i in self._query:
       paramStr = ""
       hasOptional = False
-      paramLst = i.parameter_set.all().orderBy("isOptional")
+      paramLst = i.parameterSet.all().orderBy("isOptional")
       #paramLst.sort(key=lambda x:x.isOptional)
       for j in paramLst:
         if(not hasOptional and j.isOptional==True):
