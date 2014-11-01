@@ -153,10 +153,10 @@ class BaseLabelInput(BaseFieldInput):
     hBox = self._createContainer(attrs={"isFillAlign": True, "isWeightExpand": True})
     hBox.generate()
     self.mainContainer.content = hBox
-    self.mainContainer.title = title
+    self.mainContainer.title = unicode(title)
     self.mainContainer.generate()
 
-    self.widgetLst[-1].attrs["initData"] = help
+    self.widgetLst[-1].attrs["initData"] = unicode(help)
 
     widgetLst = list(self._createWidget())
     self.widgetLst = widgetLst + self.widgetLst
@@ -169,8 +169,8 @@ class BaseLabelInput(BaseFieldInput):
   def packAsTbl(self, title, help):
     hBox = self.mainContainer
 
-    self.widgetLst[0].attrs["initData"] = title
-    self.widgetLst[-1].attrs["initData"] = help
+    self.widgetLst[0].attrs["initData"] = unicode(title)
+    self.widgetLst[-1].attrs["initData"] = unicode(help)
 
     widgetLst = self._createWidget()
     self.widgetLst = self.widgetLst[0] + widgetLst + self.widgetLst[1]
