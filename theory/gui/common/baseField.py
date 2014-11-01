@@ -85,7 +85,8 @@ class Field(object):
 
   def __init__(self, required=True, label=None, initData=None,
          helpText=None, errorMessages=None, showHiddenInitial=False,
-         validators=[], localize=False, isSkipInHistory=False, widget=None):
+         validators=[], localize=False, isSkipInHistory=False, widget=None,
+         isSingular=True):
     # required -- Boolean that specifies whether the field is required.
     #             True by default.
     # widget -- A Widget class, or instance of a Widget class, that should
@@ -106,6 +107,7 @@ class Field(object):
     # validators -- List of additional validators to use
     # localize -- Boolean that specifies if the field should be localized.
     # widget -- Default widget to use when rendering this type of Field.
+    # isSingular -- Boolean that specifies if not interact with other fields
     if label is not None:
       label = smartText(label)
     self.required, self.label, self.initData = required, label, initData
@@ -134,7 +136,7 @@ class Field(object):
 
     # should we skip recording this field into history
     self.isSkipInHistory = isSkipInHistory
-    self.isSingular = True # not interact with other fields
+    self.isSingular = isSingular # not interact with other fields
 
     if widget is not None:
       self.widget = widget
@@ -199,7 +201,7 @@ class Field(object):
     if errors:
       raise ValidationError(errors)
 
-  def clean(self, value):
+  def clean(self, value, isEmptyForgiven=False):
     """
     Validates the given value and returns its "cleaned" value as an
     appropriate Python object.
@@ -207,8 +209,12 @@ class Field(object):
     Raises ValidationError for any errors.
     """
     value = self.to_python(value)
+    if isEmptyForgiven and self.required:
+      self.required = False
     self.validate(value)
     self.runValidators(value)
+    if isEmptyForgiven and self.required:
+      self.required = True
     return value
 
   def boundData(self, data, initial):
@@ -686,7 +692,7 @@ class RegexField(TextField):
 class EmailField(TextField):
   defaultValidators = [validators.validateEmail]
 
-  def clean(self, value):
+  def clean(self, value, isEmptyForgiven=False):
     value = self.to_python(value).strip()
     return super(EmailField, self).clean(value)
 
@@ -738,7 +744,7 @@ class FileField(Field):
 
     return data
 
-  def clean(self, data, initial=None):
+  def clean(self, data, initial=None, isEmptyForgiven=False):
     if(isinstance(data, basestring)):
       data = LocalFileObject(data)
     # If the widget got contradictory inputs, we raise a validation error
@@ -880,7 +886,7 @@ class URLField(TextField):
       value = urlunsplit(urlFields)
     return value
 
-  def clean(self, value):
+  def clean(self, value, isEmptyForgiven=False):
     value = self.to_python(value).strip()
     return super(URLField, self).clean(value)
 
@@ -1036,7 +1042,7 @@ class TypedChoiceField(ChoiceField):
       )
     return value
 
-  def clean(self, value):
+  def clean(self, value, isEmptyForgiven=False):
     value = super(TypedChoiceField, self).clean(value)
     return self._coerce(value)
 
@@ -1108,7 +1114,7 @@ class TypedMultipleChoiceField(MultipleChoiceField):
         )
     return newValue
 
-  def clean(self, value):
+  def clean(self, value, isEmptyForgiven=False):
     value = super(TypedMultipleChoiceField, self).clean(value)
     return self._coerce(value)
 
@@ -1132,7 +1138,7 @@ class ComboField(Field):
       f.required = False
     self.fields = fields
 
-  def clean(self, value):
+  def clean(self, value, isEmptyForgiven=False):
     """
     Validates the given value against all of self.fields, which is a
     list of Field instances.
@@ -1228,7 +1234,7 @@ class ListField(Field):
         or len(valueList)>self.maxLength):
       raise ValidationError(self.errorMessages['required'])
 
-  def clean(self, valueList):
+  def clean(self, valueList, isEmptyForgiven=False):
     """
     Validates every value in the given list. A value is validated against
     the corresponding Field in self.fields.
@@ -1367,7 +1373,7 @@ class DictField(Field):
         or len(valueDict)>self.maxLength):
       raise ValidationError(self.errorMessages['required'])
 
-  def clean(self, valueOrderedDict):
+  def clean(self, valueOrderedDict, isEmptyForgiven=False):
     """
     Validates every value in the given list. A value is validated against
     the corresponding Field in self.fields.
@@ -1563,7 +1569,7 @@ class MultiValueField(Field):
   def validate(self, value):
     pass
 
-  def clean(self, value):
+  def clean(self, value, isEmptyForgiven=False):
     """
     Validates every value in the given list. A value is validated against
     the corresponding Field in self.fields.
@@ -1707,7 +1713,7 @@ class GenericIPAddressField(TextField):
 class SlugField(TextField):
   defaultValidators = [validators.validateSlug]
 
-  def clean(self, value):
+  def clean(self, value, isEmptyForgiven=False):
     value = self.to_python(value).strip()
     return super(SlugField, self).clean(value)
 
@@ -1827,7 +1833,7 @@ class QuerysetField(Field):
       self.widget.model = model
     self._model = model
 
-  def clean(self, value):
+  def clean(self, value, isEmptyForgiven=False):
     """
     Validates the given value and returns its "cleaned" value as an
     appropriate Python object.
