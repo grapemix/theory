@@ -180,7 +180,7 @@ class Field(object):
   def prepareValue(self, value):
     return value
 
-  def to_python(self, value):
+  def toPython(self, value):
     return value
 
   def validate(self, value):
@@ -208,7 +208,7 @@ class Field(object):
 
     Raises ValidationError for any errors.
     """
-    value = self.to_python(value)
+    value = self.toPython(value)
     if isEmptyForgiven and self.required:
       self.required = False
     self.validate(value)
@@ -256,7 +256,7 @@ class Field(object):
     # is None, replace it w/ ''.
     initialValue = initial if initial is not None else ''
     try:
-      data = self.to_python(data)
+      data = self.toPython(data)
       if hasattr(self, '_coerce'):
         data = self._coerce(data)
     except ValidationError:
@@ -346,7 +346,7 @@ class TextField(Field):
       if(maxLength>128):
         self.widget = TextInput
 
-  def to_python(self, value):
+  def toPython(self, value):
     "Returns a Unicode object."
     if value in self.emptyValues:
       return ''
@@ -388,12 +388,12 @@ class IntegerField(Field):
     if minValue is not None:
       self.validators.append(validators.MinValueValidator(minValue))
 
-  def to_python(self, value):
+  def toPython(self, value):
     """
     Validates that int() can be called on the input. Returns the result
     of int(). Returns None for empty values.
     """
-    value = super(IntegerField, self).to_python(value)
+    value = super(IntegerField, self).toPython(value)
     if value in self.emptyValues:
       return None
     if self.localize:
@@ -419,12 +419,12 @@ class FloatField(IntegerField):
     'invalid': _('Enter a number.'),
   }
 
-  def to_python(self, value):
+  def toPython(self, value):
     """
     Validates that float() can be called on the input. Returns the result
     of float(). Returns None for empty values.
     """
-    value = super(IntegerField, self).to_python(value)
+    value = super(IntegerField, self).toPython(value)
     if value in self.emptyValues:
       return None
     if self.localize:
@@ -472,7 +472,7 @@ class DecimalField(IntegerField):
     self.maxDigits, self.decimalPlaces = maxDigits, decimalPlaces
     super(DecimalField, self).__init__(maxValue, minValue, *args, **kwargs)
 
-  def to_python(self, value):
+  def toPython(self, value):
     """
     Validates that the input is a decimal number. Returns a Decimal
     instance. Returns None for empty values. Ensures that there are no more
@@ -552,7 +552,7 @@ class BaseTemporalField(Field):
     if inputFormats is not None:
       self.inputFormats = inputFormats
 
-  def to_python(self, value):
+  def toPython(self, value):
     # Try to coerce the value to unicode.
     unicodeValue = forceText(value, stringsOnly=True)
     if isinstance(unicodeValue, six.textType):
@@ -577,7 +577,7 @@ class DateField(BaseTemporalField):
     'invalid': _('Enter a valid date.'),
   }
 
-  def to_python(self, value):
+  def toPython(self, value):
     """
     Validates that the input can be converted to a date. Returns a Python
     datetime.date object.
@@ -588,7 +588,7 @@ class DateField(BaseTemporalField):
       return value.date()
     if isinstance(value, datetime.date):
       return value
-    return super(DateField, self).to_python(value)
+    return super(DateField, self).toPython(value)
 
   def strptime(self, value, format):
     return datetime.datetime.strptime(forceStr(value), format).date()
@@ -601,7 +601,7 @@ class TimeField(BaseTemporalField):
     'invalid': _('Enter a valid time.')
   }
 
-  def to_python(self, value):
+  def toPython(self, value):
     """
     Validates that the input can be converted to a time. Returns a Python
     datetime.time object.
@@ -610,7 +610,7 @@ class TimeField(BaseTemporalField):
       return None
     if isinstance(value, datetime.time):
       return value
-    return super(TimeField, self).to_python(value)
+    return super(TimeField, self).toPython(value)
 
   def strptime(self, value, format):
     return datetime.datetime.strptime(forceStr(value), format).time()
@@ -628,7 +628,7 @@ class DateTimeField(BaseTemporalField):
       value = toCurrentTimezone(value)
     return value
 
-  def to_python(self, value):
+  def toPython(self, value):
     """
     Validates that the input can be converted to a datetime. Returns a
     Python datetime.datetime object.
@@ -652,7 +652,7 @@ class DateTimeField(BaseTemporalField):
       if value[0] in self.emptyValues and value[1] in self.emptyValues:
         return None
       value = '%s %s' % tuple(value)
-    result = super(DateTimeField, self).to_python(value)
+    result = super(DateTimeField, self).toPython(value)
     return fromCurrentTimezone(result)
 
   def strptime(self, value, format):
@@ -693,7 +693,7 @@ class EmailField(TextField):
   defaultValidators = [validators.validateEmail]
 
   def clean(self, value, isEmptyForgiven=False):
-    value = self.to_python(value).strip()
+    value = self.toPython(value).strip()
     return super(EmailField, self).clean(value)
 
 
@@ -723,7 +723,7 @@ class FileField(Field):
     if(self.initDir is not None):
       self.widget.attrs["initDir"] = self.initDir
 
-  def to_python(self, data):
+  def toPython(self, data):
     if data in self.emptyValues:
       return None
 
@@ -781,12 +781,12 @@ class ImageField(FileField):
     'invalidImage': _("Upload a valid image. The file you uploaded was either not an image or a corrupted image."),
   }
 
-  def to_python(self, data):
+  def toPython(self, data):
     """
     Checks that the file-upload field data contains a valid image (GIF, JPG,
     PNG, possibly others -- whatever the Python Imaging Library supports).
     """
-    f = super(ImageField, self).to_python(data)
+    f = super(ImageField, self).toPython(data)
     if f is None:
       return None
 
@@ -855,7 +855,7 @@ class URLField(TextField):
   }
   defaultValidators = [validators.URLValidator()]
 
-  def to_python(self, value):
+  def toPython(self, value):
 
     def splitUrl(url):
       """
@@ -869,7 +869,7 @@ class URLField(TextField):
         # misformatted URLs.
         raise ValidationError(self.errorMessages['invalid'], code='invalid')
 
-    value = super(URLField, self).to_python(value)
+    value = super(URLField, self).toPython(value)
     if value:
       urlFields = splitUrl(value)
       if not urlFields[0]:
@@ -887,7 +887,7 @@ class URLField(TextField):
     return value
 
   def clean(self, value, isEmptyForgiven=False):
-    value = self.to_python(value).strip()
+    value = self.toPython(value).strip()
     return super(URLField, self).clean(value)
 
 
@@ -898,7 +898,7 @@ class BooleanField(Field):
     super(BooleanField, self).renderWidget(*args, **kwargs)
     self.widget.attrs["choices"] = ((0, "False"), (1, "True"))
 
-  def to_python(self, value):
+  def toPython(self, value):
     """Returns a Python boolean object."""
     # Explicitly check for the string 'False', which is what a hidden field
     # will submit for False. Also check for '0', since this is what
@@ -908,7 +908,7 @@ class BooleanField(Field):
       value = False
     else:
       value = bool(value)
-    return super(BooleanField, self).to_python(value)
+    return super(BooleanField, self).toPython(value)
 
   def validate(self, value):
     if value is not True and value is not False and self.required:
@@ -931,7 +931,7 @@ class NullBooleanField(BooleanField):
   """
   widget = SelectBoxInput
 
-  def to_python(self, value):
+  def toPython(self, value):
     """
     Explicitly checks for the string 'True' and 'False', which is what a
     hidden field will submit for True and False, and for '1' and '0', which
@@ -987,7 +987,7 @@ class ChoiceField(Field):
 
   choices = property(_getChoices, _setChoices)
 
-  def to_python(self, value):
+  def toPython(self, value):
     "Returns a Unicode object."
     if value in self.emptyValues:
       return ''
@@ -1055,7 +1055,7 @@ class MultipleChoiceField(ChoiceField):
     'invalidList': _('Enter a list of values.'),
   }
 
-  def to_python(self, value):
+  def toPython(self, value):
     if not value:
       return []
     elif not isinstance(value, (list, tuple)):
@@ -1639,7 +1639,7 @@ class MultiValueField(Field):
       if not isinstance(initial, list):
         initial = self.widget.decompress(initial)
     for field, initial, data in zip(self.fields, initial, data):
-      if field._hasChanged(field.to_python(initial), data):
+      if field._hasChanged(field.toPython(initial), data):
         return True
     return False
 
@@ -1689,7 +1689,7 @@ class IPAddressField(TextField):
            RemovedInTheory19Warning)
     super(IPAddressField, self).__init__(*args, **kwargs)
 
-  def to_python(self, value):
+  def toPython(self, value):
     if value in self.emptyValues:
       return ''
     return value.strip()
@@ -1701,7 +1701,7 @@ class GenericIPAddressField(TextField):
     self.defaultValidators = validators.ipAddressValidators(protocol, unpackIpv4)[0]
     super(GenericIPAddressField, self).__init__(*args, **kwargs)
 
-  def to_python(self, value):
+  def toPython(self, value):
     if value in self.emptyValues:
       return ''
     value = value.strip()
@@ -1714,7 +1714,7 @@ class SlugField(TextField):
   defaultValidators = [validators.validateSlug]
 
   def clean(self, value, isEmptyForgiven=False):
-    value = self.to_python(value).strip()
+    value = self.toPython(value).strip()
     return super(SlugField, self).clean(value)
 
 
@@ -1892,7 +1892,7 @@ class QuerysetField(Field):
 
     return True
 
-  def to_python(self, value):
+  def toPython(self, value):
     return [str(i.id) for i in value]
 
   def renderWidget(self, *args, **kwargs):
@@ -1943,7 +1943,7 @@ class GeoPointField(TextField):
   def initData(self, initData):
     self._initData = str(initData)
 
-  def to_python(self, value):
+  def toPython(self, value):
     if value in validators.EMPTY_VALUES:
       return None
     try:

@@ -384,7 +384,7 @@ class FormBase(object):
           initialPrefixedName = self.addInitialPrefix(name)
           hiddenWidget = field.hiddenWidget()
           try:
-            initialValue = field.to_python(hiddenWidget.valueFromDatadict(
+            initialValue = field.toPython(hiddenWidget.valueFromDatadict(
               self.data, self.files, initialPrefixedName))
           except ValidationError:
             # Always assume data has changed if validation fails.
@@ -418,7 +418,7 @@ class FormBase(object):
         if(field.isSkipInHistory):
           continue
         try:
-          pythonDict[fieldName] = field.to_python(field.clean(field.finalData))
+          pythonDict[fieldName] = field.toPython(field.clean(field.finalData))
         except Exception as e: # eval can throw many different errors
           raise ValidationError(str(e))
 
