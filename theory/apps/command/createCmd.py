@@ -28,7 +28,7 @@ class CreateCmd(SimpleCommand):
         helpText="The name of application being used",
         choices=(
           set(
-            [("theory", "theory")] + \
+            [("theory.apps", "theory.apps")] + \
             [(app, app) for app in settings.INSTALLED_APPS]
           )
         )
@@ -93,7 +93,8 @@ class CreateCmd(SimpleCommand):
     else:
       toPath = os.path.join(os.path.dirname(__file__), cmdName + ".py")
 
-    fromPath = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+    fromPath = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
         "conf", "command.tmpl")
     self._stdOut += "Coping %s --> %s\n" % (fromPath, toPath)
 

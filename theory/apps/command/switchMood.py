@@ -30,11 +30,11 @@ class SwitchMood(SimpleCommand):
     moodName = field.ChoiceField(
         label="Mood Name",
         helpText="The name of mood being used",
-        choices=(set([(i, settings.INSTALLED_MOODS[i]) for i in range(len(settings.INSTALLED_MOODS))])),
+        choices=(set([(i, i) for i in settings.INSTALLED_MOODS])),
         )
 
   def run(self):
-    moodName = self.paramForm.fields["moodName"].finalChoiceLabel
+    moodName = self.paramForm.fields["moodName"].finalData
     config = loadMoodData(moodName)
     for i in dir(config):
       if(i==i.upper()):
