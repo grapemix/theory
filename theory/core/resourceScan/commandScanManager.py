@@ -19,8 +19,17 @@ from .baseScanManager import BaseScanManager
 
 class CommandScanManager(BaseScanManager):
 
+  def drop(self, app=None):
+    if app is None:
+      Command.objects.all().delete()
+    else:
+      Command.objects.filter(
+          app=app
+          ).delete()
+
+
+
   def scan(self):
-    Command.objects.all().delete()
     for cmdParam in self.paramList:
       # TODO: supporting multiple mood
       if(cmdParam[2].endswith("__init__.py")):

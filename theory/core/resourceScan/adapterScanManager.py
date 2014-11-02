@@ -18,9 +18,15 @@ from baseScanManager import BaseScanManager
 ##### Misc #####
 
 class AdapterScanManager(BaseScanManager):
+  def drop(self, app=None):
+    if app is None:
+      Adapter.objects.all().delete()
+    else:
+      Adapter.objects.filter(
+          importPath__startswith=app + ".adapter"
+          ).delete()
 
   def scan(self):
-    Adapter.objects.all().delete()
     for appImportName in self.paramList:
       adapterTemplate = Adapter(importPath=appImportName)
       o = AdapterClassScanner()

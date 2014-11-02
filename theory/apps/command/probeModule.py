@@ -4,7 +4,8 @@
 
 ##### Theory lib #####
 from theory.apps.command.baseCommand import SimpleCommand
-from theory.core.loader.util import reprobeAllModule
+from theory.conf import settings
+from theory.core.loader.util import probeApps
 from theory.gui import field
 
 ##### Theory third-party lib #####
@@ -20,15 +21,20 @@ class ProbeModule(SimpleCommand):
   verboseName = "probeModule"
 
   class ParamForm(SimpleCommand.ParamForm):
-    settingMod = field.TextField(
-        label="Setting Module",
-        helpText=(
-          "The python module being used to setup environment \n",
-          "during probing"
-          ),
-        maxLength=64
+    appNameLst = field.MultipleChoiceField(
+        label="Application Name",
+        helpText="The name of application being probed",
+        choices=(
+          set(
+            [("theory.apps", "theory.apps")] + \
+            [(app, app) for app in settings.INSTALLED_APPS]
+          )
         )
+    )
 
   def run(self):
-    self._stdOut = "Probing module: %s" %  (self._settingMod,)
-    reprobeAllModule(self.paramForm.clean()["settingMod"])
+    appNameLst = self.paramForm.clean()["appNameLst"]
+
+    self._stdOut = "Probing module: %s" % (appNameLst)
+    #reprobeAllModule(settingMod)
+    probeApps(appNameLst)
