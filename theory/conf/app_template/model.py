@@ -4,7 +4,7 @@
 ##### System wide lib #####
 
 ##### Theory lib #####
-from theory.db.models import *
+from theory.db.model import *
 from theory.utils.translation import ugettextLazy as _
 
 ##### Theory third-party lib #####
