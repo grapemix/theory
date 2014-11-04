@@ -68,29 +68,6 @@ class Tester(SimpleCommand):
 
   def run(self):
     formData = self.paramForm.clean()
-    if(formData["isTestTheory"]=='1' or formData["isTestTheory"]):
-      import imp
-      import os
-      theoryTestRoot = os.path.join(
-          os.path.dirname(os.path.dirname(os.path.dirname(
-            os.path.dirname(os.path.abspath(__file__))
-            ))),
-          "tests"
-          )
-      (file, filename, data) = imp.find_module("runtests", [theoryTestRoot])
-      print file, theoryTestRoot, data
-      thoeryTestCaseClass = imp.load_module(
-          "runtests",
-          file,
-          theoryTestRoot,
-          data
-          )
-      thoeryTestCaseClass.registerTestApp()
-
-    #testRunnerClass = get_runner(settings, formData["testRunner"])
-    #testRunner = testRunnerClass(formData["testRunnerClassParam"])
-    #testRunner.run_tests(formData["testLabel"])
-
     testRunnerClass = getRunner(settings, "")
     testRunner = testRunnerClass(verbosity=formData["verbosity"])
     testRunner.runTests(formData["testLabel"])
