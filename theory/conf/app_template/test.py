@@ -4,6 +4,7 @@
 ##### System wide lib #####
 
 ##### Theory lib #####
+from theory.test.testcases import TestCase
 
 ##### Theory third-party lib #####
 
@@ -12,4 +13,8 @@
 ##### Theory app #####
 
 ##### Misc #####
+
+#class AppTestCase(TestCase):
+#  pass
+
 
