@@ -62,7 +62,7 @@ class Loaddata(SimpleCommand):
     database = field.TextField(
         label="database",
         helpText=(
-          'Nominates a specific database to load fixtures into.',
+          'Nominates a specific database to load fixture into.',
           'Defaults to the "default" database.'
           ),
         initData=DEFAULT_DB_ALIAS,
@@ -112,7 +112,7 @@ class Loaddata(SimpleCommand):
   def loaddata(self, fixtureLabels):
     connection = connections[self.using]
 
-    # Keep a count of the installed objects and fixtures
+    # Keep a count of the installed objects and fixture
     self.fixtureCount = 0
     self.loadedObjectCount = 0
     self.fixtureObjectCount = 0
@@ -138,7 +138,7 @@ class Loaddata(SimpleCommand):
     try:
       connection.checkConstraints(tableNames=tableNames)
     except Exception as e:
-      e.args = ("Problem installing fixtures: %s" % e,)
+      e.args = ("Problem installing fixture: %s" % e,)
       raise
 
     # If we found even one object in a fixture, we need to reset the
@@ -164,7 +164,7 @@ class Loaddata(SimpleCommand):
 
   def loadLabel(self, fixtureLabel):
     """
-    Loads fixtures files for a given label.
+    Loads fixture files for a given label.
     """
     for fixtureFile, fixtureDir, fixtureName in self.findFixtures(fixtureLabel):
       _, serFmt, cmpFmt = self.parseName(os.path.basename(fixtureFile))
@@ -225,7 +225,7 @@ class Loaddata(SimpleCommand):
     serFmts = serializers.getPublicSerializerFormats() if serFmt is None else [serFmt]
 
     if self.verbosity >= 2:
-      self.stdout.write("Loading '%s' fixtures..." % fixtureName)
+      self.stdout.write("Loading '%s' fixture..." % fixtureName)
 
     if os.path.isabs(fixtureName):
       fixtureDirs = [os.path.dirname(fixtureName)]
@@ -244,7 +244,7 @@ class Loaddata(SimpleCommand):
     fixtureFiles = []
     for fixtureDir in fixtureDirs:
       if self.verbosity >= 2:
-        self.stdout.write("Checking %s for fixtures..." % humanize(fixtureDir))
+        self.stdout.write("Checking %s for fixture..." % humanize(fixtureDir))
       fixtureFilesInDir = []
       for candidate in glob.iglob(os.path.join(fixtureDir, fixtureName + '*')):
         if os.path.basename(candidate) in targets:
@@ -259,7 +259,7 @@ class Loaddata(SimpleCommand):
       # duplicates are only allowed in different directories.
       if len(fixtureFilesInDir) > 1:
         raise CommandError(
-          "Multiple fixtures named '%s' in %s. Aborting." %
+          "Multiple fixture named '%s' in %s. Aborting." %
           (fixtureName, humanize(fixtureDir)))
       fixtureFiles.extend(fixtureFilesInDir)
 
@@ -274,7 +274,7 @@ class Loaddata(SimpleCommand):
     """
     Return a list of fixture directories.
 
-    The list contains the 'fixtures' subdirectory of each installed
+    The list contains the 'fixture' subdirectory of each installed
     application, if it exists, the directories in FIXTURE_DIRS, and the
     current directory.
     """
@@ -282,7 +282,7 @@ class Loaddata(SimpleCommand):
     for appConfig in apps.getAppConfigs():
       if self.appLabel and appConfig.label != self.appLabel:
         continue
-      appDir = os.path.join(appConfig.path, 'fixtures')
+      appDir = os.path.join(appConfig.path, 'fixture')
       if os.path.isdir(appDir):
         dirs.append(appDir)
     dirs.extend(list(settings.FIXTURE_DIRS))
@@ -323,7 +323,7 @@ class SingleZipReader(zipfile.ZipFile):
   def __init__(self, *args, **kwargs):
     zipfile.ZipFile.__init__(self, *args, **kwargs)
     if len(self.namelist()) != 1:
-      raise ValueError("Zip-compressed fixtures must contain one file.")
+      raise ValueError("Zip-compressed fixture must contain one file.")
 
   def read(self):
     return zipfile.ZipFile.read(self, self.namelist()[0])
