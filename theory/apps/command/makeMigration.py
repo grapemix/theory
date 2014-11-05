@@ -90,7 +90,7 @@ class MakeMigration(SimpleCommand):
         badAppLabels.add(appLabel)
     if badAppLabels:
       for appLabel in badAppLabels:
-        self.stderr.write("App '%s' could not be found. Is it in INSTALLED_APPS?" % appLabel)
+        self.stdout.write("App '%s' could not be found. Is it in INSTALLED_APPS?" % appLabel)
       sys.exit(2)
 
     # Load the current graph state. Pass in None for the connection so
