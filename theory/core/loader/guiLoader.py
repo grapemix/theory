@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 ##### System wide lib #####
+from copy import deepcopy
 from datetime import datetime, timedelta
 import gevent
 import os
@@ -58,7 +59,9 @@ def getDimensionHints():
       }
 
 def wakeup(settings_mod, argv=None):
-  apps.populate(["theory.apps",])
+  appNameLst = deepcopy(settings.INSTALLED_APPS)
+  appNameLst.insert(0, "theory.apps")
+  apps.populate(appNameLst)
   try:
     Command.objects.count()
   except:
