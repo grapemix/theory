@@ -15,8 +15,7 @@ from theory.gui import field
 from theory.core.bridge import Bridge
 
 from theory.apps import apps
-#from theory.core.management import callCommand
-#from theory.core.management.base import BaseCommand, CommandError
+from theory.core.exceptions import CommandError
 from theory.gui.color import noStyle
 from theory.core.sql import customSqlForModel, emitPostMigrateSignal, emitPreMigrateSignal
 from theory.db import connections, router, transaction, DEFAULT_DB_ALIAS
@@ -375,7 +374,8 @@ class Migrate(SimpleCommand):
                   for sql in indexSql:
                     cursor.execute(sql)
               except Exception as e:
-                self.stderr.write("    Failed to install index for %s.%s model: %s\n" % (appName, model._meta.objectName, e))
+                #self.stderr.write("    Failed to install index for %s.%s model: %s\n" % (appName, model._meta.objectName, e))
+                self.stdout.write("    Failed to install index for %s.%s model: %s\n" % (appName, model._meta.objectName, e))
     finally:
       cursor.close()
 
