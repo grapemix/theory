@@ -850,7 +850,8 @@ class TestCase(TransactionTestCase):
           cmd.paramForm = cmd.ParamForm()
           cmd.paramForm.fields["fixtureLabelLst"].finalData = self.fixtures
           cmd.paramForm.fields["verbosity"].finalData = 0
-          cmd.paramForm.fields["appLabel"].finalData = "theory.apps"
+          cmd.paramForm.fields["appLabel"].finalData = None
+          #cmd.paramForm.fields["appLabel"].finalData = "theory.apps"
           cmd.paramForm.fields["database"].finalData = dbName
           #cmd.paramForm.fields["commit"].finalData = False
           #cmd.paramForm.fields["skipChecks"].finalData = True
