@@ -50,7 +50,7 @@ class NextStep(SimpleCommand):
     super(NextStep, self).__init__(*args, **kwargs)
     self.bridge = Bridge()
 
-  def _execeuteCommand(self, cmd):
+  def _executeCommand(self, cmd):
     cmdModel = self.adapterBufferModel.toCmd
 
     # Copied from core/reactor.py, should update this part if the original is
@@ -61,7 +61,7 @@ class NextStep(SimpleCommand):
       return
 
     # Copied from reactor, should be refactor to bridge in the futher
-    self.bridge._execeuteCommand(cmd, cmdModel)
+    self.bridge._executeCommand(cmd, cmdModel)
 
     debugLvl = settings.DEBUG_LEVEL
     bridge = Bridge()
@@ -77,4 +77,4 @@ class NextStep(SimpleCommand):
     cmdId = self.paramForm.clean()["commandReady"]
     self.adapterBufferModel = AdapterBuffer.objects.get(id=cmdId)
 
-    self.bridge.bridgeFromDb(self.adapterBufferModel, self._execeuteCommand, self.uiParam)
+    self.bridge.bridgeFromDb(self.adapterBufferModel, self._executeCommand, self.uiParam)

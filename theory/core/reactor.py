@@ -324,7 +324,7 @@ class Reactor(object):
       cmd.paramForm = self.paramForm
 
     bridge = Bridge()
-    if(not bridge._execeuteCommand(cmd, self.cmdModel, self.adapter.uiParam)):
+    if(not bridge._executeCommand(cmd, self.cmdModel, self.adapter.uiParam)):
       # TODO: integrate with std reactor error system
       print cmd.paramForm.errors
       self.adapter.restoreCmdLine()

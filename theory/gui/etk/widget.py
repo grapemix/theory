@@ -973,7 +973,7 @@ class QueryIdInput(StringInput):
     cmd.postApplyChange = lambda: self.refreshData(
         self.finalData.split(",") + [cmd.modelForm.instance.id,]
         )
-    bridge._execeuteCommand(cmd, cmdModel)
+    bridge._executeCommand(cmd, cmdModel)
 
   def _selectInstanceCallback(self, btn, dummy):
     from theory.core.bridge import Bridge
@@ -995,7 +995,7 @@ class QueryIdInput(StringInput):
     cmd._applyChangeOnQueryset = lambda: self.refreshData(
         cmd.queryIdSet
         )
-    bridge._execeuteCommand(cmd, cmdModel)
+    bridge._executeCommand(cmd, cmdModel)
 
   def _createWidget(self, *args, **kwargs):
     hBox = self._createContainer(

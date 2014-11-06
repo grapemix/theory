@@ -132,7 +132,7 @@ Are you sure you want to do this?
       if options.get('isLoadInitialData'):
         # Reinstall the initialData fixture.
         options["fixtureLabel"] = "initialData"
-        bridge.execeuteEzCommand(
+        bridge.executeEzCommand(
             'theory',
             'loaddata',
             [],

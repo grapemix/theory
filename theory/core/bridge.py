@@ -252,7 +252,7 @@ class Bridge(object):
       print form.errors
     return adapter
 
-  def _execeuteCommand(
+  def _executeCommand(
       self,
       cmd,
       cmdModel,
@@ -274,7 +274,7 @@ class Bridge(object):
       cmd.run()
     return True
 
-  def execeuteEzCommand(
+  def executeEzCommand(
       self,
       appName,
       cmdName,
@@ -298,7 +298,7 @@ class Bridge(object):
       cmd.paramForm.isValid()
       return (
           cmd,
-          self._execeuteCommand(
+          self._executeCommand(
             cmd,
             None,
             uiParam,
@@ -309,4 +309,4 @@ class Bridge(object):
     else:
       cmdModel = Command.objects.get(app=appName, name=cmdName)
       cmd = self.getCmdComplex(cmdModel, args, kwargs)
-    return (cmd, self._execeuteCommand(cmd, cmdModel, uiParam, forceSync))
+    return (cmd, self._executeCommand(cmd, cmdModel, uiParam, forceSync))
