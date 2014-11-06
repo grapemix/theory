@@ -24,12 +24,12 @@ MANAGERS = ADMINS
 
 DATABASES = {
   'default': {
-    'ENGINE': 'theory.db.backends.mongoEngine',
+    'ENGINE': 'theory.db.backends.postgresqlPsycopg2',
     'NAME': '',
     'USER': '',
     'PASSWORD': '',
     'HOST': '',
-    'PORT': '27017',
+    'PORT': '',
   }
 }
 
