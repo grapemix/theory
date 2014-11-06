@@ -216,7 +216,7 @@ class Migrate(SimpleCommand):
     # The test runner requires us to flush after a syncdb but before migrations,
     # so do that here.
     if options.get("isTestFlush", False):
-      bridge.execeuteEzCommand(
+      bridge.executeEzCommand(
           'theory',
           'flush',
           [],
@@ -382,7 +382,7 @@ class Migrate(SimpleCommand):
     # Load initialData fixtures (unless that has been disabled)
     if self.isInitialData:
       for appLabel in appLabels:
-        bridge.execeuteEzCommand(
+        bridge.executeEzCommand(
             'theory',
             'loaddata',
             [],

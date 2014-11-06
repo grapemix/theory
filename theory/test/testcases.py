@@ -721,7 +721,7 @@ class TransactionTestCase(SimpleTestCase):
       if self.fixtures:
         # We have to use this slightly awkward syntax due to the fact
         # that we're using *args and **kwargs together.
-        self.bridge.execeuteEzCommand(
+        self.bridge.executeEzCommand(
             'theory',
             'loaddata',
             self.fixtures,
@@ -768,7 +768,7 @@ class TransactionTestCase(SimpleTestCase):
     # when flushing only a subset of the apps
     for dbName in self._databasesNames(includeMirrors=False):
       # Flush the database
-      self.bridge.execeuteEzCommand(
+      self.bridge.executeEzCommand(
           'theory',
           'flush',
           self.fixtures,

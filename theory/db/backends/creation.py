@@ -375,7 +375,7 @@ class BaseDatabaseCreation(object):
     #  testDatabase=True,
     #  testFlush=True,
     #)
-    bridge.execeuteEzCommand(
+    bridge.executeEzCommand(
         'theory',
         'migrate',
         [],
@@ -398,7 +398,7 @@ class BaseDatabaseCreation(object):
 
     # !!!!!!!!!! fix me
     #callCommand('createcachetable', database=self.connection.alias)
-    #bridge.execeuteEzCommand(
+    #bridge.executeEzCommand(
     #    'theory',
     #    'createcachetable',
     #    [],
