@@ -91,7 +91,7 @@ class Bridge(object):
 
   def _naivieAdapterPropertySelection(self, adapterModel, tailModel):
     propertyLst = []
-    cmdParam = [i.name for i in tailModel.param]
+    cmdParam = [i.name for i in tailModel.parameterSet.all()]
     for i in adapterModel.propertyLst:
       if(i in cmdParam):
         propertyLst.append(i)
