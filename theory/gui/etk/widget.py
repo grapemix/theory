@@ -940,8 +940,39 @@ class DictInput(ListInput):
       valueInputBox.reset(**row)
 
 class QueryIdInput(StringInput):
+  def __init__(
+      self,
+      fieldSetter,
+      fieldGetter,
+      win,
+      bx,
+      attrs=None,
+      *args,
+      **kwargs
+      ):
+    attrs = self._buildAttrs(
+        attrs,
+        # For ModelChoiceField if isMultiple=False
+        isMultiple=True,
+    )
+    super(QueryIdInput, self).__init__(
+        fieldSetter,
+        fieldGetter,
+        win,
+        bx,
+        attrs,
+        *args,
+        **kwargs
+    )
+
   def _prepareInitData(self, initData):
     self.rawInitData = initData
+    if not self.attrs["isMultiple"]:
+      if initData is None:
+        self.finalData = ""
+        return ""
+      self.finalData = str(initData)
+      return self.finalData
     if initData is None or len(initData)==0:
       self.finalData = ""
       return ""
@@ -953,6 +984,9 @@ class QueryIdInput(StringInput):
 
   def refreshData(self, idLst):
     entryWidget = self.widgetLst[0].widgetChildrenLst[0]
+
+    # We should differentiate by isMultiple in here or in the actual
+    # selection widget for better UI experience.
     finalData = ""
     for id in idLst:
       finalData += "," + str(id)
@@ -1038,7 +1072,11 @@ class QueryIdInput(StringInput):
     try:
       entryWidget = self.widgetLst[0].widgetChildrenLst[0]
       if entryWidget.finalData != "":
-        queryset = [int(i) for i in entryWidget.finalData.split(",")]
+        if self.attrs["isMultiple"]:
+          queryset = [int(i) for i in entryWidget.finalData.split(",")]
+        else:
+          # For ModelChoiceField, we want to receive as int not list
+          queryset = int(entryWidget.finalData.split(",")[0])
       else:
         queryset = None
     except AttributeError, KeyError:

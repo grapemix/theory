@@ -55,7 +55,7 @@ class NextStep(SimpleCommand):
 
     # Copied from core/reactor.py, should update this part if the original is
     # modified.
-    if(not cmd.paramForm.is_valid()):
+    if(not cmd.paramForm.isValid()):
       # TODO: integrate with std reactor error system
       print cmd.paramForm.errors
       return

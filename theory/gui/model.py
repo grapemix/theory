@@ -1148,6 +1148,7 @@ class ModelChoiceField(Field):
       "appName": appName,
       "modelName": self.queryset.modal.__name__,
       "queryset": self.initData,
+      "isMultiple": self.defaultErrorMessages.has_key('list'),
       })
     super(ModelChoiceField, self).renderWidget(*args, **kwargs)
     self.widget.queryset = self.queryset
@@ -1215,7 +1216,7 @@ class ModelChoiceField(Field):
     try:
       key = self.toFieldName or 'pk'
       value = self.queryset.get(**{key: value})
-    except (ValueError, self.queryset.model.DoesNotExist):
+    except (ValueError, self.queryset.modal.DoesNotExist):
       raise ValidationError(self.errorMessages['invalidChoice'], code='invalidChoice')
     return value
 
@@ -1226,7 +1227,6 @@ class ModelChoiceField(Field):
     initDataValue = initData if initData is not None else ''
     dataValue = data if data is not None else ''
     return forceText(self.prepareValue(initDataValue)) != forceText(dataValue)
-
 
 class ModelMultipleChoiceField(ModelChoiceField):
   """A MultipleChoiceField whose choices are a model QuerySet."""

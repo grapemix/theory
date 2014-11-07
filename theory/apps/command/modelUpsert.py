@@ -43,7 +43,7 @@ class ModelUpsert(SimpleCommand):
         helpText="The name of models to be listed",
         )
     queryset = ModelChoiceField(
-        queryset=AppModel.objects.none(),
+        queryset=AppModel.objects.all(),
         required=False,
         label="instance id",
         helpText="The instance to be edited",
@@ -165,9 +165,8 @@ class ModelUpsert(SimpleCommand):
     self.modelKlass = importClass(appModel.importPath)
     modelFormKlass = self.getModelFormKlass(appModel, self.modelKlass)
     self.instance = None
-    if(f["queryset"] is not None and len(f["queryset"])>0):
-      self.instance = self.modelKlass.objects.get(id=f["queryset"][0])
-      self.modelForm = modelFormKlass(instance=self.instance)
+    if(f["queryset"] is not None):
+      self.modelForm = modelFormKlass(instance=f["queryset"])
     else:
       self.modelForm = modelFormKlass()
     self.modelForm._nextBtnClick = self.cleanParamForm
