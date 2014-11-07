@@ -6,7 +6,6 @@
 
 ##### Theory third-party lib #####
 from theory.apps.command.baseCommand import SimpleCommand
-from theory.apps.model import Parameter
 from theory.gui import field
 
 ##### Local app #####
@@ -29,7 +28,7 @@ class BaseChain2(BaseChain):
   @classmethod
   def getCmdModel(cls):
     cmdModel = super(BaseChain2, cls).getCmdModel()
-    cmdModel.param = [Parameter(name="stdIn",type="String")]
+    cmdModel.parameterSet.create(name="stdIn",type="String")
     return cmdModel
 
   def run(self, uiParam={}):

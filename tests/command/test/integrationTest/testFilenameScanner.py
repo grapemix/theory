@@ -28,12 +28,12 @@ class FilenameScannerTestCase(BaseCommandTestCase):
     cmd = self._getCmd(self.cmdModel, [[self.thisTestCaseFilesAbsPath,]])
     cmd.paramForm.fields["rootLst"].initData
     self._validateParamForm(cmd)
-    self._execeuteCommand(cmd, self.cmdModel)
+    self._executeCommand(cmd, self.cmdModel)
     self.assertIn(__file__, self.cmd.filenameLst)
 
     cmd = self._getCmd(self.cmdModel, kwargs={"rootLst": [self.thisTestCaseFilesAbsPath,]})
     self._validateParamForm(cmd)
-    self._execeuteCommand(cmd, self.cmdModel)
+    self._executeCommand(cmd, self.cmdModel)
     self.assertIn(__file__, self.cmd.filenameLst)
 
 if __name__ == '__main__':
