@@ -28,7 +28,7 @@ class BaseCommandTestCase(TestCase):
         ("cleanUpCrtFxn", lambda: True),
         ])
 
-  def _execeuteCommand(self, cmd, cmdModel, uiParam={}):
+  def _executeCommand(self, cmd, cmdModel, uiParam={}):
     """Copied from theory.core.reactor"""
     if (hasattr(cmdModel, "RUN_MODE_ASYNC") and
         cmdModel.runMode==cmdModel.RUN_MODE_ASYNC

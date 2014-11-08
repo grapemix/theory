@@ -617,7 +617,7 @@ class ModelChoiceFieldTestCase(FieldTestCaseBase, TestCase):
   fieldKlass = ModelChoiceField
 
   def getInitData(self):
-    return []
+    return 1
 
   def testInitDataInOneLine(self):
     pass
@@ -648,7 +648,7 @@ class ModelChoiceFieldTestCase(FieldTestCaseBase, TestCase):
 
   def testValidInitData(self):
     queryset = Adapter.objects.all()
-    initData = list(queryset.valuesList('pk', flat=True))
+    initData = queryset.valuesList('pk', flat=True)[0]
     initParam = self.extraInitParam()
     initParam.update(
         {

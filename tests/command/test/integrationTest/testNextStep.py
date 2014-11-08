@@ -56,7 +56,7 @@ class NextStepTestCase(BaseCommandTestCase):
     cmd = self._getCmd(self.cmdModel, [AdapterBuffer.objects.all()[0].id,])
     self._validateParamForm(cmd)
     cmd.bridge = self.bridge
-    self._execeuteCommand(cmd, self.cmdModel)
+    self._executeCommand(cmd, self.cmdModel)
     self.assertTrue(AdapterBuffer.objects.count(), 0)
     # Note: We cannot test the output of the command being executed
     # because the nextStep command have not supported to pipe up
@@ -68,7 +68,7 @@ class NextStepTestCase(BaseCommandTestCase):
     cmd = self._getCmd(self.cmdModel, kwargs={"commandReady": AdapterBuffer.objects.all()[0].id})
     self._validateParamForm(cmd)
     cmd.bridge = self.bridge
-    self._execeuteCommand(cmd, self.cmdModel)
+    self._executeCommand(cmd, self.cmdModel)
     self.assertTrue(AdapterBuffer.objects.count(), 0)
 
 if __name__ == '__main__':

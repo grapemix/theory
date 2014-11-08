@@ -24,7 +24,7 @@ __all__ = (
     "CheckBoxInput", "DateInput", "DateTimeInput", "TimeInput",
     "StringGroupFilterInput", "ModelValidateGroupInput", "FileselectInput",
     "EmbeddedInput", "ListInput", "DictInput", "FilterFormLayout",
-    "FileSizeInput",
+    "FileSizeInput", "QueryIdInput",
     )
 
 # Honestly, I am not satisfied with the code related to the GUI. So the code

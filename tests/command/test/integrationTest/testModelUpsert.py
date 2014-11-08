@@ -44,11 +44,11 @@ class ModelUpsertTestCase(BaseCommandTestCase):
 
 
   def testAddingFormCreation(self):
-    self._execeuteCommand(self.cmd, self.cmdModel, uiParam=self.uiParam)
+    self._executeCommand(self.cmd, self.cmdModel, uiParam=self.uiParam)
     self.cmd.paramForm._nextBtnClick()
 
   def testListFieldError(self):
-    self._execeuteCommand(self.cmd, self.cmdModel, uiParam=self.uiParam)
+    self._executeCommand(self.cmd, self.cmdModel, uiParam=self.uiParam)
     self.cmd.paramForm._nextBtnClick()
 
     self.cmd.modelForm._nextBtnClick(None, None)
@@ -63,7 +63,7 @@ class ModelUpsertTestCase(BaseCommandTestCase):
         )
 
   def testAsAdding(self):
-    self._execeuteCommand(self.cmd, self.cmdModel, uiParam=self.uiParam)
+    self._executeCommand(self.cmd, self.cmdModel, uiParam=self.uiParam)
     self.cmd.paramForm._nextBtnClick()
 
     self.cmd.modelForm.fields["app"].finalData = "testBase"
@@ -98,12 +98,12 @@ class ModelUpsertTestCase(BaseCommandTestCase):
         kwargs={
           "appName": "theory.apps",
           "modelName": "Command",
-          "queryset": ["1",],
+          "queryset": "1",
           }
         )
     self._validateParamForm(self.cmd)
 
-    self._execeuteCommand(self.cmd, self.cmdModel, uiParam=self.uiParam)
+    self._executeCommand(self.cmd, self.cmdModel, uiParam=self.uiParam)
     self.cmd.paramForm._nextBtnClick()
 
     self.assertEqual(self.cmd.modelForm.instance.pk, 1)
@@ -126,7 +126,7 @@ class ModelUpsertTestCase(BaseCommandTestCase):
         )
 
   def testPureSaving(self):
-    self._execeuteCommand(self.cmd, self.cmdModel, uiParam=self.uiParam)
+    self._executeCommand(self.cmd, self.cmdModel, uiParam=self.uiParam)
     self.cmd.paramForm._nextBtnClick()
 
     self.cmd.modelForm.fields["app"].finalData = "testBase"

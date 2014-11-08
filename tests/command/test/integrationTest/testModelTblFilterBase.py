@@ -66,7 +66,7 @@ class ModelTblFilterBaseTestCase(BaseCommandTestCase):
     self.cmd.modelKlass = CombinatoryModelWithDefaultValue
     self.cmd.paramForm.isValid()
     self._validateParamForm(self.cmd)
-    self._execeuteCommand(self.cmd, None, uiParam=self.uiParam)
+    self._executeCommand(self.cmd, None, uiParam=self.uiParam)
     self.cmd.paramForm._nextBtnClick()
 
   def testRunWithWidget(self):
@@ -78,6 +78,6 @@ class ModelTblFilterBaseTestCase(BaseCommandTestCase):
     self.cmd.paramForm.isValid()
 
     self._validateParamForm(self.cmd)
-    self._execeuteCommand(self.cmd, None, uiParam=self.uiParam)
+    self._executeCommand(self.cmd, None, uiParam=self.uiParam)
     self.cmd.paramForm._nextBtnClick()
     self.assertTrue(self.cmd.hasApplyChange)
