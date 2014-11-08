@@ -179,9 +179,8 @@ class History(model.Model):
       )
   repeated = model.IntegerField(default=1)
 
-  meta = {
-      'ordering': ['-touched',]
-  }
+  class Meta:
+    ordering = ['-touched',]
 
 class Adapter(model.Model):
   name = model.CharField(
