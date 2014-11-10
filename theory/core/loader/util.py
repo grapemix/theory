@@ -8,10 +8,9 @@ from subprocess import check_output
 import sys
 
 ##### Theory lib #####
-#from theory.command import filenameScanner
+from theory.conf import settings
 from theory.core.resourceScan import *
 from theory.utils.importlib import importModule
-from theory.utils.mood import loadMoodData
 
 ##### Theory third-party lib #####
 
@@ -26,48 +25,63 @@ DIR_MODULE = 2
 
 __all__ = ('reprobeAllModule',)
 
-def setupEnviron(settings_mod, original_settings_path=None):
+def setupEnviron(settingsMod, originalSettingsPath=None):
   """
   Configures the runtime environment. This can also be used by external
   scripts wanting to set up a similar environment to manage.py.
   Returns the mood directory (assuming the passed settings module is
   directly in the mood directory).
 
-  The "original_settings_path" parameter is optional, but recommended, since
+  The "originalSettingsPath" parameter is optional, but recommended, since
   trying to work out the original path from the module can be problematic.
   """
   # Add this mood to sys.path so that it's importable in the conventional
   # way. For example, if this file (manage.py) lives in a directory
   # "mymood", this code would add "/path/to/mymood" to sys.path.
-  if '__init__.py' in settings_mod.__file__:
-    p = os.path.dirname(settings_mod.__file__)
+  if '__init__.py' in settingsMod.__file__:
+    p = os.path.dirname(settingsMod.__file__)
   else:
-    p = settings_mod.__file__
-  mood_directory, settings_filename = os.path.split(p)
-  if mood_directory == os.curdir or not mood_directory:
-    mood_directory = os.getcwd()
-  mood_name = os.path.basename(mood_directory)
+    p = settingsMod.__file__
+  moodDirectory, settings_filename = os.path.split(p)
+  if moodDirectory == os.curdir or not moodDirectory:
+    moodDirectory = os.getcwd()
+  moodName = os.path.basename(moodDirectory)
 
   # Strip filename suffix to get the module name.
-  settings_name = os.path.splitext(settings_filename)[0]
+  settingsName = os.path.splitext(settings_filename)[0]
 
   # Strip $py for Jython compiled files (like settings$py.class)
-  if settings_name.endswith("$py"):
-    settings_name = settings_name[:-3]
+  if settingsName.endswith("$py"):
+    settingsName = settingsName[:-3]
 
   # Set THEORY_SETTINGS_MODULE appropriately.
-  if original_settings_path:
-    os.environ['THEORY_SETTINGS_MODULE'] = original_settings_path
+  if originalSettingsPath:
+    os.environ['THEORY_SETTINGS_MODULE'] = originalSettingsPath
   else:
-    os.environ['THEORY_SETTINGS_MODULE'] = '%s.%s' % (mood_name, settings_name)
+    os.environ['THEORY_SETTINGS_MODULE'] = '%s.%s' % (moodName, settingsName)
 
   # Import the mood module. We add the parent directory to PYTHONPATH to
   # avoid some of the path errors new users can have.
-  sys.path.append(os.path.join(mood_directory, os.pardir))
-  mood_module = importModule(mood_name)
+  sys.path.append(os.path.join(moodDirectory, os.pardir))
+  moodModule = importModule(moodName)
   sys.path.pop()
 
-  return mood_directory
+  return moodDirectory
+
+def detectScreenResolution(configPath):
+  resolution = []
+  for i in check_output("xrandr").split("\n"):
+    if "*" in i:
+      width, height = i.split()[0].split("x")
+      resolution.append(str((width, height)))
+
+  for line in fileinput.input(configPath, inplace=True):
+    if line == "RESOLUTION = ()":
+      print "RESOLUTION = ({0},)".format(",".join(resolution))
+    elif line == "\n":
+      continue
+    else:
+      print line,
 
 def checkModuleType(path):
   if(os.path.isfile(path)):
@@ -75,14 +89,14 @@ def checkModuleType(path):
   elif(os.path.isdir(path)):
     return DIR_MODULE
 
-def findFilesInAppDir(app_name, dirName, isIncludeInit=False):
+def findFilesInAppDir(appName, dirName, isIncludeInit=False):
   """
-  Determines the path to the management module for the given app_name,
+  Determines the path to the management module for the given appName,
   without actually importing the application or the management module.
 
   Raises ImportError if the management module cannot be found for any reason.
   """
-  parts = app_name.split('.')
+  parts = appName.split('.')
   parts.append(dirName)
   parts.reverse()
   part = parts.pop()
@@ -93,7 +107,7 @@ def findFilesInAppDir(app_name, dirName, isIncludeInit=False):
   # testproject.testapp.models can be loaded in future, even if
   # testproject isn't in the path. When looking for the management
   # module, we need look for the case where the project name is part
-  # of the app_name but the project directory itself isn't on the path.
+  # of the appName but the project directory itself isn't on the path.
   try:
     f, path, descr = imp.find_module(part,path)
   except ImportError,e:
@@ -108,13 +122,11 @@ def findFilesInAppDir(app_name, dirName, isIncludeInit=False):
     filterFxn = lambda i: i.endswith(".py")
   else:
     filterFxn = lambda i: i.endswith(".py") and i!="__init__.py"
-  #return (path, [i[:-3] for i in os.listdir(path) if(filterFxn(i))])
   try:
     r = (path, [i[:-3] for i in os.listdir(path) if(filterFxn(i))])
   except OSError, e:
     if(checkModuleType(path)==FILE_MODULE):
       return ("/".join(path.split("/")[:-1]), ["__init__"])
-      #return (None, None)
     else:
       raise e
   return r
@@ -142,20 +154,27 @@ class ModuleLoader(object):
   def postPackFxnForTheory(self, lst):
     return lst
 
-  def load(self):
-    (path, fileList) = findFilesInAppDir("theory", self.dirName, True)
+  def load(self, isDropAll):
+    if isDropAll:
+      (path, fileList) = findFilesInAppDir("theory.apps", self.dirName, True)
+    else:
+      path = "Dummy"
 
-    if(path!=None):
+    if(path is not None):
       scanManager = self.scanManager()
-      scanManager.paramList = self.postPackFxnForTheory(
-          self.lstPackFxn(fileList, "theory", path)
-          )
+      if isDropAll:
+        scanManager.drop()
+        scanManager.paramList = self.postPackFxnForTheory(
+            self.lstPackFxn(fileList, "theory.apps", path)
+            )
 
-      for app_name in self.apps:
+      for appName in self.apps:
+        if not isDropAll:
+          scanManager.drop(appName)
         try:
-          (path, fileList) = findFilesInAppDir(app_name, self.dirName, True)
+          (path, fileList) = findFilesInAppDir(appName, self.dirName, True)
           scanManager.paramList.extend(
-              self.postPackFxn(self.lstPackFxn(fileList, app_name, path))
+              self.postPackFxn(self.lstPackFxn(fileList, appName, path))
               )
         except ImportError:
           pass # No module - ignore this app
@@ -179,6 +198,11 @@ class CommandModuleLoader(ModuleLoader):
       "modelTblEdit": ["norm"],
       "modelTblDel": ["norm"],
       "modelUpsert": ["norm"],
+      "dumpdata": ["norm"],
+      "loaddata": ["norm"],
+      "flush": ["norm"],
+      "makeMigration": ["norm"],
+      "migrate": ["norm"],
       "infect": ["dev"],
     }
     for o in lst:
@@ -192,22 +216,35 @@ class CommandModuleLoader(ModuleLoader):
         o[-1] = self.moodAppRel[o[0]]
     return lst
 
-def detectScreenResolution(configPath):
-  resolution = []
-  for i in check_output("xrandr").split("\n"):
-    if "*" in i:
-      width, height = i.split()[0].split("x")
-      resolution.append(str((width, height)))
+def probeApps(apps, isDropAll=False):
+  moodAppRel = {}
+  for moodDirName in settings.INSTALLED_MOODS:
+    config = importModule("%s.config" % (moodDirName))
+    for appName in config.APPS:
+      if(moodAppRel.has_key(appName)):
+        moodAppRel[appName] += moodDirName
+      else:
+        moodAppRel[appName] = [moodDirName]
 
-  for line in fileinput.input(configPath, inplace=True):
-    if line == "RESOLUTION = ()":
-      print "RESOLUTION = ({0},)".format(",".join(resolution))
-    elif line == "\n":
-      continue
-    else:
-      print line,
 
-def reprobeAllModule(settings_mod, argv=None):
+  moduleLoader = ModuleLoader(ModelScanManager, "model", apps)
+  moduleLoader.lstPackFxn = \
+      lambda lst, appName, path: [".".join([appName, i]) for i in lst]
+  moduleLoader.load(isDropAll)
+
+  moduleLoader = ModuleLoader(AdapterScanManager, "adapter", apps)
+  moduleLoader.lstPackFxn = \
+      lambda lst, appName, path: [".".join([appName, i]) for i in lst]
+  moduleLoader.load(isDropAll)
+
+  moduleLoader = CommandModuleLoader(CommandScanManager, "command", apps)
+  moduleLoader.moodAppRel = moodAppRel
+  moduleLoader.lstPackFxn = \
+      lambda lst, appName, path:\
+        [[appName, i, os.path.join(path, i + ".py"), ["lost"]] for i in lst]
+  moduleLoader.load(isDropAll)
+
+def reprobeAllModule(settingsMod, argv=None):
   """
   Returns a dictionary mapping command names to their callback applications.
 
@@ -220,9 +257,9 @@ def reprobeAllModule(settings_mod, argv=None):
   startmood command will be disabled, and the startapp command
   will be modified to use the directory in which the settings module appears.
 
-  The dictionary is in the format {command_name: app_name}. Key-value
+  The dictionary is in the format {commandName: appName}. Key-value
   pairs from this dictionary can then be used in calls to
-  load_command_class(app_name, command_name)
+  loadCommandClass(appName, commandName)
 
   If a specific version of a command must be loaded (e.g., with the
   startapp command), the instantiated module can be placed in the
@@ -233,37 +270,16 @@ def reprobeAllModule(settings_mod, argv=None):
   """
   print "Reprobing all modules"
 
-  if settings_mod is not None:
-    setupEnviron(settings_mod)
+  if settingsMod is not None:
+    setupEnviron(settingsMod)
 
   # Find the installed apps
   try:
-    from theory.conf import settings
     apps = settings.INSTALLED_APPS
   except (AttributeError, EnvironmentError, ImportError):
     apps = []
 
-  # Find the project directory
-  try:
-    from theory.conf import settings
-    module = importModule(settings.SETTINGS_MODULE)
-    project_directory = setupEnviron(module, settings.SETTINGS_MODULE)
-  except (AttributeError, EnvironmentError, ImportError, KeyError):
-    project_directory = None
-
   # Find all mood directory
-  moodAppRel = {}
-  settings.INSTALLED_MOODS = list(settings.INSTALLED_MOODS)
-  settings.INSTALLED_MOODS.append("norm")
-  settings.INSTALLED_MOODS = tuple(settings.INSTALLED_MOODS)
-  for moodDirName in settings.INSTALLED_MOODS:
-    config = importModule("%s.config" % (moodDirName))
-    for appName in config.APPS:
-      if(moodAppRel.has_key(appName)):
-        moodAppRel[appName] += moodDirName
-      else:
-        moodAppRel[appName] = [moodDirName]
-
   detectScreenResolution(
       os.path.join(
         settings.MOODS_ROOT,
@@ -272,21 +288,9 @@ def reprobeAllModule(settings_mod, argv=None):
         )
       )
 
-  loadMoodData()
+  # Find all mood directory
+  settings.INSTALLED_MOODS = list(settings.INSTALLED_MOODS)
+  settings.INSTALLED_MOODS.append("norm")
+  settings.INSTALLED_MOODS = tuple(settings.INSTALLED_MOODS)
+  probeApps(apps, isDropAll=True)
 
-  moduleLoader = ModuleLoader(AdapterScanManager, "adapter", apps)
-  moduleLoader.lstPackFxn = \
-      lambda lst, app_name, path: [".".join([app_name, i]) for i in lst]
-  moduleLoader.load()
-
-  moduleLoader = CommandModuleLoader(CommandScanManager, "command", apps)
-  moduleLoader.moodAppRel = moodAppRel
-  moduleLoader.lstPackFxn = \
-      lambda lst, app_name, path:\
-        [[app_name, i, os.path.join(path, i + ".py"), ["lost"]] for i in lst]
-  moduleLoader.load()
-
-  moduleLoader = ModuleLoader(ModelScanManager, "model", apps)
-  moduleLoader.lstPackFxn = \
-      lambda lst, app_name, path: [".".join([app_name, i]) for i in lst]
-  moduleLoader.load()

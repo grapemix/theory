@@ -10,8 +10,7 @@ import json
 from uuid import UUID
 
 ##### Theory lib #####
-from theory.db.models import QuerySet
-from theory.utils.timezone import is_aware
+from theory.utils.timezone import isAware
 
 ##### Theory third-party lib #####
 
@@ -26,6 +25,7 @@ class TheoryJSONEncoder(json.JSONEncoder):
   JSONEncoder subclass that knows how to encode date/time and decimal types.
   """
   def default(self, o):
+    from theory.db.model.query import QuerySet
     # See "Date Time String Format" in the ECMA-262 specification.
     if isinstance(o, dt.datetime):
       r = o.isoformat()
@@ -37,7 +37,7 @@ class TheoryJSONEncoder(json.JSONEncoder):
     elif isinstance(o, dt.date):
       return o.isoformat()
     elif isinstance(o, dt.time):
-      if is_aware(o):
+      if isAware(o):
         raise ValueError("JSON can't represent timezone-aware times.")
       r = o.isoformat()
       if o.microsecond:

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 ##### System wide lib #####
-#from __future__ import unicodeLiterals
+from __future__ import unicode_literals
 import locale
 import os
 import re

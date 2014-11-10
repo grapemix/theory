@@ -5,7 +5,7 @@ from collections import defaultdict
 
 ##### Theory lib #####
 from theory.core.resourceScan.modelClassScanner import ModelClassScanner
-from theory.model import AppModel
+from theory.apps.model import AppModel
 
 ##### Theory third-party lib #####
 
@@ -20,8 +20,8 @@ class ModelScanManager(BaseScanManager):
 
   def _getLabelFromFieldParam(self, fieldParam):
     return "{0}|{1}".format(
-        fieldParam.childParamLst[0].data,
-        fieldParam.childParamLst[1].data
+        fieldParam.childParamLst.all()[0].data,
+        fieldParam.childParamLst.all()[1].data
         )
 
   def _markCircular(self, rootLabel, fieldParam, parentLabelLst=[]):
@@ -40,9 +40,16 @@ class ModelScanManager(BaseScanManager):
     else:
       return False
 
+  def drop(self, app=None):
+    if app is None:
+      AppModel.objects.all().delete()
+    else:
+      AppModel.objects.filter(
+          app=app
+          ).delete()
+
   def scan(self):
     self.modelDepMap = defaultdict(list)
-    AppModel.objects.all().delete()
 
     modelLst = []
     for appImportName in self.paramList:
@@ -52,7 +59,6 @@ class ModelScanManager(BaseScanManager):
       o.modelDepMap = self.modelDepMap
       o.scan()
       modelLst.extend(o.modelList)
-
 
     for k, v in self.modelDepMap.iteritems():
       for i in v:

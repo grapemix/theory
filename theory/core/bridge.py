@@ -4,9 +4,9 @@
 import json
 
 ##### Theory lib #####
-from theory.adapter import BaseUIAdapter
+from theory.apps.adapter import BaseUIAdapter
 from theory.core.exceptions import CommandSyntaxError
-from theory.model import Adapter, AdapterBuffer, Command
+from theory.apps.model import Adapter, AdapterBuffer, Command
 from theory.utils.importlib import importClass
 
 ##### Theory third-party lib #####
@@ -71,7 +71,7 @@ class Bridge(object):
     cmdParamForm = importClass(cmdModel.classImportPath).ParamForm
     cmd.paramForm = cmdParamForm()
     cmd.paramForm.fillInitFields(cmdModel, args, kwargs)
-    cmd.paramForm.is_valid()
+    cmd.paramForm.isValid()
     return cmd
 
   # TODO: should be replaced later on. At least inheritance case should be
@@ -91,8 +91,8 @@ class Bridge(object):
 
   def _naivieAdapterPropertySelection(self, adapterModel, tailModel):
     propertyLst = []
-    cmdParam = [i.name for i in tailModel.param]
-    for i in adapterModel.property:
+    cmdParam = [i.name for i in tailModel.parameterSet.all()]
+    for i in adapterModel.propertyLst:
       if(i in cmdParam):
         propertyLst.append(i)
     return propertyLst
@@ -200,11 +200,15 @@ class Bridge(object):
       adapterModel = None
 
     adapter = None
-    if(adapterModel!=None):
+    if(adapterModel is not None):
       adapterKlass = importClass(adapterModel.importPath)
       adapter = adapterKlass()
       #adapter = self._assignAdapterProperties(adapterModel.property, adapter, cmd)
-      adapter = self._assignAdapterPropertiesFromCmd(adapterModel.property, adapter, cmd)
+      adapter = self._assignAdapterPropertiesFromCmd(
+          adapterModel.propertyLst,
+          adapter,
+          cmd
+          )
     return (adapterModel, adapter)
 
   def _adaptToCmd(self, adapterModel, adapter, cmd):
@@ -226,12 +230,16 @@ class Bridge(object):
   def _assignAdapterPropertiesFromCmd(self, properties, adapter, cmd):
     """This fxn """
     form = cmd.paramForm
-    if(form.is_valid()):
+    if(form.isValid()):
       formData = form.clean()
       for property in properties:
         try:
-          setattr(adapter, property, cmd.paramForm.clean_data[property])
-        except AttributeError:
+          setattr(
+              adapter,
+              property,
+              cmd.paramForm.cleanedData[property]
+              )
+        except KeyError:
           try:
             setattr(adapter, property, getattr(cmd, property))
           except AttributeError:
@@ -244,21 +252,29 @@ class Bridge(object):
       print form.errors
     return adapter
 
-  def _execeuteCommand(self, cmd, cmdModel, uiParam={}, forceSync=False):
-    if(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC):
+  def _executeCommand(
+      self,
+      cmd,
+      cmdModel,
+      uiParam={},
+      forceSync=False,
+      runMode=None
+      ):
+    if runMode is None:
+      runMode = cmdModel.runMode
+    if(runMode==Command.RUN_MODE_ASYNC):
       if(forceSync):
         cmd.run(paramFormData=cmd.paramForm.toPython())
       else:
         cmd.delay(paramFormData=cmd.paramForm.toPython())
     else:
-      if(not cmd.paramForm.is_valid()):
+      if(not cmd.paramForm.isValid()):
         return False
       cmd._uiParam = uiParam
       cmd.run()
     return True
 
-
-  def execeuteEzCommand(
+  def executeEzCommand(
       self,
       appName,
       cmdName,
@@ -267,6 +283,30 @@ class Bridge(object):
       uiParam={},
       forceSync=False
       ):
-    cmdModel = Command.objects.get(app=appName, name=cmdName)
-    cmd = self.getCmdComplex(cmdModel, args, kwargs)
-    return (cmd, self._execeuteCommand(cmd, cmdModel, uiParam, forceSync))
+    if appName == "theory" and args == []:
+      # for first time running
+      classImportPath = "theory.apps.command.{0}.{1}".format(
+          cmdName,
+          cmdName[0].upper() + cmdName[1:]
+          )
+      cmdKlass = importClass(classImportPath)
+      cmd = cmdKlass()
+      cmdParamForm = importClass(classImportPath).ParamForm
+      cmd.paramForm = cmdParamForm()
+      for k,v in kwargs.iteritems():
+        cmd.paramForm.fields[k].finalData = v
+      cmd.paramForm.isValid()
+      return (
+          cmd,
+          self._executeCommand(
+            cmd,
+            None,
+            uiParam,
+            forceSync,
+            Command.RUN_MODE_SIMPLE
+            )
+          )
+    else:
+      cmdModel = Command.objects.get(app=appName, name=cmdName)
+      cmd = self.getCmdComplex(cmdModel, args, kwargs)
+    return (cmd, self._executeCommand(cmd, cmdModel, uiParam, forceSync))

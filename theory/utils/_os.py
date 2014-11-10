@@ -1,6 +1,7 @@
 import os
 import stat
 import sys
+import tempfile
 from os.path import join, normcase, normpath, abspath, isabs, sep, dirname
 
 from theory.utils.encoding import forceText
@@ -34,13 +35,15 @@ else:
       path = join(os.getcwdu(), path)
     return normpath(path)
 
+
 def upath(path):
   """
   Always return a unicode path.
   """
-  if six.PY2 and not isinstance(path, six.text_type):
+  if six.PY2 and not isinstance(path, six.textType):
     return path.decode(fsEncoding)
   return path
+
 
 def npath(path):
   """
@@ -50,6 +53,7 @@ def npath(path):
   if six.PY2 and not isinstance(path, bytes):
     return path.encode(fsEncoding)
   return path
+
 
 def safeJoin(base, *paths):
   """
@@ -71,8 +75,8 @@ def safeJoin(base, *paths):
   #  b) The final path must be the same as the base path.
   #  c) The base path must be the most root path (meaning either "/" or "C:\\")
   if (not normcase(finalPath).startswith(normcase(basePath + sep)) and
-    normcase(finalPath) != normcase(basePath) and
-    dirname(normcase(basePath)) != normcase(basePath)):
+      normcase(finalPath) != normcase(basePath) and
+      dirname(normcase(basePath)) != normcase(basePath)):
     raise ValueError('The joined path (%s) is located outside of the base '
              'path component (%s)' % (finalPath, basePath))
   return finalPath
@@ -96,3 +100,26 @@ def rmtreeErrorhandler(func, path, excInfo):
   os.chmod(path, stat.S_IWRITE)
   # use the original function to repeat the operation
   func(path)
+
+
+def symlinksSupported():
+  """
+  A function to check if creating symlinks are supported in the
+  host platform and/or if they are allowed to be created (e.g.
+  on Windows it requires admin permissions).
+  """
+  tmpdir = tempfile.mkdtemp()
+  originalPath = os.path.join(tmpdir, 'original')
+  symlinkPath = os.path.join(tmpdir, 'symlink')
+  os.makedirs(originalPath)
+  try:
+    os.symlink(originalPath, symlinkPath)
+    supported = True
+  except (OSError, NotImplementedError, AttributeError):
+    supported = False
+  else:
+    os.remove(symlinkPath)
+  finally:
+    os.rmdir(originalPath)
+    os.rmdir(tmpdir)
+    return supported

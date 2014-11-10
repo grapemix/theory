@@ -4,23 +4,26 @@ without further escaping in HTML. Marking something as a "safe string" means
 that the producer of the string has already turned characters that should not
 be interpreted by the HTML engine (e.g. '<') into the appropriate entities.
 """
-from theory.utils.functional import curry, Promise, allowLazy
+from theory.utils.functional import curry, Promise
 from theory.utils import six
+
 
 class EscapeData(object):
   pass
+
 
 class EscapeBytes(bytes, EscapeData):
   """
   A byte string that should be HTML-escaped when output.
   """
-  __new__ = allowLazy(bytes.__new__, bytes)
+  pass
 
-class EscapeText(six.text_type, EscapeData):
+
+class EscapeText(six.textType, EscapeData):
   """
   A unicode string object that should be HTML-escaped when output.
   """
-  __new__ = allowLazy(six.text_type.__new__, six.text_type)
+  pass
 
 if six.PY3:
   EscapeString = EscapeText
@@ -29,16 +32,22 @@ else:
   # backwards compatibility for Python 2
   EscapeUnicode = EscapeText
 
+
 class SafeData(object):
-  pass
+  def __html__(self):
+    """
+    Returns the html representation of a string.
+
+    Allows interoperability with other template engines.
+    """
+    return self
+
 
 class SafeBytes(bytes, SafeData):
   """
   A bytes subclass that has been specifically marked as "safe" (requires no
   further escaping) for HTML output purposes.
   """
-  __new__ = allowLazy(bytes.__new__, bytes)
-
   def __add__(self, rhs):
     """
     Concatenating a safe byte string with another safe byte string or safe
@@ -66,13 +75,12 @@ class SafeBytes(bytes, SafeData):
 
   decode = curry(_proxyMethod, method=bytes.decode)
 
-class SafeText(six.text_type, SafeData):
+
+class SafeText(six.textType, SafeData):
   """
   A unicode (Python 2) / str (Python 3) subclass that has been specifically
   marked as "safe" for HTML output purposes.
   """
-  __new__ = allowLazy(six.text_type.__new__, six.text_type)
-
   def __add__(self, rhs):
     """
     Concatenating a safe unicode string with another safe byte string or
@@ -96,7 +104,7 @@ class SafeText(six.text_type, SafeData):
     else:
       return SafeText(data)
 
-  encode = curry(_proxyMethod, method=six.text_type.encode)
+  encode = curry(_proxyMethod, method=six.textType.encode)
 
 if six.PY3:
   SafeString = SafeText
@@ -104,6 +112,7 @@ else:
   SafeString = SafeBytes
   # backwards compatibility for Python 2
   SafeUnicode = SafeText
+
 
 def markSafe(s):
   """
@@ -116,9 +125,10 @@ def markSafe(s):
     return s
   if isinstance(s, bytes) or (isinstance(s, Promise) and s._delegateBytes):
     return SafeBytes(s)
-  if isinstance(s, (six.text_type, Promise)):
+  if isinstance(s, (six.textType, Promise)):
     return SafeText(s)
   return SafeString(str(s))
+
 
 def markForEscaping(s):
   """
@@ -132,7 +142,6 @@ def markForEscaping(s):
     return s
   if isinstance(s, bytes) or (isinstance(s, Promise) and s._delegateBytes):
     return EscapeBytes(s)
-  if isinstance(s, (six.text_type, Promise)):
+  if isinstance(s, (six.textType, Promise)):
     return EscapeText(s)
   return EscapeBytes(bytes(s))
-

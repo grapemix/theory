@@ -1,9 +1,0 @@
-{
-  "field1Lbl": "field1", 
-  "field2Lbl": "field2", 
-  "field3Lbl": {
-    "layer": {
-      "sublayer": "field3"
-    }
-  }
-}

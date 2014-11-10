@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
+
 ##### System wide lib #####
 
 ##### Theory lib #####
 
 ##### Theory third-party lib #####
-from theory.command.baseCommand import SimpleCommand
+from theory.apps.command.baseCommand import SimpleCommand
 from theory.gui import field
-from theory.model import *
-from theory.model import Parameter
 
 ##### Local app #####
 from .baseChain import BaseChain
@@ -23,13 +22,13 @@ class BaseChain2(BaseChain):
   _propertyForTesting = ""
 
   class ParamForm(SimpleCommand.ParamForm):
-    stdIn = field.TextField(label="Std In", help_text="Standard Input")
+    stdIn = field.TextField(label="Std In", helpText="Standard Input")
     customField = field.TextField(required=False) # unused
 
   @classmethod
   def getCmdModel(cls):
     cmdModel = super(BaseChain2, cls).getCmdModel()
-    cmdModel.param = [Parameter(name="stdIn",type="String")]
+    cmdModel.parameterSet.create(name="stdIn",type="String")
     return cmdModel
 
   def run(self, uiParam={}):

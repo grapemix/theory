@@ -2,15 +2,11 @@
 #!/usr/bin/env python
 ##### System wide lib #####
 from collections import OrderedDict
-from bson.json_util import loads as jsonLoads
 import gevent
 
 ##### Theory lib #####
-from theory.gui.transformer import (
-    #MongoModelTblDataHandler,
-    MongoModelBSONTblDataHandler
-    )
-from theory.model import AppModel
+from theory.apps.model import AppModel
+from theory.gui.transformer import TheoryModelBSONTblDataHandler
 
 ##### Theory third-party lib #####
 
@@ -25,8 +21,16 @@ from gi.repository import GObject as gobject
 __all__ = ("SpreadsheetBuilder",)
 
 class Spreadsheet(object):
-  def __init__(self, title, listStoreDataType, model,
-      renderKwargsSet, showStackDataFxn):
+  def __init__(
+      self,
+      title,
+      listStoreDataType,
+      model,
+      renderKwargsSet,
+      selectedIdLst,
+      idLabelIdx,
+      showStackDataFxn
+      ):
     self.window = gtk.Window()
     self.title = title
     self.window.set_title(title)
@@ -47,7 +51,10 @@ class Spreadsheet(object):
     self.model = gtk.ListStore(*listStoreDataType)
 
     for i in model:
-      self.model.append(i + [False, False])
+      if i[idLabelIdx] in selectedIdLst:
+        self.model.append(i + [False, True])
+      else:
+        self.model.append(i + [False, False])
 
     self._switchToGeventLoop()
 
@@ -272,7 +279,7 @@ class Spreadsheet(object):
   def main(self):
     gtk.main()
 
-class SpreadsheetBuilder(MongoModelBSONTblDataHandler):
+class SpreadsheetBuilder(TheoryModelBSONTblDataHandler):
 #class SpreadsheetBuilder(MongoModelTblDataHandler):
   """This class is used to provide information in order to render the data
   field and to decide the interaction of the data field based on the
@@ -280,30 +287,26 @@ class SpreadsheetBuilder(MongoModelBSONTblDataHandler):
   class, so it should also prepare/transform data for the spreadsheet
   class."""
 
-  def run(self, queryset, isEditable=False, isMainSpreadsheet=True):
+  def run(
+      self,
+      queryset,
+      appConfigModel,
+      isEditable=False,
+      selectedIdLst=[],
+      isMainSpreadsheet=True
+      ):
+    self.idLabelIdx = None
+    self.selectedIdLst = selectedIdLst
     if(len(queryset)>0):
       self.modelKlass = queryset[0].__class__
-      self.modelKlassName = self.modelKlass._class_name
+      self.modelKlassName = self.modelKlass.__class__.__name__
 
       # We need this to find rowData in queryset
-      self.idLabelIdx = None
-
-      if(self.modelKlass._is_document):
-        nameToken = self.modelKlass._get_collection_name().split("_")
-        appName = nameToken[0]
-        modelName = ""
-        for i in nameToken[1:]:
-          modelName += i.title()
-        appModelmodel = AppModel.objects.get(name=modelName, app=appName)
-      else:
-        # embedded document. There has not enough info to get app name.
-        # In this way, it will cause a bug if there exists two models with the
-        # same name in different apps.
-        appModelmodel = AppModel.objects.get(name=self.modelKlassName)
 
       self.isEditable = isEditable
+      self.appConfigModel = appConfigModel
       super(SpreadsheetBuilder, self).run(
-          appModelmodel.fieldParamMap
+          appConfigModel.fieldParamMap.all()
           )
     else:
       self.modelKlassName = "Unknown model"
@@ -335,6 +338,8 @@ class SpreadsheetBuilder(MongoModelBSONTblDataHandler):
         listStoreDataType,
         gtkDataModel,
         renderKwargsSet,
+        self.selectedIdLst,
+        self.idLabelIdx,
         self.showStackData,
         )
     if(isMainSpreadsheet):
@@ -344,25 +349,33 @@ class SpreadsheetBuilder(MongoModelBSONTblDataHandler):
 
   def showStackData(self, toggleWidget, rowNum, colIdx):
     rowNum = int(rowNum)
-
-    if(self.fieldPropDict[
+    queryset = getattr(
+        self.queryset[rowNum],
         self.modelFieldnameMap[colIdx]
-      ]["klassLabel"].startswith("listField")):
-      # This is for listfield linked with reference/embedded field
-      queryset = getattr(
-          self.queryset[rowNum],
-          self.modelFieldnameMap[colIdx]
-          )
+        )
+    if hasattr(queryset, "all"):
+      # That is for many to many field
+      queryset = queryset.all()
     else:
-      # This is for reference/embedded field
-      id = getattr(
-          self.queryset[rowNum],
-          self.modelFieldnameMap[colIdx]
-          )
-      queryset = [id] if(id is not None) else []
+      # This is for ForeignKey
+      # or may be for one to one?
+      queryset = [queryset] if(queryset is not None) else []
 
+    buf = self.appConfigModel.fieldParamMap.filter(
+        parent__name=self.modelFieldnameMap[colIdx]
+        )
+    for i in buf:
+      if i.name == "foreignApp":
+        appName = buf[0].data
+      elif i.name == "foreignModel":
+        modelName = buf[1].data
+
+    print appName, modelName
+    appConfigModel = AppModel.objects.get(app=appName, name=modelName)
     clone = SpreadsheetBuilder()
-    clone.run(queryset, self.isEditable, False)
+    # We don't assume modifying the stack data is possible, so we can
+    # treat the pre-selected item list as empty
+    clone.run(queryset, appConfigModel, self.isEditable, [], False)
     self.spreadsheet.childSpreadSheetLst.append(clone.spreadsheet)
 
   def getSelectedRow(self):
@@ -408,31 +421,15 @@ class SpreadsheetBuilder(MongoModelBSONTblDataHandler):
     return kwargsSet
 
   def _queryRowToGtkDataModel(self, queryrow):
-    try:
-      queryrowInJson = jsonLoads(queryrow.to_json())
-    except:
-      queryrow.to_json()
-      pass
     row = []
 
-    try:
-      id = str(queryrow.id)
-    except AttributeError:
-      # For example, EmbeddedModel does not have an id
-      id = ""
-
     for fieldName, fieldHandlerFxnLst in self.fieldPropDict.iteritems():
-      if(fieldName=="id"):
-        fieldName="_id"
-      try:
-        result = fieldHandlerFxnLst["dataHandler"](
-            id,
-            fieldName,
-            queryrowInJson[fieldName]
-            )
-      except KeyError:
-        result = fieldHandlerFxnLst["dataHandler"](id, fieldName, None)
-      if(result is not None):
+      result = fieldHandlerFxnLst["dataHandler"](
+          id,
+          fieldName,
+          getattr(queryrow, fieldName)
+          )
+      if result is not None:
         row.append(result)
     return row
 
@@ -461,10 +458,7 @@ class SpreadsheetBuilder(MongoModelBSONTblDataHandler):
           or fieldHandlerFxn=="strField"
       ):
         args.append(str)
-      elif(fieldHandlerFxn=="embeddedField"
-          or fieldHandlerFxn.startswith("listField")
-          or fieldHandlerFxn.startswith("mapField")
-          or fieldHandlerFxn.startswith("dictField")
+      elif(fieldHandlerFxn.startswith("listField")
           # TODO: remove me
           or fieldHandlerFxn=="modelField"
       ):

@@ -6,10 +6,8 @@ import copy
 import os
 
 ##### Theory lib #####
-from theory.core.bridge import Bridge
 from theory.gui.util import LocalFileObject
-from theory.model import Command
-from theory.utils import datetime_safe, formats
+from theory.utils import datetimeSafe, formats
 from theory.utils.importlib import importClass
 
 ##### Theory third-party lib #####
@@ -26,7 +24,7 @@ __all__ = (
     "CheckBoxInput", "DateInput", "DateTimeInput", "TimeInput",
     "StringGroupFilterInput", "ModelValidateGroupInput", "FileselectInput",
     "EmbeddedInput", "ListInput", "DictInput", "FilterFormLayout",
-    "FileSizeInput",
+    "FileSizeInput", "QueryIdInput",
     )
 
 # Honestly, I am not satisfied with the code related to the GUI. So the code
@@ -83,7 +81,7 @@ class BasePacker(object):
     memo[id(self)] = obj
     return obj
 
-  def value_from_datadict(self, data, files, name):
+  def valueFromDatadict(self, data, files, name):
     """
     Given a dictionary of data and this widget's name, returns the value
     of this widget. Returns None if it's not provided. Not used in this
@@ -155,10 +153,10 @@ class BaseLabelInput(BaseFieldInput):
     hBox = self._createContainer(attrs={"isFillAlign": True, "isWeightExpand": True})
     hBox.generate()
     self.mainContainer.content = hBox
-    self.mainContainer.title = title
+    self.mainContainer.title = unicode(title)
     self.mainContainer.generate()
 
-    self.widgetLst[-1].attrs["initData"] = help
+    self.widgetLst[-1].attrs["initData"] = unicode(help)
 
     widgetLst = list(self._createWidget())
     self.widgetLst = widgetLst + self.widgetLst
@@ -171,8 +169,8 @@ class BaseLabelInput(BaseFieldInput):
   def packAsTbl(self, title, help):
     hBox = self.mainContainer
 
-    self.widgetLst[0].attrs["initData"] = title
-    self.widgetLst[-1].attrs["initData"] = help
+    self.widgetLst[0].attrs["initData"] = unicode(title)
+    self.widgetLst[-1].attrs["initData"] = unicode(help)
 
     widgetLst = self._createWidget()
     self.widgetLst = self.widgetLst[0] + widgetLst + self.widgetLst[1]
@@ -283,7 +281,8 @@ class CheckBoxInput(BaseLabelInput):
 
     for v in self.attrs["choices"]:
       (label, value) = v
-      if value in self.attrs["initData"]:
+      if self.attrs["initData"] is not None \
+          and value in self.attrs["initData"]:
         widget = self.widgetClass({"initData": True, })
       else:
         widget = self.widgetClass()
@@ -344,14 +343,14 @@ class DateInput(StringInput):
       self.format = format
       self.manualFormat = True
     else:
-      self.format = formats.get_format('DATE_INPUT_FORMATS')[0]
+      self.format = formats.getFormat('DATE_INPUT_FORMATS')[0]
       self.manualFormat = False
 
   def _prepareInitData(self, value):
     if self.isLocalized and not self.manualFormat:
-      return formats.localize_input(value)
+      return formats.localizeInput(value)
     elif hasattr(value, 'strftime'):
-      value = datetime_safe.new_date(value)
+      value = datetimeSafe.newDate(value)
       return value.strftime(self.format)
     return value
 
@@ -373,14 +372,14 @@ class DateTimeInput(StringInput):
       self.format = format
       self.manualFormat = True
     else:
-      self.format = formats.get_format('DATETIME_INPUT_FORMATS')[0]
+      self.format = formats.getFormat('DATETIME_INPUT_FORMATS')[0]
       self.manualFormat = False
 
   def _prepareInitData(self, value):
     if self.isLocalized and not self.manualFormat:
-      return formats.localize_input(value)
+      return formats.localizeInput(value)
     elif hasattr(value, 'strftime'):
-      value = datetime_safe.new_datetime(value)
+      value = datetimeSafe.newDatetime(value)
       return value.strftime(self.format)
     return value
 
@@ -402,12 +401,12 @@ class TimeInput(StringInput):
       self.format = format
       self.manualFormat = True
     else:
-      self.format = formats.get_format('TIME_INPUT_FORMATS')[0]
+      self.format = formats.getFormat('TIME_INPUT_FORMATS')[0]
       self.manualFormat = False
 
   def _prepareInitData(self, value):
     if self.isLocalized and not self.manualFormat:
-      return formats.localize_input(value)
+      return formats.localizeInput(value)
     elif hasattr(value, 'strftime'):
       return value.strftime(self.format)
     return value
@@ -575,8 +574,8 @@ class ListInput(BaseLabelInput):
     self.widgetClass = childFieldTemplate.widget.widgetClass
 
     if(self.widgetClass==StringInput.widgetClass):
-      if(hasattr(childFieldTemplate, "max_length") \
-          and childFieldTemplate.max_length>20):
+      if(hasattr(childFieldTemplate, "maxLength") \
+          and childFieldTemplate.maxLength>20):
         self.widgetClass = TextInput.widgetClass
         self._createWidget = self._createLongStringWidget
         self.lineBreak = childFieldTemplate.lineBreak
@@ -941,51 +940,96 @@ class DictInput(ListInput):
       valueInputBox.reset(**row)
 
 class QueryIdInput(StringInput):
+  def __init__(
+      self,
+      fieldSetter,
+      fieldGetter,
+      win,
+      bx,
+      attrs=None,
+      *args,
+      **kwargs
+      ):
+    attrs = self._buildAttrs(
+        attrs,
+        # For ModelChoiceField if isMultiple=False
+        isMultiple=True,
+    )
+    super(QueryIdInput, self).__init__(
+        fieldSetter,
+        fieldGetter,
+        win,
+        bx,
+        attrs,
+        *args,
+        **kwargs
+    )
+
   def _prepareInitData(self, initData):
     self.rawInitData = initData
-    if(len(initData)==0):
+    if not self.attrs["isMultiple"]:
+      if initData is None:
+        self.finalData = ""
+        return ""
+      self.finalData = str(initData)
+      return self.finalData
+    if initData is None or len(initData)==0:
+      self.finalData = ""
       return ""
     s = ""
     for i in initData:
       s += str(i) + ","
-    return s[:-1]
+    self.finalData = s[:-1]
+    return self.finalData
 
   def refreshData(self, idLst):
     entryWidget = self.widgetLst[0].widgetChildrenLst[0]
+
+    # We should differentiate by isMultiple in here or in the actual
+    # selection widget for better UI experience.
     finalData = ""
     for id in idLst:
       finalData += "," + str(id)
 
-    if entryWidget.finalData is None or entryWidget.finalData == "":
-      finalData = finalData[1:]
-      entryWidget.finalData = finalData
-    else:
-      entryWidget.finalData = entryWidget.finalData + finalData
+    self.finalData = finalData[1:]
+    entryWidget.finalData = self.finalData
 
   def _createInstanceCallback(self, btn, dummy):
+    from theory.core.bridge import Bridge
+    from theory.apps.model import Command
     bridge = Bridge()
-    cmdModel = Command.objects.get(app="theory", name="modelUpsert")
+    cmdModel = Command.objects.get(app="theory.apps", name="modelUpsert")
     cmd = bridge.getCmdComplex(
         cmdModel,
         (self.app, self.model),
         {"isInNewWindow": True,},
         )
-    cmd.postApplyChange = lambda: self.refreshData([cmd.instance.id,])
-    bridge._execeuteCommand(cmd, cmdModel)
+    cmd.postApplyChange = lambda: self.refreshData(
+        self.finalData.split(",") + [cmd.modelForm.instance.id,]
+        )
+    bridge._executeCommand(cmd, cmdModel)
 
   def _selectInstanceCallback(self, btn, dummy):
+    from theory.core.bridge import Bridge
+    from theory.apps.model import Command
     bridge = Bridge()
-    cmdModel = Command.objects.get(app="theory", name="modelSelect")
-    print self.app, self.model
+    cmdModel = Command.objects.get(app="theory.apps", name="modelSelect")
+
+    kwargs = {
+        "appName": self.app,
+        "modelName": self.model,
+        "queryset": \
+            self.finalData.split(",") if self.finalData != "" else []
+        }
     cmd = bridge.getCmdComplex(
         cmdModel,
-        (self.app, self.model, {}),
-        {},
+        [],
+        kwargs
         )
     cmd._applyChangeOnQueryset = lambda: self.refreshData(
-        [model.id for model in cmd.paramForm.clean()["queryset"]]
+        cmd.queryIdSet
         )
-    bridge._execeuteCommand(cmd, cmdModel)
+    bridge._executeCommand(cmd, cmdModel)
 
   def _createWidget(self, *args, **kwargs):
     hBox = self._createContainer(
@@ -995,6 +1039,7 @@ class QueryIdInput(StringInput):
 
     widget = element.Entry()
     widget.win = self.win
+    widget.attrs["initData"] = self.initData
     hBox.addWidget(widget)
 
     vBox = self._createContainer({
@@ -1024,19 +1069,18 @@ class QueryIdInput(StringInput):
     return (hBox,)
 
   def updateField(self):
-    if(self.attrs["app"] is None or self.attrs["model"] is None):
-      queryset = self.rawInitData
-    else:
-      dbClass = importClass('{0}.model.{1}'.format(
-        self.app,
-        self.model
-        )
-      )
+    try:
       entryWidget = self.widgetLst[0].widgetChildrenLst[0]
-      idInDict = dbClass.objects.in_bulk([i.id for i in entryWidget.finalData])
-      queryset = []
-      for i in entryWidget.finalData:
-        queryset.append(idInDict[i.id])
+      if entryWidget.finalData != "":
+        if self.attrs["isMultiple"]:
+          queryset = [int(i) for i in entryWidget.finalData.split(",")]
+        else:
+          # For ModelChoiceField, we want to receive as int not list
+          queryset = int(entryWidget.finalData.split(",")[0])
+      else:
+        queryset = None
+    except AttributeError, KeyError:
+      queryset = self.rawInitData
     self.fieldSetter({"finalData": queryset})
 
 class FilterFormLayout(BasePacker):

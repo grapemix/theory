@@ -2,8 +2,10 @@ import copy
 import operator
 from functools import wraps
 import sys
+import warnings
 
 from theory.utils import six
+from theory.utils.deprecation import RemovedInTheory19Warning
 from theory.utils.six.moves import copyreg
 
 
@@ -24,6 +26,10 @@ def memoize(func, cache, numArgs):
 
   Only the first numArgs are considered when creating the key.
   """
+  warnings.warn("memoize wrapper is deprecated and will be removed in "
+         "Theory 1.9. Use theory.utils.lruCache instead.",
+         RemovedInTheory19Warning, stacklevel=2)
+
   @wraps(func)
   def wrapper(*args):
     memArgs = args[:numArgs]
@@ -39,14 +45,18 @@ class cachedProperty(object):
   """
   Decorator that converts a method with a single self argument into a
   property cached on the instance.
+
+  Optional ``name`` argument allows you to make cached properties of other
+  methods. (e.g.  url = cachedProperty(getAbsoluteUrl, name='url') )
   """
-  def __init__(self, func):
+  def __init__(self, func, name=None):
     self.func = func
+    self.name = name or func.__name__
 
   def __get__(self, instance, type=None):
     if instance is None:
       return self
-    res = instance.__dict__[self.func.__name__] = self.func(instance)
+    res = instance.__dict__[self.name] = self.func(instance)
     return res
 
 
@@ -67,7 +77,7 @@ def lazy(func, *resultclasses):
   function is evaluated on every access.
   """
 
-  @total_ordering
+  @totalOrdering
   class __proxy__(Promise):
     """
     Encapsulate a function call and act as a proxy for methods that are
@@ -88,6 +98,7 @@ def lazy(func, *resultclasses):
         (func, self.__args, self.__kw) + resultclasses
       )
 
+    @classmethod
     def __prepareClass__(cls):
       cls.__dispatch = {}
       for resultclass in resultclasses:
@@ -102,7 +113,7 @@ def lazy(func, *resultclasses):
               continue
             setattr(cls, k, meth)
       cls._delegateBytes = bytes in resultclasses
-      cls._delegateText = six.text_type in resultclasses
+      cls._delegateText = six.textType in resultclasses
       assert not (cls._delegateBytes and cls._delegateText), "Cannot call lazy() with both bytes and text return types."
       if cls._delegateText:
         if six.PY3:
@@ -114,8 +125,8 @@ def lazy(func, *resultclasses):
           cls.__bytes__ = cls.__bytesCast
         else:
           cls.__str__ = cls.__bytesCast
-    __prepareClass__ = classmethod(__prepareClass__)
 
+    @classmethod
     def __promise__(cls, klass, funcname, method):
       # Builds a wrapper around some magic method and registers that
       # magic method for the given type and method name.
@@ -132,7 +143,6 @@ def lazy(func, *resultclasses):
         cls.__dispatch[klass] = {}
       cls.__dispatch[klass][funcname] = method
       return __wrapper__
-    __promise__ = classmethod(__promise__)
 
     def __textCast(self):
       return func(*self.__args, **self.__kw)
@@ -147,6 +157,11 @@ def lazy(func, *resultclasses):
         return self.__textCast()
       else:
         return func(*self.__args, **self.__kw)
+
+    def __ne__(self, other):
+      if isinstance(other, Promise):
+        other = other.__cast()
+      return self.__cast() != other
 
     def __eq__(self, other):
       if isinstance(other, Promise):
@@ -165,7 +180,7 @@ def lazy(func, *resultclasses):
       if self._delegateBytes and six.PY2:
         return bytes(self) % rhs
       elif self._delegateText:
-        return six.text_type(self) % rhs
+        return six.textType(self) % rhs
       return self.__cast() % rhs
 
     def __deepcopy__(self, memo):
@@ -250,69 +265,9 @@ class LazyObject(object):
 
   def _setup(self):
     """
-    Must be implemented by subclasses to initialise the wrapped object.
+    Must be implemented by subclasses to initialize the wrapped object.
     """
-    raise NotImplementedError
-
-  # Introspection support
-  __dir__ = newMethodProxy(dir)
-
-  # Dictionary methods support
-  @newMethodProxy
-  def __getitem__(self, key):
-    return self[key]
-
-  @newMethodProxy
-  def __setitem__(self, key, value):
-    self[key] = value
-
-  @newMethodProxy
-  def __delitem__(self, key):
-    del self[key]
-
-
-# Workaround for http://bugs.python.org/issue12370
-_super = super
-
-
-class SimpleLazyObject(LazyObject):
-  """
-  A lazy object initialised from any function.
-
-  Designed for compound objects of unknown type. For builtins or objects of
-  known type, use theory.utils.functional.lazy.
-  """
-  def __init__(self, func):
-    """
-    Pass in a callable that returns the object to be wrapped.
-
-    If copies are made of the resulting SimpleLazyObject, which can happen
-    in various circumstances within Theory, then you must ensure that the
-    callable can be safely run more than once and will return the same
-    value.
-    """
-    self.__dict__['_setupfunc'] = func
-    _super(SimpleLazyObject, self).__init__()
-
-  def _setup(self):
-    self._wrapped = self._setupfunc()
-
-  if six.PY3:
-    __bytes__ = newMethodProxy(bytes)
-    __str__ = newMethodProxy(str)
-  else:
-    __str__ = newMethodProxy(str)
-    __unicode__ = newMethodProxy(unicode)
-
-  def __deepcopy__(self, memo):
-    if self._wrapped is empty:
-      # We have to use SimpleLazyObject, not self.__class__, because the
-      # latter is proxied.
-      result = SimpleLazyObject(self._setupfunc)
-      memo[id(self)] = result
-      return result
-    else:
-      return copy.deepcopy(self._wrapped, memo)
+    raise NotImplementedError('subclasses of LazyObject must provide a _setup() method')
 
   # Because we have messed with __class__ below, we confuse pickle as to what
   # class we are pickling. It also appears to stop __reduce__ from being
@@ -342,14 +297,26 @@ class SimpleLazyObject(LazyObject):
       # all.
       return (copyreg._reconstructor, (self.__class__, object, None), self.__getstate__())
 
-  # Return a meaningful representation of the lazy object for debugging
-  # without evaluating the wrapped object.
-  def __repr__(self):
+  def __deepcopy__(self, memo):
     if self._wrapped is empty:
-      reprAttr = self._setupfunc
-    else:
-      reprAttr = self._wrapped
-    return '<SimpleLazyObject: %r>' % reprAttr
+      # We have to use type(self), not self.__class__, because the
+      # latter is proxied.
+      result = type(self)()
+      memo[id(self)] = result
+      return result
+    return copy.deepcopy(self._wrapped, memo)
+
+  if six.PY3:
+    __bytes__ = newMethodProxy(bytes)
+    __str__ = newMethodProxy(str)
+    __bool__ = newMethodProxy(bool)
+  else:
+    __str__ = newMethodProxy(str)
+    __unicode__ = newMethodProxy(unicode)
+    __nonzero__ = newMethodProxy(bool)
+
+  # Introspection support
+  __dir__ = newMethodProxy(dir)
 
   # Need to pretend to be the wrapped class, for the sake of objects that
   # care about this (especially in equality tests)
@@ -357,8 +324,59 @@ class SimpleLazyObject(LazyObject):
   __eq__ = newMethodProxy(operator.eq)
   __ne__ = newMethodProxy(operator.ne)
   __hash__ = newMethodProxy(hash)
-  __bool__ = newMethodProxy(bool)       # Python 3
-  __nonzero__ = __bool__                  # Python 2
+
+  # Dictionary methods support
+  __getitem__ = newMethodProxy(operator.getitem)
+  __setitem__ = newMethodProxy(operator.setitem)
+  __delitem__ = newMethodProxy(operator.delitem)
+
+  __len__ = newMethodProxy(len)
+  __contains__ = newMethodProxy(operator.contains)
+
+
+# Workaround for http://bugs.python.org/issue12370
+_super = super
+
+
+class SimpleLazyObject(LazyObject):
+  """
+  A lazy object initialized from any function.
+
+  Designed for compound objects of unknown type. For builtins or objects of
+  known type, use theory.utils.functional.lazy.
+  """
+  def __init__(self, func):
+    """
+    Pass in a callable that returns the object to be wrapped.
+
+    If copies are made of the resulting SimpleLazyObject, which can happen
+    in various circumstances within Theory, then you must ensure that the
+    callable can be safely run more than once and will return the same
+    value.
+    """
+    self.__dict__['_setupfunc'] = func
+    _super(SimpleLazyObject, self).__init__()
+
+  def _setup(self):
+    self._wrapped = self._setupfunc()
+
+  # Return a meaningful representation of the lazy object for debugging
+  # without evaluating the wrapped object.
+  def __repr__(self):
+    if self._wrapped is empty:
+      reprAttr = self._setupfunc
+    else:
+      reprAttr = self._wrapped
+    return '<%s: %r>' % (type(self).__name__, reprAttr)
+
+  def __deepcopy__(self, memo):
+    if self._wrapped is empty:
+      # We have to use SimpleLazyObject, not self.__class__, because the
+      # latter is proxied.
+      result = SimpleLazyObject(self._setupfunc)
+      memo[id(self)] = result
+      return result
+    return copy.deepcopy(self._wrapped, memo)
 
 
 class lazyProperty(property):
@@ -396,13 +414,12 @@ def partition(predicate, values):
   return results
 
 if sys.version_info >= (2, 7, 2):
-  from functools import total_ordering
+  from functools import total_ordering as totalOrdering
 else:
-  # For Python < 2.7.2. Python 2.6 does not have totalOrdering, and
-  # totalOrdering in 2.7 versions prior to 2.7.2 is buggy. See
-  # http://bugs.python.org/issue10042 for details. For these versions use
+  # For Python < 2.7.2. totalOrdering in versions prior to 2.7.2 is buggy.
+  # See http://bugs.python.org/issue10042 for details. For these versions use
   # code borrowed from Python 2.7.3.
-  def total_ordering(cls):
+  def totalOrdering(cls):
     """Class decorator that fills in missing ordering methods"""
     convert = {
       '__lt__': [('__gt__', lambda self, other: not (self < other or self == other)),

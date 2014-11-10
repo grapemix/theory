@@ -2,7 +2,7 @@
 ##### System wide lib #####
 
 ##### Theory lib #####
-from theory.command.baseCommand import AsyncCommand
+from theory.apps.command.baseCommand import AsyncCommand
 from theory.core.bridge import Bridge
 from theory.gui import field
 
@@ -30,7 +30,7 @@ class AsyncCompositeChain1(AsyncChain1):
 
   def run(self, paramFormData):
     super(AsyncCompositeChain1, self).run(paramFormData)
-    self.paramForm.full_clean()
+    self.paramForm.fullClean()
     secondCmdModel = self.paramForm.clean()["queryset"]
     bridge = Bridge()
     secondCmdModel = SimpleChain2.getCmdModel()

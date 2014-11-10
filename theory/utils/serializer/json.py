@@ -13,7 +13,7 @@ from theory.utils.serializer.base import DeserializationError
 from theory.utils.serializer.base import Serializer as BaseSerializer
 from theory.utils.serializer.base import Deserializer as BaseDeserializer
 from theory.utils import six
-from theory.utils.timezone import is_aware
+from theory.utils.timezone import isAware
 
 ##### Theory third-party lib #####
 
@@ -67,7 +67,7 @@ class TheoryJSONEncoder(json.JSONEncoder):
     elif isinstance(o, dt.date):
       return o.isoformat()
     elif isinstance(o, dt.time):
-      if is_aware(o):
+      if isAware(o):
         raise ValueError("JSON can't represent timezone-aware times.")
       r = o.isoformat()
       if o.microsecond:

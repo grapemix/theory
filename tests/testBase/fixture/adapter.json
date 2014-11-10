@@ -1,0 +1,86 @@
+[
+{
+  "fields": {
+    "name": "lost"
+  },
+  "model": "apps.mood",
+  "pk": 1
+},
+{
+  "fields": {
+    "name": "norm"
+  },
+  "model": "apps.mood",
+  "pk": 2
+},
+{
+  "fields": {
+    "name": "dev"
+  },
+  "model": "apps.mood",
+  "pk": 3
+},
+{
+  "fields": {
+    "importPath": "theory.apps.adapter.terminalAdapter.TerminalAdapter",
+    "name": "Terminal",
+    "propertyLst": "[\"stdErr\",\"stdOut\"]"
+  },
+  "model": "apps.adapter",
+  "pk": 1
+},
+{
+  "fields": {
+    "importPath": "theory.apps.adapter.dummyAdapter.DummyAdapter",
+    "name": "Dummy",
+    "propertyLst": "[]"
+  },
+  "model": "apps.adapter",
+  "pk": 2
+},
+{
+  "fields": {
+    "importPath": "theory.adapter.apps.BaseAdapter",
+    "name": "Base",
+    "propertyLst": "[]"
+  },
+  "model": "apps.adapter",
+  "pk": 3
+},
+{
+  "fields": {
+    "importPath": "theory.adapter.apps.BaseUIAdapter",
+    "name": "BaseUI",
+    "propertyLst": "[]"
+  },
+  "model": "apps.adapter",
+  "pk": 4
+},
+{
+  "fields": {
+    "importPath": "theory.apps.adapter.filenameListAdapter.FilenameListAdapter",
+    "name": "FilenameList",
+    "propertyLst": "[\"files\",\"stdErr\",\"stdOut\"]"
+  },
+  "model": "apps.adapter",
+  "pk": 5
+},
+{
+  "fields": {
+    "importPath": "theory.apps.adapter.stdPipeAdapter.StdPipeAdapter",
+    "name": "StdPipe",
+    "propertyLst": "[\"stdIn\",\"stdErr\",\"stdOut\"]"
+  },
+  "model": "apps.adapter",
+  "pk": 6
+},
+{
+  "fields": {
+    "importPath": "theory.apps.adapter.querysetAsSpreadsheetAdapter.QuerysetAsSpreadsheetAdapter",
+    "name": "QuerysetAsSpreadsheet",
+    "propertyLst": "[\"appModel\",\"isEditable\",\"queryset\"]"
+  },
+  "model": "apps.adapter",
+  "pk": 7
+}
+]

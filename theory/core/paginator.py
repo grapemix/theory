@@ -1,107 +1,146 @@
-# -*- coding: utf-8 -*-
-#!/usr/bin/env python
+import collections
 from math import ceil
+
+from theory.utils import six
+
 
 class InvalidPage(Exception):
   pass
 
+
 class PageNotAnInteger(InvalidPage):
   pass
+
 
 class EmptyPage(InvalidPage):
   pass
 
-class Paginator(object):
-  def __init__(self, object_list, per_page, orphans=0, allow_empty_first_page=True):
-    self.object_list = object_list
-    self.per_page = per_page
-    self.orphans = orphans
-    self.allow_empty_first_page = allow_empty_first_page
-    self._num_pages = self._count = None
 
-  def validate_number(self, number):
-    "Validates the given 1-based page number."
+class Paginator(object):
+
+  def __init__(self, objectList, perPage, orphans=0,
+         allowEmptyFirstPage=True):
+    self.objectList = objectList
+    self.perPage = int(perPage)
+    self.orphans = int(orphans)
+    self.allowEmptyFirstPage = allowEmptyFirstPage
+    self._numPages = self._count = None
+
+  def validateNumber(self, number):
+    """
+    Validates the given 1-based page number.
+    """
     try:
       number = int(number)
-    except ValueError:
+    except (TypeError, ValueError):
       raise PageNotAnInteger('That page number is not an integer')
     if number < 1:
       raise EmptyPage('That page number is less than 1')
-    if number > self.num_pages:
-      if number == 1 and self.allow_empty_first_page:
+    if number > self.numPages:
+      if number == 1 and self.allowEmptyFirstPage:
         pass
       else:
         raise EmptyPage('That page contains no results')
     return number
 
   def page(self, number):
-    "Returns a Page object for the given 1-based page number."
-    number = self.validate_number(number)
-    bottom = (number - 1) * self.per_page
-    top = bottom + self.per_page
+    """
+    Returns a Page object for the given 1-based page number.
+    """
+    number = self.validateNumber(number)
+    bottom = (number - 1) * self.perPage
+    top = bottom + self.perPage
     if top + self.orphans >= self.count:
       top = self.count
-    return Page(self.object_list[bottom:top], number, self)
+    return self._getPage(self.objectList[bottom:top], number, self)
 
-  def _get_count(self):
-    "Returns the total number of objects, across all pages."
+  def _getPage(self, *args, **kwargs):
+    """
+    Returns an instance of a single page.
+
+    This hook can be used by subclasses to use an alternative to the
+    standard :cls:`Page` object.
+    """
+    return Page(*args, **kwargs)
+
+  def _getCount(self):
+    """
+    Returns the total number of objects, across all pages.
+    """
     if self._count is None:
       try:
-        self._count = self.object_list.count()
+        self._count = self.objectList.count()
       except (AttributeError, TypeError):
-        # AttributeError if object_list has no count() method.
-        # TypeError if object_list.count() requires arguments
+        # AttributeError if objectList has no count() method.
+        # TypeError if objectList.count() requires arguments
         # (i.e. is of type list).
-        self._count = len(self.object_list)
+        self._count = len(self.objectList)
     return self._count
-  count = property(_get_count)
+  count = property(_getCount)
 
-  def _get_num_pages(self):
-    "Returns the total number of pages."
-    if self._num_pages is None:
-      if self.count == 0 and not self.allow_empty_first_page:
-        self._num_pages = 0
+  def _getNumPages(self):
+    """
+    Returns the total number of pages.
+    """
+    if self._numPages is None:
+      if self.count == 0 and not self.allowEmptyFirstPage:
+        self._numPages = 0
       else:
         hits = max(1, self.count - self.orphans)
-        self._num_pages = int(ceil(hits / float(self.per_page)))
-    return self._num_pages
-  num_pages = property(_get_num_pages)
+        self._numPages = int(ceil(hits / float(self.perPage)))
+    return self._numPages
+  numPages = property(_getNumPages)
 
-  def _get_page_range(self):
+  def _getPageRange(self):
     """
     Returns a 1-based range of pages for iterating through within
     a template for loop.
     """
-    return range(1, self.num_pages + 1)
-  page_range = property(_get_page_range)
+    return range(1, self.numPages + 1)
+  pageRange = property(_getPageRange)
 
-QuerySetPaginator = Paginator # For backwards-compatibility.
 
-class Page(object):
-  def __init__(self, object_list, number, paginator):
-    self.object_list = object_list
+QuerySetPaginator = Paginator   # For backwards-compatibility.
+
+
+class Page(collections.Sequence):
+
+  def __init__(self, objectList, number, paginator):
+    self.objectList = objectList
     self.number = number
     self.paginator = paginator
 
   def __repr__(self):
-    return '<Page %s of %s>' % (self.number, self.paginator.num_pages)
+    return '<Page %s of %s>' % (self.number, self.paginator.numPages)
 
-  def has_next(self):
-    return self.number < self.paginator.num_pages
+  def __len__(self):
+    return len(self.objectList)
 
-  def has_previous(self):
+  def __getitem__(self, index):
+    if not isinstance(index, (slice,) + six.integerTypes):
+      raise TypeError
+    # The objectList is converted to a list so that if it was a QuerySet
+    # it won't be a database hit per __getitem__.
+    if not isinstance(self.objectList, list):
+      self.objectList = list(self.objectList)
+    return self.objectList[index]
+
+  def hasNext(self):
+    return self.number < self.paginator.numPages
+
+  def hasPrevious(self):
     return self.number > 1
 
-  def has_other_pages(self):
-    return self.has_previous() or self.has_next()
+  def hasOtherPages(self):
+    return self.hasPrevious() or self.hasNext()
 
-  def next_page_number(self):
-    return self.number + 1
+  def nextPageNumber(self):
+    return self.paginator.validateNumber(self.number + 1)
 
-  def previous_page_number(self):
-    return self.number - 1
+  def previousPageNumber(self):
+    return self.paginator.validateNumber(self.number - 1)
 
-  def start_index(self):
+  def startIndex(self):
     """
     Returns the 1-based index of the first object on this page,
     relative to total objects in the paginator.
@@ -109,14 +148,14 @@ class Page(object):
     # Special case, return zero if no items.
     if self.paginator.count == 0:
       return 0
-    return (self.paginator.per_page * (self.number - 1)) + 1
+    return (self.paginator.perPage * (self.number - 1)) + 1
 
-  def end_index(self):
+  def endIndex(self):
     """
     Returns the 1-based index of the last object on this page,
     relative to total objects found (hits).
     """
     # Special case for the last page because there can be orphans.
-    if self.number == self.paginator.num_pages:
+    if self.number == self.paginator.numPages:
       return self.paginator.count
-    return self.number * self.paginator.per_page
+    return self.number * self.paginator.perPage

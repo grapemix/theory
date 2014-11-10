@@ -8,12 +8,14 @@ Synchronization primitives:
 (Contributed to Theory by eugene@lazutkin.com)
 """
 
+import contextlib
 try:
-  import threading
+  from gevent import coros as threading
 except ImportError:
-  import dummy_threading as threading
+  import dummyThreading as threading
 
-class RWLock:
+
+class RWLock(object):
   """
   Classic implementation of reader-writer lock with preference to writers.
 
@@ -21,69 +23,73 @@ class RWLock:
   Writers get an exclusive access.
 
   API is self-descriptive:
-    reader_enters()
-    reader_leaves()
-    writer_enters()
-    writer_leaves()
+    readerEnters()
+    readerLeaves()
+    writerEnters()
+    writerLeaves()
   """
   def __init__(self):
-    self.mutex     = threading.RLock()
-    self.can_read  = threading.Semaphore(0)
-    self.can_write = threading.Semaphore(0)
-    self.active_readers  = 0
-    self.active_writers  = 0
-    self.waiting_readers = 0
-    self.waiting_writers = 0
+    self.mutex = threading.RLock()
+    self.canRead = threading.Semaphore(0)
+    self.canWrite = threading.Semaphore(0)
+    self.activeReaders = 0
+    self.activeWriters = 0
+    self.waitingReaders = 0
+    self.waitingWriters = 0
 
-  def reader_enters(self):
-    self.mutex.acquire()
-    try:
-      if self.active_writers == 0 and self.waiting_writers == 0:
-        self.active_readers += 1
-        self.can_read.release()
+  def readerEnters(self):
+    with self.mutex:
+      if self.activeWriters == 0 and self.waitingWriters == 0:
+        self.activeReaders += 1
+        self.canRead.release()
       else:
-        self.waiting_readers += 1
-    finally:
-      self.mutex.release()
-    self.can_read.acquire()
+        self.waitingReaders += 1
+    self.canRead.acquire()
 
-  def reader_leaves(self):
-    self.mutex.acquire()
-    try:
-      self.active_readers -= 1
-      if self.active_readers == 0 and self.waiting_writers != 0:
-        self.active_writers  += 1
-        self.waiting_writers -= 1
-        self.can_write.release()
-    finally:
-      self.mutex.release()
+  def readerLeaves(self):
+    with self.mutex:
+      self.activeReaders -= 1
+      if self.activeReaders == 0 and self.waitingWriters != 0:
+        self.activeWriters += 1
+        self.waitingWriters -= 1
+        self.canWrite.release()
 
-  def writer_enters(self):
-    self.mutex.acquire()
+  @contextlib.contextmanager
+  def reader(self):
+    self.readerEnters()
     try:
-      if self.active_writers == 0 and self.waiting_writers == 0 and self.active_readers == 0:
-        self.active_writers += 1
-        self.can_write.release()
+      yield
+    finally:
+      self.readerLeaves()
+
+  def writerEnters(self):
+    with self.mutex:
+      if self.activeWriters == 0 and self.waitingWriters == 0 and self.activeReaders == 0:
+        self.activeWriters += 1
+        self.canWrite.release()
       else:
-        self.waiting_writers += 1
-    finally:
-      self.mutex.release()
-    self.can_write.acquire()
+        self.waitingWriters += 1
+    self.canWrite.acquire()
 
-  def writer_leaves(self):
-    self.mutex.acquire()
-    try:
-      self.active_writers -= 1
-      if self.waiting_writers != 0:
-        self.active_writers  += 1
-        self.waiting_writers -= 1
-        self.can_write.release()
-      elif self.waiting_readers != 0:
-        t = self.waiting_readers
-        self.waiting_readers = 0
-        self.active_readers += t
+  def writerLeaves(self):
+    with self.mutex:
+      self.activeWriters -= 1
+      if self.waitingWriters != 0:
+        self.activeWriters += 1
+        self.waitingWriters -= 1
+        self.canWrite.release()
+      elif self.waitingReaders != 0:
+        t = self.waitingReaders
+        self.waitingReaders = 0
+        self.activeReaders += t
         while t > 0:
-          self.can_read.release()
+          self.canRead.release()
           t -= 1
+
+  @contextlib.contextmanager
+  def writer(self):
+    self.writerEnters()
+    try:
+      yield
     finally:
-      self.mutex.release()
+      self.writerLeaves()

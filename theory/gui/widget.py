@@ -15,7 +15,7 @@ from theory.utils.importlib import importModule
 ##### Misc #####
 
 # 1) Developer should import this class instead of specific tookkit's field
-# 2) Try your best to use 'from theory.gui import field' instead of
+# 2) Try your best to use 'from theory.gui import widget' instead of
 #    'from theory.gui.field import *' to avoid the name collision
 #    between field and mongoenigne.
 

@@ -17,12 +17,12 @@ class Bridge(TheoryBridge):
   """It is just a mock object. This fxn must be synced with the original bridge.
   Instead of delay(), the AsyncCommand is run as run() to skip the celery setup.
   """
-  def _execeuteCommand(self, cmd, cmdModel, uiParam={}):
+  def _executeCommand(self, cmd, cmdModel, uiParam={}):
     if(cmdModel.runMode==cmdModel.RUN_MODE_ASYNC):
       paramFormData = json.loads(cmd.paramForm.toJson())
       cmd.run(paramFormData=paramFormData)
     else:
-      if(not cmd.paramForm.is_valid()):
+      if(not cmd.paramForm.isValid()):
         return False
       cmd._uiParam = uiParam
       cmd.run(uiParam)

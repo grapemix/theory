@@ -1,7 +1,14 @@
 # Taken from Python 2.7 with permission from/by the original author.
+import warnings
 import sys
 
 from theory.utils import six
+from theory.utils.deprecation import RemovedInTheory19Warning
+
+
+warnings.warn("theory.utils.importlib will be removed in Theory 1.9.",
+  RemovedInTheory19Warning, stacklevel=2)
+
 
 def _resolveName(name, package, level):
   """Return the absolute name of the module to be imported."""
@@ -12,8 +19,7 @@ def _resolveName(name, package, level):
     try:
       dot = package.rindex('.', 0, dot)
     except ValueError:
-      raise ValueError("attempted relative import beyond top-level "
-               "package")
+      raise ValueError("attempted relative import beyond top-level package")
   return "%s.%s" % (package[:dot], name)
 
 
@@ -40,11 +46,10 @@ else:
     __import__(name)
     return sys.modules[name]
 
-
 def importClass(name, package=None):
   """Import a class.
 
-  To import Module.Class directly instead of from Module import Class in programatically way
+  To import Module.Class directly instead of from Module import Class in programatic
 
   The 'package' argument is required when performing a relative import. It
   specifies the package to use as the anchor point from which to resolve the
@@ -58,6 +63,8 @@ def importClass(name, package=None):
     return getattr(sys.modules[moduleName], klassName)
 
   module = importModule(moduleName, package)
-  del sys.modules[moduleName]
+  # Cause problem
+  #del sys.modules[moduleName]
 
   return getattr(module, klassName)
+

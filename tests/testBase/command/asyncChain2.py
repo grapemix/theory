@@ -4,8 +4,8 @@
 ##### Theory lib #####
 
 ##### Theory third-party lib #####
-from theory.command.baseCommand import AsyncCommand
-from theory.model import Command
+from theory.apps.command.baseCommand import AsyncCommand
+from theory.apps.model import Command
 
 ##### Local app #####
 from .baseChain2 import BaseChain2

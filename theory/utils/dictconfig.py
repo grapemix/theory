@@ -1,5 +1,10 @@
-# -*- coding: utf-8 -*-
-#!/usr/bin/env python
+import warnings
+
+from theory.utils.deprecation import RemovedInTheory19Warning
+
+warnings.warn("theory.utils.dictconfig will be removed in Theory 1.9.",
+  RemovedInTheory19Warning, stacklevel=2)
+
 # This is a copy of the Python logging.config.dictconfig module,
 # reproduced with permission. It is provided here for backwards
 # compatibility for Python versions prior to 2.7.
@@ -25,9 +30,12 @@ import re
 import sys
 import types
 
+from theory.utils import six
+
 IDENTIFIER = re.compile('^[a-z_][a-z0-9_]*$', re.I)
 
-def valid_ident(s):
+
+def validIdent(s):
   m = IDENTIFIER.match(s)
   if not m:
     raise ValueError('Not a valid Python identifier: %r' % s)
@@ -60,13 +68,14 @@ except ImportError:
 # Each wrapper should have a configurator attribute holding the actual
 # configurator to use for conversion.
 
+
 class ConvertingDict(dict):
   """A converting dictionary wrapper."""
 
   def __getitem__(self, key):
     value = dict.__getitem__(self, key)
     result = self.configurator.convert(value)
-    #If the converted value is different, save for next time
+    # If the converted value is different, save for next time
     if value is not result:
       self[key] = result
       if type(result) in (ConvertingDict, ConvertingList,
@@ -78,7 +87,7 @@ class ConvertingDict(dict):
   def get(self, key, default=None):
     value = dict.get(self, key, default)
     result = self.configurator.convert(value)
-    #If the converted value is different, save for next time
+    # If the converted value is different, save for next time
     if value is not result:
       self[key] = result
       if type(result) in (ConvertingDict, ConvertingList,
@@ -97,12 +106,13 @@ class ConvertingDict(dict):
         result.key = key
     return result
 
+
 class ConvertingList(list):
   """A converting list wrapper."""
   def __getitem__(self, key):
     value = list.__getitem__(self, key)
     result = self.configurator.convert(value)
-    #If the converted value is different, save for next time
+    # If the converted value is different, save for next time
     if value is not result:
       self[key] = result
       if type(result) in (ConvertingDict, ConvertingList,
@@ -120,6 +130,7 @@ class ConvertingList(list):
         result.parent = self
     return result
 
+
 class ConvertingTuple(tuple):
   """A converting tuple wrapper."""
   def __getitem__(self, key):
@@ -131,6 +142,7 @@ class ConvertingTuple(tuple):
         result.parent = self
         result.key = key
     return result
+
 
 class BaseConfigurator(object):
   """
@@ -144,9 +156,9 @@ class BaseConfigurator(object):
   INDEX_PATTERN = re.compile(r'^\[\s*(\w+)\s*\]\s*')
   DIGIT_PATTERN = re.compile(r'^\d+$')
 
-  value_converters = {
-    'ext' : 'ext_convert',
-    'cfg' : 'cfg_convert',
+  valueConverters = {
+    'ext' : 'extConvert',
+    'cfg' : 'cfgConvert',
   }
 
   # We might want to use a different one, e.g. importlib
@@ -174,16 +186,16 @@ class BaseConfigurator(object):
           found = getattr(found, frag)
       return found
     except ImportError:
-      e, tb = sys.exc_info()[1:]
+      e, tb = sys.excInfo()[1:]
       v = ValueError('Cannot resolve %r: %s' % (s, e))
       v.__cause__, v.__traceback__ = e, tb
       raise v
 
-  def ext_convert(self, value):
+  def extConvert(self, value):
     """Default converter for the ext:// protocol."""
     return self.resolve(value)
 
-  def cfg_convert(self, value):
+  def cfgConvert(self, value):
     """Default converter for the cfg:// protocol."""
     rest = value
     m = self.WORD_PATTERN.match(rest)
@@ -192,7 +204,7 @@ class BaseConfigurator(object):
     else:
       rest = rest[m.end():]
       d = self.config[m.groups()[0]]
-      #print d, rest
+      # print d, rest
       while rest:
         m = self.DOT_PATTERN.match(rest)
         if m:
@@ -205,7 +217,7 @@ class BaseConfigurator(object):
               d = d[idx]
             else:
               try:
-                n = int(idx) # try as number first (most likely)
+                n = int(idx)  # try as number first (most likely)
                 d = d[n]
               except TypeError:
                 d = d[idx]
@@ -214,7 +226,7 @@ class BaseConfigurator(object):
         else:
           raise ValueError('Unable to convert '
                    '%r at %r' % (value, rest))
-    #rest should be empty
+    # rest should be empty
     return d
 
   def convert(self, value):
@@ -233,37 +245,38 @@ class BaseConfigurator(object):
          isinstance(value, tuple):
       value = ConvertingTuple(value)
       value.configurator = self
-    elif isinstance(value, basestring): # str for py3k
+    elif isinstance(value, six.stringTypes):  # str for py3k
       m = self.CONVERT_PATTERN.match(value)
       if m:
         d = m.groupdict()
         prefix = d['prefix']
-        converter = self.value_converters.get(prefix, None)
+        converter = self.valueConverters.get(prefix, None)
         if converter:
           suffix = d['suffix']
           converter = getattr(self, converter)
           value = converter(suffix)
     return value
 
-  def configure_custom(self, config):
+  def configureCustom(self, config):
     """Configure an object with a user-supplied factory."""
     c = config.pop('()')
     if not hasattr(c, '__call__') and hasattr(types, 'ClassType') and type(c) != types.ClassType:
       c = self.resolve(c)
     props = config.pop('.', None)
     # Check for valid identifiers
-    kwargs = dict([(k, config[k]) for k in config if valid_ident(k)])
+    kwargs = dict((k, config[k]) for k in config if validIdent(k))
     result = c(**kwargs)
     if props:
       for name, value in props.items():
         setattr(result, name, value)
     return result
 
-  def as_tuple(self, value):
+  def asTuple(self, value):
     """Utility function which converts lists to tuples."""
     if isinstance(value, list):
       value = tuple(value)
     return value
+
 
 class DictConfigurator(BaseConfigurator):
   """
@@ -287,7 +300,7 @@ class DictConfigurator(BaseConfigurator):
         handlers = config.get('handlers', EMPTY_DICT)
         # incremental handler config only if handler name
         # ties in to logging._handlers (Python 2.7)
-        if sys.version_info[:2] == (2, 7):
+        if sys.versionInfo[:2] == (2, 7):
           for name in handlers:
             if name not in logging._handlers:
               raise ValueError('No handler found with '
@@ -295,29 +308,29 @@ class DictConfigurator(BaseConfigurator):
             else:
               try:
                 handler = logging._handlers[name]
-                handler_config = handlers[name]
-                level = handler_config.get('level', None)
+                handlerConfig = handlers[name]
+                level = handlerConfig.get('level', None)
                 if level:
                   handler.setLevel(_checkLevel(level))
-              except StandardError, e:
+              except StandardError as e:
                 raise ValueError('Unable to configure handler '
                          '%r: %s' % (name, e))
         loggers = config.get('loggers', EMPTY_DICT)
         for name in loggers:
           try:
-            self.configure_logger(name, loggers[name], True)
-          except StandardError, e:
+            self.configureLogger(name, loggers[name], True)
+          except StandardError as e:
             raise ValueError('Unable to configure logger '
                      '%r: %s' % (name, e))
         root = config.get('root', None)
         if root:
           try:
-            self.configure_root(root, True)
-          except StandardError, e:
+            self.configureRoot(root, True)
+          except StandardError as e:
             raise ValueError('Unable to configure root '
                      'logger: %s' % e)
       else:
-        disable_existing = config.pop('disable_existing_loggers', True)
+        disableExisting = config.pop('disableExistingLoggers', True)
 
         logging._handlers.clear()
         del logging._handlerList[:]
@@ -326,17 +339,17 @@ class DictConfigurator(BaseConfigurator):
         formatters = config.get('formatters', EMPTY_DICT)
         for name in formatters:
           try:
-            formatters[name] = self.configure_formatter(
+            formatters[name] = self.configureFormatter(
                               formatters[name])
-          except StandardError, e:
+          except StandardError as e:
             raise ValueError('Unable to configure '
                      'formatter %r: %s' % (name, e))
         # Next, do filters - they don't refer to anything else, either
         filters = config.get('filters', EMPTY_DICT)
         for name in filters:
           try:
-            filters[name] = self.configure_filter(filters[name])
-          except StandardError, e:
+            filters[name] = self.configureFilter(filters[name])
+          except StandardError as e:
             raise ValueError('Unable to configure '
                      'filter %r: %s' % (name, e))
 
@@ -346,123 +359,123 @@ class DictConfigurator(BaseConfigurator):
         handlers = config.get('handlers', EMPTY_DICT)
         for name in sorted(handlers):
           try:
-            handler = self.configure_handler(handlers[name])
+            handler = self.configureHandler(handlers[name])
             handler.name = name
             handlers[name] = handler
-          except StandardError, e:
+          except StandardError as e:
             raise ValueError('Unable to configure handler '
                      '%r: %s' % (name, e))
         # Next, do loggers - they refer to handlers and filters
 
-        #we don't want to lose the existing loggers,
-        #since other threads may have pointers to them.
-        #existing is set to contain all existing loggers,
-        #and as we go through the new configuration we
-        #remove any which are configured. At the end,
-        #what's left in existing is the set of loggers
-        #which were in the previous configuration but
-        #which are not in the new configuration.
+        # we don't want to lose the existing loggers,
+        # since other threads may have pointers to them.
+        # existing is set to contain all existing loggers,
+        # and as we go through the new configuration we
+        # remove any which are configured. At the end,
+        # what's left in existing is the set of loggers
+        # which were in the previous configuration but
+        # which are not in the new configuration.
         root = logging.root
-        existing = root.manager.loggerDict.keys()
-        #The list needs to be sorted so that we can
-        #avoid disabling child loggers of explicitly
-        #named loggers. With a sorted list it is easier
-        #to find the child loggers.
+        existing = list(root.manager.loggerDict)
+        # The list needs to be sorted so that we can
+        # avoid disabling child loggers of explicitly
+        # named loggers. With a sorted list it is easier
+        # to find the child loggers.
         existing.sort()
-        #We'll keep the list of existing loggers
-        #which are children of named loggers here...
-        child_loggers = []
-        #now set up the new ones...
+        # We'll keep the list of existing loggers
+        # which are children of named loggers here...
+        childLoggers = []
+        # now set up the new ones...
         loggers = config.get('loggers', EMPTY_DICT)
         for name in loggers:
           if name in existing:
             i = existing.index(name)
             prefixed = name + "."
             pflen = len(prefixed)
-            num_existing = len(existing)
-            i = i + 1 # look at the entry after name
-            while (i < num_existing) and\
+            numExisting = len(existing)
+            i = i + 1  # look at the entry after name
+            while (i < numExisting) and\
                (existing[i][:pflen] == prefixed):
-              child_loggers.append(existing[i])
+              childLoggers.append(existing[i])
               i = i + 1
             existing.remove(name)
           try:
-            self.configure_logger(name, loggers[name])
-          except StandardError, e:
+            self.configureLogger(name, loggers[name])
+          except StandardError as e:
             raise ValueError('Unable to configure logger '
                      '%r: %s' % (name, e))
 
-        #Disable any old loggers. There's no point deleting
-        #them as other threads may continue to hold references
-        #and by disabling them, you stop them doing any logging.
-        #However, don't disable children of named loggers, as that's
-        #probably not what was intended by the user.
+        # Disable any old loggers. There's no point deleting
+        # them as other threads may continue to hold references
+        # and by disabling them, you stop them doing any logging.
+        # However, don't disable children of named loggers, as that's
+        # probably not what was intended by the user.
         for log in existing:
           logger = root.manager.loggerDict[log]
-          if log in child_loggers:
+          if log in childLoggers:
             logger.level = logging.NOTSET
             logger.handlers = []
             logger.propagate = True
-          elif disable_existing:
+          elif disableExisting:
             logger.disabled = True
 
         # And finally, do the root logger
         root = config.get('root', None)
         if root:
           try:
-            self.configure_root(root)
-          except StandardError, e:
+            self.configureRoot(root)
+          except StandardError as e:
             raise ValueError('Unable to configure root '
                      'logger: %s' % e)
     finally:
       logging._releaseLock()
 
-  def configure_formatter(self, config):
+  def configureFormatter(self, config):
     """Configure a formatter from a dictionary."""
     if '()' in config:
-      factory = config['()'] # for use in exception handler
+      factory = config['()']  # for use in exception handler
       try:
-        result = self.configure_custom(config)
-      except TypeError, te:
+        result = self.configureCustom(config)
+      except TypeError as te:
         if "'format'" not in str(te):
           raise
-        #Name of parameter changed from fmt to format.
-        #Retry with old name.
-        #This is so that code can be used with older Python versions
+        # Name of parameter changed from fmt to format.
+        # Retry with old name.
+        # This is so that code can be used with older Python versions
         #(e.g. by Theory)
         config['fmt'] = config.pop('format')
         config['()'] = factory
-        result = self.configure_custom(config)
+        result = self.configureCustom(config)
     else:
       fmt = config.get('format', None)
       dfmt = config.get('datefmt', None)
       result = logging.Formatter(fmt, dfmt)
     return result
 
-  def configure_filter(self, config):
+  def configureFilter(self, config):
     """Configure a filter from a dictionary."""
     if '()' in config:
-      result = self.configure_custom(config)
+      result = self.configureCustom(config)
     else:
       name = config.get('name', '')
       result = logging.Filter(name)
     return result
 
-  def add_filters(self, filterer, filters):
+  def addFilters(self, filterer, filters):
     """Add filters to a filterer from a list of names."""
     for f in filters:
       try:
         filterer.addFilter(self.config['filters'][f])
-      except StandardError, e:
+      except StandardError as e:
         raise ValueError('Unable to add filter %r: %s' % (f, e))
 
-  def configure_handler(self, config):
+  def configureHandler(self, config):
     """Configure a handler from a dictionary."""
     formatter = config.pop('formatter', None)
     if formatter:
       try:
         formatter = self.config['formatters'][formatter]
-      except StandardError, e:
+      except StandardError as e:
         raise ValueError('Unable to set formatter '
                  '%r: %s' % (formatter, e))
     level = config.pop('level', None)
@@ -474,30 +487,30 @@ class DictConfigurator(BaseConfigurator):
       factory = c
     else:
       klass = self.resolve(config.pop('class'))
-      #Special case for handler which refers to another handler
+      # Special case for handler which refers to another handler
       if issubclass(klass, logging.handlers.MemoryHandler) and\
         'target' in config:
         try:
           config['target'] = self.config['handlers'][config['target']]
-        except StandardError, e:
+        except StandardError as e:
           raise ValueError('Unable to set target handler '
                    '%r: %s' % (config['target'], e))
       elif issubclass(klass, logging.handlers.SMTPHandler) and\
         'mailhost' in config:
-        config['mailhost'] = self.as_tuple(config['mailhost'])
+        config['mailhost'] = self.asTuple(config['mailhost'])
       elif issubclass(klass, logging.handlers.SysLogHandler) and\
         'address' in config:
-        config['address'] = self.as_tuple(config['address'])
+        config['address'] = self.asTuple(config['address'])
       factory = klass
-    kwargs = dict([(k, config[k]) for k in config if valid_ident(k)])
+    kwargs = dict((k, config[k]) for k in config if validIdent(k))
     try:
       result = factory(**kwargs)
-    except TypeError, te:
+    except TypeError as te:
       if "'stream'" not in str(te):
         raise
-      #The argument name changed from strm to stream
-      #Retry with old name.
-      #This is so that code can be used with older Python versions
+      # The argument name changed from strm to stream
+      # Retry with old name.
+      # This is so that code can be used with older Python versions
       #(e.g. by Theory)
       kwargs['strm'] = kwargs.pop('stream')
       result = factory(**kwargs)
@@ -506,18 +519,18 @@ class DictConfigurator(BaseConfigurator):
     if level is not None:
       result.setLevel(_checkLevel(level))
     if filters:
-      self.add_filters(result, filters)
+      self.addFilters(result, filters)
     return result
 
-  def add_handlers(self, logger, handlers):
+  def addHandlers(self, logger, handlers):
     """Add handlers to a logger from a list of names."""
     for h in handlers:
       try:
         logger.addHandler(self.config['handlers'][h])
-      except StandardError, e:
+      except StandardError as e:
         raise ValueError('Unable to add handler %r: %s' % (h, e))
 
-  def common_logger_config(self, logger, config, incremental=False):
+  def commonLoggerConfig(self, logger, config, incremental=False):
     """
     Perform configuration which is common to root and non-root loggers.
     """
@@ -525,30 +538,31 @@ class DictConfigurator(BaseConfigurator):
     if level is not None:
       logger.setLevel(_checkLevel(level))
     if not incremental:
-      #Remove any existing handlers
+      # Remove any existing handlers
       for h in logger.handlers[:]:
         logger.removeHandler(h)
       handlers = config.get('handlers', None)
       if handlers:
-        self.add_handlers(logger, handlers)
+        self.addHandlers(logger, handlers)
       filters = config.get('filters', None)
       if filters:
-        self.add_filters(logger, filters)
+        self.addFilters(logger, filters)
 
-  def configure_logger(self, name, config, incremental=False):
+  def configureLogger(self, name, config, incremental=False):
     """Configure a non-root logger from a dictionary."""
     logger = logging.getLogger(name)
-    self.common_logger_config(logger, config, incremental)
+    self.commonLoggerConfig(logger, config, incremental)
     propagate = config.get('propagate', None)
     if propagate is not None:
       logger.propagate = propagate
 
-  def configure_root(self, config, incremental=False):
+  def configureRoot(self, config, incremental=False):
     """Configure a root logger from a dictionary."""
     root = logging.getLogger()
-    self.common_logger_config(root, config, incremental)
+    self.commonLoggerConfig(root, config, incremental)
 
 dictConfigClass = DictConfigurator
+
 
 def dictConfig(config):
   """Configure logging using a dictionary."""

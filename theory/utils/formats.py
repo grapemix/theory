@@ -1,187 +1,233 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
+from __future__ import absolute_import  # Avoid importing `importlib` from this package.
+
 import decimal
 import datetime
+from importlib import import_module
+import unicodedata
 
 from theory.conf import settings
-from theory.utils.translation import getLanguage, toLocale, checkForLanguage
-from theory.utils.importlib import importModule
-from theory.utils.encoding import smartStr
+from theory.utils import dateformat, numberformat, datetimeSafe
+from theory.utils.encoding import forceStr
 from theory.utils.functional import lazy
-from theory.utils import dateformat, numberformat, datetime_safe
 from theory.utils.safestring import markSafe
+from theory.utils import six
+from theory.utils.translation import getLanguage, toLocale, checkForLanguage
 
-# format_cache is a mapping from (format_type, lang) to the format string.
-# By using the cache, it is possible to avoid running get_format_modules
+# formatCache is a mapping from (formatType, lang) to the format string.
+# By using the cache, it is possible to avoid running getFormatModules
 # repeatedly.
-_format_cache = {}
-_format_modules_cache = {}
+_formatCache = {}
+_formatModulesCache = {}
 
-def reset_format_cache():
+ISO_INPUT_FORMATS = {
+  'DATE_INPUT_FORMATS': ('%Y-%m-%d',),
+  'TIME_INPUT_FORMATS': ('%H:%M:%S', '%H:%M:%S.%f', '%H:%M'),
+  'DATETIME_INPUT_FORMATS': (
+    '%Y-%m-%d %H:%M:%S',
+    '%Y-%m-%d %H:%M:%S.%f',
+    '%Y-%m-%d %H:%M',
+    '%Y-%m-%d'
+  ),
+}
+
+
+def resetFormatCache():
   """Clear any cached formats.
 
   This method is provided primarily for testing purposes,
   so that the effects of cached formats can be removed.
   """
-  global _format_cache, _format_modules_cache
-  _format_cache = {}
-  _format_modules_cache = {}
+  global _formatCache, _formatModulesCache
+  _formatCache = {}
+  _formatModulesCache = {}
 
-def iter_format_modules(lang):
+
+def iterFormatModules(lang, formatModulePath=None):
   """
   Does the heavy lifting of finding format modules.
   """
-  if checkForLanguage(lang):
-    format_locations = ['theory.conf.locale.%s']
-    if settings.FORMAT_MODULE_PATH:
-      format_locations.append(settings.FORMAT_MODULE_PATH + '.%s')
-      format_locations.reverse()
-    locale = toLocale(lang)
-    locales = [locale]
-    if '_' in locale:
-      locales.append(locale.split('_')[0])
-    for location in format_locations:
-      for loc in locales:
-        try:
-          yield importModule('.formats', location % loc)
-        except ImportError:
-          pass
+  if not checkForLanguage(lang):
+    return
 
-def get_format_modules(reverse=False):
+  if formatModulePath is None:
+    formatModulePath = settings.FORMAT_MODULE_PATH
+
+  formatLocations = []
+  if formatModulePath:
+    if isinstance(formatModulePath, six.stringTypes):
+      formatModulePath = [formatModulePath]
+    for path in formatModulePath:
+      formatLocations.append(path + '.%s')
+  formatLocations.append('theory.conf.locale.%s')
+  locale = toLocale(lang)
+  locales = [locale]
+  if '_' in locale:
+    locales.append(locale.split('_')[0])
+  for location in formatLocations:
+    for loc in locales:
+      try:
+        yield import_module('%s.formats' % (location % loc))
+      except ImportError:
+        pass
+
+
+def getFormatModules(lang=None, reverse=False):
   """
   Returns a list of the format modules found
   """
-  lang = getLanguage()
-  modules = _format_modules_cache.setdefault(lang, list(iter_format_modules(lang)))
+  if lang is None:
+    lang = getLanguage()
+  modules = _formatModulesCache.setdefault(lang, list(iterFormatModules(lang, settings.FORMAT_MODULE_PATH)))
   if reverse:
     return list(reversed(modules))
   return modules
 
-def get_format(format_type, lang=None, use_l10n=None):
+
+def getFormat(formatType, lang=None, useL10n=None):
   """
   For a specific format type, returns the format for the current
   language (locale), defaults to the format in the settings.
-  format_type is the name of the format, e.g. 'DATE_FORMAT'
+  formatType is the name of the format, e.g. 'DATE_FORMAT'
 
-  If use_l10n is provided and is not None, that will force the value to
+  If useL10n is provided and is not None, that will force the value to
   be localized (or not), overriding the value of settings.USE_L10N.
   """
-  format_type = smartStr(format_type)
-  if use_l10n or (use_l10n is None and settings.USE_L10N):
+  formatType = forceStr(formatType)
+  if useL10n or (useL10n is None and settings.USE_L10N):
     if lang is None:
       lang = getLanguage()
-    cache_key = (format_type, lang)
+    cacheKey = (formatType, lang)
     try:
-      return _format_cache[cache_key] or getattr(settings, format_type)
+      cached = _formatCache[cacheKey]
+      if cached is not None:
+        return cached
+      else:
+        # Return the general setting by default
+        return getattr(settings, formatType)
     except KeyError:
-      for module in get_format_modules():
+      for module in getFormatModules(lang):
         try:
-          val = getattr(module, format_type)
-          _format_cache[cache_key] = val
+          val = getattr(module, formatType)
+          for isoInput in ISO_INPUT_FORMATS.get(formatType, ()):
+            if isoInput not in val:
+              if isinstance(val, tuple):
+                val = list(val)
+              val.append(isoInput)
+          _formatCache[cacheKey] = val
           return val
         except AttributeError:
           pass
-      _format_cache[cache_key] = None
-  return getattr(settings, format_type)
+      _formatCache[cacheKey] = None
+  return getattr(settings, formatType)
 
-get_format_lazy = lazy(get_format, unicode, list, tuple)
+getFormatLazy = lazy(getFormat, six.textType, list, tuple)
 
-def date_format(value, format=None, use_l10n=None):
+
+def dateFormat(value, format=None, useL10n=None):
   """
   Formats a datetime.date or datetime.datetime object using a
   localizable format
 
-  If use_l10n is provided and is not None, that will force the value to
+  If useL10n is provided and is not None, that will force the value to
   be localized (or not), overriding the value of settings.USE_L10N.
   """
-  return dateformat.format(value, get_format(format or 'DATE_FORMAT', use_l10n=use_l10n))
+  return dateformat.format(value, getFormat(format or 'DATE_FORMAT', useL10n=useL10n))
 
-def time_format(value, format=None, use_l10n=None):
+
+def timeFormat(value, format=None, useL10n=None):
   """
   Formats a datetime.time object using a localizable format
 
-  If use_l10n is provided and is not None, that will force the value to
+  If useL10n is provided and is not None, that will force the value to
   be localized (or not), overriding the value of settings.USE_L10N.
   """
-  return dateformat.time_format(value, get_format(format or 'TIME_FORMAT', use_l10n=use_l10n))
+  return dateformat.timeFormat(value, getFormat(format or 'TIME_FORMAT', useL10n=useL10n))
 
-def number_format(value, decimal_pos=None, use_l10n=None):
+
+def numberFormat(value, decimalPos=None, useL10n=None, forceGrouping=False):
   """
   Formats a numeric value using localization settings
 
-  If use_l10n is provided and is not None, that will force the value to
+  If useL10n is provided and is not None, that will force the value to
   be localized (or not), overriding the value of settings.USE_L10N.
   """
-  if use_l10n or (use_l10n is None and settings.USE_L10N):
+  if useL10n or (useL10n is None and settings.USE_L10N):
     lang = getLanguage()
   else:
     lang = None
   return numberformat.format(
     value,
-    get_format('DECIMAL_SEPARATOR', lang, use_l10n=use_l10n),
-    decimal_pos,
-    get_format('NUMBER_GROUPING', lang, use_l10n=use_l10n),
-    get_format('THOUSAND_SEPARATOR', lang, use_l10n=use_l10n),
+    getFormat('DECIMAL_SEPARATOR', lang, useL10n=useL10n),
+    decimalPos,
+    getFormat('NUMBER_GROUPING', lang, useL10n=useL10n),
+    getFormat('THOUSAND_SEPARATOR', lang, useL10n=useL10n),
+    forceGrouping=forceGrouping
   )
 
-def localize(value, use_l10n=None):
+
+def localize(value, useL10n=None):
   """
   Checks if value is a localizable type (date, number...) and returns it
   formatted as a string using current locale format.
 
-  If use_l10n is provided and is not None, that will force the value to
+  If useL10n is provided and is not None, that will force the value to
   be localized (or not), overriding the value of settings.USE_L10N.
   """
   if isinstance(value, bool):
-    return mark_safe(unicode(value))
-  elif isinstance(value, (decimal.Decimal, float, int, long)):
-    return number_format(value, use_l10n=use_l10n)
+    return markSafe(six.textType(value))
+  elif isinstance(value, (decimal.Decimal, float) + six.integerTypes):
+    return numberFormat(value, useL10n=useL10n)
   elif isinstance(value, datetime.datetime):
-    return date_format(value, 'DATETIME_FORMAT', use_l10n=use_l10n)
+    return dateFormat(value, 'DATETIME_FORMAT', useL10n=useL10n)
   elif isinstance(value, datetime.date):
-    return date_format(value, use_l10n=use_l10n)
+    return dateFormat(value, useL10n=useL10n)
   elif isinstance(value, datetime.time):
-    return time_format(value, 'TIME_FORMAT', use_l10n=use_l10n)
+    return timeFormat(value, 'TIME_FORMAT', useL10n=useL10n)
   else:
     return value
 
-def localize_input(value, default=None):
+
+def localizeInput(value, default=None):
   """
   Checks if an input value is a localizable type and returns it
   formatted with the appropriate formatting string of the current locale.
   """
-  if isinstance(value, (decimal.Decimal, float, int, long)):
-    return number_format(value)
+  if isinstance(value, (decimal.Decimal, float) + six.integerTypes):
+    return numberFormat(value)
   elif isinstance(value, datetime.datetime):
-    value = datetime_safe.new_datetime(value)
-    format = smartStr(default or get_format('DATETIME_INPUT_FORMATS')[0])
+    value = datetimeSafe.newDatetime(value)
+    format = forceStr(default or getFormat('DATETIME_INPUT_FORMATS')[0])
     return value.strftime(format)
   elif isinstance(value, datetime.date):
-    value = datetime_safe.new_date(value)
-    format = smartStr(default or get_format('DATE_INPUT_FORMATS')[0])
+    value = datetimeSafe.newDate(value)
+    format = forceStr(default or getFormat('DATE_INPUT_FORMATS')[0])
     return value.strftime(format)
   elif isinstance(value, datetime.time):
-    format = smartStr(default or get_format('TIME_INPUT_FORMATS')[0])
+    format = forceStr(default or getFormat('TIME_INPUT_FORMATS')[0])
     return value.strftime(format)
   return value
 
-def sanitize_separators(value):
+
+def sanitizeSeparators(value):
   """
   Sanitizes a value according to the current decimal and
   thousand separator setting. Used with form field input.
   """
-  if settings.USE_L10N:
-    decimal_separator = get_format('DECIMAL_SEPARATOR')
-    if isinstance(value, basestring):
-      parts = []
-      if decimal_separator in value:
-        value, decimals = value.split(decimal_separator, 1)
-        parts.append(decimals)
-      if settings.USE_THOUSAND_SEPARATOR:
-        parts.append(value.replace(get_format('THOUSAND_SEPARATOR'), ''))
-      else:
-        parts.append(value)
-      value = '.'.join(reversed(parts))
+  if settings.USE_L10N and isinstance(value, six.stringTypes):
+    parts = []
+    decimalSeparator = getFormat('DECIMAL_SEPARATOR')
+    if decimalSeparator in value:
+      value, decimals = value.split(decimalSeparator, 1)
+      parts.append(decimals)
+    if settings.USE_THOUSAND_SEPARATOR:
+      thousandSep = getFormat('THOUSAND_SEPARATOR')
+      for replacement in set([
+          thousandSep, unicodedata.normalize('NFKD', thousandSep)]):
+        value = value.replace(replacement, '')
+    parts.append(value)
+    value = '.'.join(reversed(parts))
   return value
 
 SYMBOLS = {

@@ -2,7 +2,7 @@
 ##### System wide lib #####
 
 ##### Theory lib #####
-from theory.model import Command
+from theory.apps.model import Command, Mood
 
 ##### Theory third-party lib #####
 
@@ -19,11 +19,13 @@ class BaseChain(object):
   @classmethod
   def getCmdModel(cls):
     # It is mongoengine's bug. Del me after mongoengine fix it.
-    Command.objects.filter(name=cls.name).delete()
+    #Command.objects.filter(name=cls.name).delete()
     cmdModel = Command(
         name=cls.name,
         app="tests.testBase",
-        mood=["test",],
         runMode=cls.runMode
         )
+    cmdModel.save()
+    moodModel, created = Mood.objects.getOrCreate(name="test")
+    cmdModel.moodSet.add(moodModel)
     return cmdModel
