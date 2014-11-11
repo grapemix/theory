@@ -34,7 +34,7 @@ class CreateApp(SimpleCommand):
         )
 
   def run(self):
-    fromPath = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+    fromPath = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
         "conf", "app_template")
     toPath = os.path.join(settings.APPS_ROOT, self.paramForm.clean()["appName"])
     self._stdOut += "Coping" + fromPath + " --> " + toPath + "<br/>"

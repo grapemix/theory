@@ -1,19 +1,19 @@
 import os
 import sys
 
-from setuptools import setup, findPackages
-from distutils.sysconfig import getPythonLib
+from setuptools import setup, find_packages
+from distutils.sysconfig import get_python_lib
 
 # Warn if we are installing over top of an existing installation. This can
 # cause issues where files that were deleted from a more recent Theory are
 # still present in site-packages. See #18115.
 overlayWarning = False
 if "install" in sys.argv:
-  libPaths = [getPythonLib()]
+  libPaths = [get_python_lib()]
   if libPaths[0].startswith("/usr/lib/"):
     # We have to try also with an explicit prefix of /usr/local in order to
     # catch Debian's custom user site-packages directory.
-    libPaths.append(getPythonLib(prefix="/usr/local"))
+    libPaths.append(get_python_lib(prefix="/usr/local"))
   for libPath in libPaths:
     existingPath = os.path.abspath(os.path.join(libPath, "theory"))
     if os.path.exists(existingPath):
@@ -41,7 +41,7 @@ setup(
   description=('A high-level Python Web framework that encourages '
          'rapid development and clean, pragmatic design.'),
   license='BSD',
-  packages=findPackages(exclude=EXCLUDE_FROM_PACKAGES),
+  packages=find_packages(exclude=EXCLUDE_FROM_PACKAGES),
   includePackageData=True,
   scripts=['theory/bin/theory_start.py'],
   entryPoints={'consoleScripts': [
