@@ -40,7 +40,9 @@ class TheoryModelDetectorBase(object):
       handlerFxnName = self._typeCatMap[fieldParam.data][0]
       choices = None
       if(handlerFxnName=="listField"):
-        handlerFxnName += self._typeCatMap[fieldParam.childParamLst[0].name][1]
+        handlerFxnName += self._typeCatMap[
+            fieldParam.childParamLst.first().data
+            ][1]
       elif(handlerFxnName=="intField"):
         for i in fieldParam.childParamLst.all():
           if(i.name=="choices"):

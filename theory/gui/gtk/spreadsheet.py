@@ -306,7 +306,7 @@ class SpreadsheetBuilder(TheoryModelBSONTblDataHandler):
       self.isEditable = isEditable
       self.appConfigModel = appConfigModel
       super(SpreadsheetBuilder, self).run(
-          appConfigModel.fieldParamMap.all()
+          appConfigModel.fieldParamMap.filter(parent__isnull=True)
           )
     else:
       self.modelKlassName = "Unknown model"

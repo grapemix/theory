@@ -9,6 +9,7 @@ from copy import deepcopy
 ##### Theory lib #####
 from theory.db import model
 from theory.conf import settings
+from theory.contrib.postgres.fields import ArrayField
 from theory.apps.model import Command, Parameter, FieldParameter
 from theory.utils.functional import Promise
 
@@ -80,7 +81,7 @@ class ModelClassScanner(BaseClassScanner):
         'CommaSeparatedIntegerField', 'EmailField', 'FilePathField',
         'GenericIPAddressField', 'IPAddressField', 'SlugField', 'URLField',
         'CharField', 'TextField',
-        'OneToOneField', 'ManyToManyField', 'ForeignKey'
+        'OneToOneField', 'ManyToManyField', 'ForeignKey', 'ArrayField'
     ]
 
     # The reason we needed OrderedDict in here instead of Dict is because
@@ -89,7 +90,10 @@ class ModelClassScanner(BaseClassScanner):
     # can be automatically casted as StringField first.
     r = OrderedDict()
     for fieldname in fieldnameLst:
-      r[fieldname] = getattr(model, fieldname)
+      if fieldname == "ArrayField":
+        r[fieldname] = ArrayField
+      else:
+        r[fieldname] = getattr(model, fieldname)
     return r
 
   #def _getMongoTypeDict(self):
@@ -313,12 +317,16 @@ class ModelClassScanner(BaseClassScanner):
         if(typeName in [
             "ArrayField",
           ]):
-          fieldParam.childParamLst.append(
-              self._createFieldParam(
-                fieldType.field,
+          r = self._createFieldParam(
+                fieldType.baseField,
                 theoryTypeDict,
+                appModel,
                 )
-              )
+          r.data = r.name
+          r.name = typeName
+          fieldParam.data = typeName
+          fieldParam.save()
+          fieldParam.childParamLst.add(r)
         elif(typeName == "ForeignKey"):
           fieldParam.isField = True
           fieldParam.data = typeName
