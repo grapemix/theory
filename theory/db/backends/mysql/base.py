@@ -130,7 +130,7 @@ class CursorWrapper(object):
       # Map some error codes to IntegrityError, since they seem to be
       # misclassified and Theory would prefer the more logical place.
       if e.args[0] in self.codesForIntegrityerror:
-        six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.excInfo()[2])
+        six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
       raise
 
   def executemany(self, query, args):
@@ -140,7 +140,7 @@ class CursorWrapper(object):
       # Map some error codes to IntegrityError, since they seem to be
       # misclassified and Theory would prefer the more logical place.
       if e.args[0] in self.codesForIntegrityerror:
-        six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.excInfo()[2])
+        six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
       raise
 
   def __getattr__(self, attr):

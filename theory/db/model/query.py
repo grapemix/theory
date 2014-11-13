@@ -457,12 +457,12 @@ class QuerySet(object):
         obj.save(forceInsert=True, using=self.db)
       return obj, True
     except IntegrityError:
-      excInfo = sys.excInfo()
+      exc_info = sys.exc_info()
       try:
         return self.get(**lookup), False
       except self.modal.DoesNotExist:
         pass
-      six.reraise(*excInfo)
+      six.reraise(*exc_info)
 
   def _extractModelParams(self, defaults, **kwargs):
     """

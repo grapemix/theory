@@ -684,7 +684,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         x = e.args[0]
         if hasattr(x, 'code') and hasattr(x, 'message') \
           and x.code == 2091 and 'ORA-02291' in x.message:
-          six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.excInfo()[2])
+          six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
         raise
 
   def schemaEditor(self, *args, **kwargs):
@@ -900,7 +900,7 @@ class FormatStylePlaceholderCursor(object):
     except Database.DatabaseError as e:
       # cx_Oracle <= 4.4.0 wrongly raises a DatabaseError for ORA-01400.
       if hasattr(e.args[0], 'code') and e.args[0].code == 1400 and not isinstance(e, IntegrityError):
-        six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.excInfo()[2])
+        six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
       raise
 
   def executemany(self, query, params=None):
@@ -920,7 +920,7 @@ class FormatStylePlaceholderCursor(object):
     except Database.DatabaseError as e:
       # cx_Oracle <= 4.4.0 wrongly raises a DatabaseError for ORA-01400.
       if hasattr(e.args[0], 'code') and e.args[0].code == 1400 and not isinstance(e, IntegrityError):
-        six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.excInfo()[2])
+        six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
       raise
 
   def fetchone(self):
