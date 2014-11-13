@@ -53,7 +53,7 @@ class TheoryModelBSONTblDataHandler(TheoryModelTblDetectorBase):
       fieldName,
       fieldVal
       ):
-    if len(fieldVal) > 30:
+    if fieldVal is not None and len(fieldVal) > 30:
       return "Too much to display......"
     return jsonDumps(fieldVal, cls=TheoryJSONEncoder)
 
