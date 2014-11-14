@@ -15,13 +15,15 @@ from . import BaseUIAdapter
 
 ##### Misc #####
 
+__all__ = ("TerminalAdapter",)
+
+class TerminalForm(SimpleGuiForm):
+  stdOut = field.TextField(label="Standard Output")
+  #stdErr = field.TextField(label="Standard Error")
+
 class TerminalAdapter(BaseUIAdapter):
   _stdOut = ""
   _stdErr = ""
-
-  class TerminalForm(SimpleGuiForm):
-    stdOut = field.TextField(label="Standard Output")
-    #stdErr = field.TextField(label="Standard Error")
 
   @property
   def stdOut(self):
@@ -57,7 +59,7 @@ class TerminalAdapter(BaseUIAdapter):
     bx = kwargs["uiParam"]["bx"]
     bx.clear()
 
-    o = self.TerminalForm()
+    o = TerminalForm()
     o.fields["stdOut"].initData = self.stdOut
     #o.fields["stdErr"].initData = self.stdErr
     o.generateForm(**kwargs["uiParam"])

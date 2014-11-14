@@ -4,6 +4,7 @@
 from copy import deepcopy
 
 ##### Theory lib #####
+from theory.apps.adapter.terminalAdapter import TerminalForm
 from theory.apps.command.baseCommand import SimpleCommand
 from theory.apps.model import AppModel
 from theory.conf import settings
@@ -152,6 +153,12 @@ class ModelUpsert(SimpleCommand):
       if self.paramForm.clean()["isInNewWindow"]:
         self._uiParam["cleanUpCrtFxn"](None, None)
       self.postApplyChange()
+
+      self._uiParam["bx"].clear()
+
+      o = TerminalForm()
+      o.fields["stdOut"].initData = "Model has been saved successfully."
+      o.generateForm(**self._uiParam)
     else:
       # TODO: integrate with std reactor error system
       self.modelForm.showErrInFieldLabel()
