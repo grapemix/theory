@@ -1,4 +1,5 @@
 import json
+import sys
 
 #from theory.contrib.postgres.forms import SimpleArrayField
 from theory.gui.common.baseField import ListField
@@ -24,7 +25,7 @@ class ArrayField(Field):
     'nestedArrayMismatch': _('Nested arrays must have the same length.'),
   }
 
-  def __init__(self, baseField, size=None, **kwargs):
+  def __init__(self, baseField, size=sys.maxint, **kwargs):
     self.baseField = baseField
     self.size = size
     if self.size:

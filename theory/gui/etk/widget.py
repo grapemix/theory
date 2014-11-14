@@ -219,6 +219,7 @@ class HiddenInput(BaseLabelInput):
 
 class StringInput(BaseLabelInput):
   widgetClass = element.Entry
+  lineBreak = "<br/>"
 
   def _getData(self):
     return self.widgetLst[0].finalData
@@ -227,7 +228,7 @@ class StringInput(BaseLabelInput):
     self.fieldSetter({"finalData": self._getData()})
 
 class TextInput(StringInput):
-  lineBreak = "<br>"
+  lineBreak = "<br/>"
   def __init__(self, fieldSetter, fieldGetter, win, bx,
       attrs=None, *args, **kwargs):
     attrs = self._buildAttrs(
@@ -578,7 +579,7 @@ class ListInput(BaseLabelInput):
           and childFieldTemplate.maxLength>20):
         self.widgetClass = TextInput.widgetClass
         self._createWidget = self._createLongStringWidget
-        self.lineBreak = childFieldTemplate.lineBreak
+        self.lineBreak = childFieldTemplate.widget.lineBreak
       else:
         self.widgetClass = element.Multibuttonentry
         self._createWidget = self._createShortStringWidget
@@ -590,7 +591,6 @@ class ListInput(BaseLabelInput):
       self.isOverridedData = False
       del self.fieldSetter
       del self.fieldGetter
-
 
   def _createShortStringWidget(self, *args, **kwargs):
     """The adding child mechanism is handled by the widget itself."""

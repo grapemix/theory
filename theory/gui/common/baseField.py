@@ -365,7 +365,6 @@ class TextField(Field):
     if self.lineBreak!="\n" and isinstance(initData, basestring):
       self._initData = initData.replace("\n", self.lineBreak)
     elif isinstance(initData, (list, tuple)):
-      print initData
       self._initData = "\n".join(initData)
     else:
       self._initData = initData
