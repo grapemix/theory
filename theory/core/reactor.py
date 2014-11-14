@@ -299,6 +299,7 @@ class Reactor(object):
     #    )
     historyQuery = History.objects.filter(
         commandName=self.parser.cmdInTxt,
+        jsonData=jsonData,
         )
     if len(historyQuery) > 0:
       historyQuery[0].touched = datetime.utcnow()
