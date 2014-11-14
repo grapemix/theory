@@ -96,8 +96,7 @@ class GtkSpreadsheetModelDataHandlerTestCaseBase(object):
         'stringField': {'klassLabel': 'strField', },
         'emailField': {'klassLabel': 'editableForceStrField', },
         'uRLField': {'klassLabel': 'editableForceStrField', },
-        'choiceField': {'klassLabel': 'intField', },
-        #'choiceField': {'klassLabel': 'enumField', },
+        'choiceField': {'klassLabel': 'enumField', },
         #dynamicField
 
         'id': {'klassLabel': 'const', },

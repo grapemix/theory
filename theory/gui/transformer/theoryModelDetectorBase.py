@@ -3,6 +3,7 @@
 ##### System wide lib #####
 from abc import ABCMeta, abstractmethod
 from collections import OrderedDict
+import json
 
 ##### Theory lib #####
 
@@ -55,7 +56,7 @@ class TheoryModelDetectorBase(object):
           ""
           )
       if(choices is not None):
-        self.fieldPropDict[fieldName]["choices"] = dict(i.data)
+        self.fieldPropDict[fieldName]["choices"] = dict(json.loads(i.data))
 
   @abstractmethod
   def _fillUpTypeHandler(self, klassLabel, prefix=""):

@@ -5,6 +5,7 @@ import datetime
 import inspect
 from collections import OrderedDict
 from copy import deepcopy
+import json
 
 ##### Theory lib #####
 from theory.db import model
@@ -325,6 +326,7 @@ class ModelClassScanner(BaseClassScanner):
           r.data = r.name
           r.name = typeName
           fieldParam.data = typeName
+          fieldParam.isField = True
           fieldParam.save()
           fieldParam.childParamLst.add(r)
         elif(typeName == "ForeignKey"):
@@ -390,6 +392,20 @@ class ModelClassScanner(BaseClassScanner):
 
           # Declare dependency to check circular dependency later
           self.modelDepMap[self.modelAppClassName].append(fieldParam)
+        elif(typeName == "IntegerField"):
+          if hasattr(fieldType, "choices") and len(fieldType.choices) > 0:
+            # For enum field
+            fieldParam.isField = True
+            fieldParam.data = fieldParam.name
+            fieldParam.save()
+            FieldParameter(
+                name="choices",
+                data=json.dumps(fieldType.choices),
+                parent=fieldParam,
+                appModel=appModel,
+                ).save()
+
+
         # After getting all args, now fill up field's kwargs
         for i in self._getFieldParamKwargs(fieldType, typeName):
           i.parent = fieldParam
