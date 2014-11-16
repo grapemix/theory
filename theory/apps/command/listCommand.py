@@ -55,7 +55,7 @@ class ListCommand(SimpleCommand):
   @property
   def query(self):
     """
-    :param query: The mongoengine QuerySet being pass to mongoengine
+    :param query: The QuerySet being pass to theory orm
     :type query: QuerySet
     """
     return self._query

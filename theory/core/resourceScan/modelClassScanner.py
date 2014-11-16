@@ -24,7 +24,7 @@ from .baseClassScanner import BaseClassScanner
 ##### Misc #####
 
 class ModelClassScanner(BaseClassScanner):
-  """This class is mongoengine specific"""
+  """This class is theory orm specific"""
 
   fieldKwargsLst = ("default", "verboseName", "helpText", "choices",
       "uniqueWith", "unique", "required", "maxLength", "minLength",

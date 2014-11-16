@@ -3,7 +3,6 @@
 ##### System wide lib #####
 from datetime import datetime
 import json
-#from mongoengine import Q
 import sys
 
 ##### Theory lib #####

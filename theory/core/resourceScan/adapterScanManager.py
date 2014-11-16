@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 ##### System wide lib #####
-from mongoengine import *
 
 ##### Theory lib #####
 from theory.conf import settings

@@ -3,7 +3,6 @@
 ##### System wide lib #####
 import inspect
 from copy import deepcopy
-from mongoengine import *
 
 ##### Theory lib #####
 from theory.apps.adapter import BaseAdapter
