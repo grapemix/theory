@@ -25,7 +25,7 @@ class ArrayField(Field):
     'nestedArrayMismatch': _('Nested arrays must have the same length.'),
   }
 
-  def __init__(self, baseField, size=sys.maxint, **kwargs):
+  def __init__(self, baseField, size=None, **kwargs):
     self.baseField = baseField
     self.size = size
     if self.size:
@@ -153,12 +153,18 @@ class ArrayField(Field):
         )
 
   def formfield(self, **kwargs):
+    if self.size is None:
+      # maxLength has be an int according to field. However, postgres will
+      # complain during table creation if maxint is used.
+      maxLength = sys.maxint
+    else:
+      maxLength = self.size
     defaults = {
       'formClass': ListField,
       #'formClass': SimpleArrayField,
       #'baseField': self.baseField.formfield(),
       'field': self.baseField.formfield(),
-      'maxLength': self.size,
+      'maxLength': maxLength,
     }
     defaults.update(kwargs)
     return super(ArrayField, self).formfield(**defaults)
