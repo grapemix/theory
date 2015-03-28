@@ -374,7 +374,7 @@ class ListModelValidator(Genlist):
     self.grpAState = []
 
   def _rowItemTextGetter(self, obj, part, item_data):
-    return item_data[0].ref.links[item_data[1]]
+    return item_data[0].ref.getModelValidateLabel(item_data[1])
 
   def _rowItemContentGetter(self, obj, part, data):
     r = CheckBox()
