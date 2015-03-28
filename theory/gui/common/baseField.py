@@ -1181,8 +1181,12 @@ class ListField(Field):
     super(ListField, self).__init__(*args, **kwargs)
 
   def _setupChildrenData(self, data, fieldName):
-    for i in data:
-      self.addChildField(i, fieldName)
+    # ArrayField's default can be None. If the init data is None, ListField
+    # does not gurantee return None if no modification is applied, ListField
+    # will return [] instead.
+    if data is not None:
+      for i in data:
+        self.addChildField(i, fieldName)
     #if(not isinstance(self.widget, type)):
     if(not isclass(self.widget)):
       self.widget.childFieldLst = self.fields

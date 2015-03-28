@@ -219,7 +219,7 @@ class ArrayLenTransform(Transform):
 
   def asSql(self, qn, connection):
     lhs, params = qn.compile(self.lhs)
-    return 'arrayLength(%s, 1)' % lhs, params
+    return 'array_length(%s, 1)' % lhs, params
 
 
 ArrayField.registerLookup(ArrayLenTransform)
