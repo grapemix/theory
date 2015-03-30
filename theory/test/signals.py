@@ -31,17 +31,17 @@ def clearCacheHandlers(**kwargs):
 def updateInstalledApps(**kwargs):
   if kwargs['setting'] == 'INSTALLED_APPS':
     # Rebuild any AppDirectoriesFinder instance.
-    from theory.contrib.staticfiles.finders import getFinder
-    getFinder.cacheClear()
+    #from theory.contrib.staticfiles.finders import getFinder
+    #getFinder.cacheClear()
     # Rebuild management commands cache
-    from theory.core.management import getCommands
-    getCommands.cacheClear()
+    #from theory.core.management import getCommands
+    #getCommands.cacheClear()
     # Rebuild templatetags module cache.
-    from theory.template import base as mod
-    mod.templatetagsModules = []
+    #from theory.template import base as mod
+    #mod.templatetagsModules = []
     # Rebuild appTemplateDirs cache.
-    from theory.template.loaders import appDirectories as mod
-    mod.appTemplateDirs = mod.calculateAppTemplateDirs()
+    #from theory.template.loaders import appDirectories as mod
+    #mod.appTemplateDirs = mod.calculateAppTemplateDirs()
     # Rebuild translations cache.
     from theory.utils.translation import transReal
     transReal._translations = {}
