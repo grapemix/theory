@@ -59,7 +59,8 @@ class DiscoverRunner(object):
     if self.pattern is not None:
       discoverKwargs['pattern'] = self.pattern
     if self.topLevel is not None:
-      discoverKwargs['topLevelDir'] = self.topLevel
+      # the var is with underscore is becasue unittest require it
+      discoverKwargs['top_level_dir'] = self.topLevel
 
     for label in testLabels:
       kwargs = discoverKwargs.copy()
@@ -94,18 +95,15 @@ class DiscoverRunner(object):
             topLevel = tryNext
             continue
           break
-        kwargs['topLevelDir'] = topLevel
+        kwargs['top_level_dir'] = topLevel
 
       if not (tests and tests.countTestCases()) and isDiscoverable(label):
-        if kwargs.has_key("topLevelDir"):
-          kwargs["top_level_dir"] = kwargs["topLevelDir"]
-          del kwargs["topLevelDir"]
         # Try discovery if path is a package or directory
         tests = self.testLoader.discover(start_dir=label, **kwargs)
 
         # Make unittest forget the top-level dir it calculated from this
         # run, to support running tests from two different top-levels.
-        self.testLoader._topLevelDir = None
+        self.testLoader._top_level_dir = None
 
       suite.addTests(tests)
 
@@ -139,6 +137,7 @@ class DiscoverRunner(object):
   def teardownTestEnvironment(self, **kwargs):
     unittest.removeHandler()
     teardownTestEnvironment()
+
 
   def suiteResult(self, suite, result, **kwargs):
     return len(result.failures) + len(result.errors)
