@@ -202,8 +202,7 @@ def theoryTests(verbosity, interactive, failfast, testLabels):
       RemovedInTheory19Warning
     )
     failures = testRunner.runTests(
-      ["/home/kingston/theory/tests/",], extraTests=extraTests)
-      #testLabels or getInstalled(), extraTests=extraTests)
+      [".",], extraTests=extraTests)
 
   teardown(state)
   return failures
