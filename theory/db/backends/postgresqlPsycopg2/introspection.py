@@ -35,70 +35,70 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
       FROM pg_catalog.pg_class c
       LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
       WHERE c.relkind IN ('r', 'v', '')
-        AND n.nspname NOT IN ('pg_catalog', 'pgToast')
+        AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
         AND pg_catalog.pg_table_is_visible(c.oid)""")
     return [row[0] for row in cursor.fetchall() if row[0] not in self.ignoredTables]
 
-  def getTableDescription(self, cursor, tableName):
+  def getTableDescription(self, cursor, table_name):
     "Returns a description of the table, with the DB-API cursor.description interface."
     # As cursor.description does not return reliably the nullable property,
-    # we have to query the informationSchema (#7783)
+    # we have to query the information_schema (#7783)
     cursor.execute("""
-      SELECT columnName, isNullable
-      FROM informationSchema.columns
-      WHERE tableName = %s""", [tableName])
+      SELECT column_name, is_nullable
+      FROM information_schema.columns
+      WHERE table_name = %s""", [table_name])
     nullMap = dict(cursor.fetchall())
-    cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quoteName(tableName))
+    cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quoteName(table_name))
     return [FieldInfo(*((forceText(line[0]),) + line[1:6] + (nullMap[forceText(line[0])] == 'YES',)))
         for line in cursor.description]
 
-  def getRelations(self, cursor, tableName):
+  def getRelations(self, cursor, table_name):
     """
     Returns a dictionary of {fieldIndex: (fieldIndexOtherTable, otherTable)}
     representing all relationships to the given table. Indexes are 0-based.
     """
     cursor.execute("""
       SELECT con.conkey, con.confkey, c2.relname
-      FROM pgConstraint con, pg_class c1, pg_class c2
+      FROM pg_constraint con, pg_class c1, pg_class c2
       WHERE c1.oid = con.conrelid
         AND c2.oid = con.confrelid
         AND c1.relname = %s
-        AND con.contype = 'f'""", [tableName])
+        AND con.contype = 'f'""", [table_name])
     relations = {}
     for row in cursor.fetchall():
       # row[0] and row[1] are single-item lists, so grab the single item.
       relations[row[0][0] - 1] = (row[1][0] - 1, row[2])
     return relations
 
-  def getKeyColumns(self, cursor, tableName):
+  def getKeyColumns(self, cursor, table_name):
     keyColumns = []
     cursor.execute("""
-      SELECT kcu.columnName, ccu.tableName AS referencedTable, ccu.columnName AS referencedColumn
-      FROM informationSchema.constraintColumnUsage ccu
-      LEFT JOIN informationSchema.keyColumnUsage kcu
-        ON ccu.constraintCatalog = kcu.constraintCatalog
-          AND ccu.constraintSchema = kcu.constraintSchema
-          AND ccu.constraintName = kcu.constraintName
-      LEFT JOIN informationSchema.tableConstraints tc
-        ON ccu.constraintCatalog = tc.constraintCatalog
-          AND ccu.constraintSchema = tc.constraintSchema
-          AND ccu.constraintName = tc.constraintName
-      WHERE kcu.tableName = %s AND tc.constraintType = 'FOREIGN KEY'""", [tableName])
+      SELECT kcu.column_name, ccu.table_name AS referenced_table, ccu.column_name AS referenced_column
+      FROM information_schema.constraint_column_usage ccu
+      LEFT JOIN information_schema.key_column_usage kcu
+        ON ccu.constraint_catalog = kcu.constraint_catalog
+          AND ccu.constraint_schema = kcu.constraint_schema
+          AND ccu.constraint_name = kcu.constraint_name
+      LEFT JOIN information_schema.table_constraints tc
+        ON ccu.constraint_catalog = tc.constraint_catalog
+          AND ccu.constraint_schema = tc.constraint_schema
+          AND ccu.constraint_name = tc.constraint_name
+      WHERE kcu.table_name = %s AND tc.constraint_type = 'FOREIGN KEY'""", [table_name])
     keyColumns.extend(cursor.fetchall())
     return keyColumns
 
-  def getIndexes(self, cursor, tableName):
+  def getIndexes(self, cursor, table_name):
     # This query retrieves each index on the given table, including the
     # first associated field name
     cursor.execute("""
       SELECT attr.attname, idx.indkey, idx.indisunique, idx.indisprimary
       FROM pg_catalog.pg_class c, pg_catalog.pg_class c2,
-        pg_catalog.pgIndex idx, pg_catalog.pgAttribute attr
+        pg_catalog.pg_index idx, pg_catalog.pg_attribute attr
       WHERE c.oid = idx.indrelid
         AND idx.indexrelid = c2.oid
         AND attr.attrelid = c.oid
         AND attr.attnum = idx.indkey[0]
-        AND c.relname = %s""", [tableName])
+        AND c.relname = %s""", [table_name])
     indexes = {}
     for row in cursor.fetchall():
       # row[1] (idx.indkey) is stored in the DB as an array. It comes out as
@@ -116,7 +116,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         indexes[row[0]]['unique'] = True
     return indexes
 
-  def getConstraints(self, cursor, tableName):
+  def getConstraints(self, cursor, table_name):
     """
     Retrieves any constraints or keys (unique, pk, fk, check, index) across one or more columns.
     """
@@ -125,20 +125,20 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     # This will get PKs, FKs, and uniques, but not CHECK
     cursor.execute("""
       SELECT
-        kc.constraintName,
-        kc.columnName,
-        c.constraintType,
-        array(SELECT tableName::text || '.' || columnName::text FROM informationSchema.constraintColumnUsage WHERE constraintName = kc.constraintName)
-      FROM informationSchema.keyColumnUsage AS kc
-      JOIN informationSchema.tableConstraints AS c ON
-        kc.tableSchema = c.tableSchema AND
-        kc.tableName = c.tableName AND
-        kc.constraintName = c.constraintName
+        kc.constraint_name,
+        kc.column_name,
+        c.constraint_type,
+        array(SELECT table_name::text || '.' || column_name::text FROM information_schema.constraint_column_usage WHERE constraint_name = kc.constraint_name)
+      FROM information_schema.key_column_usage AS kc
+      JOIN information_schema.table_constraints AS c ON
+        kc.table_schema = c.table_schema AND
+        kc.table_name = c.table_name AND
+        kc.constraint_name = c.constraint_name
       WHERE
-        kc.tableSchema = %s AND
-        kc.tableName = %s
-      ORDER BY kc.ordinalPosition ASC
-    """, ["public", tableName])
+        kc.table_schema = %s AND
+        kc.table_name = %s
+      ORDER BY kc.ordinal_position ASC
+    """, ["public", table_name])
     for constraint, column, kind, usedCols in cursor.fetchall():
       # If we're the first column, make the record
       if constraint not in constraints:
@@ -154,17 +154,17 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
       constraints[constraint]['columns'].append(column)
     # Now get CHECK constraint columns
     cursor.execute("""
-      SELECT kc.constraintName, kc.columnName
-      FROM informationSchema.constraintColumnUsage AS kc
-      JOIN informationSchema.tableConstraints AS c ON
-        kc.tableSchema = c.tableSchema AND
-        kc.tableName = c.tableName AND
-        kc.constraintName = c.constraintName
+      SELECT kc.constraint_name, kc.column_name
+      FROM information_schema.constraint_column_usage AS kc
+      JOIN information_schema.table_constraints AS c ON
+        kc.table_schema = c.table_schema AND
+        kc.table_name = c.table_name AND
+        kc.constraint_name = c.constraint_name
       WHERE
-        c.constraintType = 'CHECK' AND
-        kc.tableSchema = %s AND
-        kc.tableName = %s
-    """, ["public", tableName])
+        c.constraint_type = 'CHECK' AND
+        kc.table_schema = %s AND
+        kc.table_name = %s
+    """, ["public", table_name])
     for constraint, column in cursor.fetchall():
       # If we're the first column, make the record
       if constraint not in constraints:
@@ -183,17 +183,17 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
       SELECT
         c2.relname,
         ARRAY(
-          SELECT (SELECT attname FROM pg_catalog.pgAttribute WHERE attnum = i AND attrelid = c.oid)
+          SELECT (SELECT attname FROM pg_catalog.pg_attribute WHERE attnum = i AND attrelid = c.oid)
           FROM unnest(idx.indkey) i
         ),
         idx.indisunique,
         idx.indisprimary
       FROM pg_catalog.pg_class c, pg_catalog.pg_class c2,
-        pg_catalog.pgIndex idx
+        pg_catalog.pg_index idx
       WHERE c.oid = idx.indrelid
         AND idx.indexrelid = c2.oid
         AND c.relname = %s
-    """, [tableName])
+    """, [table_name])
     for index, columns, unique, primary in cursor.fetchall():
       if index not in constraints:
         constraints[index] = {
