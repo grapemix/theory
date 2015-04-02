@@ -1694,7 +1694,7 @@ class IPAddressField(TextField):
 
   def toPython(self, value):
     if value in self.emptyValues:
-      return ''
+      return None
     return value.strip()
 
 
