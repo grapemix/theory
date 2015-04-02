@@ -2,6 +2,7 @@
 #!/usr/bin/env python
 from __future__ import unicode_literals
 ##### System wide lib #####
+from cStringIO import StringIO
 import glob
 import gzip
 import os
@@ -91,6 +92,7 @@ class Loaddata(SimpleCommand):
 
   def run(self):
     options = self.paramForm.clean()
+    self.stdout = StringIO()
 
     self.ignore = options.get('ignore')
     self.using = options.get('database')
@@ -108,6 +110,9 @@ class Loaddata(SimpleCommand):
     # can return incorrect results. See Theory #7572, MySQL #37735.
     if transaction.getAutocommit(self.using):
       connections[self.using].close()
+
+    self._stdOut = self.stdout.getvalue()
+    self.stdout.close()
 
   def loaddata(self, fixtureLabels):
     connection = connections[self.using]
