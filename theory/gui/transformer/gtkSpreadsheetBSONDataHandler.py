@@ -117,6 +117,8 @@ class GtkSpreadsheetModelBSONDataHandler(TheoryModelTblDetectorBase):
     return bool(fieldVal)
 
   def _strFieldDataHandler(self, rowId, fieldName, fieldVal):
+    if fieldVal == u"None":
+      return None
     return unicode(fieldVal.decode("utf8"))
 
   def _floatFieldDataHandler(self, rowId, fieldName, fieldVal):
