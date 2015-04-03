@@ -23,16 +23,14 @@ class CreateCmd(SimpleCommand):
   _drums = {"Terminal": 1, }
 
   class ParamForm(SimpleCommand.ParamForm):
-    appName = field.ChoiceField(
-        label="Application Name",
-        helpText="The name of application being used",
-        choices=(
-          set(
-            [("theory.apps", "theory.apps")] + \
-            [(app, app) for app in settings.INSTALLED_APPS]
-          )
+    appName = field.ChoiceField(label="Application Name",
+        helpText="The name of applications to be listed",
+        initData="theory.apps",
+        choices=(set([("theory.apps", "theory.apps")] +
+          [(settings.INSTALLED_APPS[i], settings.INSTALLED_APPS[i])
+            for i in range(len(settings.INSTALLED_APPS))])),
         )
-    )
+
     cmdName = field.TextField(
         label="Command Name",
         helpText=" The name of command being created in lowercase.",
