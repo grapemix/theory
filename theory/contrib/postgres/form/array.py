@@ -1,6 +1,6 @@
 import copy
 
-from theory.contrib.postgres.validators import ArrayMinLengthValidator, ArrayMaxLengthValidator
+from theory.contrib.postgres.validator import ArrayMinLengthValidator, ArrayMaxLengthValidator
 from theory.core.exceptions import ValidationError
 from theory.gui import field
 from theory.gui import widget

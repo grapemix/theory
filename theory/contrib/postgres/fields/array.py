@@ -3,7 +3,7 @@ import sys
 
 #from theory.contrib.postgres.forms import SimpleArrayField
 from theory.gui.common.baseField import ListField
-from theory.contrib.postgres.validators import ArrayMaxLengthValidator
+from theory.contrib.postgres.validator import ArrayMaxLengthValidator
 from theory.core import checks, exceptions
 from theory.db.model import Field, Lookup, Transform, IntegerField
 from theory.utils import six
