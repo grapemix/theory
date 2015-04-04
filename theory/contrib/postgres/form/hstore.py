@@ -13,7 +13,7 @@ __all__ = ['HStoreField']
 class HStoreField(DictField):
   """A field for HStore data which accepts JSON input."""
   default_error_messages = {
-      'invalid_json': _('Could not load JSON data.'),
+      'invalidJson': _('Could not load JSON data.'),
   }
 
   @property
@@ -45,8 +45,8 @@ class HStoreField(DictField):
       value = json.loads(value)
     except ValueError:
       raise ValidationError(
-          self.error_messages['invalid_json'],
-          code='invalid_json',
+          self.error_messages['invalidJson'],
+          code='invalidJson',
       )
     # Cast everything to strings for ease.
     for key, val in value.items():
