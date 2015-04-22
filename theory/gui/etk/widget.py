@@ -753,13 +753,19 @@ class ListInput(BaseLabelInput):
 
     self.mainContainer.content.insertAndGenerateWidget(1 , widgetLst)
 
-    for i, input in enumerate(self._inputLst):
-      row = {}
-      for k in kwargsKeys:
-        if(len(kwargs[k])<=i):
-          continue
-        row[k] = kwargs[k][i]
-      input.reset(**row)
+    if self.isOverridedData:
+      # That means the widget is either for long or short sting which imply
+      # we only have one widget and we don't have to slice data
+      self._inputLst[0].reset(**kwargs)
+    else:
+      # slice data for each child widget
+      for i, input in enumerate(self._inputLst):
+        row = {}
+        for k in kwargsKeys:
+          if(len(kwargs[k])<=i):
+            continue
+          row[k] = kwargs[k][i]
+        input.reset(**row)
 
 class DictInput(ListInput):
   def __init__(self, fieldSetter, fieldGetter, win, bx, addChildFieldFxn,
