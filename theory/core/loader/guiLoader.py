@@ -86,9 +86,9 @@ def wakeup(settings_mod, argv=None):
   if Command.objects.count()==0:
     from .util import reprobeAllModule
     reprobeAllModule(settings_mod, argv)
-  else:
-    for cmd in Command.objects.all():
-      importModule(cmd.moduleImportPath)
+  #else:
+  #  for cmd in Command.objects.all():
+  #    importModule(cmd.moduleImportPath)
 
   loadMoodData()
 
