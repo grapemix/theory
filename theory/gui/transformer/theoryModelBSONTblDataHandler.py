@@ -91,4 +91,6 @@ class TheoryModelBSONTblDataHandler(TheoryModelTblDetectorBase):
     return fieldVal
 
   def _enumFieldDataHandler(self, rowId, fieldName, fieldVal):
+    if(fieldVal is None):
+      return "None"
     return self.fieldPropDict[fieldName]["choices"][fieldVal]

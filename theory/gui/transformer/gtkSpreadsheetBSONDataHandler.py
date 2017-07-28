@@ -128,6 +128,8 @@ class GtkSpreadsheetModelBSONDataHandler(TheoryModelTblDetectorBase):
     return long(fieldVal)
 
   def _enumFieldDataHandler(self, rowId, fieldName, fieldVal):
+    if fieldVal == u"None":
+      return None
     return self.fieldPropDict[fieldName]["reverseChoices"][fieldVal]
 
   def _constDataHandler(self, rowId, fieldName, fieldVal):
