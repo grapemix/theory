@@ -12,10 +12,19 @@ from theory.conf import settings
 ##### Theory third-party lib #####
 
 ##### Enlightenment lib #####
-import ecore
-import edje
-import elementary
-import evas
+from efl import ecore
+from efl import edje
+from efl import elementary
+from efl.elementary.background import Background
+from efl.elementary.box import Box
+from efl.elementary.button import Button
+from efl.elementary.entry import Entry
+from efl.elementary.label import Label
+from efl.elementary.layout import Layout
+from efl.elementary.scroller import Scroller
+from efl.elementary.separator import Separator
+from efl.elementary.window import StandardWindow
+from efl import evas
 
 ##### Local app #####
 
@@ -102,23 +111,23 @@ class Terminal(object):
 
   def __init__(self):
     elementary.init()
-    self.win = elementary.Window("theory", elementary.ELM_WIN_BASIC)
+    self.win = StandardWindow("theory", "Theory", autodel=True)
     self.win.autodel = True
     self.win.title_set("Theory")
     self.win.callback_delete_request_add(lambda x: elementary.exit())
     self.win.autodel_set(True)
-    bg = elementary.Background(self.win)
+    bg = Background(self.win)
     self.win.resize_object_add(bg)
     bg.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
     bg.show()
 
-    ly = elementary.Layout(self.win)
+    ly = Layout(self.win)
     ly.file_set("gui/background.edj", "layout")
     ly.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
     self.win.resize_object_add(ly)
     ly.show()
 
-    self.bx = elementary.Box(self.win)
+    self.bx = Box(self.win)
     self.win.resize_object_add(self.bx)
     self.bx.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
     self.bx.show()
@@ -187,12 +196,12 @@ class Terminal(object):
     win = self.win
     bx = self.bx
 
-    bx2 = elementary.Box(win)
+    bx2 = Box(win)
     bx2.horizontal_set(True)
     bx2.size_hint_weight_set(evas.EVAS_HINT_EXPAND, 0.0)
     bx2.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
 
-    en = elementary.Entry(win)
+    en = Entry(win)
     en.line_wrap_set(True)
     #en = elementary.ScrolledEntry(win)
     en.entry_set("")
@@ -210,7 +219,7 @@ class Terminal(object):
 
     self._cmdLineEntry = en
 
-    bt = elementary.Button(win)
+    bt = Button(win)
     bt.text_set("Clear")
     bt.callback_clicked_add(self._clearShellInput)
     bt.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
@@ -244,23 +253,23 @@ class Terminal(object):
   def drawLabel(self, txt):
     box0 = self.bx
 
-    sp = elementary.Separator(self.win)
+    sp = Separator(self.win)
     sp.horizontal_set(True)
     self.bx.pack_end(sp)
     sp.show()
 
-    sc = elementary.Scroller(self.win)
+    sc = Scroller(self.win)
     sc.bounce = (False, True)
-    sc.policy = (elementary.ELM_SCROLLER_POLICY_OFF, elementary.ELM_SCROLLER_POLICY_AUTO)
+    sc.policy = (elementary.scroller.ELM_SCROLLER_POLICY_OFF, elementary.scroller.ELM_SCROLLER_POLICY_AUTO)
     sc.size_hint_align = (evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
     sc.size_hint_weight = (evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
     self.bx.pack_end(sc)
     sc.show()
 
-    self.bxCrt = elementary.Box(self.win)
+    self.bxCrt = Box(self.win)
     self.bxCrt.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
     self.bxCrt.size_hint_align_set(evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
-    self.lb = elementary.Label(self.win)
+    self.lb = Label(self.win)
     self.lb.text_set(txt)
     #fr.content_set(lb)
     self.lb.show()

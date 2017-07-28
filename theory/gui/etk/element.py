@@ -9,8 +9,26 @@ from collections import OrderedDict
 ##### Theory third-party lib #####
 
 ##### Enlightenment lib #####
-import elementary
-import evas
+from efl import elementary
+from efl import evas
+from efl.elementary.background import Background as EBackground
+from efl.elementary.box import Box as EBox
+from efl.elementary.check import Check as ECheck
+from efl.elementary.button import Button as EButton
+from efl.elementary.entry import Entry as EEntry
+from efl.elementary.fileselector_entry import FileselectorEntry \
+    as EFileselectorEntry
+from efl.elementary.frame import Frame as EFrame
+from efl.elementary.genlist import Genlist as EGenlist
+from efl.elementary.genlist import GenlistItemClass as EGenlistItemClass
+from efl.elementary.genlist import ELM_GENLIST_ITEM_GROUP
+from efl.elementary.hoversel import Hoversel as EHoversel
+from efl.elementary.icon import Icon as EIcon
+from efl.elementary.label import Label as ELabel
+from efl.elementary.list import List as EList
+from efl.elementary.radio import Radio as ERadio
+from efl.elementary.table import Table as ETable
+from efl.elementary.window import StandardWindow as EStandardWindow
 
 ##### Local app #####
 
@@ -29,16 +47,16 @@ FILL_BOTH = (evas.EVAS_HINT_FILL, evas.EVAS_HINT_FILL)
 FILL_HORIZ = (evas.EVAS_HINT_FILL, 0.0)
 
 def getNewUiParam(winTitle=""):
-  win = elementary.Window(winTitle, elementary.ELM_WIN_BASIC)
+  win = EStandardWindow(str(winTitle), str(elementary.ELM_WIN_BASIC))
   win.autodel = True
   win.title_set(winTitle)
   win.autodel_set(True)
-  bg = elementary.Background(win)
+  bg = EBackground(win)
   win.resize_object_add(bg)
   bg.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
   bg.show()
 
-  bx = elementary.Box(win)
+  bx = EBox(win)
   win.resize_object_add(bx)
   bx.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
   bx.show()
@@ -109,7 +127,7 @@ class E17Widget(object):
       else:
         self.obj.size_hint_align = FILL_HORIZ
 
-    if(isinstance(self.obj, elementary.Box) and self.attrs.has_key("layout")):
+    if(isinstance(self.obj, EBox) and self.attrs.has_key("layout")):
       self.obj.layout_set(self.attrs["layout"])
     self.obj.show()
     if(self.attrs["isFocus"]):
@@ -129,7 +147,7 @@ class Label(E17Widget):
     super(Label, self).__init__(defaultAttrs, *args, **kwargs)
 
   def generate(self, *args, **kwargs):
-    lb = elementary.Label(self.win)
+    lb = ELabel(self.win)
     lb.text_set(self.attrs["initData"].replace("\n", "<br/>"))
     self.obj = lb
 
@@ -150,7 +168,7 @@ class Frame(E17Widget):
   content = None
 
   def generate(self, *args, **kwargs):
-    fr = elementary.Frame(self.win)
+    fr = EFrame(self.win)
     fr.text_set(self.title)
     self.obj = fr
 
@@ -183,7 +201,7 @@ class List(E17Widget):
     self.children = []
 
   def generate(self, *args, **kwargs):
-    li = elementary.List(self.win)
+    li = EList(self.win)
     self.obj = li
 
   def addChild(self, item, *args, **kwargs):
@@ -204,7 +222,7 @@ class Genlist(E17Widget):
     self.children = []
 
   def generate(self, *args, **kwargs):
-    gl = elementary.Genlist(self.win)
+    gl = EGenlist(self.win)
     # TODO: Use this when genlist elm_genlist_highlight_mode_set is ready
     #gl.multi_select_set(True)
     self.obj = gl
@@ -247,7 +265,7 @@ class Genlist(E17Widget):
     """
     Have to define text getter fxn and content getter fxn before calling it
     """
-    return elementary.GenlistItemClass(item_style="default",
+    return EGenlistItemClass(item_style="default",
                                        text_get_func=self._rowItemTextGetter,
                                        content_get_func=self._rowItemContentGetter)
 
@@ -255,14 +273,14 @@ class Genlist(E17Widget):
     """
     Have to define text getter fxn and content getter fxn before calling it
     """
-    return elementary.GenlistItemClass(item_style="group_index",
+    return EGenlistItemClass(item_style="group_index",
                                        text_get_func=self._rowGroupTextGetter,
                                        content_get_func=self._rowGroupContentGetter)
 
   def _groupAdder(self, itc_g, data, *args, **kwargs):
     return self.obj.item_append(itc_g, data,
                          #flags=elementary.ELM_GENLIST_ITEM_TREE)
-                         flags=elementary.ELM_GENLIST_ITEM_GROUP)
+                         flags=ELM_GENLIST_ITEM_GROUP)
 
   def _itemAdder(self, itc_i, data, git, *args, **kwargs):
     self.obj.item_append(itc_i, data, git)
@@ -374,7 +392,7 @@ class ListModelValidator(Genlist):
     self.grpAState = []
 
   def _rowItemTextGetter(self, obj, part, item_data):
-    return item_data[0].ref.getModelValidateLabel(item_data[1])
+    return item_data[0].ref.links[item_data[1]]
 
   def _rowItemContentGetter(self, obj, part, data):
     r = CheckBox()
@@ -486,7 +504,7 @@ class Box(E17Widget):
     if(self.obj is not None):
       return
 
-    bx = elementary.Box(self.win)
+    bx = EBox(self.win)
 
     if(self.attrs["isHorizontal"]):
       bx.horizontal_set(True)
@@ -561,7 +579,7 @@ class Table(Box):
     if(self.obj is not None):
       return
 
-    bx = elementary.Table(self.win)
+    bx = ETable(self.win)
 
     # If a box is inside a frame
     if(self.bx is not None):
@@ -594,7 +612,7 @@ class Entry(E17Widget):
     super(Entry, self).__init__(defaultAttrs, *args, **kwargs)
 
   def _createObj(self):
-    return elementary.Entry(self.win)
+    return EEntry(self.win)
 
   def generate(self, *args, **kwargs):
     en = self._createObj()
@@ -640,7 +658,7 @@ class Entry(E17Widget):
       txt = kwargs["initData"]
     elif(kwargs.has_key("finalData")):
       txt = kwargs["finalData"]
-    self.obj.entry_set(txt)
+    self.obj.entry_set(unicode(txt))
 
 class Button(E17Widget):
   icon = None
@@ -655,7 +673,7 @@ class Button(E17Widget):
     super(Button, self).__init__(defaultAttrs, *args, **kwargs)
 
   def generate(self, *args, **kwargs):
-    bt = elementary.Button(self.win)
+    bt = EButton(self.win)
     if(self.label):
       bt.text_set(self.label)
     if(hasattr(self, "_clicked")):
@@ -667,7 +685,7 @@ class Icon(E17Widget):
   file = ""
 
   def generate(self, *args, **kwargs):
-    ic = elementary.Icon(self.win)
+    ic = EIcon(self.win)
     ic.file_set(file)
     self.obj = ic
 
@@ -677,7 +695,7 @@ class CheckBox(E17Widget):
   label = None
 
   def generate(self, *args, **kwargs):
-    ck = elementary.Check(self.win)
+    ck = ECheck(self.win)
     self.obj = ck
 
     if(self.label is not None):
@@ -716,7 +734,7 @@ class RadioBox(E17Widget):
     self.objLst = []
 
   def _addRadioChoice(self, value, label, icon=None):
-    rd = elementary.Radio(self.win)
+    rd = ERadio(self.win)
     if(hasattr(self, "_focusChanged")):
       # callback_unfocused_add is not working as we expected, so we use
       # callback_changed in here
@@ -747,7 +765,7 @@ class RadioBox(E17Widget):
   def generate(self, *args, **kwargs):
     if(self.obj is not None):
       self.obj.destroy()
-    self.obj = elementary.Box(self.win)
+    self.obj = EBox(self.win)
     self.obj.show()
 
     self.reset(choices=self.attrs["choices"], initData=self.attrs["initData"])
@@ -840,7 +858,7 @@ class SelectBox(E17Widget):
     self.selectedData = finalData
 
   def generate(self, *args, **kwargs):
-    bt = elementary.Hoversel(self.win)
+    bt = EHoversel(self.win)
     bt.hover_parent_set(self.win)
     if(self.label!=None):
       bt.text_set(self.label)
@@ -892,7 +910,7 @@ class FileSelector(E17Widget):
     pass
 
   def generate(self, *args, **kwargs):
-    fs = elementary.FileselectorEntry(self.win)
+    fs = EFileselectorEntry(self.win)
     fs.text_set("Select a file")
     fs.inwin_mode_set(False)
     fs.folder_only_set(self.attrs["isFolderOnly"])
@@ -908,19 +926,6 @@ class Multibuttonentry(Entry):
   @finalData.setter
   def finalData(self, finalData):
     self.reset(finalData=",".join(finalData))
-
-  def reset(self, **kwargs):
-    txt = ""
-    if(kwargs.has_key("initData")):
-      txt = kwargs["initData"]
-    elif(kwargs.has_key("finalData")):
-      txt = kwargs["finalData"]
-
-    # This part should be different than Entry
-    if isinstance(txt, (list, tuple)):
-      txt = ",".join(txt)
-
-    self.obj.entry_set(txt)
 
 #class Multibuttonentry(E17Widget):
 #  def cb_filter1(self, mbe, text):

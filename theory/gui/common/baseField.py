@@ -957,6 +957,10 @@ class NullBooleanField(BooleanField):
 
 
 class ChoiceField(Field):
+  """
+  Choices will be (value, label). Value must be the key, as label may be
+  crushed while value can never be crushed.
+  """
   widget = SelectBoxInput
   defaultErrorMessages = {
     'invalidChoice': _('Select a valid choice. %(value)s is not one of the available choices.'),

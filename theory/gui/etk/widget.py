@@ -281,7 +281,8 @@ class CheckBoxInput(BaseLabelInput):
     hBox.generate()
 
     for v in self.attrs["choices"]:
-      (label, value) = v
+      (value, label) = v
+      #(label, value) = v
       if self.attrs["initData"] is not None \
           and value in self.attrs["initData"]:
         widget = self.widgetClass({"initData": True, })

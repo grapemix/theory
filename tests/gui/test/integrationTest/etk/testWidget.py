@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 ##### System wide lib #####
+from efl import elementary
 
 ##### Theory lib #####
 from theory.apps.model import Adapter
@@ -15,7 +16,7 @@ from theory.gui.etk.element import Multibuttonentry, Entry
 
 from gui.test.integrationTest.testField import FieldTestCaseBase
 from gui.test.integrationTest.testField import *
-from testDummyEnv import getDummyEnv
+from util import getDummyEnv
 
 ##### Theory app #####
 
@@ -40,6 +41,10 @@ __all__ = ('AdapterFieldWidgetTestCase', 'BooleanFieldWidgetTestCase',
     )
 
 class FieldWidgetTestCaseBase(FieldTestCaseBase):
+  def setUp(self):
+    super(FieldWidgetTestCaseBase, self).setUp()
+    elementary.init()
+
   def extraWidgetParam(self):
     return {}
 
@@ -57,6 +62,8 @@ class FieldWidgetTestCaseBase(FieldTestCaseBase):
       self.dummyWin.delete()
       del self.dummyWin
       self.dummyWin = None
+      elementary.shutdown()
+
 
 class BooleanFieldWidgetTestCase(BooleanFieldTestCase, FieldWidgetTestCaseBase):
   pass
