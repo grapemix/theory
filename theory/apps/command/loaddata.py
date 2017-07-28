@@ -56,7 +56,7 @@ class Loaddata(SimpleCommand):
 
   class ParamForm(SimpleCommand.ParamForm):
     fixtureLabelLst = field.ListField(
-        field.TextField(maxLength=32),
+        field.TextField(maxLength=256),
         label="Fixture Label",
         helpText="Fixture labels",
         )
