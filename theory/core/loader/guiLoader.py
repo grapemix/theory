@@ -4,6 +4,7 @@
 from copy import deepcopy
 from datetime import datetime, timedelta
 import gevent
+import notify2
 import os
 os.environ.setdefault("CELERY_LOADER", "theory.core.loader.celeryLoader.CeleryLoader")
 import signal
@@ -16,7 +17,7 @@ from theory.utils.importlib import importModule
 from theory.utils.mood import loadMoodData
 
 ##### Theory third-party lib #####
-from theory.gui.gtk.notify import getNotify
+from theory.gui.etk import getDbusMainLoop
 
 ##### Local app #####
 
@@ -25,12 +26,17 @@ from theory.gui.gtk.notify import getNotify
 ##### Misc #####
 
 def _chkAdapterBuffer():
+  notify2.init('Theory', getDbusMainLoop())
   while(True):
-    adapterBufferModelLst = AdapterBuffer.objects.filter(
+    for adapterBufferModel in AdapterBuffer.objects.filter(
         created__gt=datetime.now()-timedelta(minutes=1)
-        )
-    for m in adapterBufferModelLst:
-      getNotify("Done", str(m))
+      ):
+      n = notify2.Notification(
+          "Done",
+          str(adapterBufferModel),
+          "notification-message-im"   # Icon name
+          )
+      n.show()
     gevent.sleep(60)
   return False
 
