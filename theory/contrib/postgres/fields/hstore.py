@@ -71,14 +71,17 @@ class HStoreField(Field):
     else:
       maxLength = self.size
     defaults = {
-        'keyField': TextField,
-        'valueField': TextField,
+        'keyField': TextField(),
+        'valueField': TextField(),
         'formClass': form.HStoreField,
         'maxLength': maxLength,
     }
     defaults.update(kwargs)
     return super(HStoreField, self).formfield(**defaults)
 
+  def clean(self, value, isEmptyForgiven=False):
+    super(HStoreField, self).clean(self.toPython(value), isEmptyForgiven)
+    return self.toPython(value)
 
 HStoreField.registerLookup(lookup.DataContains)
 HStoreField.registerLookup(lookup.ContainedBy)
