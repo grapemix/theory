@@ -8,13 +8,13 @@ class CreateExtension(Operation):
   def __init__(self, name):
     self.name = name
 
-  def state_forwards(self, appLabel, state):
+  def stateForwards(self, appLabel, state):
     pass
 
   def databaseForwards(self, appLabel, schemaEditor, formState, toState):
     schemaEditor.execute("CREATE EXTENSION IF NOT EXISTS %s" % self.name)
 
-  def database_backwards(self, appLabel, schemaEditor, formState, toState):
+  def databaseBackwards(self, appLabel, schemaEditor, formState, toState):
     schemaEditor.execute("DROP EXTENSION %s" % self.name)
 
   def describe(self):
@@ -31,7 +31,7 @@ class HStoreExtension(CreateExtension):
     # Register hstore straight away as it cannot be done before the
     # extension is installed, a subsequent data migration would use the
     # same connection
-   registerHstoreHandler(schemaEditor.connection)
+    registerHstoreHandler(schemaEditor.connection)
 
 
 class UnaccentExtension(CreateExtension):
