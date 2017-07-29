@@ -57,7 +57,7 @@ def getDimensionHints():
       maxWidth = width
     if maxHeight < height:
       maxHeight = height
-  settings.dimensionHints = {
+  settings.DIMENSION_HINTS = {
       "minWidth": minWidth,
       "minHeight":minHeight,
       "maxWidth": maxWidth,

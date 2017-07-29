@@ -105,9 +105,9 @@ class Terminal(object):
     self.win.resize(self.initCrtSize[0], height)
 
   def _getDimensionHints(self):
-    self.initCrtSize = (settings.dimensionHints["minWidth"] * 3 / 4, 30)
+    self.initCrtSize = (settings.DIMENSION_HINTS["minWidth"] * 3 / 4, 30)
     settings.initCrtSize = self.initCrtSize
-    self.maxHeight = settings.dimensionHints["maxHeight"]
+    self.maxHeight = settings.DIMENSION_HINTS["maxHeight"]
 
   def __init__(self):
     elementary.init()

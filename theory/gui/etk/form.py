@@ -197,7 +197,7 @@ class SimpleGuiFormBase(GuiFormBase):
     fieldHeight = len(self.fields) * settings.UI_FORM_FIELD_HEIGHT_RATIO
     preferHeight = fieldHeight if(fieldHeight<maxHeight) else maxHeight
 
-    orgWidth = settings.dimensionHints["minWidth"] * 3 / 4
+    orgWidth = settings.DIMENSION_HINTS["minWidth"] * 3 / 4
     self.win.resize(orgWidth, preferHeight)
     self.win.pos_set(self.win.pos[0], 0)
 
@@ -228,7 +228,7 @@ class SimpleGuiFormBase(GuiFormBase):
         self.formBx.addInput(field.widget)
 
     self.formBx.postGenerate()
-    self._changeFormWindowHeight(settings.dimensionHints["maxHeight"] - 200)
+    self._changeFormWindowHeight(settings.DIMENSION_HINTS["maxHeight"] - 200)
 
   def generateFilterForm(self, win, bx, unFocusFxn, **kwargs):
     self.unFocusFxn = unFocusFxn
@@ -267,7 +267,7 @@ class SimpleGuiFormBase(GuiFormBase):
     self.formBx.postGenerate()
     optionalMenu.generate()
     optionalMenu.postGenerate()
-    self._changeFormWindowHeight(settings.dimensionHints["maxHeight"])
+    self._changeFormWindowHeight(settings.DIMENSION_HINTS["maxHeight"])
 
   def showErrInFieldLabel(self):
     for fieldName, errMsg in self.errors.iteritems():
