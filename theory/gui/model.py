@@ -10,7 +10,7 @@ import warnings
 
 from theory.core.exceptions import (
   ImproperlyConfigured, ValidationError, NON_FIELD_ERRORS, FieldError)
-from theory.gui.field import Field, QuerysetField
+from theory.gui.field import Field
 from theory.gui.common.baseForm import DeclarativeFieldsMetaclass, FormBase
 from theory.gui.formset import BaseFormSet, formsetFactory
 from theory.gui.util import ErrorList
@@ -21,6 +21,7 @@ from theory.gui.widget import (
 from theory.utils import six
 from theory.utils.deprecation import RemovedInTheory19Warning
 from theory.utils.encoding import smartText, forceText
+from theory.utils.importlib import importClass
 from theory.utils.text import getTextList, capfirst
 from theory.utils.translation import ugettextLazy as _, ugettext
 
@@ -1165,13 +1166,23 @@ class ModelChoiceField(Field):
     return self._queryset
 
   def _setQueryset(self, queryset):
-    self._queryset = queryset
-    self.widget.queryset = queryset
-    module = queryset.modal.__module__
-    appName = module[:module.find(".model")]
-    self.widget.app = appName
-    self.widget.model = queryset.modal.__name__
-    #self.widget.choices = self.choices
+    if isinstance(queryset, dict):
+      self.widget.app = queryset["appName"]
+      self.widget.model = queryset["modelName"]
+      modelKlass = importClass("{appName}.model.{modelName}".format(**queryset))
+      if "idLst" in queryset:
+        self._queryset = modelKlass.objects.filter(id__in=queryset["idLst"])
+      elif "id" in queryset:
+        self._queryset = modelKlass.objects.filter(id=queryset["id"])
+      else:
+        raise self
+    else:
+      self._queryset = queryset
+      self.widget.queryset = queryset
+      module = queryset.modal.__module__
+      appName = module[:module.find(".model")]
+      self.widget.app = appName
+      self.widget.model = queryset.modal.__name__
 
   queryset = property(_getQueryset, _setQueryset)
 
@@ -1213,6 +1224,9 @@ class ModelChoiceField(Field):
   def toPython(self, value):
     if value in self.emptyValues:
       return None
+    elif type(value.__class__.__bases__[0]).__name__ == "ModelBase":
+      # Already an model instance
+      return value
     try:
       key = self.toFieldName or 'pk'
       value = self.queryset.get(**{key: value})
@@ -1227,6 +1241,9 @@ class ModelChoiceField(Field):
     initDataValue = initData if initData is not None else ''
     dataValue = data if data is not None else ''
     return forceText(self.prepareValue(initDataValue)) != forceText(dataValue)
+
+  def getModelFieldNameSuffix(self):
+    return "Id"
 
 class ModelMultipleChoiceField(ModelChoiceField):
   """A MultipleChoiceField whose choices are a model QuerySet."""
@@ -1260,7 +1277,16 @@ class ModelMultipleChoiceField(ModelChoiceField):
       return value
     if not isinstance(value, (list, tuple)):
       raise ValidationError(self.errorMessages['list'], code='list')
+    if len(value) > 0 and isinstance(value[0], dict):
+      # after seialize, we got [{"modelName": "", "id": "", "appName": ""]
+      value = [i["id"] for i in value]
     key = self.toFieldName or 'pk'
+
+    # if the initData is none, the queryset is empty and hence any id lst
+    # provided by user will be invalid
+    if self.initData is None:
+      self.queryset = self.queryset.modal.objects.all()
+
     for pk in value:
       try:
         self.queryset.filter(**{key: pk})
@@ -1302,6 +1328,9 @@ class ModelMultipleChoiceField(ModelChoiceField):
     dataSet = set(forceText(value) for value in data)
     return dataSet != initDataSet
 
+
+  def getModelFieldNameSuffix(self):
+    return "__m2m"
 
 def modelformDefinesFields(formClass):
   return (formClass is not None and (

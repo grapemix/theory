@@ -31,8 +31,8 @@ def _importModule():
     'FloatField', 'DecimalField', 'IPAddressField', 'GenericIPAddressField',
     'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField',
     'StringGroupFilterField', 'ModelValidateGroupField', 'PythonModuleField',
-    'PythonClassField', 'QuerysetField', 'ModelField', 'EmbeddedField',
-    'ObjectIdField', 'BinaryField', 'GeoPointField',
+    'PythonClassField', 'DynamicModelIdField', 'DynamicModelSetField',
+    'QuerysetField', 'ObjectIdField', 'BinaryField', 'GeoPointField',
   )
 
   module = importModule("theory.gui.{0}.field".format(settings.UI_TOOLKIT))

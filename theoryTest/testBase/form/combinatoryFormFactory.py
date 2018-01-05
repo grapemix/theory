@@ -104,8 +104,13 @@ def getPythonClassDefault():
   return "theory.core.reactor.Reactor"
 
 def getQuerysetDefault():
-  return Command.objects.all()
+  return [str(Command.objects.first().id)]
 
+def getDynamicModelIdDefault():
+  return str(Command.objects.first().id)
+
+def getDynamicModelSetDefault():
+  return [str(Command.objects.first().id)]
 
 def getChoiceSelection():
   return ((1, "1",), (2, "2",), (3, "3",),)
@@ -139,6 +144,8 @@ defaultValueSet1 = {
     "PythonModule": getPythonModuleDefault(),
     "PythonClass": getPythonClassDefault(),
     "Queryset": getQuerysetDefault(),
+    "DynamicModelId": getDynamicModelIdDefault(),
+    "DynamicModelSet": getDynamicModelSetDefault(),
 }
 
 class CombinatoryFormWithDefaultValue(Form):
@@ -172,7 +179,23 @@ class CombinatoryFormWithDefaultValue(Form):
 
   pythonModuleField = field.PythonClassField(initData=defaultValueSet1["PythonModule"])
   pythonClassField = field.PythonClassField(initData=defaultValueSet1["PythonClass"])
-  querysetField = field.QuerysetField(initData=defaultValueSet1["Queryset"])
+  querysetField = field.QuerysetField(
+    appName="theory.apps",
+    modelName="Command",
+    initData=defaultValueSet1["Queryset"]
+  )
+  appNameField = field.TextField(initData="theory.apps")
+  modelNameField = field.TextField(initData="Command")
+  dynamicModelIdField = field.DynamicModelIdField(
+    appFieldName="appNameField",
+    modelFieldName="modelNameField",
+    initData=defaultValueSet1["DynamicModelId"]
+  )
+  dynamicModelSetField = field.DynamicModelSetField(
+    appFieldName="appNameField",
+    modelFieldName="modelNameField",
+    initData=defaultValueSet1["DynamicModelSet"]
+  )
 
   #binaryField = field.BinaryField(initData=defaultValueSet1["Binary"])
   dateField = field.DateField(initData=defaultValueSet1["DateTime"])

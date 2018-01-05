@@ -62,8 +62,8 @@ __all__ = (
   'FloatField', 'DecimalField', 'IPAddressField', 'GenericIPAddressField',
   'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField',
   'StringGroupFilterField', 'ModelValidateGroupField', 'PythonModuleField',
-  'PythonClassField', 'QuerysetField', 'ModelField', 'ObjectIdField',
-  'BinaryField', 'GeoPointField',
+  'PythonClassField', 'DynamicModelIdField', 'DynamicModelSetField',
+  'QuerysetField', 'ObjectIdField', 'BinaryField', 'GeoPointField',
 )
 
 FILE_INPUT_CONTRADICTION = object()
@@ -86,7 +86,7 @@ class Field(object):
   def __init__(self, required=True, label=None, initData=None,
          helpText=None, errorMessages=None, showHiddenInitial=False,
          validators=[], localize=False, isSkipInHistory=False, widget=None,
-         isSingular=True):
+         isSingular=True, getSibilingFieldData=None):
     # required -- Boolean that specifies whether the field is required.
     #             True by default.
     # widget -- A Widget class, or instance of a Widget class, that should
@@ -138,6 +138,11 @@ class Field(object):
     self.isSkipInHistory = isSkipInHistory
     self.isSingular = isSingular # not interact with other fields
 
+    if getSibilingFieldData is None:
+      self.getSibilingFieldData = lambda x: None
+    else:
+      self.getSibilingFieldData = getSibilingFieldData
+
     if widget is not None:
       self.widget = widget
 
@@ -176,6 +181,9 @@ class Field(object):
     if(settings.UI_DEBUG and settings.DEBUG_LEVEL>5):
       print widget.attrs
     self.widget = widget
+
+  def getModelFieldNameSuffix(self):
+    return ""
 
   def prepareValue(self, value):
     return value
@@ -1801,7 +1809,7 @@ class PythonClassField(Field):
       raise ValidationError(self.errorMessages['invalid'] % {'value': value})
     # else (value is empty and it is not required, suppress error)
 
-class QuerysetField(Field):
+class DynamicModelIdField(Field):
   widget = QueryIdInput
 
   defaultErrorMessages = {
@@ -1812,33 +1820,225 @@ class QuerysetField(Field):
     'configInvalid': _('Configuration has been invalid'),
   }
 
-  def __init__(self, autoImport=False, app=None, model=None, *args, **kwargs):
-    super(QuerysetField, self).__init__(*args, **kwargs)
-    self.autoImport = autoImport
-    self.app = app
-    self.model = model
+  def __init__(self, appFieldName=None, modelFieldName=None, *args, **kwargs):
+    super(DynamicModelIdField, self).__init__(*args, **kwargs)
+    self.appFieldName = appFieldName
+    self.modelFieldName = modelFieldName
+
+  def clean(self, value, isEmptyForgiven=False):
+    """
+    Validates the given value and returns its "cleaned" value as an
+    appropriate Python object.
+
+    Raises ValidationError for any errors.
+    """
+    self.validate(value)
+    self.runValidators(value)
+
+    if value is None or value == "None":
+      return value
+    elif type(value.__class__.__bases__[0]).__name__ == "ModelBase":
+      return value.id
+
+    appName = self.getSibilingFieldData(self.appFieldName)
+    modelName = self.getSibilingFieldData(self.modelFieldName)
+
+    try:
+      dbClass = importClass('{0}.model.{1}'.format(
+        appName,
+        modelName
+        )
+      )
+      # We are not actually return the new queryset, instead, we just check if
+      # the id set is in the given queryset
+      if dbClass.objects.filter(id=value).count() == 0:
+        raise ValidationError(
+            self.errorMessages['dbInvalid'] % {'value': value}
+        )
+    except Exception as e:
+      raise ValidationError(
+          self.errorMessages['dbInvalid'] % {'value': value}
+      )
+
+    return value
+
+  def validate(self, value):
+    """
+    Validates if the input exists in the db
+    """
+    value = super(DynamicModelIdField, self).validate(value)
+    if(not value):
+      return value
+
+    if(isclass(self.widget)):
+      return True
+
+    if(value is not None):
+      if(self.app is None):
+        raise ValidationError(
+            self.errorMessages['appInvalid'] % {'value': value}
+        )
+      if(self.model is None):
+        raise ValidationError(
+            self.errorMessages['modelInvalid'] % {'value': value}
+        )
+
+    return True
+
+  def toPython(self, value):
+    return str(value)
+
+  def getModelFieldNameSuffix(self):
+    return "Id"
+
+  def renderWidget(self, *args, **kwargs):
+    if("attrs" not in kwargs):
+      kwargs["attrs"] = {}
+    kwargs["attrs"].update({"app": None, "model": None})
+    super(DynamicModelIdField, self).renderWidget(*args, **kwargs)
+    #self.widget.app = self.app
+    #self.widget.model = self.model
 
   @property
-  def app(self):
-    return self._app
+  def finalData(self):
+    """It is used to store data directly from widget before validation and
+    cleaning."""
+    # TODO: allow lazy update
+    if(self._finalData in validators.EMPTY_VALUES):
+      if(isclass(self.widget)):
+        # return initial data if widget has not been rendered and finalData
+        # is empty
+        return self.initData
+      else:
+        # force update
+        self.widget.updateField()
+    if self._finalData is not None:
+      return self._finalData[0]
 
-  @app.setter
-  def app(self, app):
+  @finalData.setter
+  def finalData(self, finalData):
+    self._finalData = finalData
+
+class DynamicModelSetField(DynamicModelIdField):
+  def clean(self, value, isEmptyForgiven=False):
+    """
+    Validates the given value and returns its "cleaned" value as an
+    appropriate Python object.
+
+    Raises ValidationError for any errors.
+    """
+    self.validate(value)
+    self.runValidators(value)
+
+    if(value==[] or value is None):
+      return []
+
+    appName = self.getSibilingFieldData(self.appFieldName)
+    modelName = self.getSibilingFieldData(self.modelFieldName)
+
+    try:
+      dbClass = importClass('{0}.model.{1}'.format(
+        appName,
+        modelName
+        )
+      )
+      # We are not actually return the new queryset, instead, we just check if
+      # the id set is in the given queryset
+      if len(value)!=\
+          dbClass.objects.filter(id__in=value).count():
+        raise ValidationError(
+            self.errorMessages['dbInvalid'] % {'value': value}
+        )
+    except:
+      raise ValidationError(
+          self.errorMessages['dbInvalid'] % {'value': value}
+      )
+
+    return value
+
+  def validate(self, value):
+    """
+    Validates if the input exists in the db
+    """
+    value = super(DynamicModelSetField, self).validate(value)
+    if(not value):
+      return value
+
+    if(isclass(self.widget)):
+      return True
+
+    if(value!=[] and value is not None):
+      if(self.app is None):
+        raise ValidationError(
+            self.errorMessages['appInvalid'] % {'value': value}
+        )
+      if(self.model is None):
+        raise ValidationError(
+            self.errorMessages['modelInvalid'] % {'value': value}
+        )
+
+    return True
+
+  def toPython(self, value):
+    return [str(i) for i in value]
+
+  def getModelFieldNameSuffix(self):
+    return "__m2m"
+
+  @property
+  def finalData(self):
+    """It is used to store data directly from widget before validation and
+    cleaning."""
+    # TODO: allow lazy update
+    if(self._finalData in validators.EMPTY_VALUES):
+      if(isclass(self.widget)):
+        # return initial data if widget has not been rendered and finalData
+        # is empty
+        return self.initData
+      else:
+        # force update
+        self.widget.updateField()
+    return self._finalData
+
+  @finalData.setter
+  def finalData(self, finalData):
+    self._finalData = finalData
+
+class QuerysetField(Field):
+  defaultErrorMessages = {
+    'invalid': _('Unable to import the given queryset'),
+    'dbInvalid': _('Unable to find data in DB'),
+    'appInvalid': _('No app has been set'),
+    'modelInvalid': _('No model has been set'),
+    'configInvalid': _('Configuration has been invalid'),
+  }
+
+  def __init__(self, appName=None, modelName=None, *args, **kwargs):
+    super(QuerysetField, self).__init__(*args, **kwargs)
+    self.appName = appName
+    self.modelName = modelName
+
+  @property
+  def appName(self):
+    return self._appName
+
+  @appName.setter
+  def appName(self, appName):
     if(not isclass(self.widget)):
       # When form level app change, widget's app ref should also be changed
-      self.widget.app = app
-    self._app = app
+      self.widget.app = appName
+    self._appName = appName
 
   @property
-  def model(self):
-    return self._model
+  def modelName(self):
+    return self._modelName
 
-  @model.setter
-  def model(self, model):
+  @modelName.setter
+  def modelName(self, modelName):
     if(not isclass(self.widget)):
       # When form level model change, widget's model ref should also be changed
-      self.widget.model = model
-    self._model = model
+      self.widget.model = modelName
+    self._modelName = modelName
 
   def clean(self, value, isEmptyForgiven=False):
     """
@@ -1853,19 +2053,16 @@ class QuerysetField(Field):
     if(value==[] or value is None):
       return []
 
-    if(not self.autoImport):
-      return value
-
     try:
       dbClass = importClass('{0}.model.{1}'.format(
-        self.app,
-        self.model
+        self.appName,
+        self.modelName
         )
       )
       # We are not actually return the new queryset, instead, we just check if
       # the id set is in the given queryset
       if len(value)!=\
-          dbClass.objects.filter(id__in=[i.id for i in value]).count():
+          dbClass.objects.filter(id__in=value).count():
         raise ValidationError(
             self.errorMessages['dbInvalid'] % {'value': value}
         )
@@ -1884,15 +2081,15 @@ class QuerysetField(Field):
     if(not value):
       return value
 
-    if(not self.autoImport and isclass(self.widget)):
+    if(isclass(self.widget)):
       return True
 
     if(value!=[] and value is not None):
-      if(self.app is None):
+      if(self.appName is None):
         raise ValidationError(
             self.errorMessages['appInvalid'] % {'value': value}
         )
-      if(self.model is None):
+      if(self.modelName is None):
         raise ValidationError(
             self.errorMessages['modelInvalid'] % {'value': value}
         )
@@ -1900,30 +2097,7 @@ class QuerysetField(Field):
     return True
 
   def toPython(self, value):
-    return [str(i.id) for i in value]
-
-  def renderWidget(self, *args, **kwargs):
-    if("attrs" not in kwargs):
-      kwargs["attrs"] = {}
-    kwargs["attrs"].update({"app": self.app, "model": self.model})
-    super(QuerysetField, self).renderWidget(*args, **kwargs)
-    self.widget.app = self.app
-    self.widget.model = self.model
-
-class ModelField(Field):
-  #widget = ModelInput
-
-  def __init__(self, appName, modelName, *args, **kwargs):
-    #self.modelConfigModel = AppModel.objects.get(
-    #    isEmbedded=False,
-    #    app=appName,
-    #    name=modelName
-    #    )
-    self.modelFieldLst = []
-    #for fieldName in self.modelConfigModel.formField:
-    #  fieldType = self.modelConfigModel.fieldNameTypeMap[fieldName]
-
-    super(ModelField, self).__init__(*args, **kwargs)
+    return [str(i) for i in value]
 
 class ObjectIdField(Field):
   @property

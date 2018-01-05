@@ -156,6 +156,8 @@ class FormBase(object):
     # self.baseFields.
     super(FormBase, self).__init__()
     self.fields = copy.deepcopy(self.baseFields)
+    for field in self.fields.values():
+      field.getSibilingFieldData = self.getSibilingFieldData
 
   def __str__(self):
     return self.__class__.__name__
@@ -435,6 +437,10 @@ class FormBase(object):
           raise ValidationError(str(e))
       return self.jsonData
 
+  def getSibilingFieldData(self, fieldName):
+    return self.fields[fieldName].clean(
+        self.fields[fieldName].finalData
+        )
 
 class Form(six.withMetaclass(DeclarativeFieldsMetaclass, FormBase)):
   """A collection of Fields, plus their associated data."""

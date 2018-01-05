@@ -31,8 +31,8 @@ __all__ = (
   'FloatField', 'DecimalField', 'IPAddressField', 'GenericIPAddressField',
   'FilePathField', 'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField',
   'StringGroupFilterField', 'ModelValidateGroupField', 'PythonModuleField',
-  'PythonClassField', 'QuerysetField', 'ModelField', 'EmbeddedField',
-  'ObjectIdField', 'BinaryField', 'GeoPointField',
+  'PythonClassField', 'QuerysetField', 'DynamicModelIdField',
+  'DynamicModelSetField', 'ObjectIdField', 'BinaryField', 'GeoPointField',
 )
 
 

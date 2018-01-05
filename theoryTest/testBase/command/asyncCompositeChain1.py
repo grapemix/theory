@@ -3,8 +3,9 @@
 
 ##### Theory lib #####
 from theory.apps.command.baseCommand import AsyncCommand
+from theory.apps.model import Command
 from theory.core.bridge import Bridge
-from theory.gui import field
+from theory.gui.model import ModelMultipleChoiceField
 
 ##### Theory third-party lib #####
 
@@ -21,9 +22,8 @@ class AsyncCompositeChain1(AsyncChain1):
   verboseName = "asyncComoisiteChain1"
 
   class ParamForm(AsyncCommand.ParamForm):
-    queryset = field.QuerysetField(
-        app="theory",
-        model="Command",
+    queryset = ModelMultipleChoiceField(
+        queryset=Command.objects.all(),
         required=False,
         initData=[]
     )
