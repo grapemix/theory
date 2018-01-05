@@ -16,7 +16,7 @@ from theory.test.testcases import TestCase
 ##### Theory app #####
 
 ##### Misc #####
-from gui.test.integrationTest.etk.testDummyEnv import getDummyEnv
+from testGui.test.integrationTest.etk.testDummyEnv import getDummyEnv
 
 __all__ = (
     'ListFieldTestCase',
@@ -44,6 +44,8 @@ class ListFieldTestCase(TestCase):
     self.dummyBx.postGenerate()
     self.assertEqual(f.clean(f.finalData), [b"11", b"10"])
 
+"""
+Have to rewrite the QuerysetField
 class QuerysetFieldTestCase(TestCase):
   def __init__(self, *args, **kwargs):
     super(QuerysetFieldTestCase, self).__init__(*args, **kwargs)
@@ -131,3 +133,4 @@ class QuerysetFieldTestCase(TestCase):
   #  self.dummyBx.generate()
   #  self.dummyBx.postGenerate()
   #  self.assertEqual(f.finalData, Command.objects.all())
+"""

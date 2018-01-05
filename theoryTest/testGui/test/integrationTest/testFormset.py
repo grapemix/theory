@@ -16,7 +16,7 @@ from theory.test.testcases import TestCase
 ##### Theory app #####
 
 ##### Misc #####
-from gui.test.integrationTest.etk.testDummyEnv import getDummyEnv
+from testGui.test.integrationTest.etk.testDummyEnv import getDummyEnv
 from testBase.form.combinatoryFormFactory import CombinatoryFormFactory
 
 __all__ = ('FormsetTestCase',)

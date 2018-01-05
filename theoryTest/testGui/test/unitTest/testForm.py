@@ -40,6 +40,8 @@ class FormBaseTestCase(TestCase):
   #  print form.clean()
 
 class CombinatoryFormTestCase(TestCase):
+  fixtures = ["theory",]
+
   def setUp(self):
     self.factory = CombinatoryFormFactory()
     self.form = self.factory.getCombinatoryFormWithDefaultValue()
