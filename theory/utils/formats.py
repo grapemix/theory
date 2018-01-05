@@ -27,6 +27,7 @@ ISO_INPUT_FORMATS = {
   'DATETIME_INPUT_FORMATS': (
     '%Y-%m-%d %H:%M:%S',
     '%Y-%m-%d %H:%M:%S.%f',
+    '%Y-%m-%dT%H:%M:%S.%f',
     '%Y-%m-%d %H:%M',
     '%Y-%m-%d'
   ),

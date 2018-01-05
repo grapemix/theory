@@ -250,6 +250,8 @@ DATETIME_INPUT_FORMATS = (
   '%m/%d/%y %H:%M:%S',     # '10/25/06 14:30:59'
   '%m/%d/%y %H:%M',        # '10/25/06 14:30'
   '%m/%d/%y',              # '10/25/06'
+  '%Y-%m-%d %H:%M:%S.%f',
+  '%Y-%m-%dT%H:%M:%S.%f',
 )
 
 # First day of week, to be used on calendars

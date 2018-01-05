@@ -647,18 +647,18 @@ class DateTimeField(BaseTemporalField):
     if isinstance(value, datetime.date):
       result = datetime.datetime(value.year, value.month, value.day)
       return fromCurrentTimezone(result)
-    if isinstance(value, list):
-      # Input comes from a SplitDateTimeWidget, for example. So, it's two
-      # components: date and time.
-      warnings.warn(
-        'Using SplitDateTimeWidget with DateTimeField is deprecated. '
-        'Use SplitDateTimeField instead.',
-        RemovedInTheory19Warning, stacklevel=2)
-      if len(value) != 2:
-        raise ValidationError(self.errorMessages['invalid'], code='invalid')
-      if value[0] in self.emptyValues and value[1] in self.emptyValues:
-        return None
-      value = '%s %s' % tuple(value)
+    if isinstance(value, six.textType):
+      unicodeValue = forceText(value, stringsOnly=True)
+      if isinstance(unicodeValue, six.textType):
+        value = unicodeValue.strip()
+      # If unicode, try to strptime against each input format.
+      if isinstance(value, six.textType):
+        for format in self.inputFormats:
+          try:
+            return self.strptime(value, format)
+          except (ValueError, TypeError):
+            continue
+
     result = super(DateTimeField, self).toPython(value)
     return fromCurrentTimezone(result)
 

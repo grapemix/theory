@@ -12,7 +12,7 @@ from theory.utils.six.moves.urllib.parse import urlsplit, urlunsplit
 
 
 # These values, if given to validate(), will trigger the self.required check.
-EMPTY_VALUES = (None, '', [], (), {})
+EMPTY_VALUES = (None, '', [], (), {}, "None")
 
 
 @deconstructible
