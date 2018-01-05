@@ -24,7 +24,7 @@ def _resolveName(name, package, level):
 
 
 if six.PY3:
-  from importlib import importModule
+  from importlib import import_module as importModule
 else:
   def importModule(name, package=None):
     """Import a module.
