@@ -55,10 +55,13 @@ class BasePacker(object):
   def _createWidget(self, *args, **kwargs):
     widget = self.widgetClass(self.attrs)
     widget.win = self.win
-    if(self.attrs.has_key("focusChgFxn")):
-      widget._focusChanged = self.attrs["focusChgFxn"]
-    elif(self.attrs.has_key("contentChgFxn")):
-      widget._contentChanged = self.attrs["contentChgFxn"]
+    if "isFocusChgTrigger" in self.attrs and self.attrs["isFocusChgTrigger"]:
+      widget._focusChanged = self.attrs["syncFormData"]
+      widget._fieldName = self.attrs["fieldName"]
+    elif "isContentChgTrigger" in self.attrs \
+        and self.attrs["isContentChgTrigger"]:
+      widget._contentChanged = self.attrs["syncFormData"]
+      widget._fieldName = self.attrs["fieldName"]
     return (widget,)
 
   def _createContainer(self, attrs=None, *args, **kwargs):
@@ -269,6 +272,12 @@ class SelectBoxInput(BaseLabelInput):
   def updateField(self):
     self.fieldSetter({"finalData": self.widgetLst[0].finalData})
 
+  #def _createWidget(self, *args, **kwargs):
+  #  widgetLst = super(SelectBoxInput, self)._createWidget(*args, **kwargs)
+  #  print widgetLst[0].objLst[-1]
+  #  print dir(widgetLst[0].objLst[-1])
+  #  return widgetLst
+
 class CheckBoxInput(BaseLabelInput):
   widgetClass = element.CheckBox
 
@@ -431,9 +440,26 @@ class StringGroupFilterInput(BaseLabelInput):
 class ModelValidateGroupInput(BaseLabelInput):
   widgetClass = element.ListModelValidator
 
-  def __init__(self, fieldSetter, fieldGetter, win, bx, attrs=None, *args, **kwargs):
+  def __init__(
+      self,
+      fieldSetter,
+      fieldGetter,
+      win,
+      bx,
+      attrs=None,
+      *args,
+      **kwargs
+      ):
     attrs = self._buildAttrs(attrs, initData=(), isExpandMainContainer=True)
-    super(ModelValidateGroupInput, self).__init__(fieldSetter, fieldGetter, win, bx, attrs, *args, **kwargs)
+    super(ModelValidateGroupInput, self).__init__(
+        fieldSetter,
+        fieldGetter,
+        win,
+        bx,
+        attrs,
+        *args,
+        **kwargs
+        )
 
   @property
   def initData(self):
@@ -786,6 +812,7 @@ class DictInput(ListInput):
     # Used to keep track of the index of each button belong to
     self.btnIdxMap = {}
 
+    self._inputLst = []
     # We should call the __init__() of ListInput's parent because
     # widgetClass should not be changed even StringInput is used.
     super(ListInput, self).__init__(
@@ -828,6 +855,7 @@ class DictInput(ListInput):
 
     keyField.renderWidget(self.win, keyInputBox.obj, attrs=defaultParam)
     keyField.widget.widgetLst = list(keyField.widget._createWidget())
+    self._inputLst.append(keyField.widget)
 
     keyInputBox.addWidget(keyField.widget.widgetLst[0])
 
@@ -855,6 +883,7 @@ class DictInput(ListInput):
     valueField.renderWidget(self.win, valueInputBox.obj, attrs=defaultParam)
 
     valueField.widget.widgetLst = list(valueField.widget._createWidget())
+    self._inputLst.append(valueField.widget)
     valueInputBox.addWidget(valueField.widget.widgetLst[0])
 
     buttonControlBox = self._createGenericWidgetBtnControlBox(idx)
@@ -1108,7 +1137,7 @@ class FilterFormLayout(BasePacker):
   def addInput(self, fieldName, input):
     self.inputLst.append((fieldName.lower(), input))
 
-  def _filterField(self, en):
+  def _filterField(self, en, dummyFieldName):
     if(self.isJustStart):
       self.isJustStart = False
       return
@@ -1143,6 +1172,7 @@ class FilterFormLayout(BasePacker):
     en = element.Entry({"isFillAlign": False, "isWeightExpand": False})
     en.win = self.win
     en._contentChanged = self._filterField
+    en._fieldName = None
     filterEntryBox.addWidget(en)
 
     self.inputContainer = self._createContainer(

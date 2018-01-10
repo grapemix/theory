@@ -625,11 +625,11 @@ class Entry(E17Widget):
     if(hasattr(self, "_keyDownAdd")):
       en.on_key_down_add(self._keyDownAdd)
     if(hasattr(self, "_contentChanged")):
-      en.callback_changed_add(self._contentChanged)
+      en.callback_changed_add(self._contentChanged, self._fieldName)
     if(self.attrs["autoFocus"]):
       en.focus_set(1)
     if(hasattr(self, "_focusChanged")):
-      en.callback_unfocused_add(self._focusChanged)
+      en.callback_unfocused_add(self._focusChanged, self._fieldName)
 
     if(self.attrs["isSingleLine"]):
       en.single_line_set(True)
@@ -738,9 +738,9 @@ class RadioBox(E17Widget):
     if(hasattr(self, "_focusChanged")):
       # callback_unfocused_add is not working as we expected, so we use
       # callback_changed in here
-      rd.callback_changed_add(self._focusChanged)
+      rd.callback_changed_add(self._focusChanged, self._fieldName)
     if(hasattr(self, "_contentChanged")):
-      rd.callback_changed_add(self._contentChanged)
+      rd.callback_changed_add(self._contentChanged, self._fieldName)
 
     rd.text_set(label)
     rd.state_value_set(len(self.dataChoice))
