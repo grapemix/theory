@@ -978,9 +978,15 @@ class ChoiceField(Field):
     super(ChoiceField, self).renderWidget(*args, **kwargs)
     self.widget.attrs["choices"] = self.choices
 
-  def __init__(self, choices=(), *args, **kwargs):
+  def __init__(self, choices=(), dynamicChoiceLst=None, *args, **kwargs):
+    # Choice field and its descendant will have dynamicChoiceLst and set
+    # as None by default. We don't want to store it unless
+    # dynamicChoiceLst has been actually in use because we will override
+    # choices by dynamicChoiceLst
     super(ChoiceField, self).__init__(*args, **kwargs)
     self.choices = choices
+    # Have to store it for CommandClassScanner to read and validation
+    self.dynamicChoiceLst = dynamicChoiceLst
 
   def __deepcopy__(self, memo):
     result = super(ChoiceField, self).__deepcopy__(memo)
@@ -994,7 +1000,9 @@ class ChoiceField(Field):
     # Setting choices also sets the choices on the widget.
     # choices can be any iterable, but we call list() on it because
     # it will be consumed more than once.
-    self._choices = self.widget.choices = list(value)
+    self._choices = list(value)
+    if not isclass(self.widget):
+      self.widget.choices = self._choices
 
   choices = property(_getChoices, _setChoices)
 
@@ -1008,6 +1016,8 @@ class ChoiceField(Field):
     """
     Validates that the input is in self.choices.
     """
+    if self.dynamicChoiceLst is not None:
+      self.choices = self.dynamicChoiceLst
     super(ChoiceField, self).validate(value)
     if value and not self.validValue(value):
       raise ValidationError(
@@ -1079,6 +1089,8 @@ class MultipleChoiceField(ChoiceField):
     """
     if self.required and not value:
       raise ValidationError(self.errorMessages['required'], code='required')
+    if self.dynamicChoiceLst is not None:
+      self.choices = self.dynamicChoiceLst
     # Validate that each value in the value list is in self.choices.
     for val in value:
       if not self.validValue(val):
@@ -1463,6 +1475,9 @@ class DictField(Field):
       d = OrderedDict()
       for i in range(len(self.keyFields)):
         d[self.keyFields[i].finalData] = self.valueFields[i].finalData
+      # fullClean() will clear the widget instance and hence finalData will be
+      # equal to initData if we don't set the finalData in here
+      self._finalData = d
       return d
 
   @finalData.setter
