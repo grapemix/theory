@@ -7,7 +7,7 @@ from copy import deepcopy
 ##### Theory lib #####
 from theory.apps.adapter import BaseAdapter
 from theory.conf import settings
-from theory.apps.model import Command, Parameter
+from theory.apps.model import Command
 
 ##### Theory third-party lib #####
 
@@ -75,12 +75,12 @@ class AdapterClassScanner(BaseClassScanner):
 
       token = adapter.importPath.split(".")
 
-      if(len(token)>1):
+      if(adapter.importPath.endswith("theory.apps")):
+        adapter.importPath += ".adapter." + adapterClassName
+      elif(len(token)>1):
         token.insert(-1, "adapter")
         token.append(adapterClassName)
         adapter.importPath =".".join(token)
-      elif(adapter.importPath.endswith("theory")):
-        adapter.importPath += ".adapter." + adapterClassName
 
       buffer = [] # del me when arrayField is supported
       # Don't use __dict__.iteritems() which unable to retrieve property
