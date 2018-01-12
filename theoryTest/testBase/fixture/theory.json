@@ -5,203 +5,77 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 1,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 1
 },
 {
   "fields": {
     "comment": "",
-    "name": "database",
+    "name": "appName",
     "isOptional": false,
     "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": \"theory.apps\", \"label\": \"Application Name\", \"choices\": [], \"helpText\": \"The name of applications to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": true, \"type\": \"ChoiceField\"}",
     "command": 1,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 2
 },
 {
   "fields": {
     "comment": "",
-    "name": "isLoadInitData",
-    "isOptional": true,
+    "name": "modelName",
+    "isOptional": false,
     "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": null, \"label\": \"Model Name\", \"choices\": [], \"helpText\": \"The name of models to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
     "command": 1,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 3
 },
 {
   "fields": {
     "comment": "",
-    "name": "isResetSequence",
+    "name": "queryset",
     "isOptional": true,
     "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"invalidPkValue\": \"\\\"%(pk)s\\\" is not a valid value for a primary key.\", \"list\": \"Enter a list of values.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\", \"required\": \"This field is required.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"queryset\": {\"idLst\": [\"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\"], \"modelName\": \"AppModel\", \"appName\": \"theory.apps\"}, \"isSingular\": true, \"initData\": [], \"label\": \"Queryset\", \"helpText\": \"The queryset to be processed\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ModelMultipleChoiceField\"}",
     "command": 1,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 4
 },
 {
   "fields": {
     "comment": "",
-    "name": "isAllowCascade",
-    "isOptional": true,
+    "name": "queryFilter",
+    "isOptional": false,
     "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"lenUnmatch\": \"The length of various fields unmatch.\", \"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": {}, \"label\": \"QueryFilter\", \"childValueFieldTemplate\": \"TextField\", \"helpText\": \"The simple filter being applied to the query\", \"showHiddenInitial\": false, \"localize\": false, \"childKeyFieldTemplate\": \"TextField\", \"widgetIsFocusChgTrigger\": false, \"type\": \"DictField\"}",
     "command": 1,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 5
 },
 {
   "fields": {
     "comment": "",
-    "name": "isInhibitPostMigrate",
+    "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
-    "command": 1,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "command": 2,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 6
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "verbosity",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 2,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 7
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "appName",
-    "isOptional": false,
-    "isReadOnly": false,
-    "command": 2,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 8
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "modelName",
-    "isOptional": false,
-    "isReadOnly": false,
-    "command": 2,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 9
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "queryset",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 2,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 10
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "queryFilter",
-    "isOptional": false,
-    "isReadOnly": false,
-    "command": 2,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 11
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "verbosity",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 3,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 12
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "appName",
-    "isOptional": false,
-    "isReadOnly": false,
-    "command": 3,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 13
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "modelName",
-    "isOptional": false,
-    "isReadOnly": false,
-    "command": 3,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 14
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "queryset",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 3,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 15
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "queryFilter",
-    "isOptional": false,
-    "isReadOnly": false,
-    "command": 3,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 16
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "verbosity",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 4,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 17
 },
 {
   "fields": {
@@ -209,11 +83,12 @@
     "name": "commandReady",
     "isOptional": false,
     "isReadOnly": false,
-    "command": 4,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": null, \"label\": \"Command Ready\", \"choices\": [], \"helpText\": \"Select a command ready to be continued\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "command": 2,
     "type": ""
   },
-  "model": "apps.parameter",
-  "pk": 18
+  "model": "apps.cmdfield",
+  "pk": 7
 },
 {
   "fields": {
@@ -221,275 +96,12 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
-    "command": 5,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "command": 3,
     "type": ""
   },
-  "model": "apps.parameter",
-  "pk": 19
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "fixtureLabelLst",
-    "isOptional": false,
-    "isReadOnly": false,
-    "command": 5,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 20
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "database",
-    "isOptional": false,
-    "isReadOnly": false,
-    "command": 5,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 21
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "appLabel",
-    "isOptional": false,
-    "isReadOnly": false,
-    "command": 5,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 22
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "isIgnorenonexistent",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 5,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 23
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "isHideEmpty",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 5,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 24
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "verbosity",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 6,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 25
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "rootLst",
-    "isOptional": false,
-    "isReadOnly": false,
-    "command": 6,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 26
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "yieldMethod",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 6,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 27
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "depth",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 6,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 28
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "includeFileExtLst",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 6,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 29
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "excludeFileExtLst",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 6,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 30
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "includeDirLst",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 6,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 31
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "excludeDirLst",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 6,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 32
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "stdout",
-    "isOptional": true,
-    "isReadOnly": true,
-    "command": 6,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 33
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "dirnameLst",
-    "isOptional": true,
-    "isReadOnly": true,
-    "command": 6,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 34
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "filenameLst",
-    "isOptional": true,
-    "isReadOnly": true,
-    "command": 6,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 35
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "verbosity",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 7,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 36
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "appLabelLst",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 7,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 37
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "isDryRun",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 7,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 38
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "isMerge",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 7,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 39
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "isEmpty",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 7,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 40
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "verbosity",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 8,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 41
+  "model": "apps.cmdfield",
+  "pk": 8
 },
 {
   "fields": {
@@ -497,11 +109,12 @@
     "name": "appLabelLst",
     "isOptional": false,
     "isReadOnly": false,
-    "command": 8,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": [], \"label\": \"app label list\", \"helpText\": \"Restricts dumped data to the specified appLabel or appLabel.ModelName.\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
+    "command": 3,
     "type": ""
   },
-  "model": "apps.parameter",
-  "pk": 42
+  "model": "apps.cmdfield",
+  "pk": 9
 },
 {
   "fields": {
@@ -509,11 +122,12 @@
     "name": "format",
     "isOptional": false,
     "isReadOnly": false,
-    "command": 8,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": \"json\", \"label\": \"format\", \"choices\": [[\"json\", \"json\"]], \"helpText\": \"Specifies the output serialization format for fixtures.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "command": 3,
     "type": ""
   },
-  "model": "apps.parameter",
-  "pk": 43
+  "model": "apps.cmdfield",
+  "pk": 10
 },
 {
   "fields": {
@@ -521,11 +135,12 @@
     "name": "indent",
     "isOptional": false,
     "isReadOnly": false,
-    "command": 8,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": 2, \"label\": \"indent\", \"helpText\": \"Specifies the indent level to use when pretty-printing output.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "command": 3,
     "type": ""
   },
-  "model": "apps.parameter",
-  "pk": 44
+  "model": "apps.cmdfield",
+  "pk": 11
 },
 {
   "fields": {
@@ -533,11 +148,12 @@
     "name": "database",
     "isOptional": false,
     "isReadOnly": false,
-    "command": 8,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": \"default\", \"label\": \"database\", \"helpText\": \"('Nominates a specific database to dump fixtures from.', 'Defaults to the \\\"default\\\" database.')\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
+    "command": 3,
     "type": ""
   },
-  "model": "apps.parameter",
-  "pk": 45
+  "model": "apps.cmdfield",
+  "pk": 12
 },
 {
   "fields": {
@@ -545,11 +161,12 @@
     "name": "excludeLst",
     "isOptional": false,
     "isReadOnly": false,
-    "command": 8,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": [], \"label\": \"exclude list\", \"helpText\": \"appLabel or appLabel.ModelName to exclude \", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
+    "command": 3,
     "type": ""
   },
-  "model": "apps.parameter",
-  "pk": 46
+  "model": "apps.cmdfield",
+  "pk": 13
 },
 {
   "fields": {
@@ -557,11 +174,12 @@
     "name": "isNature",
     "isOptional": true,
     "isReadOnly": false,
-    "command": 8,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is nature\", \"helpText\": \"Use natural keys if they are available\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "command": 3,
     "type": ""
   },
-  "model": "apps.parameter",
-  "pk": 47
+  "model": "apps.cmdfield",
+  "pk": 14
 },
 {
   "fields": {
@@ -569,11 +187,12 @@
     "name": "isNatureForeign",
     "isOptional": true,
     "isReadOnly": false,
-    "command": 8,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is nature foreign\", \"helpText\": \"Use natural foreign keys if they are available.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "command": 3,
     "type": ""
   },
-  "model": "apps.parameter",
-  "pk": 48
+  "model": "apps.cmdfield",
+  "pk": 15
 },
 {
   "fields": {
@@ -581,11 +200,12 @@
     "name": "isNaturePrimary",
     "isOptional": true,
     "isReadOnly": false,
-    "command": 8,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is nature primary\", \"helpText\": \"Use natural primary keys if they are available.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "command": 3,
     "type": ""
   },
-  "model": "apps.parameter",
-  "pk": 49
+  "model": "apps.cmdfield",
+  "pk": 16
 },
 {
   "fields": {
@@ -593,11 +213,12 @@
     "name": "isUseBaseManager",
     "isOptional": true,
     "isReadOnly": false,
-    "command": 8,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is use base manager\", \"helpText\": \"(\\\"Use Theory's base manager to dump all models stored in the database, \\\", 'including those that would otherwise be filtered or modified by ', 'a custom manager.')\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "command": 3,
     "type": ""
   },
-  "model": "apps.parameter",
-  "pk": 50
+  "model": "apps.cmdfield",
+  "pk": 17
 },
 {
   "fields": {
@@ -605,11 +226,12 @@
     "name": "primaryKeyLst",
     "isOptional": true,
     "isReadOnly": false,
-    "command": 8,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": [], \"label\": \"primary key list\", \"helpText\": \"('Only dump objects with given primary keys. ', 'Accepts a comma separated list of keys. ', 'This option will only work when you specify one model.')\", \"childFieldTemplate\": \"IntegerField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
+    "command": 3,
     "type": ""
   },
-  "model": "apps.parameter",
-  "pk": 51
+  "model": "apps.cmdfield",
+  "pk": 18
 },
 {
   "fields": {
@@ -617,11 +239,12 @@
     "name": "output",
     "isOptional": true,
     "isReadOnly": false,
-    "command": 8,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": \"\", \"label\": \"output\", \"helpText\": \"Specifies file to which the output is written.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
+    "command": 3,
     "type": ""
   },
-  "model": "apps.parameter",
-  "pk": 52
+  "model": "apps.cmdfield",
+  "pk": 19
 },
 {
   "fields": {
@@ -629,11 +252,12 @@
     "name": "isShowTraceback",
     "isOptional": true,
     "isReadOnly": false,
-    "command": 8,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is show traceback\", \"helpText\": \"Show traceback if they are available.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "command": 3,
     "type": ""
   },
-  "model": "apps.parameter",
-  "pk": 53
+  "model": "apps.cmdfield",
+  "pk": 20
 },
 {
   "fields": {
@@ -641,59 +265,64 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
-    "command": 9,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "command": 4,
     "type": ""
   },
-  "model": "apps.parameter",
-  "pk": 54
+  "model": "apps.cmdfield",
+  "pk": 21
 },
 {
   "fields": {
     "comment": "",
-    "name": "appName",
-    "isOptional": false,
-    "isReadOnly": false,
-    "command": 9,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 55
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "verbosity",
+    "name": "appLabelLst",
     "isOptional": true,
     "isReadOnly": false,
-    "command": 10,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": [], \"label\": \"Application Name\", \"helpText\": \"Specify the app label(s) to create migrations for.\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
+    "command": 4,
     "type": ""
   },
-  "model": "apps.parameter",
-  "pk": 56
+  "model": "apps.cmdfield",
+  "pk": 22
 },
 {
   "fields": {
     "comment": "",
-    "name": "appName",
+    "name": "isDryRun",
     "isOptional": true,
     "isReadOnly": false,
-    "command": 10,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is dry run\", \"helpText\": \"Just show what migrations would be made; don't actually write them.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "command": 4,
     "type": ""
   },
-  "model": "apps.parameter",
-  "pk": 57
+  "model": "apps.cmdfield",
+  "pk": 23
 },
 {
   "fields": {
     "comment": "",
-    "name": "mood",
+    "name": "isMerge",
     "isOptional": true,
     "isReadOnly": false,
-    "command": 10,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is merge\", \"helpText\": \"Enable fixing of migration conflicts.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "command": 4,
     "type": ""
   },
-  "model": "apps.parameter",
-  "pk": 58
+  "model": "apps.cmdfield",
+  "pk": 24
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isEmpty",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is empty\", \"helpText\": \"Create an empty migration.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "command": 4,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 25
 },
 {
   "fields": {
@@ -701,11 +330,233 @@
     "name": "stdOut",
     "isOptional": true,
     "isReadOnly": true,
-    "command": 10,
+    "param": "",
+    "command": 4,
     "type": ""
   },
-  "model": "apps.parameter",
-  "pk": 59
+  "model": "apps.cmdfield",
+  "pk": 26
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "command": 5,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 27
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "appNameLst",
+    "isOptional": false,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"invalidList\": \"Enter a list of values.\", \"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": null, \"label\": \"Application Name\", \"choices\": [], \"helpText\": \"The name of applications to be managed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"MultipleChoiceField\"}",
+    "command": 5,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 28
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "action",
+    "isOptional": false,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": \"backup\", \"label\": \"Action\", \"choices\": [[\"backup\", \"backup\"], [\"drop\", \"drop\"]], \"helpText\": \"Backup is only available for third-party apps\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "command": 5,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 29
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "command": 6,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 30
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "appName",
+    "isOptional": false,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": \"theory.apps\", \"label\": \"Application Name\", \"choices\": [], \"helpText\": \"The name of applications to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": true, \"type\": \"ChoiceField\"}",
+    "command": 6,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 31
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "modelName",
+    "isOptional": false,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": null, \"label\": \"Model Name\", \"choices\": [], \"helpText\": \"The name of models to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "command": 6,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 32
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "queryset",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"invalidPkValue\": \"\\\"%(pk)s\\\" is not a valid value for a primary key.\", \"list\": \"Enter a list of values.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\", \"required\": \"This field is required.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"queryset\": {\"idLst\": [\"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\"], \"modelName\": \"AppModel\", \"appName\": \"theory.apps\"}, \"isSingular\": true, \"initData\": [], \"label\": \"Queryset\", \"helpText\": \"The queryset to be processed\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ModelMultipleChoiceField\"}",
+    "command": 6,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 33
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "queryFilter",
+    "isOptional": false,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"lenUnmatch\": \"The length of various fields unmatch.\", \"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": {}, \"label\": \"QueryFilter\", \"childValueFieldTemplate\": \"TextField\", \"helpText\": \"The simple filter being applied to the query\", \"showHiddenInitial\": false, \"localize\": false, \"childKeyFieldTemplate\": \"TextField\", \"widgetIsFocusChgTrigger\": false, \"type\": \"DictField\"}",
+    "command": 6,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 34
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": false,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": 1, \"label\": \"Verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "command": 7,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 35
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "testRunner",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"wrong_classtype\": \"The given class is not matched\", \"invalid\": \"Unable to import the given class\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": \"\", \"label\": \"Test Runner\", \"helpText\": \"The python class of testcase runner being used\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"PythonClassField\"}",
+    "command": 7,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 36
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "testLabel",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": [], \"label\": \"Test Label\", \"helpText\": \"Labels must be of the form: - app.TestClass.test_method\\nRun a single specific test method - app.TestClass\\nRun all the test methods in a given class - app\\nSearch for doctests and unittests in the named application.\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
+    "command": 7,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 37
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "testRunnerClassParam",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"lenUnmatch\": \"The length of various fields unmatch.\", \"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": {}, \"label\": \"Test Runner Class Parameter\", \"childValueFieldTemplate\": \"TextField\", \"helpText\": \"The parameter passed to the test runner class constructor\", \"showHiddenInitial\": false, \"localize\": false, \"childKeyFieldTemplate\": \"TextField\", \"widgetIsFocusChgTrigger\": false, \"type\": \"DictField\"}",
+    "command": 7,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 38
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "stdOut",
+    "isOptional": true,
+    "isReadOnly": true,
+    "param": "",
+    "command": 7,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 39
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "command": 8,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 40
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "appName",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": \"all\", \"label\": \"Application Name\", \"choices\": [], \"helpText\": \"Commands provided by this application\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "command": 8,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 41
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "mood",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": \"all\", \"label\": \"Mood\", \"choices\": [], \"helpText\": \"Commands provided by this mood\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "command": 8,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 42
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "stdOut",
+    "isOptional": true,
+    "isReadOnly": true,
+    "param": "",
+    "command": 8,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 43
 },
 {
   "fields": {
@@ -713,10 +564,219 @@
     "name": "query",
     "isOptional": true,
     "isReadOnly": true,
+    "param": "",
+    "command": 8,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 44
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "command": 9,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 45
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "appName",
+    "isOptional": false,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": \"theory.apps\", \"label\": \"Application Name\", \"choices\": [], \"helpText\": \"The name of applications to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "command": 9,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 46
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "cmdName",
+    "isOptional": false,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": null, \"label\": \"Command Name\", \"helpText\": \" The name of command being created in lowercase.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
+    "command": 9,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 47
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "cmdType",
+    "isOptional": false,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": \"SimpleCommand\", \"label\": \"Command Type\", \"choices\": [[\"SimpleCommand\", \"SimpleCommand\"], [\"AsyncCommand\", \"AsyncCommand\"]], \"helpText\": \"The name of application being used\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "command": 9,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 48
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "propertyNameLst",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": [], \"label\": \"Property Name List\", \"helpText\": \" The name list of property being created\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
+    "command": 9,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 49
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 10,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
+  "pk": 50
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "appName",
+    "isOptional": false,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": \"theory.apps\", \"label\": \"Application Name\", \"choices\": [], \"helpText\": \"The name of applications to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": true, \"type\": \"ChoiceField\"}",
+    "command": 10,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 51
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "modelName",
+    "isOptional": false,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": null, \"label\": \"Model Name\", \"choices\": [], \"helpText\": \"The name of models to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "command": 10,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 52
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "queryset",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"invalidPkValue\": \"\\\"%(pk)s\\\" is not a valid value for a primary key.\", \"list\": \"Enter a list of values.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\", \"required\": \"This field is required.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"queryset\": {\"idLst\": [\"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\"], \"modelName\": \"AppModel\", \"appName\": \"theory.apps\"}, \"isSingular\": true, \"initData\": [], \"label\": \"Queryset\", \"helpText\": \"The queryset to be processed\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ModelMultipleChoiceField\"}",
+    "command": 10,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 53
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "queryFilter",
+    "isOptional": false,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"lenUnmatch\": \"The length of various fields unmatch.\", \"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": {}, \"label\": \"QueryFilter\", \"childValueFieldTemplate\": \"TextField\", \"helpText\": \"The simple filter being applied to the query\", \"showHiddenInitial\": false, \"localize\": false, \"childKeyFieldTemplate\": \"TextField\", \"widgetIsFocusChgTrigger\": false, \"type\": \"DictField\"}",
+    "command": 10,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 54
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "command": 11,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 55
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "database",
+    "isOptional": false,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": \"default\", \"label\": \"database\", \"helpText\": \"('Nominates a specific database to load fixtures into.', 'Defaults to the \\\"default\\\" database.')\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
+    "command": 11,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 56
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isLoadInitData",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is loading initial data\", \"helpText\": \"('Tells Theory not to load any initial data after database ', 'synchronization.')\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "command": 11,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 57
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isResetSequence",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": true, \"label\": \"is reseting sequence\", \"helpText\": \"is reseting sequence\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "command": 11,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 58
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isAllowCascade",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is allowing cascade\", \"helpText\": \"is allowing cascade\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "command": 11,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 59
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isInhibitPostMigrate",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is inhibiting post-migrate\", \"helpText\": \"is inhibiting post-migrate\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "command": 11,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
   "pk": 60
 },
 {
@@ -725,35 +785,168 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
-    "command": 11,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "command": 12,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 61
 },
 {
   "fields": {
     "comment": "",
-    "name": "appLabel",
-    "isOptional": true,
+    "name": "rootLst",
+    "isOptional": false,
     "isReadOnly": false,
-    "command": 11,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": [], \"label\": \"Root Directory List\", \"helpText\": \"\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
+    "command": 12,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 62
 },
 {
   "fields": {
     "comment": "",
-    "name": "isInitialData",
-    "isOptional": false,
+    "name": "yieldMethod",
+    "isOptional": true,
     "isReadOnly": false,
-    "command": 11,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"Yield Method\", \"choices\": [[1, \"All\"], [2, \"File\"], [3, \"Line\"], [4, \"Chunk\"]], \"helpText\": \"how to send the filename in each iteration\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "command": 12,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 63
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "depth",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 0, \"label\": \"Depth\", \"helpText\": \"The recursion level. (0 = not recursive, -1 = recursive infinitely)\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "command": 12,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 64
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "includeFileExtLst",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": [], \"label\": \"The list of file extension being included\", \"helpText\": \"File extenstion being included\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
+    "command": 12,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 65
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "excludeFileExtLst",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": [], \"label\": \"The list of file extension being excluded\", \"helpText\": \"File extenstion being excluded\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
+    "command": 12,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 66
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "includeDirLst",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": [], \"label\": \"The list of directory being included\", \"helpText\": \"Directory being included\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
+    "command": 12,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 67
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "excludeDirLst",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": [], \"label\": \"The list of directory being excluded\", \"helpText\": \"Directory being excluded\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
+    "command": 12,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 68
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "stdout",
+    "isOptional": true,
+    "isReadOnly": true,
+    "param": "",
+    "command": 12,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 69
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "dirnameLst",
+    "isOptional": true,
+    "isReadOnly": true,
+    "param": "",
+    "command": 12,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 70
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "filenameLst",
+    "isOptional": true,
+    "isReadOnly": true,
+    "param": "",
+    "command": 12,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 71
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "command": 13,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 72
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "fixtureLabelLst",
+    "isOptional": false,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": [], \"label\": \"Fixture Label\", \"helpText\": \"Fixture labels\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
+    "command": 13,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 73
 },
 {
   "fields": {
@@ -761,166 +954,50 @@
     "name": "database",
     "isOptional": false,
     "isReadOnly": false,
-    "command": 11,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": \"default\", \"label\": \"database\", \"helpText\": \"(u'Nominates a specific database to load fixture into.', u'Defaults to the \\\"default\\\" database.')\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
+    "command": 13,
     "type": ""
   },
-  "model": "apps.parameter",
-  "pk": 64
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "migrationName",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 11,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 65
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "isFake",
-    "isOptional": false,
-    "isReadOnly": false,
-    "command": 11,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 66
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "isList",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 11,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 67
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "isShowTraceback",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 11,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 68
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "isTestDatabase",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 11,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 69
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "isTestFlush",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 11,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 70
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "verbosity",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 12,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 71
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "appName",
-    "isOptional": false,
-    "isReadOnly": false,
-    "command": 12,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 72
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "modelName",
-    "isOptional": false,
-    "isReadOnly": false,
-    "command": 12,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 73
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "instanceId",
-    "isOptional": true,
-    "isReadOnly": false,
-    "command": 12,
-    "type": ""
-  },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 74
 },
 {
   "fields": {
     "comment": "",
-    "name": "isInNewWindow",
-    "isOptional": true,
+    "name": "appLabel",
+    "isOptional": false,
     "isReadOnly": false,
-    "command": 12,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": null, \"label\": \"Application Label\", \"helpText\": \" The name of application being loaded\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
+    "command": 13,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 75
 },
 {
   "fields": {
     "comment": "",
-    "name": "verbosity",
+    "name": "isIgnorenonexistent",
     "isOptional": true,
     "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is ignore non existent\", \"helpText\": \"(u'Ignores entries in the serialized data for fields that do not ', u'currently exist on the model.')\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
     "command": 13,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 76
 },
 {
   "fields": {
     "comment": "",
-    "name": "moodName",
-    "isOptional": false,
+    "name": "isHideEmpty",
+    "isOptional": true,
     "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is hiding empty\", \"helpText\": \"is hiding empty\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
     "command": 13,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 77
 },
 {
@@ -929,22 +1006,24 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 14,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 78
 },
 {
   "fields": {
     "comment": "",
-    "name": "settingMod",
+    "name": "appName",
     "isOptional": false,
     "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": null, \"label\": \"Application Name\", \"helpText\": \" The name of application being created\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
     "command": 14,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 79
 },
 {
@@ -953,59 +1032,25 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 15,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 80
 },
 {
   "fields": {
     "comment": "",
-    "name": "appName",
-    "isOptional": false,
-    "isReadOnly": false,
-    "command": 15,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 81
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "cmdName",
-    "isOptional": false,
-    "isReadOnly": false,
-    "command": 15,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 82
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "cmdType",
-    "isOptional": false,
-    "isReadOnly": false,
-    "command": 15,
-    "type": ""
-  },
-  "model": "apps.parameter",
-  "pk": 83
-},
-{
-  "fields": {
-    "comment": "",
-    "name": "propertyNameLst",
+    "name": "stdOut",
     "isOptional": true,
-    "isReadOnly": false,
+    "isReadOnly": true,
+    "param": "",
     "command": 15,
     "type": ""
   },
-  "model": "apps.parameter",
-  "pk": 84
+  "model": "apps.cmdfield",
+  "pk": 81
 },
 {
   "fields": {
@@ -1013,58 +1058,102 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 16,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
+  "pk": 82
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "appName",
+    "isOptional": false,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": \"theory.apps\", \"label\": \"Application Name\", \"choices\": [], \"helpText\": \"The name of applications to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": true, \"type\": \"ChoiceField\"}",
+    "command": 16,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 83
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "modelName",
+    "isOptional": false,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": null, \"label\": \"Model Name\", \"choices\": [], \"helpText\": \"The name of models to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "command": 16,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 84
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "queryId",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"configInvalid\": \"Configuration has been invalid\", \"modelInvalid\": \"No model has been set\", \"required\": \"This field is required.\", \"invalid\": \"Unable to import the given queryset\", \"dbInvalid\": \"Unable to find data in DB\", \"appInvalid\": \"No app has been set\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": null, \"label\": \"instance id\", \"helpText\": \"The instance to be edited\", \"appFieldName\": \"appName\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"DynamicModelIdField\", \"modelFieldName\": \"modelName\"}",
+    "command": 16,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
   "pk": 85
 },
 {
   "fields": {
     "comment": "",
-    "name": "isTestTheory",
-    "isOptional": false,
+    "name": "isInNewWindow",
+    "isOptional": true,
     "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"Is in new window\", \"helpText\": \"Is shown in new window\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
     "command": 16,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 86
 },
 {
   "fields": {
     "comment": "",
-    "name": "testRunner",
+    "name": "stdOut",
     "isOptional": true,
-    "isReadOnly": false,
+    "isReadOnly": true,
+    "param": "",
     "command": 16,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 87
 },
 {
   "fields": {
     "comment": "",
-    "name": "testLabel",
+    "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
-    "command": 16,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "command": 17,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 88
 },
 {
   "fields": {
     "comment": "",
-    "name": "testRunnerClassParam",
-    "isOptional": true,
+    "name": "moodName",
+    "isOptional": false,
     "isReadOnly": false,
-    "command": 16,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": null, \"label\": \"Mood Name\", \"choices\": [], \"helpText\": \"The name of mood being used\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "command": 17,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 89
 },
 {
@@ -1073,88 +1162,190 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
-    "command": 17,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "command": 18,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 90
 },
 {
   "fields": {
     "comment": "",
-    "name": "appName",
-    "isOptional": false,
+    "name": "appLabel",
+    "isOptional": true,
     "isReadOnly": false,
-    "command": 17,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": null, \"label\": \"Application Name\", \"helpText\": \" The name of application being created\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
+    "command": 18,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 91
 },
 {
   "fields": {
     "comment": "",
-    "name": "modelName",
+    "name": "isInitialData",
     "isOptional": false,
     "isReadOnly": false,
-    "command": 17,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": false, \"label\": \"is initial data\", \"helpText\": \"Tells Theory not to load any initial data after database synchronization.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "command": 18,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 92
 },
 {
   "fields": {
     "comment": "",
-    "name": "queryset",
-    "isOptional": true,
+    "name": "database",
+    "isOptional": false,
     "isReadOnly": false,
-    "command": 17,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": \"default\", \"label\": \"database\", \"helpText\": \"(u'Nominates a database to synchronize.', u'Defaults to the \\\"default\\\" database.')\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
+    "command": 18,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 93
 },
 {
   "fields": {
     "comment": "",
-    "name": "queryFilter",
-    "isOptional": false,
+    "name": "migrationName",
+    "isOptional": true,
     "isReadOnly": false,
-    "command": 17,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": null, \"label\": \"Migration Name\", \"helpText\": \"Database state will be brought to the state after that migration.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
+    "command": 18,
     "type": ""
   },
-  "model": "apps.parameter",
+  "model": "apps.cmdfield",
   "pk": 94
 },
 {
   "fields": {
-    "name": "lost"
+    "comment": "",
+    "name": "isFake",
+    "isOptional": false,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": false, \"label\": \"is fake\", \"helpText\": \"Mark migrations as run without actually running them\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "command": 18,
+    "type": ""
   },
-  "model": "apps.mood",
-  "pk": 1
+  "model": "apps.cmdfield",
+  "pk": 95
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isList",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is list\", \"helpText\": \"Show a list of all known migrations and which are applied\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "command": 18,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 96
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isShowTraceback",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is show traceback\", \"helpText\": \"Show traceback if they are available.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "command": 18,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 97
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isTestDatabase",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is test database\", \"helpText\": \"is test database\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "command": 18,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 98
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "isTestFlush",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is test flushing database\", \"helpText\": \"is test flushing database\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "command": 18,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 99
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "verbosity",
+    "isOptional": true,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "command": 19,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 100
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "appNameLst",
+    "isOptional": false,
+    "isReadOnly": false,
+    "param": "{\"errorMessages\": {\"invalidList\": \"Enter a list of values.\", \"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": null, \"label\": \"Application Name\", \"choices\": [], \"helpText\": \"The name of application being probed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"MultipleChoiceField\"}",
+    "command": 19,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 101
+},
+{
+  "fields": {
+    "comment": "",
+    "name": "stdOut",
+    "isOptional": true,
+    "isReadOnly": true,
+    "param": "",
+    "command": 19,
+    "type": ""
+  },
+  "model": "apps.cmdfield",
+  "pk": 102
 },
 {
   "fields": {
     "name": "norm"
   },
   "model": "apps.mood",
-  "pk": 2
+  "pk": 1
 },
 {
   "fields": {
     "name": "dev"
   },
   "model": "apps.mood",
-  "pk": 3
+  "pk": 2
 },
 {
   "fields": {
     "comment": null,
-    "name": "flush",
+    "name": "modelTblDel",
     "nextAvblCmd": [],
     "app": "theory.apps",
-    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/flush.py",
+    "sourceFile": "/home/kingston/theory/theory/apps/command/modelTblDel.py",
     "moodSet": [
       1
     ],
@@ -1166,12 +1357,12 @@
 {
   "fields": {
     "comment": null,
-    "name": "modelSelect",
+    "name": "nextStep",
     "nextAvblCmd": [],
     "app": "theory.apps",
-    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/modelSelect.py",
+    "sourceFile": "/home/kingston/theory/theory/apps/command/nextStep.py",
     "moodSet": [
-      2
+      1
     ],
     "runMode": 1
   },
@@ -1181,12 +1372,12 @@
 {
   "fields": {
     "comment": null,
-    "name": "modelTblDel",
+    "name": "dumpdata",
     "nextAvblCmd": [],
     "app": "theory.apps",
-    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/modelTblDel.py",
+    "sourceFile": "/home/kingston/theory/theory/apps/command/dumpdata.py",
     "moodSet": [
-      2
+      1
     ],
     "runMode": 1
   },
@@ -1196,12 +1387,12 @@
 {
   "fields": {
     "comment": null,
-    "name": "nextStep",
+    "name": "makeMigration",
     "nextAvblCmd": [],
     "app": "theory.apps",
-    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/nextStep.py",
+    "sourceFile": "/home/kingston/theory/theory/apps/command/makeMigration.py",
     "moodSet": [
-      2
+      1
     ],
     "runMode": 1
   },
@@ -1211,12 +1402,12 @@
 {
   "fields": {
     "comment": null,
-    "name": "loaddata",
+    "name": "manageAppDb",
     "nextAvblCmd": [],
     "app": "theory.apps",
-    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/loaddata.py",
+    "sourceFile": "/home/kingston/theory/theory/apps/command/manageAppDb.py",
     "moodSet": [
-      1
+      2
     ],
     "runMode": 1
   },
@@ -1226,12 +1417,12 @@
 {
   "fields": {
     "comment": null,
-    "name": "filenameScanner",
+    "name": "modelTblEdit",
     "nextAvblCmd": [],
     "app": "theory.apps",
-    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/filenameScanner.py",
+    "sourceFile": "/home/kingston/theory/theory/apps/command/modelTblEdit.py",
     "moodSet": [
-      2
+      1
     ],
     "runMode": 1
   },
@@ -1241,12 +1432,12 @@
 {
   "fields": {
     "comment": null,
-    "name": "makeMigration",
+    "name": "tester",
     "nextAvblCmd": [],
     "app": "theory.apps",
-    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/makeMigration.py",
+    "sourceFile": "/home/kingston/theory/theory/apps/command/tester.py",
     "moodSet": [
-      1
+      2
     ],
     "runMode": 1
   },
@@ -1256,12 +1447,12 @@
 {
   "fields": {
     "comment": null,
-    "name": "dumpdata",
+    "name": "listCommand",
     "nextAvblCmd": [],
     "app": "theory.apps",
-    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/dumpdata.py",
+    "sourceFile": "/home/kingston/theory/theory/apps/command/listCommand.py",
     "moodSet": [
-      2
+      1
     ],
     "runMode": 1
   },
@@ -1271,12 +1462,12 @@
 {
   "fields": {
     "comment": null,
-    "name": "createApp",
+    "name": "createCmd",
     "nextAvblCmd": [],
     "app": "theory.apps",
-    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/createApp.py",
+    "sourceFile": "/home/kingston/theory/theory/apps/command/createCmd.py",
     "moodSet": [
-      3
+      2
     ],
     "runMode": 1
   },
@@ -1286,12 +1477,12 @@
 {
   "fields": {
     "comment": null,
-    "name": "listCommand",
+    "name": "modelSelect",
     "nextAvblCmd": [],
     "app": "theory.apps",
-    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/listCommand.py",
+    "sourceFile": "/home/kingston/theory/theory/apps/command/modelSelect.py",
     "moodSet": [
-      2
+      1
     ],
     "runMode": 1
   },
@@ -1301,10 +1492,10 @@
 {
   "fields": {
     "comment": null,
-    "name": "migrate",
+    "name": "flush",
     "nextAvblCmd": [],
     "app": "theory.apps",
-    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/migrate.py",
+    "sourceFile": "/home/kingston/theory/theory/apps/command/flush.py",
     "moodSet": [
       1
     ],
@@ -1316,12 +1507,12 @@
 {
   "fields": {
     "comment": null,
-    "name": "modelUpsert",
+    "name": "filenameScanner",
     "nextAvblCmd": [],
     "app": "theory.apps",
-    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/modelUpsert.py",
+    "sourceFile": "/home/kingston/theory/theory/apps/command/filenameScanner.py",
     "moodSet": [
-      2
+      1
     ],
     "runMode": 1
   },
@@ -1331,12 +1522,12 @@
 {
   "fields": {
     "comment": null,
-    "name": "switchMood",
+    "name": "loaddata",
     "nextAvblCmd": [],
     "app": "theory.apps",
-    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/switchMood.py",
+    "sourceFile": "/home/kingston/theory/theory/apps/command/loaddata.py",
     "moodSet": [
-      2
+      1
     ],
     "runMode": 1
   },
@@ -1346,10 +1537,10 @@
 {
   "fields": {
     "comment": null,
-    "name": "probeModule",
+    "name": "createApp",
     "nextAvblCmd": [],
     "app": "theory.apps",
-    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/probeModule.py",
+    "sourceFile": "/home/kingston/theory/theory/apps/command/createApp.py",
     "moodSet": [
       2
     ],
@@ -1361,14 +1552,14 @@
 {
   "fields": {
     "comment": null,
-    "name": "createCmd",
+    "name": "updateUiApi",
     "nextAvblCmd": [],
     "app": "theory.apps",
-    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/createCmd.py",
+    "sourceFile": "/home/kingston/theory/theory/apps/command/updateUiApi.py",
     "moodSet": [
-      3
+      2
     ],
-    "runMode": 1
+    "runMode": 2
   },
   "model": "apps.command",
   "pk": 15
@@ -1376,12 +1567,12 @@
 {
   "fields": {
     "comment": null,
-    "name": "tester",
+    "name": "modelUpsert",
     "nextAvblCmd": [],
     "app": "theory.apps",
-    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/tester.py",
+    "sourceFile": "/home/kingston/theory/theory/apps/command/modelUpsert.py",
     "moodSet": [
-      2
+      1
     ],
     "runMode": 1
   },
@@ -1391,12 +1582,12 @@
 {
   "fields": {
     "comment": null,
-    "name": "modelTblEdit",
+    "name": "switchMood",
     "nextAvblCmd": [],
     "app": "theory.apps",
-    "sourceFile": "/home/kingston/crystal/venv/panel/src/theory/theory/apps/command/modelTblEdit.py",
+    "sourceFile": "/home/kingston/theory/theory/apps/command/switchMood.py",
     "moodSet": [
-      2
+      1
     ],
     "runMode": 1
   },
@@ -1405,48 +1596,42 @@
 },
 {
   "fields": {
-    "importPath": "theory.apps.adapter.terminalAdapter.TerminalAdapter",
-    "propertyLst": "[\"stdErr\", \"stdOut\"]",
-    "name": "Terminal"
+    "comment": null,
+    "name": "migrate",
+    "nextAvblCmd": [],
+    "app": "theory.apps",
+    "sourceFile": "/home/kingston/theory/theory/apps/command/migrate.py",
+    "moodSet": [
+      1
+    ],
+    "runMode": 1
+  },
+  "model": "apps.command",
+  "pk": 18
+},
+{
+  "fields": {
+    "comment": null,
+    "name": "probeModule",
+    "nextAvblCmd": [],
+    "app": "theory.apps",
+    "sourceFile": "/home/kingston/theory/theory/apps/command/probeModule.py",
+    "moodSet": [
+      1
+    ],
+    "runMode": 1
+  },
+  "model": "apps.command",
+  "pk": 19
+},
+{
+  "fields": {
+    "importPath": "theory.apps.adapter.querysetAsSpreadsheetAdapter.QuerysetAsSpreadsheetAdapter",
+    "propertyLst": "[\"appModel\", \"isEditable\", \"queryset\", \"selectedIdLst\"]",
+    "name": "QuerysetAsSpreadsheet"
   },
   "model": "apps.adapter",
   "pk": 1
-},
-{
-  "fields": {
-    "importPath": "theory.apps.adapter.dummyAdapter.DummyAdapter",
-    "propertyLst": "[]",
-    "name": "Dummy"
-  },
-  "model": "apps.adapter",
-  "pk": 2
-},
-{
-  "fields": {
-    "importPath": "theory.adapter.apps.BaseAdapter",
-    "propertyLst": "[]",
-    "name": "Base"
-  },
-  "model": "apps.adapter",
-  "pk": 3
-},
-{
-  "fields": {
-    "importPath": "theory.adapter.apps.BaseUIAdapter",
-    "propertyLst": "[]",
-    "name": "BaseUI"
-  },
-  "model": "apps.adapter",
-  "pk": 4
-},
-{
-  "fields": {
-    "importPath": "theory.apps.adapter.filenameListAdapter.FilenameListAdapter",
-    "propertyLst": "[\"files\", \"stdErr\", \"stdOut\"]",
-    "name": "FilenameList"
-  },
-  "model": "apps.adapter",
-  "pk": 5
 },
 {
   "fields": {
@@ -1455,16 +1640,76 @@
     "name": "StdPipe"
   },
   "model": "apps.adapter",
+  "pk": 2
+},
+{
+  "fields": {
+    "importPath": "theory.apps.adapter.terminalAdapter.TerminalAdapter",
+    "propertyLst": "[\"stdErr\", \"stdOut\"]",
+    "name": "Terminal"
+  },
+  "model": "apps.adapter",
+  "pk": 3
+},
+{
+  "fields": {
+    "importPath": "theory.apps.adapter.BaseAdapter",
+    "propertyLst": "[]",
+    "name": "Base"
+  },
+  "model": "apps.adapter",
+  "pk": 4
+},
+{
+  "fields": {
+    "importPath": "theory.apps.adapter.BaseUIAdapter",
+    "propertyLst": "[]",
+    "name": "BaseUI"
+  },
+  "model": "apps.adapter",
+  "pk": 5
+},
+{
+  "fields": {
+    "importPath": "theory.apps.adapter.dummyAdapter.DummyAdapter",
+    "propertyLst": "[]",
+    "name": "Dummy"
+  },
+  "model": "apps.adapter",
   "pk": 6
 },
 {
   "fields": {
-    "importPath": "theory.apps.adapter.querysetAsSpreadsheetAdapter.QuerysetAsSpreadsheetAdapter",
-    "propertyLst": "[\"appModel\", \"isEditable\", \"queryset\", \" selectedIdLst\"]",
-    "name": "QuerysetAsSpreadsheet"
+    "importPath": "theory.apps.adapter.filenameListAdapter.FilenameListAdapter",
+    "propertyLst": "[\"files\", \"stdErr\", \"stdOut\"]",
+    "name": "FilenameList"
   },
   "model": "apps.adapter",
   "pk": 7
+},
+{
+  "fields": {
+    "appModel": 1,
+    "name": "propertyLst",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "ArrayField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 1
+},
+{
+  "fields": {
+    "appModel": 1,
+    "name": "ArrayField",
+    "parent": 1,
+    "isField": true,
+    "isCircular": false,
+    "data": "TextField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 2
 },
 {
   "fields": {
@@ -1476,7 +1721,7 @@
     "data": "AutoField"
   },
   "model": "apps.fieldparameter",
-  "pk": 1
+  "pk": 3
 },
 {
   "fields": {
@@ -1488,7 +1733,7 @@
     "data": "CharField"
   },
   "model": "apps.fieldparameter",
-  "pk": 2
+  "pk": 4
 },
 {
   "fields": {
@@ -1500,7 +1745,7 @@
     "data": "CharField"
   },
   "model": "apps.fieldparameter",
-  "pk": 3
+  "pk": 5
 },
 {
   "fields": {
@@ -1512,31 +1757,31 @@
     "data": "ForeignKey"
   },
   "model": "apps.fieldparameter",
-  "pk": 4
+  "pk": 6
 },
 {
   "fields": {
     "appModel": 2,
     "name": "foreignApp",
-    "parent": 4,
+    "parent": 6,
     "isField": false,
     "isCircular": false,
-    "data": "('theory.apps',)"
+    "data": "theory.apps"
   },
   "model": "apps.fieldparameter",
-  "pk": 5
+  "pk": 7
 },
 {
   "fields": {
     "appModel": 2,
     "name": "foreignModel",
-    "parent": 4,
+    "parent": 6,
     "isField": false,
     "isCircular": false,
     "data": "Command"
   },
   "model": "apps.fieldparameter",
-  "pk": 6
+  "pk": 8
 },
 {
   "fields": {
@@ -1548,31 +1793,31 @@
     "data": "ForeignKey"
   },
   "model": "apps.fieldparameter",
-  "pk": 7
+  "pk": 9
 },
 {
   "fields": {
     "appModel": 2,
     "name": "foreignApp",
-    "parent": 7,
+    "parent": 9,
     "isField": false,
     "isCircular": false,
-    "data": "('theory.apps',)"
+    "data": "theory.apps"
   },
   "model": "apps.fieldparameter",
-  "pk": 8
+  "pk": 10
 },
 {
   "fields": {
     "appModel": 2,
     "name": "foreignModel",
-    "parent": 7,
+    "parent": 9,
     "isField": false,
     "isCircular": false,
     "data": "Command"
   },
   "model": "apps.fieldparameter",
-  "pk": 9
+  "pk": 11
 },
 {
   "fields": {
@@ -1584,31 +1829,31 @@
     "data": "ForeignKey"
   },
   "model": "apps.fieldparameter",
-  "pk": 10
+  "pk": 12
 },
 {
   "fields": {
     "appModel": 2,
     "name": "foreignApp",
-    "parent": 10,
+    "parent": 12,
     "isField": false,
     "isCircular": false,
-    "data": "('theory.apps',)"
+    "data": "theory.apps"
   },
   "model": "apps.fieldparameter",
-  "pk": 11
+  "pk": 13
 },
 {
   "fields": {
     "appModel": 2,
     "name": "foreignModel",
-    "parent": 10,
+    "parent": 12,
     "isField": false,
     "isCircular": false,
     "data": "Adapter"
   },
   "model": "apps.fieldparameter",
-  "pk": 12
+  "pk": 14
 },
 {
   "fields": {
@@ -1620,7 +1865,7 @@
     "data": "AutoField"
   },
   "model": "apps.fieldparameter",
-  "pk": 13
+  "pk": 15
 },
 {
   "fields": {
@@ -1632,7 +1877,7 @@
     "data": "TextField"
   },
   "model": "apps.fieldparameter",
-  "pk": 14
+  "pk": 16
 },
 {
   "fields": {
@@ -1644,7 +1889,55 @@
     "data": "DateTimeField"
   },
   "model": "apps.fieldparameter",
-  "pk": 15
+  "pk": 17
+},
+{
+  "fields": {
+    "appModel": 3,
+    "name": "tblField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "ArrayField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 18
+},
+{
+  "fields": {
+    "appModel": 3,
+    "name": "ArrayField",
+    "parent": 18,
+    "isField": true,
+    "isCircular": false,
+    "data": "TextField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 19
+},
+{
+  "fields": {
+    "appModel": 3,
+    "name": "formField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "ArrayField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 20
+},
+{
+  "fields": {
+    "appModel": 3,
+    "name": "ArrayField",
+    "parent": 20,
+    "isField": true,
+    "isCircular": false,
+    "data": "TextField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 21
 },
 {
   "fields": {
@@ -1656,7 +1949,7 @@
     "data": "AutoField"
   },
   "model": "apps.fieldparameter",
-  "pk": 16
+  "pk": 22
 },
 {
   "fields": {
@@ -1668,7 +1961,7 @@
     "data": "CharField"
   },
   "model": "apps.fieldparameter",
-  "pk": 17
+  "pk": 23
 },
 {
   "fields": {
@@ -1680,7 +1973,7 @@
     "data": "CharField"
   },
   "model": "apps.fieldparameter",
-  "pk": 18
+  "pk": 24
 },
 {
   "fields": {
@@ -1692,7 +1985,7 @@
     "data": "CharField"
   },
   "model": "apps.fieldparameter",
-  "pk": 19
+  "pk": 25
 },
 {
   "fields": {
@@ -1704,7 +1997,55 @@
     "data": "IntegerField"
   },
   "model": "apps.fieldparameter",
-  "pk": 20
+  "pk": 26
+},
+{
+  "fields": {
+    "appModel": 4,
+    "name": "initState",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "ArrayField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 27
+},
+{
+  "fields": {
+    "appModel": 4,
+    "name": "ArrayField",
+    "parent": 27,
+    "isField": true,
+    "isCircular": false,
+    "data": "BooleanField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 28
+},
+{
+  "fields": {
+    "appModel": 4,
+    "name": "finalState",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "ArrayField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 29
+},
+{
+  "fields": {
+    "appModel": 4,
+    "name": "ArrayField",
+    "parent": 29,
+    "isField": true,
+    "isCircular": false,
+    "data": "BooleanField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 30
 },
 {
   "fields": {
@@ -1716,7 +2057,7 @@
     "data": "AutoField"
   },
   "model": "apps.fieldparameter",
-  "pk": 21
+  "pk": 31
 },
 {
   "fields": {
@@ -1728,79 +2069,43 @@
     "data": "IntegerField"
   },
   "model": "apps.fieldparameter",
-  "pk": 22
+  "pk": 32
 },
 {
   "fields": {
     "appModel": 5,
-    "name": "moodSet",
+    "name": "command",
     "parent": null,
     "isField": true,
     "isCircular": false,
-    "data": "ManyToManyField"
+    "data": "ForeignKey"
   },
   "model": "apps.fieldparameter",
-  "pk": 23
+  "pk": 33
 },
 {
   "fields": {
     "appModel": 5,
     "name": "foreignApp",
-    "parent": 23,
+    "parent": 33,
     "isField": false,
     "isCircular": false,
-    "data": "('theory.apps',)"
+    "data": "theory.apps"
   },
   "model": "apps.fieldparameter",
-  "pk": 24
+  "pk": 34
 },
 {
   "fields": {
     "appModel": 5,
     "name": "foreignModel",
-    "parent": 23,
-    "isField": false,
-    "isCircular": false,
-    "data": "Mood"
-  },
-  "model": "apps.fieldparameter",
-  "pk": 25
-},
-{
-  "fields": {
-    "appModel": 5,
-    "name": "nextAvblCmd",
-    "parent": null,
-    "isField": true,
-    "isCircular": false,
-    "data": "ManyToManyField"
-  },
-  "model": "apps.fieldparameter",
-  "pk": 26
-},
-{
-  "fields": {
-    "appModel": 5,
-    "name": "foreignApp",
-    "parent": 26,
-    "isField": false,
-    "isCircular": false,
-    "data": "('theory.apps',)"
-  },
-  "model": "apps.fieldparameter",
-  "pk": 27
-},
-{
-  "fields": {
-    "appModel": 5,
-    "name": "foreignModel",
-    "parent": 26,
+    "parent": 33,
     "isField": false,
     "isCircular": false,
     "data": "Command"
   },
   "model": "apps.fieldparameter",
-  "pk": 28
+  "pk": 35
 },
 {
   "fields": {
@@ -1812,7 +2117,7 @@
     "data": "AutoField"
   },
   "model": "apps.fieldparameter",
-  "pk": 29
+  "pk": 36
 },
 {
   "fields": {
@@ -1824,31 +2129,55 @@
     "data": "CharField"
   },
   "model": "apps.fieldparameter",
-  "pk": 30
+  "pk": 37
 },
 {
   "fields": {
     "appModel": 5,
-    "name": "app",
+    "name": "type",
     "parent": null,
     "isField": true,
     "isCircular": false,
     "data": "CharField"
   },
   "model": "apps.fieldparameter",
-  "pk": 31
+  "pk": 38
 },
 {
   "fields": {
     "appModel": 5,
-    "name": "sourceFile",
+    "name": "param",
     "parent": null,
     "isField": true,
     "isCircular": false,
-    "data": "CharField"
+    "data": "TextField"
   },
   "model": "apps.fieldparameter",
-  "pk": 32
+  "pk": 39
+},
+{
+  "fields": {
+    "appModel": 5,
+    "name": "isOptional",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "BooleanField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 40
+},
+{
+  "fields": {
+    "appModel": 5,
+    "name": "isReadOnly",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "BooleanField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 41
 },
 {
   "fields": {
@@ -1860,11 +2189,11 @@
     "data": "TextField"
   },
   "model": "apps.fieldparameter",
-  "pk": 33
+  "pk": 42
 },
 {
   "fields": {
-    "appModel": 5,
+    "appModel": 6,
     "name": "runMode",
     "parent": null,
     "isField": true,
@@ -1872,124 +2201,16 @@
     "data": "IntegerField"
   },
   "model": "apps.fieldparameter",
-  "pk": 34
-},
-{
-  "fields": {
-    "appModel": 6,
-    "name": "parent",
-    "parent": null,
-    "isField": true,
-    "isCircular": false,
-    "data": "ForeignKey"
-  },
-  "model": "apps.fieldparameter",
-  "pk": 35
-},
-{
-  "fields": {
-    "appModel": 6,
-    "name": "foreignApp",
-    "parent": 35,
-    "isField": false,
-    "isCircular": false,
-    "data": "('theory.apps',)"
-  },
-  "model": "apps.fieldparameter",
-  "pk": 36
-},
-{
-  "fields": {
-    "appModel": 6,
-    "name": "foreignModel",
-    "parent": 35,
-    "isField": false,
-    "isCircular": false,
-    "data": "FieldParameter"
-  },
-  "model": "apps.fieldparameter",
-  "pk": 37
-},
-{
-  "fields": {
-    "appModel": 6,
-    "name": "appModel",
-    "parent": null,
-    "isField": true,
-    "isCircular": false,
-    "data": "ForeignKey"
-  },
-  "model": "apps.fieldparameter",
-  "pk": 38
-},
-{
-  "fields": {
-    "appModel": 6,
-    "name": "foreignApp",
-    "parent": 38,
-    "isField": false,
-    "isCircular": false,
-    "data": "('theory.apps',)"
-  },
-  "model": "apps.fieldparameter",
-  "pk": 39
-},
-{
-  "fields": {
-    "appModel": 6,
-    "name": "foreignModel",
-    "parent": 38,
-    "isField": false,
-    "isCircular": false,
-    "data": "AppModel"
-  },
-  "model": "apps.fieldparameter",
-  "pk": 40
-},
-{
-  "fields": {
-    "appModel": 6,
-    "name": "id",
-    "parent": null,
-    "isField": true,
-    "isCircular": false,
-    "data": "AutoField"
-  },
-  "model": "apps.fieldparameter",
-  "pk": 41
-},
-{
-  "fields": {
-    "appModel": 6,
-    "name": "name",
-    "parent": null,
-    "isField": true,
-    "isCircular": false,
-    "data": "CharField"
-  },
-  "model": "apps.fieldparameter",
-  "pk": 42
-},
-{
-  "fields": {
-    "appModel": 6,
-    "name": "data",
-    "parent": null,
-    "isField": true,
-    "isCircular": false,
-    "data": "TextField"
-  },
-  "model": "apps.fieldparameter",
   "pk": 43
 },
 {
   "fields": {
     "appModel": 6,
-    "name": "isField",
-    "parent": null,
-    "isField": true,
+    "name": "choices",
+    "parent": 43,
+    "isField": false,
     "isCircular": false,
-    "data": "BooleanField"
+    "data": "[[1, \"Simple run-mode\"], [2, \"Async run-mode\"]]"
   },
   "model": "apps.fieldparameter",
   "pk": 44
@@ -1997,18 +2218,6 @@
 {
   "fields": {
     "appModel": 6,
-    "name": "isCircular",
-    "parent": null,
-    "isField": true,
-    "isCircular": false,
-    "data": "BooleanField"
-  },
-  "model": "apps.fieldparameter",
-  "pk": 45
-},
-{
-  "fields": {
-    "appModel": 7,
     "name": "moodSet",
     "parent": null,
     "isField": true,
@@ -2016,95 +2225,71 @@
     "data": "ManyToManyField"
   },
   "model": "apps.fieldparameter",
+  "pk": 45
+},
+{
+  "fields": {
+    "appModel": 6,
+    "name": "foreignApp",
+    "parent": 45,
+    "isField": false,
+    "isCircular": false,
+    "data": "theory.apps"
+  },
+  "model": "apps.fieldparameter",
   "pk": 46
 },
 {
   "fields": {
-    "appModel": 7,
-    "name": "foreignApp",
-    "parent": 46,
+    "appModel": 6,
+    "name": "foreignModel",
+    "parent": 45,
     "isField": false,
     "isCircular": false,
-    "data": "('theory.apps',)"
+    "data": "Mood"
   },
   "model": "apps.fieldparameter",
   "pk": 47
 },
 {
   "fields": {
-    "appModel": 7,
-    "name": "foreignModel",
-    "parent": 46,
-    "isField": false,
+    "appModel": 6,
+    "name": "nextAvblCmd",
+    "parent": null,
+    "isField": true,
     "isCircular": false,
-    "data": "Mood"
+    "data": "ManyToManyField"
   },
   "model": "apps.fieldparameter",
   "pk": 48
 },
 {
   "fields": {
-    "appModel": 7,
-    "name": "id",
-    "parent": null,
-    "isField": true,
+    "appModel": 6,
+    "name": "foreignApp",
+    "parent": 48,
+    "isField": false,
     "isCircular": false,
-    "data": "AutoField"
+    "data": "theory.apps"
   },
   "model": "apps.fieldparameter",
   "pk": 49
 },
 {
   "fields": {
-    "appModel": 7,
-    "name": "commandName",
-    "parent": null,
-    "isField": true,
+    "appModel": 6,
+    "name": "foreignModel",
+    "parent": 48,
+    "isField": false,
     "isCircular": false,
-    "data": "CharField"
+    "data": "Command"
   },
   "model": "apps.fieldparameter",
   "pk": 50
 },
 {
   "fields": {
-    "appModel": 7,
-    "name": "jsonData",
-    "parent": null,
-    "isField": true,
-    "isCircular": false,
-    "data": "TextField"
-  },
-  "model": "apps.fieldparameter",
-  "pk": 51
-},
-{
-  "fields": {
-    "appModel": 7,
-    "name": "touched",
-    "parent": null,
-    "isField": true,
-    "isCircular": false,
-    "data": "DateTimeField"
-  },
-  "model": "apps.fieldparameter",
-  "pk": 52
-},
-{
-  "fields": {
-    "appModel": 7,
-    "name": "repeated",
-    "parent": null,
-    "isField": true,
-    "isCircular": false,
-    "data": "IntegerField"
-  },
-  "model": "apps.fieldparameter",
-  "pk": 53
-},
-{
-  "fields": {
-    "appModel": 8,
+    "appModel": 6,
     "name": "id",
     "parent": null,
     "isField": true,
@@ -2112,11 +2297,11 @@
     "data": "AutoField"
   },
   "model": "apps.fieldparameter",
-  "pk": 54
+  "pk": 51
 },
 {
   "fields": {
-    "appModel": 8,
+    "appModel": 6,
     "name": "name",
     "parent": null,
     "isField": true,
@@ -2124,12 +2309,48 @@
     "data": "CharField"
   },
   "model": "apps.fieldparameter",
+  "pk": 52
+},
+{
+  "fields": {
+    "appModel": 6,
+    "name": "app",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "CharField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 53
+},
+{
+  "fields": {
+    "appModel": 6,
+    "name": "sourceFile",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "CharField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 54
+},
+{
+  "fields": {
+    "appModel": 6,
+    "name": "comment",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "TextField"
+  },
+  "model": "apps.fieldparameter",
   "pk": 55
 },
 {
   "fields": {
-    "appModel": 9,
-    "name": "command",
+    "appModel": 7,
+    "name": "parent",
     "parent": null,
     "isField": true,
     "isCircular": false,
@@ -2140,27 +2361,219 @@
 },
 {
   "fields": {
-    "appModel": 9,
+    "appModel": 7,
     "name": "foreignApp",
     "parent": 56,
     "isField": false,
     "isCircular": false,
-    "data": "('theory.apps',)"
+    "data": "theory.apps"
   },
   "model": "apps.fieldparameter",
   "pk": 57
 },
 {
   "fields": {
-    "appModel": 9,
+    "appModel": 7,
     "name": "foreignModel",
     "parent": 56,
     "isField": false,
     "isCircular": false,
-    "data": "Command"
+    "data": "FieldParameter"
   },
   "model": "apps.fieldparameter",
   "pk": 58
+},
+{
+  "fields": {
+    "appModel": 7,
+    "name": "appModel",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "ForeignKey"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 59
+},
+{
+  "fields": {
+    "appModel": 7,
+    "name": "foreignApp",
+    "parent": 59,
+    "isField": false,
+    "isCircular": false,
+    "data": "theory.apps"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 60
+},
+{
+  "fields": {
+    "appModel": 7,
+    "name": "foreignModel",
+    "parent": 59,
+    "isField": false,
+    "isCircular": false,
+    "data": "AppModel"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 61
+},
+{
+  "fields": {
+    "appModel": 7,
+    "name": "id",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "AutoField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 62
+},
+{
+  "fields": {
+    "appModel": 7,
+    "name": "name",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "CharField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 63
+},
+{
+  "fields": {
+    "appModel": 7,
+    "name": "data",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "TextField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 64
+},
+{
+  "fields": {
+    "appModel": 7,
+    "name": "isField",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "BooleanField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 65
+},
+{
+  "fields": {
+    "appModel": 7,
+    "name": "isCircular",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "BooleanField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 66
+},
+{
+  "fields": {
+    "appModel": 8,
+    "name": "moodSet",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "ManyToManyField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 67
+},
+{
+  "fields": {
+    "appModel": 8,
+    "name": "foreignApp",
+    "parent": 67,
+    "isField": false,
+    "isCircular": false,
+    "data": "theory.apps"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 68
+},
+{
+  "fields": {
+    "appModel": 8,
+    "name": "foreignModel",
+    "parent": 67,
+    "isField": false,
+    "isCircular": false,
+    "data": "Mood"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 69
+},
+{
+  "fields": {
+    "appModel": 8,
+    "name": "id",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "AutoField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 70
+},
+{
+  "fields": {
+    "appModel": 8,
+    "name": "commandName",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "CharField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 71
+},
+{
+  "fields": {
+    "appModel": 8,
+    "name": "jsonData",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "TextField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 72
+},
+{
+  "fields": {
+    "appModel": 8,
+    "name": "touched",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "DateTimeField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 73
+},
+{
+  "fields": {
+    "appModel": 8,
+    "name": "repeated",
+    "parent": null,
+    "isField": true,
+    "isCircular": false,
+    "data": "IntegerField"
+  },
+  "model": "apps.fieldparameter",
+  "pk": 74
 },
 {
   "fields": {
@@ -2172,7 +2585,7 @@
     "data": "AutoField"
   },
   "model": "apps.fieldparameter",
-  "pk": 59
+  "pk": 75
 },
 {
   "fields": {
@@ -2184,55 +2597,7 @@
     "data": "CharField"
   },
   "model": "apps.fieldparameter",
-  "pk": 60
-},
-{
-  "fields": {
-    "appModel": 9,
-    "name": "type",
-    "parent": null,
-    "isField": true,
-    "isCircular": false,
-    "data": "CharField"
-  },
-  "model": "apps.fieldparameter",
-  "pk": 61
-},
-{
-  "fields": {
-    "appModel": 9,
-    "name": "isOptional",
-    "parent": null,
-    "isField": true,
-    "isCircular": false,
-    "data": "BooleanField"
-  },
-  "model": "apps.fieldparameter",
-  "pk": 62
-},
-{
-  "fields": {
-    "appModel": 9,
-    "name": "isReadOnly",
-    "parent": null,
-    "isField": true,
-    "isCircular": false,
-    "data": "BooleanField"
-  },
-  "model": "apps.fieldparameter",
-  "pk": 63
-},
-{
-  "fields": {
-    "appModel": 9,
-    "name": "comment",
-    "parent": null,
-    "isField": true,
-    "isCircular": false,
-    "data": "TextField"
-  },
-  "model": "apps.fieldparameter",
-  "pk": 64
+  "pk": 76
 },
 {
   "fields": {
@@ -2284,6 +2649,18 @@
 },
 {
   "fields": {
+    "name": "CmdField",
+    "app": "theory.apps",
+    "formField": "[\"id\", \"name\", \"type\", \"command\", \"param\", \"isOptional\", \"isReadOnly\", \"comment\"]",
+    "importPath": "theory.apps.model.CmdField",
+    "tblField": "[\"id\", \"name\", \"type\", \"command\", \"param\", \"isOptional\", \"isReadOnly\", \"comment\"]",
+    "importanceRating": 0
+  },
+  "model": "apps.appmodel",
+  "pk": 5
+},
+{
+  "fields": {
     "name": "Command",
     "app": "theory.apps",
     "formField": "[\"id\", \"name\", \"app\", \"sourceFile\", \"comment\", \"runMode\"]",
@@ -2292,7 +2669,7 @@
     "importanceRating": 0
   },
   "model": "apps.appmodel",
-  "pk": 5
+  "pk": 6
 },
 {
   "fields": {
@@ -2304,7 +2681,7 @@
     "importanceRating": 0
   },
   "model": "apps.appmodel",
-  "pk": 6
+  "pk": 7
 },
 {
   "fields": {
@@ -2316,7 +2693,7 @@
     "importanceRating": 0
   },
   "model": "apps.appmodel",
-  "pk": 7
+  "pk": 8
 },
 {
   "fields": {
@@ -2325,18 +2702,6 @@
     "formField": "[\"id\", \"name\"]",
     "importPath": "theory.apps.model.Mood",
     "tblField": "[\"id\", \"name\"]",
-    "importanceRating": 0
-  },
-  "model": "apps.appmodel",
-  "pk": 8
-},
-{
-  "fields": {
-    "name": "Parameter",
-    "app": "theory.apps",
-    "formField": "[\"id\", \"name\", \"type\", \"command\", \"isOptional\", \"isReadOnly\", \"comment\"]",
-    "importPath": "theory.apps.model.Parameter",
-    "tblField": "[\"id\", \"name\", \"type\", \"command\", \"isOptional\", \"isReadOnly\", \"comment\"]",
     "importanceRating": 0
   },
   "model": "apps.appmodel",

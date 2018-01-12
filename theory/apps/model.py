@@ -17,23 +17,33 @@ from theory.utils.translation import ugettextLazy as _
 ##### Misc #####
 
 __all__ = (
-      "Command", "Mood", "Adapter", "History", "Parameter",
+      "Command", "Mood", "Adapter", "History", "CmdField",
       "AdapterBuffer", "AppModel", "BinaryClassifierHistory",
       "FieldParameter"
   )
 
-class Parameter(model.Model):
+# Don't forget to call makeMigration thru UI with empty application label
+# for the model change
+
+class CmdField(model.Model):
   name = model.CharField(
       maxLength=256,
-      verboseName=_("Parameter's name"),
-      helpText=_("The name of this parameter")
+      verboseName=_("Field's name"),
+      helpText=_("The name of this field")
       )
   type = model.CharField(
       maxLength=256,
-      verboseName=_("Parameter's type"),
-      helpText=_("The type of this parameter")
+      verboseName=_("field's type"),
+      helpText=_("The type of this field")
       )
-  command = model.ForeignKey("Command")
+  command = model.ForeignKey(
+      "Command",
+      relatedName="cmdFieldSet",
+      )
+  param = model.TextField(
+      verboseName=_("The field's parameter in json"),
+      helpText=_("The field's parameter in json")
+      )
 
   isOptional = model.BooleanField(
       default=True,
@@ -117,7 +127,7 @@ class Command(model.Model):
     comment = lambda x: x if(x) else "No comment"
     hints = "%s -- %s%sParameters:" % (self.name, comment(self.comment), crlf)
 
-    for i in self.parameterSet.all():
+    for i in self.cmdFieldSet.all():
       if(i.isOptional):
         hints += crlf + "(%s) [%s]: %s" % (i.type, i.name, comment(i.comment))
       else:
@@ -127,8 +137,12 @@ class Command(model.Model):
 
   def getAutocompleteHints(self):
     comment = self.comment if(self.comment) else "No comment"
-    param = ",".join([i.name for i in self.parameterSet.filter(isOptional=False)])
-    optionalParam = ",".join([i.name for i in self.parameterSet.filter(isOptional=True)])
+    param = ",".join(
+        [i.name for i in self.cmdFieldSet.filter(isOptional=False)]
+        )
+    optionalParam = ",".join(
+        [i.name for i in self.cmdFieldSet.filter(isOptional=True)]
+        )
     if(optionalParam!=""):
       if(param):
         optionalParam = ", [%s]" % (optionalParam)

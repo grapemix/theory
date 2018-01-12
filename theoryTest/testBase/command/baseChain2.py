@@ -28,7 +28,7 @@ class BaseChain2(BaseChain):
   @classmethod
   def getCmdModel(cls):
     cmdModel = super(BaseChain2, cls).getCmdModel()
-    cmdModel.parameterSet.create(name="stdIn",type="String")
+    cmdModel.cmdFieldSet.create(name="stdIn",type="String")
     return cmdModel
 
   def run(self, uiParam={}):

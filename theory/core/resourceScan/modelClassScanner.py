@@ -11,7 +11,7 @@ import json
 from theory.db import model
 from theory.conf import settings
 from theory.contrib.postgres.fields import ArrayField
-from theory.apps.model import Command, Parameter, FieldParameter
+from theory.apps.model import Command, FieldParameter
 from theory.utils.functional import Promise
 
 ##### Theory third-party lib #####

@@ -16,7 +16,7 @@ from theory.core.exceptions import (
     ValidationError,
     NON_FIELD_ERRORS
     )
-from theory.gui.etk import field as FormField
+from theory.gui.common import baseField as FormField
 from theory.gui.util import flatatt, ErrorDict, ErrorList
 from theory.gui.transformer.theoryJSONEncoder import TheoryJSONEncoder
 from theory.utils.deprecation import RemovedInTheory19Warning
@@ -397,37 +397,36 @@ class FormBase(object):
     return self._changedData
 
   def fillInitFields(self, cmdModel, args, kwargs):
-    cmdArgs = [i for i in cmdModel.parameterSet.all() if(not i.isOptional)]
-    if(args!=[]):
-      for i in range(len(cmdArgs)):
-        try:
-          self.fields[cmdArgs[i].name].initData = args[i]
-        except IndexError as e:
-          # This means the number of param given unmatch the number of param
-          # register in *.command
-          raise CommandSyntaxError(str(e))
+    if cmdModel is not None:
+      cmdArgs = [i for i in cmdModel.cmdFieldSet.all() if(not i.isOptional)]
+      if args!=[]:
+        for i in range(len(cmdArgs)):
+          try:
+            self.fields[cmdArgs[i].name].initData = args[i]
+          except IndexError as e:
+            # This means the number of param given unmatch the number of param
+            # register in *.command
+            raise CommandSyntaxError(str(e))
     for k,v in kwargs.iteritems():
       self.fields[k].initData = v
 
   def toPython(self):
-    if(self.isValid()):
+    if self.isValid():
       pythonDict = {}
       for fieldName, field in self.fields.iteritems():
         # Make sure not getting data from widget because the widget may be
         # destroied
         tmpWidget = field.widget
         field.widget = field.widget.__class__
-        if(field.isSkipInHistory):
-          continue
         try:
           pythonDict[fieldName] = field.toPython(field.clean(field.finalData))
-        except Exception as e: # eval can throw many different errors
+        except Exception as e:
           raise ValidationError(str(e))
 
       return pythonDict
 
   def toJson(self):
-    if(self.isValid()):
+    if self.isValid():
       if(self.jsonData is None):
         encoderKwargs = {"cls": TheoryJSONEncoder}
         pythonDict = self.toPython()
