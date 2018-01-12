@@ -45,8 +45,20 @@ class TheoryJSONEncoder(json.JSONEncoder):
       return r
     elif(isinstance(o, decimal.Decimal) or isinstance(o, UUID)):
       return str(o)
+    elif type(o.__class__.__bases__[0]).__name__ == "ModelBase":
+      module = o.__module__
+      return {
+          "appName": module[:module.find(".model")],
+          "modelName": type(o).__name__,
+          "id": str(o.id)
+          }
     elif isinstance(o, QuerySet):
-      return [str(i.id) for i in o]
+      module = o.modal.__module__
+      return {
+          "appName": module[:module.find(".model")],
+          "modelName": o.modal.__name__,
+          "idLst": [str(i.id) for i in o]
+          }
     elif type(o).__name__=="LocalFileObject":
       # We don't want to store the data because JSON cannot store binary
       # natively and no storing solution can provide human readibility
