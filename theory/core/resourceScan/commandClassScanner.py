@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 ##### System wide lib #####
+from collections import OrderedDict
+import json
 
 ##### Theory lib #####
 from theory.apps.command.baseCommand import SimpleCommand, AsyncCommand
+from theory.apps.model import Command, CmdField
 from theory.conf import settings
-from theory.apps.model import Command, Parameter
+from theory.gui.transformer.theoryJSONEncoder import TheoryJSONEncoder
 
 ##### Theory third-party lib #####
 
 ##### Local app #####
 from .baseClassScanner import BaseClassScanner
-from .paramScanner import ParamScanner
 
 ##### Theory app #####
 
@@ -32,12 +34,108 @@ class CommandClassScanner(BaseClassScanner):
     class instance. All errors raised by the import process
     (ImportError, AttributeError) are allowed to propagate.
     """
-    module = self._loadSubModuleCommandClass(self.cmdModel.app, "command", self.cmdModel.name)
+    module = self._loadSubModuleCommandClass(
+      self.cmdModel.app,
+      "command",
+      self.cmdModel.name
+    )
     return module
 
   def saveModel(self):
-    if(self._cmdModel!=None):
-      self._cmdModel.save()
+    # We already save model in scan() and we probably should rm this fxn in the
+    # future
+    pass
+
+  def getParmFormFieldDesc(self, field, row):
+    for i in [
+        'helpText',
+        'initData',
+        'isSingular',
+        'label',
+        'localize',
+        'required',
+        'showHiddenInitial',
+        'queryset',
+        'errorMessages',
+        'choices',
+        'dynamicChoiceLst',
+        'appFieldName',
+        'modelFieldName',
+        'childFieldTemplate',
+        'childKeyFieldTemplate',
+        'childValueFieldTemplate',
+        ]:
+      if hasattr(field, i):
+        val = getattr(field, i)
+        if type(val).__name__ == "__proxy__":
+          # for fields from model form
+          val = unicode(val)
+        elif isinstance(val, dict):
+          # for errorMessages
+          newDict = {}
+          for k, v in val.iteritems():
+            if type(v).__name__ == "__proxy__":
+              newDict[k] = unicode(v)
+          if len(newDict) > 0:
+            val = newDict
+        elif i == "childFieldTemplate":
+          val = type(val).__name__
+        elif i == "childKeyFieldTemplate":
+          val = type(val).__name__
+        elif i == "childValueFieldTemplate":
+          val = type(val).__name__
+        elif i == "dynamicChoiceLst":
+          if val is None:
+            # Choice field and its descendant will have dynamicChoiceLst and set
+            # as None by default. We don't want to store it unless
+            # dynamicChoiceLst has been actually in use because we will override
+            # choices by dynamicChoiceLst
+            continue
+          # Since the val has to freshly generate everytime, stored val should
+          # be empty
+          val = ""
+        row[i] =  val
+    return row
+
+  def geneateModelFormFieldDesc(self, form):
+    r = OrderedDict()
+    # If baseFields are used, then the modelForm won't get field value
+    for fieldName, field in form.fields.iteritems():
+      row = {
+          "type": type(field).__name__,
+          "widgetIsFocusChgTrigger": False,
+          "widgetIsContentChgTrigger": False
+          }
+      if type(field).__name__ == "HStoreField":
+        row["type"] = "DictField"
+        row["childKeyFieldTemplate"] = "CharField"
+        row["childValueFieldTemplate"] = "CharField"
+      r[fieldName] = self.getParmFormFieldDesc(field, row)
+    return r
+
+  def addParmFormFieldLst(self, form):
+    focusChgFxnNameTmpl = "{0}FocusChgCallback"
+    contentChgFxnNameTmpl = "{0}ContentChgCallback"
+
+    for fieldName, field in form.baseFields.iteritems():
+      if(field.required):
+        cmdField = CmdField(name=fieldName, isOptional=False)
+      else:
+        cmdField = CmdField(name=fieldName)
+      focusChgFxnName = focusChgFxnNameTmpl.format(fieldName)
+      contentChgFxnName = contentChgFxnNameTmpl.format(fieldName)
+
+      row = {
+          "type": type(field).__name__,
+          "widgetIsFocusChgTrigger": \
+              True if hasattr(form, focusChgFxnName) else False,
+          "widgetIsContentChgTrigger": \
+              True if(hasattr(form, contentChgFxnName)) else False
+          }
+      row = self.getParmFormFieldDesc(field, row)
+
+      cmdField.param = json.dumps(row, cls=TheoryJSONEncoder)
+      self.cmdModel.cmdFieldSet.add(cmdField)
 
   def scan(self):
     cmdFileClass = self._loadCommandClass()
@@ -47,7 +145,10 @@ class CommandClassScanner(BaseClassScanner):
       self._cmdModel = None
       return
     try:
-      cmdClass = getattr(cmdFileClass, self.cmdModel.name[0].upper() + self.cmdModel.name[1:])
+      cmdClass = getattr(
+          cmdFileClass,
+          self.cmdModel.name[0].upper() + self.cmdModel.name[1:]
+          )
       # Should add debug flag checking and dump to log file instead
     except AttributeError:
       self._cmdModel = None
@@ -59,25 +160,12 @@ class CommandClassScanner(BaseClassScanner):
       self.cmdModel.runMode = self.cmdModel.RUN_MODE_SIMPLE
 
     self.cmdModel.save()
-    # Get the fields in the paramForm first. All fields in the paramForm
-    # are able to pass to adapter. Only the order of the required fields
-    # are important.
-    for paramName, param in cmdClass.ParamForm.baseFields.iteritems():
-      if(param.required):
-        parameter = Parameter(name=paramName, isOptional=False)
-      else:
-        parameter = Parameter(name=paramName)
-      self.cmdModel.parameterSet.add(parameter)
+    self.addParmFormFieldLst(cmdClass.ParamForm)
 
     # Class properties will be able to be captured and passed to adapter
     for k,v in cmdClass.__dict__.iteritems():
       if(isinstance(v, property)):
-        param = Parameter(name=k)
+        param = CmdField(name=k)
         if(getattr(getattr(cmdClass, k), "fset") is None):
           param.isReadOnly = True
-        self.cmdModel.parameterSet.add(param)
-
-    paramScanner = ParamScanner()
-    paramScanner.filePath = self.cmdModel.sourceFile
-    paramScanner.paramModelLst = self.cmdModel.parameterSet.all()
-    paramScanner.scan()
+        self.cmdModel.cmdFieldSet.add(param)
