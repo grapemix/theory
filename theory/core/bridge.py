@@ -28,7 +28,6 @@ class Bridge(object):
   def _objAssign(self, o, k, v):
     setattr(o, k, v)
     return o
-    #return setattr(o, k, v)
 
   def _dictAssign(self, o, k, v):
     o[k] = v
@@ -46,7 +45,6 @@ class Bridge(object):
       assignFxn = self._dictAssign
       storage = {}
     else:
-      #assignFxn = lambda o, k, v: setattr(o, k, v)
       assignFxn = self._objAssign
       storage = cmd
 
@@ -118,7 +116,7 @@ class Bridge(object):
     (adapterModel, adapter) = self.adaptFromCmd(commonAdapterName, headInst)
     adapter.run()
     if(hasattr(adapter, "render")):
-      adapter.render()
+      adapter.render(None, None)
 
     for field in headInst.paramForm.fields.values():
       field.widget = field.widget.__class__
@@ -149,12 +147,17 @@ class Bridge(object):
         propertyLst))
 
     firstCmdModel = Command.objects.get(name=headInst.name)
-    abm = AdapterBuffer(fromCmd=firstCmdModel, toCmd=tailModel, adapter=adapterModel, data=jsonData)
+    abm = AdapterBuffer(
+      fromCmd=firstCmdModel,
+      toCmd=tailModel,
+      adapter=adapterModel,
+      data=jsonData
+    )
     abm.save()
 
     return jsonData
 
-  def bridgeFromDb(self, adapterBufferModel, callbackFxn, uiParam={}):
+  def bridgeFromDb(self, adapterBufferModel, callbackFxn, actionQ=[]):
     jsonData = json.loads(adapterBufferModel.data)
     adapterModel = adapterBufferModel.adapter
     adapterKlass = importClass(adapterModel.importPath)
@@ -164,29 +167,43 @@ class Bridge(object):
 
     adapter.fromDb()
 
-    propertyLst = self._naivieAdapterPropertySelection(adapterModel, adapterBufferModel.toCmd)
+    propertyLst = self._naivieAdapterPropertySelection(
+      adapterModel,
+      adapterBufferModel.toCmd
+    )
     if(hasattr(adapter, "render")):
-      adapter.render(uiParam=uiParam)
-      adapter.bridge = self
-      self.propertyLst = propertyLst
-      self.adapterBufferModel = adapterBufferModel
-      self.callbackFxn = callbackFxn
+      val = adapter.toUi()
+      val["importPath"] = adapterModel.importPath
+      val["adapterBufferModelId"] = adapterBufferModel.id
+
+      actionQ.append({
+        "action": "startAdapterUi",
+        "val": json.dumps(val)
+        })
     else:
-      dataDict = self._propertiesAssign(adapter, \
-          self._dictAssign, \
-          {}, \
-          propertyLst)
+      dataDict = self._propertiesAssign(
+        adapter,
+        self._dictAssign,
+        {},
+        propertyLst
+      )
 
       callbackFxn(self.getCmdComplex(adapterBufferModel.toCmd, [], dataDict))
 
-  def bridgeFromUIAdapter(self, adapter):
-    dataDict = self._propertiesAssign(adapter, \
-        self._dictAssign, \
-        {}, \
-        self.propertyLst)
+  def bridgeFromUIAdapter(self, adapterBufferModel, adapterObj):
+    propertyLst = self._naivieAdapterPropertySelection(
+        adapterBufferModel.adapter,
+        adapterBufferModel.toCmd
+        )
+    dataDict = self._propertiesAssign(
+        adapterObj,
+        self._dictAssign,
+        {},
+        propertyLst
+        )
 
-    cmd = self.getCmdComplex(self.adapterBufferModel.toCmd, [], dataDict)
-    self.callbackFxn(cmd)
+    cmd = self.getCmdComplex(adapterBufferModel.toCmd, [], dataDict)
+    return cmd
 
   # TODO: to support fall back
   def _probeAdapter(self, headClass, tailClass):
@@ -200,10 +217,9 @@ class Bridge(object):
       adapterModel = None
 
     adapter = None
-    if(adapterModel is not None):
+    if adapterModel is not None:
       adapterKlass = importClass(adapterModel.importPath)
       adapter = adapterKlass()
-      #adapter = self._assignAdapterProperties(adapterModel.property, adapter, cmd)
       adapter = self._assignAdapterPropertiesFromCmd(
           adapterModel.propertyLst,
           adapter,
@@ -212,7 +228,7 @@ class Bridge(object):
     return (adapterModel, adapter)
 
   def _adaptToCmd(self, adapterModel, adapter, cmd):
-    if(adapterModel!=None and adapter!=None and cmd!=None):
+    if adapterModel is not None and adapter is not None and cmd is not None:
       cmd = self._assignProperties(adapterModel.property, cmd, adapter)
     return cmd
 
@@ -228,9 +244,8 @@ class Bridge(object):
     return o1
 
   def _assignAdapterPropertiesFromCmd(self, properties, adapter, cmd):
-    """This fxn """
     form = cmd.paramForm
-    if(form.isValid()):
+    if form.isValid():
       formData = form.clean()
       for property in properties:
         try:

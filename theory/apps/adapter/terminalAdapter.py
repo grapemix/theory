@@ -3,8 +3,7 @@
 ##### System wide lib #####
 
 ##### Theory lib #####
-from theory.gui import field
-from theory.gui.form import SimpleGuiForm
+
 
 ##### Theory third-party lib #####
 
@@ -17,10 +16,6 @@ from . import BaseUIAdapter
 
 __all__ = ("TerminalAdapter",)
 
-class TerminalForm(SimpleGuiForm):
-  stdOut = field.TextField(label="Standard Output")
-  #stdErr = field.TextField(label="Standard Error")
-
 class TerminalAdapter(BaseUIAdapter):
   _stdOut = ""
   _stdErr = ""
@@ -28,9 +23,6 @@ class TerminalAdapter(BaseUIAdapter):
   @property
   def stdOut(self):
     return self._stdOut
-    #self.preStdOutPacker()
-    #r = self.stdOutPacker()
-    #return self.postStdOutPacker(r)
 
   def preStdOutPacker(self):
     if(self._stdOut=="" and self._stdRowOut!=[]):
@@ -55,13 +47,7 @@ class TerminalAdapter(BaseUIAdapter):
     self._stdErr = stdErr
 
   def render(self, *args, **kwargs):
-    super(TerminalAdapter, self).render(*args, **kwargs)
-    bx = kwargs["uiParam"]["bx"]
-    bx.clear()
-
-    o = TerminalForm()
-    o.fields["stdOut"].initData = self.stdOut
-    #o.fields["stdErr"].initData = self.stdErr
-    o.generateForm(**kwargs["uiParam"])
-    self.terminalForm = o
-    kwargs["stdOutAdjuster"](self.stdOut, "\n")
+    return [{
+        "action": "printStdOut",
+        "val": self.stdOut + "\n"
+        }]

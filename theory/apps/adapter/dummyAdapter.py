@@ -22,4 +22,4 @@ class DummyAdapter(BaseUIAdapter):
   new rendering piece.
   """
   def render(self, *args, **kwargs):
-    pass
+    return []

@@ -38,9 +38,17 @@ class BaseAdapter(object):
 class BaseUIAdapter(BaseAdapter):
   abstract = True
   """Any adapter which interacted with UI should inheritage from this class.
-  This class should be platform semi-independent. All UI related param is
-  passed to fields and then to widget transparently."""
+  The render fxn must be a static method which will be called in the gui side.
+  """
 
   @abstractmethod
-  def render(self, *args, **kwargs):
+  def toUi(self):
     pass
+
+  @abstractmethod
+  def fromUi(self):
+    pass
+
+  @staticmethod
+  def render(data, uiParam, callReactor):
+    raise NotImplementedError
