@@ -436,6 +436,35 @@ class FormBase(object):
           raise ValidationError(str(e))
       return self.jsonData
 
+  def toModelForm(self):
+    if self.isValid():
+      pythonDict = {}
+      # Never cache model form data
+      for fieldName, field in self.fields.iteritems():
+        # Make sure not getting data from widget because the widget may be
+        # destroied
+        tmpWidget = field.widget
+        field.widget = field.widget.__class__
+
+        try:
+          if type(field).__name__ in [
+              "ModelChoiceField",
+              "ModelMultipleChoiceField"
+              ]:
+            pythonDict[fieldName + field.getModelFieldNameSuffix()] \
+                = field.prepareValue(field.finalData)
+          else:
+            pythonDict[fieldName + field.getModelFieldNameSuffix()] \
+                = field.toPython(field.clean(field.finalData))
+        except Exception as e: # eval can throw many different errors
+          raise ValidationError(fieldName + ": " + str(e))
+
+      encoderKwargs = {"cls": TheoryJSONEncoder}
+      try:
+        return json.dumps(pythonDict, **encoderKwargs)
+      except Exception as e: # eval can throw many different errors
+        raise ValidationError(str(e))
+
   def getSibilingFieldData(self, fieldName):
     return self.fields[fieldName].clean(
         self.fields[fieldName].finalData
