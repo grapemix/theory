@@ -463,7 +463,25 @@ class FormBase(object):
       try:
         return json.dumps(pythonDict, **encoderKwargs)
       except Exception as e: # eval can throw many different errors
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(e, exc_info=True)
         raise ValidationError(str(e))
+
+  def exportToHistory(self):
+    data = self.toPython()
+    r = {}
+    for fieldName, field in self.fields.iteritems():
+      if field.isSkipInHistory:
+        continue
+      r[fieldName] = data[fieldName]
+    try:
+      return json.dumps(r, cls=TheoryJSONEncoder)
+    except Exception as e: # eval can throw many different errors
+      import logging
+      logger = logging.getLogger(__name__)
+      logger.error(e, exc_info=True)
+      raise ValidationError(str(e))
 
   def getSibilingFieldData(self, fieldName):
     return self.fields[fieldName].clean(
