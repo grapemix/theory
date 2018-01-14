@@ -223,7 +223,7 @@ def probeApps(apps, isDropAll=False):
     config = importModule("%s.config" % (moodDirName))
     for appName in config.APPS:
       if(moodAppRel.has_key(appName)):
-        moodAppRel[appName] += moodDirName
+        moodAppRel[appName].append(moodDirName)
       else:
         moodAppRel[appName] = [moodDirName]
 
@@ -269,8 +269,6 @@ def reprobeAllModule(settingsMod, argv=None):
   The dictionary is cached on the first call and reused on subsequent
   calls.
   """
-  print "Reprobing all modules"
-
   if settingsMod is not None:
     setupEnviron(settingsMod)
 
