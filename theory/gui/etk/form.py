@@ -3,15 +3,17 @@
 
 ##### System wide lib #####
 from collections import OrderedDict
+import json
 
 ##### Theory lib #####
 from theory.conf import settings
+from theory.core.exceptions import ValidationError
 from theory.gui.common.baseForm import (
     Form,
     FormBase,
     DeclarativeFieldsMetaclass,
     )
-#from theory.gui.widget import *
+from theory.gui.transformer.theoryJSONEncoder import TheoryJSONEncoder
 
 ##### Theory third-party lib #####
 
@@ -229,6 +231,36 @@ class SimpleGuiFormBase(GuiFormBase):
 
     self.formBx.postGenerate()
     self._changeFormWindowHeight(settings.DIMENSION_HINTS["maxHeight"] - 200)
+
+  def syncFormData(self, widgetElement, fieldName):
+    val = self.fields[fieldName].clean(
+        self.fields[fieldName].finalData
+        )
+    try:
+      jsonData = json.dumps(val, cls=TheoryJSONEncoder)
+    except Exception as e: # eval can throw many different errors
+      import logging
+      logger = logging.getLogger(__name__)
+      logger.error(e, exc_info=True)
+      raise ValidationError(str(e))
+    self.fields[fieldName].finalData = None
+
+    resp = self._syncFormData(self.cmdId, fieldName, jsonData)
+    try:
+      formData = json.loads(resp.jsonData)
+    except Exception as e: # eval can throw many different errors
+      import logging
+      logger = logging.getLogger(__name__)
+      logger.error(e, exc_info=True)
+      raise ValidationError(str(e))
+
+    for fieldName, attrNameVsAttr in formData.iteritems():
+      # TODO: simplify this procedure later
+      field = self.fields[fieldName]
+      for attrName, attr in attrNameVsAttr.iteritems():
+        setattr(field, attrName, attr)
+        if attrName == "choices":
+          field.widget.reset(choices=field.choices)
 
   def generateFilterForm(self, win, bx, unFocusFxn, **kwargs):
     self.unFocusFxn = unFocusFxn
