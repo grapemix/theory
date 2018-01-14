@@ -361,6 +361,7 @@ class StepFormBase(SimpleGuiFormBase):
     btn.label = "Cancel"
     if(kwargs.has_key("cleanUpCrtFxn")):
       btn._clicked = kwargs["cleanUpCrtFxn"]
+      btn._clickedData = self
     self.stepControlBox.addWidget(btn)
 
     if(hasattr(self, "_backBtnClick")):
@@ -369,6 +370,7 @@ class StepFormBase(SimpleGuiFormBase):
       btn.bx = self.stepControlBox.obj
       btn.label = "Back"
       btn._clicked = self._backBtnClick
+      btn._clickedData = self
       self.stepControlBox.addWidget(btn)
 
     btn = Button()
@@ -376,15 +378,16 @@ class StepFormBase(SimpleGuiFormBase):
     btn.bx = self.stepControlBox.obj
     btn.label = "Next"
     btn._clicked = self._nextBtnClick
+    btn._clickedData = self
     self.stepControlBox.addWidget(btn)
 
     self.stepControlBox.postGenerate()
 
 class CommandFormBase(StepFormBase):
-  def _nextBtnClick(self):
-    self._run()
+  def _nextBtnClick(self, *args, **kwargs):
+    self._run(*args, **kwargs)
 
-  def _run(self):
+  def _run(self, *args, **kwargs):
     pass
 
   def focusOnTheFirstChild(self):
