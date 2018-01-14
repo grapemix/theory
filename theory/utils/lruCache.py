@@ -9,7 +9,7 @@ except ImportError:
 
   from collections import namedtuple
   from functools import update_wrapper
-  from gevent.coros import RLock
+  from gevent.lock import RLock
 
   _CacheInfo = namedtuple("CacheInfo", ["hits", "misses", "maxsize", "currsize"])
 
