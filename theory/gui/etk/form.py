@@ -14,6 +14,7 @@ from theory.gui.common.baseForm import (
     DeclarativeFieldsMetaclass,
     )
 from theory.gui.transformer.theoryJSONEncoder import TheoryJSONEncoder
+from theory.utils.importlib import importClass
 
 ##### Theory third-party lib #####
 
@@ -262,7 +263,23 @@ class SimpleGuiFormBase(GuiFormBase):
         if attrName == "choices":
           field.widget.reset(choices=field.choices)
 
-  def generateFilterForm(self, win, bx, unFocusFxn, **kwargs):
+  def callExtCmd(self, widgetElement, appName, cmdName, val):
+    pass
+
+  def generateFilterForm(
+      self,
+      win,
+      bx,
+      unFocusFxn,
+      cmdId,
+      fieldNameVsDesc,
+      syncFormDataFxn,
+      callExtCmdFxn,
+      **kwargs
+      ):
+    self._syncFormData = syncFormDataFxn
+    self._callExtCmd = callExtCmdFxn
+    self.cmdId = cmdId
     self.unFocusFxn = unFocusFxn
     self._createFormSkeleton(win, bx)
     optionalMenu = FilterFormLayout(
@@ -273,27 +290,51 @@ class SimpleGuiFormBase(GuiFormBase):
     self.optionalMenu = optionalMenu
 
     i = 0
-    focusChgFxnNameTmpl = "{0}FocusChgCallback"
-    contentChgFxnNameTmpl = "{0}ContentChgCallback"
-
-    for name, field in self.fields.items():
-      kwargs = {}
-      focusChgFxnName = focusChgFxnNameTmpl.format(name)
-      contentChgFxnName = contentChgFxnNameTmpl.format(name)
-      if(hasattr(self, focusChgFxnName)):
-        kwargs["focusChgFxn"] = getattr(self, focusChgFxnName)
-      elif(hasattr(self, contentChgFxnName)):
-        kwargs["contentChgFxn"] = getattr(self, contentChgFxnName)
-
+    for fieldName, fieldDesc in fieldNameVsDesc.iteritems():
+      if fieldDesc["type"].startswith("Model"):
+        fieldKlass = importClass(
+            "theory.gui.model.{type}".format(**fieldDesc)
+            )
+      else:
+        fieldKlass = importClass(
+            "theory.gui.etk.field.{type}".format(**fieldDesc)
+            )
+      widgetKwargs = kwargs
+      widgetKwargs["isFocusChgTrigger"] = fieldDesc["widgetIsFocusChgTrigger"]
+      widgetKwargs["isContentChgTrigger"] = \
+          fieldDesc["widgetIsContentChgTrigger"]
+      if widgetKwargs["isFocusChgTrigger"] or widgetKwargs["isContentChgTrigger"]:
+        widgetKwargs["syncFormData"] = self.syncFormData
+        widgetKwargs["fieldName"] = fieldName
+      del fieldDesc["widgetIsFocusChgTrigger"]
+      del fieldDesc["widgetIsContentChgTrigger"]
+      if fieldDesc["type"] == "ListField":
+        fieldDesc["field"] = importClass(
+            "theory.gui.etk.field.{childFieldTemplate}".format(**fieldDesc)
+            )()
+        del fieldDesc["childFieldTemplate"]
+      if fieldDesc["type"] == "DictField":
+        fieldDesc["keyField"] = importClass(
+            "theory.gui.etk.field.{childKeyFieldTemplate}".format(**fieldDesc)
+            )()
+        fieldDesc["valueField"] = importClass(
+            "theory.gui.etk.field.{childValueFieldTemplate}".format(**fieldDesc)
+            )()
+        del fieldDesc["childKeyFieldTemplate"]
+        del fieldDesc["childValueFieldTemplate"]
+      del fieldDesc["type"]
+      fieldDesc["getSibilingFieldData"] = self.getSibilingFieldData
+      field = fieldKlass(**fieldDesc)
+      self.fields[fieldName] = field
       if(field.required):
-        field.renderWidget(self.win, self.formBx.obj, attrs=kwargs)
+        field.renderWidget(self.win, self.formBx.obj, attrs=widgetKwargs)
         self.formBx.addInput(field.widget)
         if(self.firstRequiredInputIdx==-1):
           self.firstRequiredInputIdx = i
       else:
-        field.renderWidget(self.win, self.formBx.obj, attrs=kwargs)
+        field.renderWidget(self.win, self.formBx.obj, attrs=widgetKwargs)
         if(field.widget is not None):
-          optionalMenu.addInput(name, field.widget)
+          optionalMenu.addInput(fieldName, field.widget)
       i += 1
 
     self.formBx.postGenerate()
