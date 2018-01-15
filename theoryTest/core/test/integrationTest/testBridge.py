@@ -103,11 +103,10 @@ class TestBridgeTestCase(TestCase):
     secondCmdModel = self.asyncChain2CommandModel
     secondCmdModel.save()
 
-    mockLst = [secondCmdModel]
-    with Stub(type=QuerySet, proxy=mockLst) as queryset:
-      pass
+    queryset = secondCmdModel.__class__.objects.filter(id=secondCmdModel.id)
 
     firstCmd.paramForm.fields["queryset"].finalData = queryset
+
     self.bridge._executeCommand(firstCmd, firstCmd.getCmdModel())
 
   def testSimpleCommandToSelf(self):

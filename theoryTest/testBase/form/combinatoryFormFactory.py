@@ -104,13 +104,16 @@ def getPythonClassDefault():
   return "theory.core.reactor.Reactor"
 
 def getQuerysetDefault():
-  return [str(Command.objects.first().id)]
+  #return [str(Command.objects.first().id)]
+  return [1]
 
 def getDynamicModelIdDefault():
-  return str(Command.objects.first().id)
+  #return str(Command.objects.first().id)
+  return 1
 
 def getDynamicModelSetDefault():
-  return [str(Command.objects.first().id)]
+  #return [str(Command.objects.first().id)]
+  return [1]
 
 def getChoiceSelection():
   return ((1, "1",), (2, "2",), (3, "3",),)
