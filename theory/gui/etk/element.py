@@ -320,6 +320,7 @@ class ListValidator(Genlist):
     self.checkboxLst[data[0]] = r
     return r.obj
 
+  # Probably depreciate
   def _keyDownAdd(self, gl, e, *args, **kwargs):
     # "Shift", "Control", "Alt", "Meta", "Hyper", "Super".
     #if(e.keyname=="space" and e.modifier_is_set("Control")):
@@ -392,17 +393,17 @@ class ListModelValidator(Genlist):
     self.grpAState = []
 
   def _rowItemTextGetter(self, obj, part, item_data):
-    return item_data[0].ref.links[item_data[1]]
+    return item_data[0]["refItemTitleLst"][item_data[1]]
 
   def _rowItemContentGetter(self, obj, part, data):
     r = CheckBox()
     r.win = self.win
-    r.attrs["initData"] = data[0].finalState[data[1]]
+    r.attrs["initData"] = data[0]["finalState"][data[1]]
     r.generate()
     return r.obj
 
   def _rowGroupTextGetter(self, obj, part, item_data):
-    return item_data[0].name.encode("utf8")
+    return item_data[0]["refGrpTitle"].encode("utf8")
 
   def _rowGroupContentGetter(self, obj, part, data):
     r = CheckBox()
@@ -417,18 +418,20 @@ class ListModelValidator(Genlist):
     if(e.keyname=="space"):
       item = gl.selected_item
       pos = item.data[1]
-      if(item.parent==None):
+      if item.parent is None:
         currentState = self.grpAState[pos]
         self.grpAState[pos] = not currentState
         item.update()
         child = item.next
-        child.data[0].finalState = [not currentState for i in range(len(child.data[0].finalState))]
-        while(child.parent!=None):
+        child.data[0]["finalState"] = [
+            not currentState for i in range(len(child.data[0]["finalState"]))
+            ]
+        while child.parent is not None:
           child.update()
           child = child.next
       else:
-        currentState = item.data[0].finalState[item.data[1]]
-        item.data[0].finalState[item.data[1]] = not currentState
+        currentState = item.data[0]["finalState"][item.data[1]]
+        item.data[0]["finalState"][item.data[1]] = not currentState
         item.update()
         item.next.selected = True
 
@@ -439,14 +442,14 @@ class ListModelValidator(Genlist):
     itc_g = self.generateGroupRow()
 
     counter = 0
-    for classifierModel in self.attrs["initData"]:
+    for classifierDict in self.attrs["initData"]:
       self.grpAState.append(True)
-      git = self._groupAdder(itc_g, (classifierModel.ref, counter))
+      git = self._groupAdder(itc_g, (classifierDict, counter))
 
       isAllTrue = True
-      for stateIdx in range(len(classifierModel.finalState)):
-        self._itemAdder(itc_i, (classifierModel, stateIdx), git)
-        if(classifierModel.finalState[stateIdx]==False):
+      for stateIdx in range(len(classifierDict["finalState"])):
+        self._itemAdder(itc_i, (classifierDict, stateIdx), git)
+        if classifierDict["finalState"][stateIdx] == False:
           isAllTrue = False
       if(isAllTrue):
         self.grpAState[-1] = True
