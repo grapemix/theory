@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package theory;
+//import "google/protobuf/any.proto";
+import "google/protobuf/empty.proto";
+//import "google/protobuf/timestamp.proto";
+
+//enum RUN_MODE_CHOICES {
+//  RUN_MODE_SIMPLE = 0;
+//  RUN_MODE_ASYNC = 1;
+//}
+//
+//service RemoteQuerySet {
+//  rpc count (google.protobuf.Empty) returns (CountResult) {}
+//  rpc list (QuerySetRequest) returns (QuerySetData) {}
+//}
+//
+//message QuerySetRequest{
+//  string modelName = 1;
+//  int32 startPos = 2;
+//  int32 endPos = 3;
+//  repeated string includeField = 4;
+//  repeated string excludeField = 5;
+//
+//}
+//message QuerySetData{
+//  int32 count = 1;
+//  repeated google.protobuf.Any resultLst = 2;
+//}
+//
+//message CountResult{
+//  int32 count = 1;
+//}
+
+////////////////////////////////////////////////
+
+message UiReq{
+  string action = 1;
+  string val = 2;
+  string userId = 3;
+}
+
+message ReactorReq{
+  string action = 1;
+  string val = 2;
+}
+
+message ReactorReqArr{
+  repeated ReactorReq reqLst = 1;
+}
+
+message UiId{
+  string id = 1;
+  repeated string adapterLst = 2;
+}
+
+message FieldData{
+  int32 cmdId = 1;
+  string fieldName = 2;
+  string jsonData = 3;
+}
+
+message CmdFxnInput{
+  int32 cmdId = 1;
+  string fxnName = 2;
+  string jsonData = 3;
+}
+
+message uiData4Adapter{
+  int32 adapterBufferModelId = 1;
+  //google.protobuf.Any data = 2;
+  string jsonData = 2;
+}
+
+message JsonData{
+  string jsonData = 1;
+}
+
+message ModelLstData{
+  string appName = 1;
+  string modelName = 2;
+  repeated string jsonDataLst = 3;
+}
+
+message Empty{
+}
+
+service Reactor {
+  // Should add auth in the future
+  rpc bye(Empty) returns (google.protobuf.Empty) {}
+  rpc call(UiReq) returns (ReactorReqArr) {}
+  //rpc register(UiId) returns (stream ReactorReq) {}
+  rpc register(UiId) returns (ReactorReqArr) {}
+  rpc syncFormData(FieldData) returns (JsonData) {}
+  rpc callCmdSubFxn(CmdFxnInput) returns (JsonData) {}
+  rpc adaptFromUi(uiData4Adapter) returns (JsonData) {}
+  rpc upsertModelLst(ModelLstData) returns (ReactorReqArr) {}
+}

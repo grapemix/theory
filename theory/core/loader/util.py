@@ -205,6 +205,7 @@ class CommandModuleLoader(ModuleLoader):
       "migrate": ["norm"],
       "infect": ["dev"],
       "manageAppDb": ["dev"],
+      "updateUiApi": ["dev"],
     }
     for o in lst:
       if(moodCommandRel.has_key(o[1])):
