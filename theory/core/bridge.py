@@ -271,23 +271,38 @@ class Bridge(object):
       self,
       cmd,
       cmdModel,
-      uiParam={},
+      actionQ=[],
       forceSync=False,
-      runMode=None
+      runMode=None,
       ):
     if runMode is None:
       runMode = cmdModel.runMode
-    if(runMode==Command.RUN_MODE_ASYNC):
-      if(forceSync):
-        cmd.run(paramFormData=cmd.paramForm.toPython())
+
+    try:
+      if runMode == Command.RUN_MODE_ASYNC:
+        if forceSync:
+          cmd.run(
+            paramFormData=cmd.paramForm.toPython(), cmdId=int(cmdModel.id)
+          )
+        else:
+          cmd.apply_async(
+              kwargs={
+                "cmdId": int(cmdModel.id),
+                "paramFormData": cmd.paramForm.toPython()
+              },
+          )
       else:
-        cmd.delay(paramFormData=cmd.paramForm.toPython())
-    else:
-      if(not cmd.paramForm.isValid()):
-        return False
-      cmd._uiParam = uiParam
-      cmd.run()
-    return True
+        if not cmd.paramForm.isValid():
+          return False
+        cmd.cmdId = int(cmdModel.id)
+        cmd.actionQ = actionQ
+        cmd.run()
+      return True
+    except Exception as e:
+      import logging
+      logger = logging.getLogger(__name__)
+      logger.error(e, exc_info=True)
+      raise e
 
   def executeEzCommand(
       self,
@@ -295,8 +310,8 @@ class Bridge(object):
       cmdName,
       args,
       kwargs,
-      uiParam={},
-      forceSync=False
+      actionQ=[],
+      forceSync=False,
       ):
     if appName == "theory" and args == []:
       # for first time running
@@ -311,17 +326,20 @@ class Bridge(object):
       for k,v in kwargs.iteritems():
         cmd.paramForm.fields[k].finalData = v
       cmd.paramForm.isValid()
+      # mainly for testing theory
+      dummyCmdObj = type('DummyCmdModel', (object,), {})()
+      dummyCmdObj.id = -1
       return (
           cmd,
           self._executeCommand(
             cmd,
-            None,
-            uiParam,
-            forceSync,
-            Command.RUN_MODE_SIMPLE
+            dummyCmdObj,
+            actionQ=actionQ,
+            forceSync=forceSync,
+            runMode=Command.RUN_MODE_SIMPLE,
             )
           )
     else:
       cmdModel = Command.objects.get(app=appName, name=cmdName)
       cmd = self.getCmdComplex(cmdModel, args, kwargs)
-    return (cmd, self._executeCommand(cmd, cmdModel, uiParam, forceSync))
+    return (cmd, self._executeCommand(cmd, cmdModel, actionQ, forceSync))
