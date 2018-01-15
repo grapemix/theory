@@ -3,8 +3,6 @@
 ##### System wide lib #####
 
 ##### Theory lib #####
-from theory.db import models
-from theory.utils.encoding import smart_text
 from theory.utils import six
 
 ##### Theory third-party lib #####
