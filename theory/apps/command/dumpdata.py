@@ -123,7 +123,6 @@ class Dumpdata(SimpleCommand):
 
   def run(self):
     data = self.paramForm.clean()
-    #moodName = self.paramForm.fields["moodName"].finalChoiceLabel
     format = data["format"]
     indent = data["indent"]
     database = data["database"]
@@ -164,7 +163,10 @@ class Dumpdata(SimpleCommand):
       appList = OrderedDict()
       for label in appLabelLst:
         try:
-          appLabel, modelLabel = label.split('.')
+          if not label.startswith("theory.apps"):
+            appLabel, modelLabel = label.split('.')
+          else:
+            dummy, appLabel, modelLabel = label.split('.')
           try:
             appConfig = apps.getAppConfig(appLabel)
           except LookupError:
@@ -188,7 +190,10 @@ class Dumpdata(SimpleCommand):
           if primaryKeyLst:
             raise CommandError("You can only use --pks option with one model")
           # This is just an app - no model qualifier
-          appLabel = label
+          if not label.startswith("theory.apps"):
+            appLabel = label
+          else:
+            appLabel = "apps"
           try:
             appConfig = apps.getAppConfig(appLabel)
           except LookupError:
@@ -225,8 +230,12 @@ class Dumpdata(SimpleCommand):
             yield obj
 
     try:
-      #self.stdout.ending = None
-      stream = open(output, 'w') if output else None
+      if output:
+        stream = open(output, 'w')
+      else:
+        from cStringIO import StringIO
+        stream = StringIO()
+        None
       try:
         serializers.serialize(format, getObjects(), indent=indent,
             useNaturalForeignKeys=isNatureForeign,
@@ -234,6 +243,8 @@ class Dumpdata(SimpleCommand):
             stream=stream or self.stdOut)
       finally:
         if stream:
+          if not output:
+            self._stdOut = stream.getvalue()
           stream.close()
     except Exception as e:
       if isShowTraceback:
@@ -318,25 +329,3 @@ def sortDependencies(appList):
     modelDependencies = skipped
 
   return modelList
-
-
-
-
-#class Command(BaseCommand):
-#
-#  def addArguments(self, parser):
-#    parser.addArgument('args', metavar='appLabel[.ModelName]', nargs='*',
-#      help='Restricts dumped data to the specified appLabel or appLabel.ModelName.')
-    #parser.addArgument('-n', '--natural', action='storeTrue', dest='useNaturalKeys', default=False,
-    #  help='Use natural keys if they are available (deprecated: use --natural-foreign instead).')
-    #parser.addArgument('--natural-foreign', action='storeTrue', dest='useNaturalForeignKeys', default=False,
-    #  help='Use natural foreign keys if they are available.')
-    #parser.addArgument('--natural-primary', action='storeTrue', dest='useNaturalPrimaryKeys', default=False,
-    #  help='Use natural primary keys if they are available.')
-    #parser.addArgument('-a', '--all', action='storeTrue', dest='useBaseManager', default=False,
-    #  help="Use Theory's base manager to dump all models stored in the database, "
-    #     "including those that would otherwise be filtered or modified by a custom manager.")
-    #parser.addArgument('--pks', dest='primaryKeys',
-    #  help="Only dump objects with given primary keys. "
-    #     "Accepts a comma separated list of keys. "
-    #     "This option will only work when you specify one model.")
