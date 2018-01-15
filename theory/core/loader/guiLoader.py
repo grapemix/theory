@@ -2,43 +2,19 @@
 #!/usr/bin/env python
 ##### System wide lib #####
 from copy import deepcopy
-from datetime import datetime, timedelta
-import gevent
-import notify2
-import os
-os.environ.setdefault("CELERY_LOADER", "theory.core.loader.celeryLoader.CeleryLoader")
-import signal
 
 ##### Theory lib #####
-from theory.apps import apps
 from theory.conf import settings
-from theory.apps.model import AdapterBuffer, Command
-from theory.utils.importlib import importModule
 from theory.utils.mood import loadMoodData
 
 ##### Theory third-party lib #####
-from theory.gui.etk import getDbusMainLoop
+from theory.gui.etk.terminal import Terminal
 
 ##### Local app #####
 
 ##### Theory app #####
 
 ##### Misc #####
-
-def _chkAdapterBuffer():
-  notify2.init('Theory', getDbusMainLoop())
-  while(True):
-    for adapterBufferModel in AdapterBuffer.objects.filter(
-        created__gt=datetime.now()-timedelta(minutes=1)
-      ):
-      n = notify2.Notification(
-          "Done",
-          str(adapterBufferModel),
-          "notification-message-im"   # Icon name
-          )
-      n.show()
-    gevent.sleep(60)
-  return False
 
 def getDimensionHints():
   resolutionSet = settings.MOOD["RESOLUTION"]
@@ -65,48 +41,14 @@ def getDimensionHints():
       }
 
 def wakeup(settings_mod, argv=None):
+  # TODO: Make reactor to generate all choices for all fields to rm all deps
+  from theory.apps import apps
+  from copy import deepcopy
   appNameLst = deepcopy(settings.INSTALLED_APPS)
   appNameLst.insert(0, "theory.apps")
   apps.populate(appNameLst)
-  try:
-    Command.objects.count()
-  except:
-    # DB has been flushed
-    from core.bridge import Bridge
-    from theory.apps.command.makeMigration import MakeMigration
-    from theory.apps.command.migrate import Migrate
-    cmd = MakeMigration()
-    cmd.paramForm = MakeMigration.ParamForm()
-    cmd.paramForm.fields["appLabelLst"].finalData = ["apps", ]
-    cmd.paramForm.isValid()
-    cmd.run()
-
-    cmd = Migrate()
-    cmd.paramForm = Migrate.ParamForm()
-    cmd.paramForm.fields["appLabel"].finalData = "apps"
-    cmd.paramForm.fields["isFake"].finalData = False
-    cmd.paramForm.fields["isInitialData"].finalData = False
-    cmd.paramForm.isValid()
-    cmd.run()
-
-  if Command.objects.count()==0:
-    from .util import reprobeAllModule
-    reprobeAllModule(settings_mod, argv)
-  #else:
-  #  for cmd in Command.objects.all():
-  #    importModule(cmd.moduleImportPath)
 
   loadMoodData()
 
-  from theory.core.reactor import *
   getDimensionHints()
-  # in 0.13.8, it is shutdown
-  #gevent.signal(signal.SIGQUIT, gevent.shutdown)
-  # in 1.0.1
-  gevent.signal(signal.SIGQUIT, gevent.kill)
-  gevent.joinall(
-      [
-        gevent.spawn(reactor.ui.drawAll),
-        gevent.spawn(_chkAdapterBuffer),
-      ]
-  )
+  Terminal().start()

@@ -279,15 +279,6 @@ def reprobeAllModule(settingsMod, argv=None):
     apps = []
 
   # Find all mood directory
-  detectScreenResolution(
-      os.path.join(
-        settings.MOODS_ROOT,
-        "norm",
-        "config.py"
-        )
-      )
-
-  # Find all mood directory
   settings.INSTALLED_MOODS = list(settings.INSTALLED_MOODS)
   settings.INSTALLED_MOODS.append("norm")
   settings.INSTALLED_MOODS = tuple(settings.INSTALLED_MOODS)
