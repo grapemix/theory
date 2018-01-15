@@ -26,9 +26,8 @@ class CreateCmd(SimpleCommand):
     appName = field.ChoiceField(label="Application Name",
         helpText="The name of applications to be listed",
         initData="theory.apps",
-        choices=(set([("theory.apps", "theory.apps")] +
-          [(settings.INSTALLED_APPS[i], settings.INSTALLED_APPS[i])
-            for i in range(len(settings.INSTALLED_APPS))])),
+        dynamicChoiceLst=(set([("theory.apps", "theory.apps")] +
+          [(appName, appName) for appName in settings.INSTALLED_APPS])),
         )
 
     cmdName = field.TextField(
@@ -81,7 +80,7 @@ class CreateCmd(SimpleCommand):
     data = self.paramForm.clean()
     appName = data["appName"]
     cmdName = data["cmdName"]
-    if(appName!="theory"):
+    if appName!="theory.apps":
       toPath = os.path.join(
           settings.APPS_ROOT,
           appName,
@@ -99,7 +98,7 @@ class CreateCmd(SimpleCommand):
     propertyLst = self.getPropertyLst(data["propertyNameLst"])
 
     CmdName = cmdName[0].upper() + cmdName[1:]
-    if(data["cmdType"]=="AsyncCommand"):
+    if data["cmdType"]=="AsyncCommand":
       extraCode = "super({0}, self).run(*args, **kwargs)".format(CmdName)
     else:
       extraCode = "pass"
