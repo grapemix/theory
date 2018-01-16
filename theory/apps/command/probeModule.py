@@ -19,22 +19,26 @@ from theory.gui import field
 class ProbeModule(SimpleCommand):
   name = "probeModule"
   verboseName = "probeModule"
+  _drums = {"Terminal": 1,}
+
+  @property
+  def stdOut(self):
+    return self._stdOut
 
   class ParamForm(SimpleCommand.ParamForm):
     appNameLst = field.MultipleChoiceField(
         label="Application Name",
         helpText="The name of application being probed",
-        choices=(
-          set(
-            [("theory.apps", "theory.apps")] + \
-            [(app, app) for app in settings.INSTALLED_APPS]
-          )
-        )
+        dynamicChoiceLst=(set([("theory.apps", "theory.apps")] +
+          [(appName, appName) for appName in settings.INSTALLED_APPS])
+        ),
     )
 
   def run(self):
     appNameLst = self.paramForm.clean()["appNameLst"]
 
-    self._stdOut = "Probing module: %s" % (appNameLst)
+    self._stdOut = "Probing module: %s\n" % (appNameLst)
     #reprobeAllModule(settingMod)
+
     probeApps(appNameLst)
+    self._stdOut += "done"
