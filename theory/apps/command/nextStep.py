@@ -4,7 +4,7 @@
 
 ##### Theory lib #####
 from theory.apps.command.baseCommand import SimpleCommand
-from theory.apps.model import AdapterBuffer, Command
+from theory.apps.model import AdapterBuffer
 from theory.conf import settings
 from theory.core.bridge import Bridge
 from theory.gui import field
@@ -22,18 +22,10 @@ __all__ = ("NextStep", )
 class ParamForm(SimpleCommand.ParamForm):
   # This form can move to somewhere else if we like
   commandReady = field.ChoiceField(
-      choices=(),
+      dynamicChoiceLst=[(i.pk, str(i)) for i in AdapterBuffer.objects.all()],
       label="Command Ready",
       helpText="Select a command ready to be continued"
       )
-
-  def __init__(self, *args, **kwargs):
-    super(ParamForm, self).__init__(*args, **kwargs)
-    self.fields["commandReady"].choices = self.getCommandChoiceLst()
-
-  def getCommandChoiceLst(self):
-    # example return value:  ((1, "command1"), (2, "command2"))
-    return [(i.pk, str(i)) for i in AdapterBuffer.objects.all()]
 
 class NextStep(SimpleCommand):
   """
@@ -77,4 +69,8 @@ class NextStep(SimpleCommand):
     cmdId = self.paramForm.clean()["commandReady"]
     self.adapterBufferModel = AdapterBuffer.objects.get(id=cmdId)
 
-    self.bridge.bridgeFromDb(self.adapterBufferModel, self._executeCommand, self.uiParam)
+    self.bridge.bridgeFromDb(
+        self.adapterBufferModel,
+        self._executeCommand,
+        self.actionQ
+        )
