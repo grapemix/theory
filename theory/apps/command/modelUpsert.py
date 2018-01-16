@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 ##### System wide lib #####
-from copy import deepcopy
+import json
 
 ##### Theory lib #####
-from theory.apps.adapter.terminalAdapter import TerminalForm
 from theory.apps.command.baseCommand import SimpleCommand
-from theory.apps.model import AppModel
+from theory.apps.model import AppModel, Command
 from theory.conf import settings
+from theory.core.exceptions import ValidationError
+from theory.core.resourceScan.commandClassScanner import CommandClassScanner
 from theory.gui import field
-from theory.gui.etk.element import getNewUiParam
 from theory.gui.etk.form import StepFormBase
-#from theory.gui.model import GuiModelForm
-from theory.gui.model import ModelForm, ModelChoiceField
+from theory.gui.model import ModelForm
+from theory.gui.transformer.theoryJSONEncoder import TheoryJSONEncoder
 from theory.utils.importlib import importClass
 
 ##### Theory third-party lib #####
@@ -36,43 +36,37 @@ class ModelUpsert(SimpleCommand):
     appName = field.ChoiceField(label="Application Name",
         helpText="The name of applications to be listed",
         initData="theory.apps",
-        choices=(set([("theory.apps", "theory.apps")] +
-          [(settings.INSTALLED_APPS[i], settings.INSTALLED_APPS[i])
-            for i in range(len(settings.INSTALLED_APPS))])),
+        dynamicChoiceLst=(set([("theory.apps", "theory.apps")] +
+          [(appName, appName) for appName in settings.INSTALLED_APPS])),
         )
     modelName = field.ChoiceField(label="Model Name",
         helpText="The name of models to be listed",
+        dynamicChoiceLst=(set(
+          [(appModel.name, appModel.name)
+           for appModel in AppModel.objects.only("name").filter(
+               app="theory.apps"
+           )
+          ])),
         )
-    queryset = ModelChoiceField(
-        queryset=AppModel.objects.all(),
+    queryId = field.DynamicModelIdField(
         required=False,
         label="instance id",
         helpText="The instance to be edited",
         initData=None,
+        appFieldName="appName",
+        modelFieldName="modelName",
         isSkipInHistory=True,
         )
-
     isInNewWindow = field.BooleanField(
         label="Is in new window",
         helpText="Is shown in new window",
         required=False,
         initData=False,
         )
-    # Not yet in this version
-    #queryset = field.QuerysetField(
-    #    required=False,
-    #    label="Queryset",
-    #    helpText="The queryset to be processed",
-    #    initData=[],
-    #    isSkipInHistory=True,
-    #    )
-
-    def __init__(self, *args, **kwargs):
-      super(SimpleCommand.ParamForm, self).__init__(*args, **kwargs)
-      self._preFillFieldProperty()
 
     def _getQuerysetByAppAndModel(self, appName, modelName):
-      appModel = AppModel.objects.get(
+      # being called from modelTblFilterBase.py
+      appModel = AppModel.objects.only("importPath").get(
           app=appName,
           name=modelName
           )
@@ -87,54 +81,29 @@ class ModelUpsert(SimpleCommand):
       if len(cmdArgs) == 2:
         # This is for QuerysetField preset the form for modelSelect
         appName = self.fields["appName"].initData
-        self.fields["modelName"].choices = self._getModelNameChoices(appName)
+        self.fields["modelName"].dynamicChoiceLst = self._getModelNameChoices(
+          appName
+        )
       elif cmdKwargs.has_key("appName") and cmdKwargs.has_key("modelName"):
         # For perseting by kwargs
-        self.fields["modelName"].choices = \
+        self.fields["modelName"].dynamicChoiceLst = \
             self._getModelNameChoices(cmdKwargs["appName"])
-      self.fields["queryset"].queryset = \
-          self._getQuerysetByAppAndModel(
-              self.fields["appName"].finalData,
-              self.fields["modelName"].finalData
-              )
-
-    def _preFillFieldProperty(self):
-      appName = self.fields["appName"].initData
-      self.fields["modelName"].choices = self._getModelNameChoices(appName)
 
     def _getModelNameChoices(self, appName):
-      return set(
-          [(i.name, i.name) for i in AppModel.objects.filter(app=appName)]
-      )
+      return list(set(
+          [(i.name, i.name)
+           for i in AppModel.objects.only("name").filter(app=appName)
+          ]
+      ))
 
-    def appNameFocusChgCallback(self, *args, **kwargs):
-      field = self.fields["appName"]
-      appName = field.clean(field.finalData)
-      field.finalData = None
+    def appNameFocusChgCallback(self, appName):
+      return {
+          "modelName": {"choices": self._getModelNameChoices(appName)},
+      }
 
-      field = self.fields["modelName"]
-      field.choices = self._getModelNameChoices(appName)
-      modelName = field.choices[0][0]
-      field.widget.reset(choices=field.choices)
-
-      field.queryset = \
-          self._getQuerysetByAppAndModel(
-              appName,
-              modelName
-              )
-
-    def modelNameFocusChgCallback(self, *args, **kwargs):
-      field = self.fields["queryset"]
-      self.fields["modelName"].finalData = None
-      field.model = self.fields["modelName"].clean(
-          self.fields["modelName"].finalData
-          )
-
-      field.queryset = self._getQuerysetByAppAndModel(
-          self.fields["appName"].finalData,
-          self.fields["modelName"].finalData
-          )
-
+  @property
+  def stdOut(self):
+    return self._stdOut
 
   def getModelFormKlass(self, appModel, modelKlass):
     class DynamicModelForm(ModelForm, StepFormBase):
@@ -144,44 +113,67 @@ class ModelUpsert(SimpleCommand):
         exclude = []
     return DynamicModelForm
 
-  def postApplyChange(self):
-    pass
-
-  def cleanParamForm(self, btn, dummy):
-    if(self.modelForm.isValid()):
-      self.modelForm.save()
-      if self.paramForm.clean()["isInNewWindow"]:
-        self._uiParam["cleanUpCrtFxn"](None, None)
-      self.postApplyChange()
-
-      self._uiParam["bx"].clear()
-
-      o = TerminalForm()
-      o.fields["stdOut"].initData = "Model has been saved successfully."
-      o.generateForm(**self._uiParam)
-    else:
-      # TODO: integrate with std reactor error system
-      self.modelForm.showErrInFieldLabel()
-
   def run(self, *args, **kwargs):
     f = self.paramForm.clean()
-    if not f["isInNewWindow"]:
-      self._uiParam["bx"].clear()
-
-    appModel = AppModel.objects.get(app=f["appName"], name=f["modelName"])
-    self.modelKlass = importClass(appModel.importPath)
-    modelFormKlass = self.getModelFormKlass(appModel, self.modelKlass)
-    self.instance = None
-    if(f["queryset"] is not None):
-      self.modelForm = modelFormKlass(instance=f["queryset"])
-    else:
-      self.modelForm = modelFormKlass()
-    self.modelForm._nextBtnClick = self.cleanParamForm
-
-    if f["isInNewWindow"]:
-      self._uiParam = getNewUiParam()
-
-    self.modelForm.generateForm(**self._uiParam)
-    self.modelForm.generateStepControl(
-        cleanUpCrtFxn=self._uiParam["cleanUpCrtFxn"]
+    appModel = AppModel.objects.get(
+        app=f["appName"],
+        name=f["modelName"]
         )
+
+    modelKlass = importClass(appModel.importPath)
+    modelFormKlass = self.getModelFormKlass(appModel, modelKlass)
+    if f["queryId"] is not None and f["queryId"] != "None":
+      modelForm = modelFormKlass(
+          instance=modelKlass.objects.get(id=f["queryId"])
+          )
+    else:
+      modelForm = modelFormKlass()
+
+    cmdModel = Command.objects.only("id").get(
+        app="theory.apps",
+        name="modelUpsert"
+        )
+    scanner = CommandClassScanner()
+    fieldNameVsDesc = scanner.geneateModelFormFieldDesc(modelForm)
+    if f["queryId"] is not None and f["queryId"] != "None":
+      fieldNameVsDesc["id"] = {
+          "errorMessages": {
+            "required": "This field is required.",
+            "invalid": "Enter a whole number."
+          },
+          "widgetIsContentChgTrigger": False,
+          "required": False,
+          "isSingular": True,
+          "initData": f["queryId"],
+          "label": "id",
+          "helpText": "",
+          "showHiddenInitial": False,
+          "localize": False,
+          "widgetIsFocusChgTrigger": False,
+          "type": "IntegerField"
+          }
+    try:
+      val = json.dumps({
+        "cmdId": cmdModel.id,
+        "fieldNameVsDesc": fieldNameVsDesc,
+        "nextFxn": "upsertModelLst",
+        # Needed for the model form's save fxn when users call this cmd thru
+        # history
+        "appName": f["appName"],
+        "modelName": f["modelName"],
+        },
+        cls=TheoryJSONEncoder
+      )
+    except Exception as e: # eval can throw many different errors
+      import logging
+      logger = logging.getLogger(__name__)
+      logger.error(e, exc_info=True)
+      raise ValidationError(str(e))
+
+    self.actionQ.append({
+      "action": "cleanUpCrt",
+      })
+    self.actionQ.append({
+      "action": "buildParamForm",
+      "val": val
+      })
