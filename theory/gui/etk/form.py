@@ -29,33 +29,20 @@ from element import Button
 __all__ = ("Form", "CommandForm", "SimpleGuiForm", "FlexibleGuiForm")
 
 class GuiFormBase(BasePacker):
-  def _preFillFieldProperty(self):
-    """It is used to prefill fields which depends on the fields'
-    value. It will only be called in the __init__() and when the form
-    needs another set of initData(e.x: when prefilling the history)."""
-    pass
-
   def _changeFormWindowHeight(self, maxHeight):
     pass
 
-  def fillInitData(self, initDataAsDict):
-    """This is used for updating form and destroy all widget and past
-    reference. It should be used when no previous fields and widgets
-    can be reused and need reference to.
-    """
-    for fieldName, data in initDataAsDict.iteritems():
-      try:
-        self.fields[fieldName].initData = data
-      except KeyError:
-        pass
+  def generateForm(self, win, bx, unFocusFxn):
+    pass
 
-    # used to fill in other properties which depends on the
-    # other field's initData
-    self._preFillFieldProperty()
+  def _createFormSkeleton(self, win, bx):
+    self.win = win
+    self.bx = bx
 
   def reFillInitData(self, initDataAsDict):
     """This fxn will not destroy any widgets, instead, it will just update it.
-    It should be faster and allow previous reference to it.
+    It should be faster and allow previous reference to it. Only useful for the
+    reset button in the future.
     """
     for fieldName, data in initDataAsDict.iteritems():
       try:
@@ -68,17 +55,6 @@ class GuiFormBase(BasePacker):
             )
       except KeyError:
         pass
-
-    # used to fill in other properties which depends on the
-    # other field's initData
-    self._preFillFieldProperty()
-
-  def generateForm(self, win, bx, unFocusFxn):
-    pass
-
-  def _createFormSkeleton(self, win, bx):
-    self.win = win
-    self.bx = bx
 
 class FlexibleGuiFormBase(GuiFormBase):
   def __init__(self, *args, **kwargs):
