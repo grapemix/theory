@@ -4,7 +4,7 @@
 
 ##### Theory lib #####
 from theory.conf import settings
-from theory.core.reactor import *
+from theory.core.reactor.reactor import Reactor
 from theory.gui import field
 from theory.utils.mood import loadMoodData
 
@@ -30,19 +30,25 @@ class SwitchMood(SimpleCommand):
     moodName = field.ChoiceField(
         label="Mood Name",
         helpText="The name of mood being used",
-        choices=(set([(i, i) for i in settings.INSTALLED_MOODS])),
+        dynamicChoiceLst=(
+          set([(moodName, moodName) for moodName in settings.INSTALLED_MOODS])
+        ),
         )
 
   def run(self):
     moodName = self.paramForm.fields["moodName"].finalData
     config = loadMoodData(moodName)
     for i in dir(config):
-      if(i==i.upper()):
+      if i == i.upper():
         settings.MOOD[i] = getattr(config, i)
 
-    reactor.mood = moodName
+    reactor = Reactor()
+    reactor.moodName = moodName
 
-    self._stdOut += "Successfully switch to %s mood\n\nThe following config is applied:\n" % (moodName)
+    self._stdOut += (
+      "Successfully switch to {0} mood\n\n"
+      "The following config is applied:\n"
+    ).format(moodName)
+
     for k,v in settings.MOOD.iteritems():
       self._stdOut += "    %s: %s\n" % (k, unicode(v))
-
