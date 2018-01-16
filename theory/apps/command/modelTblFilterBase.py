@@ -35,12 +35,16 @@ class ModelTblFilterBase(SimpleCommand):
     appName = field.ChoiceField(label="Application Name",
         helpText="The name of applications to be listed",
         initData="theory.apps",
-        choices=(set([("theory.apps", "theory.apps")] +
-          [(settings.INSTALLED_APPS[i], settings.INSTALLED_APPS[i])
-            for i in range(len(settings.INSTALLED_APPS))])),
+        dynamicChoiceLst=(set([("theory.apps", "theory.apps")] +
+          [(appName, appName) for appName in settings.INSTALLED_APPS])),
         )
-    modelName = field.ChoiceField(label="Model Name",
+    modelName = field.ChoiceField(
+        label="Model Name",
         helpText="The name of models to be listed",
+        dynamicChoiceLst=(set(
+          [(i.name, i.name) for i in AppModel.objects.only(
+            "name"
+          ).filter(app="theory.apps")])),
         )
     queryset = ModelMultipleChoiceField(
         queryset=AppModel.objects.all(),
@@ -63,27 +67,6 @@ class ModelTblFilterBase(SimpleCommand):
     #    initData=50,
     #    required=False)
 
-
-    def __init__(self, *args, **kwargs):
-      super(SimpleCommand.ParamForm, self).__init__(*args, **kwargs)
-      self._preFillFieldProperty()
-
-    #def _validateNonSingularField(self):
-    #  # Not being used for now since we can only allow to key in id list,
-    #  # but not queryset. In that way, we cannot extract appName and
-    #  # modelName from the id list. So in the widget level, we still
-    #  # have to treat appName and modelName as required, even though
-    #  # appName and modelName are not neccessary required in the field level
-    #  try:
-    #    field = self.fields["queryset"]
-    #    if(not self.isLazy):
-    #      field.forceUpdate()
-    #    value = field.finalData
-    #    value = field.clean(value)
-    #    self.emptyForgivenLst = ["appName", "modelName"]
-    #  except:
-    #    pass
-
     def _getQuerysetByAppAndModel(self, appName, modelName):
       appModel = AppModel.objects.get(
           app=appName,
@@ -91,9 +74,14 @@ class ModelTblFilterBase(SimpleCommand):
           )
       return importClass(appModel.importPath).objects.all()
 
-    def _preFillFieldProperty(self):
-      appName = self.fields["appName"].initData
-      self.fields["modelName"].choices = self._getModelNameChoices(appName)
+    def _updateQueryset(self, appName, modelName):
+      self.fields["queryset"].appName = appName
+      self.fields["queryset"].modelName = modelName
+      self.fields["queryset"].queryset = \
+          self._getQuerysetByAppAndModel(
+              appName,
+              modelName
+              )
 
     def fillInitFields(self, cmdModel, cmdArgs, cmdKwargs):
       super(ModelTblFilterBase.ParamForm, self).fillInitFields(
@@ -107,54 +95,21 @@ class ModelTblFilterBase(SimpleCommand):
           ):
         # This is for QuerysetField preset the form for modelSelect
         appName = self.fields["appName"].initData
-        self.fields["modelName"].choices = self._getModelNameChoices(appName)
+        self.fields["modelName"].dynamicChoiceLst = self._getModelNameChoices(appName)
         modelName = self.fields["modelName"].initData
-        self.fields["queryset"].appName = appName
-        self.fields["queryset"].modelName = modelName
-        self.fields["queryset"].queryset = \
-            self._getQuerysetByAppAndModel(
-                appName,
-                modelName
-                )
-
+        self._updateQueryset(appName, modelName)
 
     def _getModelNameChoices(self, appName):
-      return set(
-          [(i.name, i.name) for i in AppModel.objects.filter(app=appName)]
-      )
+      return list(set(
+          [(i.name, i.name) for i in AppModel.objects.only(
+            "name"
+          ).filter(app=appName)]
+      ))
 
-    def appNameFocusChgCallback(self, *args, **kwargs):
-      field = self.fields["appName"]
-      appName = field.clean(field.finalData)
-      field.finalData = None
-
-      field = self.fields["modelName"]
-      field.choices = self._getModelNameChoices(appName)
-      initChoice = field.choices[0][0]
-      field.widget.reset(choices=field.choices)
-
-      field = self.fields["queryset"]
-      field.appName = appName
-      field.modelName = initChoice
-
-      field.queryset = self._getQuerysetByAppAndModel(
-          appName,
-          initChoice
-          )
-
-    def modelNameFocusChgCallback(self, *args, **kwargs):
-      field = self.fields["appName"]
-      appName = field.clean(field.finalData)
-      field = self.fields["queryset"]
-      self.fields["modelName"].finalData = None
-      field.model = self.fields["modelName"].clean(
-          self.fields["modelName"].finalData
-          )
-
-      field.queryset = self._getQuerysetByAppAndModel(
-          appName,
-          self.fields["modelName"].finalData
-          )
+    def appNameFocusChgCallback(self, appName):
+      return {
+          "modelName": {"choices": self._getModelNameChoices(appName)},
+          }
 
   @property
   def queryIdSet(self):
