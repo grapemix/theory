@@ -20,7 +20,6 @@ from theory.conf import settings
 
 ##### Misc #####
 
-
 class CeleryLoader(BaseLoader):
   """Modified from celery default loader and django-celery DjangoLoader"""
   def now(self):
@@ -31,20 +30,6 @@ class CeleryLoader(BaseLoader):
     celery and Theory so it can be used by regular Python."""
     self.configured = True
     return settings.CELERY_SETTINGS
-
-  def on_worker_init(self):
-    """Called when the worker starts.
-
-    Automatically discovers any ``tasks.py`` files in the applications
-    listed in ``INSTALLED_APPS``.
-
-    """
-
-    if settings.DEBUG:
-      import warnings
-      warnings.warn("Using settings.DEBUG leads to a memory leak, never "
-                    "use this setting in production environments!")
-    self.import_default_modules()
 
   def import_default_modules(self):
     super(CeleryLoader, self).import_default_modules()
@@ -58,15 +43,9 @@ class CeleryLoader(BaseLoader):
             filter(runMode=Command.RUN_MODE_ASYNC)
             ]
     for path in cmdImportPath:
-      importModule(path)
-
-    # TODO: should be support individual commands define themselves as
-    # celery task instead using the default task wrapper. In that case,
-    # all those celery task command should be added in here
-    import theory.apps.command.baseCommand
-    self.task_modules.update(["theory.apps.command.baseCommand"])
-
-  # TODO: fix mail
-  #def mail_admins(self, subject, body, fail_silently=False, **kwargs):
-  #  return mail_admins(subject, body, fail_silently=fail_silently)
-
+      module = importModule(path)
+      klsName = path.split(".")[-1]
+      klsName = klsName[0].upper() + klsName[1:]
+      kls = getattr(module, klsName)
+      self.app.tasks.register(kls)
+      kls.bind(self.app)
