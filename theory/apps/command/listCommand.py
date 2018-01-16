@@ -30,10 +30,10 @@ class ListCommand(SimpleCommand):
     appName = field.ChoiceField(
         label="Application Name",
         helpText="Commands provided by this application",
-        choices=(
+        dynamicChoiceLst=(
           set(
             [("all", "all")] + \
-            [(app, app) for app in settings.INSTALLED_APPS]
+            [(appName, appName) for appName in settings.INSTALLED_APPS]
           )
         ),
         initData="all",
@@ -42,10 +42,10 @@ class ListCommand(SimpleCommand):
     mood = field.ChoiceField(
         label="Mood",
         helpText="Commands provided by this mood",
-        choices=(
+        dynamicChoiceLst=(
           set(
             [("all", "all")] + \
-            [(mood, mood) for mood in settings.INSTALLED_MOODS]
+            [(moodName, moodName) for moodName in settings.INSTALLED_MOODS]
           )
         ),
         initData="all",
@@ -69,27 +69,25 @@ class ListCommand(SimpleCommand):
     queryParam = {}
     formData = self.paramForm.clean()
 
-    if(formData["appName"]!="all"):
+    if formData["appName"] != "all":
       queryParam["app"] = formData["appName"]
-    if(formData["mood"]!="all"):
+    if formData["mood"] != "all":
       queryParam["moodSet__name"] = formData["mood"]
 
     self._query = Command.objects.all()
-    if(queryParam!={}):
+    if queryParam != {}:
       self._query = self._query.filter(**queryParam)
-    #self._query = self._query.select_related(1)
 
     for i in self._query:
       paramStr = ""
       hasOptional = False
-      paramLst = i.parameterSet.all().orderBy("isOptional")
-      #paramLst.sort(key=lambda x:x.isOptional)
+      paramLst = i.cmdFieldSet.all().orderBy("isOptional")
       for j in paramLst:
-        if(not hasOptional and j.isOptional==True):
+        if not hasOptional and j.isOptional == True:
           paramStr += "["
           hasOptional = True
         paramStr += "%s %s," % (j.type, j.name)
       paramStr = paramStr[:-1]
-      if(hasOptional):
+      if hasOptional:
         paramStr += "]"
       self._stdOut += "%s(%s)\n" % (i.name, paramStr)
