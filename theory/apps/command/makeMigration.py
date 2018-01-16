@@ -69,6 +69,10 @@ class MakeMigration(SimpleCommand):
         initData=False,
         )
 
+  @property
+  def stdOut(self):
+    return self._stdOut
+
   def run(self):
     options = self.paramForm.clean()
 
@@ -91,7 +95,9 @@ class MakeMigration(SimpleCommand):
     if badAppLabels:
       for appLabel in badAppLabels:
         self.stdout.write("App '%s' could not be found. Is it in INSTALLED_APPS?" % appLabel)
-      sys.exit(2)
+        self._stdOut = self.stdout.getvalue()
+        self.stdout.close()
+      return
 
     # Load the current graph state. Pass in None for the connection so
     # the loader doesn't try to resolve replaced migrations from DB.
