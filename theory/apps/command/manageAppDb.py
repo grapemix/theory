@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 ##### System wide lib #####
+import logging
 import os
 import re
 from subprocess import check_call
@@ -33,9 +34,8 @@ class ManageAppDb(SimpleCommand):
   class ParamForm(SimpleCommand.ParamForm):
     appNameLst = field.MultipleChoiceField(label="Application Name",
         helpText="The name of applications to be managed",
-        choices=(set([("apps", "apps")] +
-          [(settings.INSTALLED_APPS[i], settings.INSTALLED_APPS[i])
-            for i in range(len(settings.INSTALLED_APPS))])),
+        dynamicChoiceLst=(set([("theory.apps", "theory.apps")] +
+          [(appName, appName) for appName in settings.INSTALLED_APPS])),
         )
     action = field.ChoiceField(
         label="Action",
@@ -61,20 +61,27 @@ class ManageAppDb(SimpleCommand):
       if p.match(i):
         seqLst.append(i)
 
-    if "apps" in self.paramForm.clean()["appNameLst"]:
+    if "theory.apps" in self.paramForm.clean()["appNameLst"]:
       tblLst.append("theoryMigrations")
       seqLst.append("theoryMigrations_id_seq")
 
-    if len(tblLst) > 0:
-      c.execute('DROP TABLE IF EXISTS "{0}" CASCADE'.format('","'.join(tblLst)))
-    if len(seqLst) > 0:
-      c.execute(
-          'DROP SEQUENCE IF EXISTS "{0}" CASCADE'.format('","'.join(seqLst))
-          )
+    try:
+      if len(tblLst) > 0:
+        c.execute('DROP TABLE IF EXISTS "{0}" CASCADE'.format('","'.join(tblLst)))
+      if len(seqLst) > 0:
+        c.execute(
+            'DROP SEQUENCE IF EXISTS "{0}" CASCADE'.format('","'.join(seqLst))
+            )
+      self._stdOut += "Success"
+    except Exception as e:
+      logger = logging.getLogger(__name__)
+      logger.error(e, exc_info=True)
 
   def _backupTbl(self, allTblLst, allSeqLst):
     dirName = time.strftime("%y%m%d%H%M")
     for appName in self.paramForm.clean()["appNameLst"]:
+      if appName == "theory.apps":
+        appName = "apps"
       tblLst = []
       for i in allTblLst:
         if i.startswith(appName):
@@ -129,11 +136,17 @@ class ManageAppDb(SimpleCommand):
         cmd.append("-t")
         cmd.append(i)
 
-      check_call(cmd,
-          env={"PGPASSWORD": settings.DATABASES["default"]["PASSWORD"]}
-          )
+      try:
+        check_call(cmd,
+            env={"PGPASSWORD": settings.DATABASES["default"]["PASSWORD"]}
+            )
+        self._stdOut += "Success"
+      except Exception as e:
+        logger = logging.getLogger(__name__)
+        logger.error(e, exc_info=True)
 
   def run(self):
+    self._stdOut = ""
     action = self.paramForm.clean()["action"]
     with connection.cursor() as c:
       c.execute("SELECT sequence_name FROM information_schema.sequences")
