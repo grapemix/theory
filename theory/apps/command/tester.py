@@ -1,16 +1,12 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 ##### System wide lib #####
-import gevent
-import os
 
 ##### Theory lib #####
-from theory.apps import apps
 from theory.conf import settings
 from theory.apps.command.baseCommand import SimpleCommand
 from theory.gui import field
 from theory.test.util import getRunner
-from theory.utils.importlib import importModule
 
 ##### Theory third-party lib #####
 
@@ -34,11 +30,6 @@ class Tester(SimpleCommand):
   _drums = {"Terminal": 1,}
 
   class ParamForm(SimpleCommand.ParamForm):
-    isTestTheory = field.BooleanField(
-        label="Is test Theory",
-        helpText="The testcase of Theory is being runned or not",
-        initData=1
-        )
     testRunner = field.PythonClassField(
         label="Test Runner",
         helpText="The python class of testcase runner being used",
@@ -74,33 +65,49 @@ class Tester(SimpleCommand):
   def stdOut(self):
     return self._stdOut
 
+  #def runOld(self):
+  #  # Using subprocess to run theory testcase. deprecate
+  #  formData = self.paramForm.clean()
+  #  theoryDirPath = importModule("dev.config").THEORY_ROOT
+  #  if formData["isTestTheory"]:
+  #    settings_module = "testBase.settings"
+  #    testLabelLst = theoryDirPath + "/theoryTest"
+  #  else:
+  #    settings_module = os.environ["THEORY_SETTINGS_MODULE"]
+  #    testLabelLst = " ".join(formData["testLabel"])
+
+  #  standardAloneTheoryTestScript = \
+  #    theoryDirPath + "/theoryTest/runTheoryTest.py"
+  #  from gevent import subprocess
+  #  p1 = subprocess.Popen(
+  #      [
+  #        'python',
+  #        standardAloneTheoryTestScript,
+  #        "--verbosity",
+  #        str(formData["verbosity"]),
+  #        "--settings_module",
+  #        settings_module,
+  #        "--testLabelLst",
+  #        testLabelLst
+  #      ],
+  #      #stdout=subprocess.PIPE
+  #      )
+  #  #gevent.wait([p1,], timeout=10)
+  #  #while True:
+  #  #  if p1.poll() is not None:
+  #  #    self._stdOut += p1.stdout.read()
+  #  #  else:
+  #  #    self._stdOut += "\n Test is done."
+  #  #    break
+
   def run(self):
     formData = self.paramForm.clean()
-    if formData["isTestTheory"]:
-      standardAloneTheoryTestScript = importModule(
-          "dev.config"
-          ).THEORY_ROOT + "/theoryTest/runTheoryTest.py"
-      from gevent import subprocess
-      p1 = subprocess.Popen(
-          [
-            'python',
-            standardAloneTheoryTestScript,
-            "--verbosity",
-            str(formData["verbosity"])
-          ],
-          #stdout=subprocess.PIPE
-          )
-      #gevent.wait([p1,], timeout=10)
-      #while True:
-      #  if p1.poll() is not None:
-      #    self._stdOut += p1.stdout.read()
-      #  else:
-      #    self._stdOut += "\n Test is done."
-      #    break
-    else:
-      formData = self.paramForm.clean()
-      runnerKwargs = {"verbosity": formData["verbosity"]}
+    # the original way. Since grpc dominated the main thread, using the
+    # following method will yield
+    # "ValueError: 'signal only works in main thread'"
+    # So we have to disable unittest's sigint handler
+    runnerKwargs = {"verbosity": formData["verbosity"], "sigintHandler": False}
 
-      testRunnerClass = getRunner(settings, "")
-      testRunner = testRunnerClass(**runnerKwargs)
-      testRunner.runTests(formData["testLabel"])
+    testRunnerClass = getRunner(settings, "")
+    testRunner = testRunnerClass(**runnerKwargs)
+    testRunner.runTests(formData["testLabel"])

@@ -184,7 +184,7 @@ class CommandModuleLoader(ModuleLoader):
   def postPackFxnForTheory(self, lst):
     # TODO: should move this config into somewhere
     moodCommandRel = {
-      "tester": ["norm"],
+      "tester": ["dev"],
       "loadDbData": ["norm"],
       "listCommand": ["norm"],
       "probeModule": ["norm"],
@@ -284,4 +284,3 @@ def reprobeAllModule(settingsMod, argv=None):
   settings.INSTALLED_MOODS.append("norm")
   settings.INSTALLED_MOODS = tuple(settings.INSTALLED_MOODS)
   probeApps(apps, isDropAll=True)
-

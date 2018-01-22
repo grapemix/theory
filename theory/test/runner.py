@@ -21,9 +21,17 @@ class DiscoverRunner(object):
   testLoader = defaultTestLoader
   reorderBy = (TestCase, SimpleTestCase)
 
-  def __init__(self, pattern=None, topLevel=None,
-         verbosity=1, interactive=True, failfast=False, keepdb=False,
-         **kwargs):
+  def __init__(
+      self,
+      pattern=None,
+      topLevel=None,
+      verbosity=1,
+      interactive=True,
+      failfast=False,
+      keepdb=False,
+      sigintHandler=True,
+      **kwargs
+    ):
 
     self.pattern = pattern
     self.topLevel = topLevel
@@ -32,6 +40,7 @@ class DiscoverRunner(object):
     self.interactive = interactive
     self.failfast = failfast
     self.keepdb = keepdb
+    self.sigintHandler = sigintHandler
 
   @classmethod
   def addArguments(cls, parser):
@@ -48,7 +57,8 @@ class DiscoverRunner(object):
   def setupTestEnvironment(self, **kwargs):
     setupTestEnvironment()
     settings.DEBUG = False
-    unittest.installHandler()
+    if self.sigintHandler:
+      unittest.installHandler()
 
   def buildSuite(self, testLabels=None, extraTests=None, **kwargs):
     suite = self.testSuite()
@@ -135,7 +145,8 @@ class DiscoverRunner(object):
             )
 
   def teardownTestEnvironment(self, **kwargs):
-    unittest.removeHandler()
+    if self.sigintHandler:
+      unittest.removeHandler()
     teardownTestEnvironment()
 
 
