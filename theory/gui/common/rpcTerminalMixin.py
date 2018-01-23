@@ -4,6 +4,7 @@
 import gevent
 import grpc
 import json
+from math import pow
 import notify2
 
 ##### Theory lib #####
@@ -40,15 +41,23 @@ class RpcTerminalMixin(object):
 
   def _registerToReactor(self):
     notify2.init('Theory', getDbusMainLoop())
+    errAttemptCounter = -1
     while not self.shouldIDie:
-      reactorReqArr = self.stub.register(theory_pb2.UiId(id="etkTerminal"))
-      self._handleReactorReq(reactorReqArr)
-      # Instead of sleep big chunk of time which will block the dieTogether
-      # feature, we should break it down into a short amount of time instead
-      for i in range(60):
-        gevent.sleep(1)
-        if self.shouldIDie:
-          return
+      try:
+        reactorReqArr = self.stub.register(theory_pb2.UiId(id="etkTerminal"))
+        errAttemptCounter = 5
+        self._handleReactorReq(reactorReqArr)
+        # Instead of sleep big chunk of time which will block the dieTogether
+        # feature, we should break it down into a short amount of time instead
+        for i in range(60):
+          gevent.sleep(1)
+          if self.shouldIDie:
+            return
+      except grpc._channel._Rendezvous as e:
+        if errAttemptCounter >= 3:
+          raise e
+        gevent.sleep(pow(2, int(errAttemptCounter)))
+        errAttemptCounter += 0.5
 
   def dieTogether(self):
     try:
