@@ -41,12 +41,12 @@ class ModelUpsert(SimpleCommand):
         )
     modelName = field.ChoiceField(label="Model Name",
         helpText="The name of models to be listed",
-        dynamicChoiceLst=(set(
-          [(appModel.name, appModel.name)
+        dynamicChoiceLst=[
+          (appModel.name, appModel.name)
            for appModel in AppModel.objects.only("name").filter(
                app="theory.apps"
-           )
-          ])),
+           ).orderBy("name")
+          ],
         )
     queryId = field.DynamicModelIdField(
         required=False,
@@ -90,11 +90,10 @@ class ModelUpsert(SimpleCommand):
             self._getModelNameChoices(cmdKwargs["appName"])
 
     def _getModelNameChoices(self, appName):
-      return list(set(
-          [(i.name, i.name)
-           for i in AppModel.objects.only("name").filter(app=appName)
-          ]
-      ))
+      return [
+        (i.name, i.name)
+        for i in AppModel.objects.only("name").filter(app=appName).orderBy("name")
+      ]
 
     def appNameFocusChgCallback(self, appName):
       return {
