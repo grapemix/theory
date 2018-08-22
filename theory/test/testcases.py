@@ -633,6 +633,84 @@ class SimpleTestCase(unittest.TestCase):
         standardMsg = '%s == %s' % (safe_repr(xml1, True), safe_repr(xml2, True))
         self.fail(self._formatMessage(msg, standardMsg))
 
+  def assertDict(self, dict1, dict2, excludeKeyLst=[], excludePathLst=[]):
+    self.assertDataBlock(
+      dict1,
+      dict2,
+      lambda d, key: d.get(key),
+      lambda d: d.keys(),
+      [],
+      excludeKeyLst,
+      excludePathLst,
+    )
+
+  def assertObj(self, obj1, obj2, excludeKeyLst=[], excludePathLst=[]):
+    self.assertDataBlock(
+      obj1,
+      obj2,
+      lambda obj, key: getattr(obj, key),
+      # or may be we should use dirs, can we cmp method? We should investigate
+      # deeper when we have more time
+      lambda obj: vars(obj),
+      [],
+      excludeKeyLst,
+      excludePathLst,
+    )
+
+  def assertDataBlock(
+      self,
+      dobj1,
+      dobj2,
+      getFxn,
+      lstFxn,
+      pathLst,
+      excludeKeyLst=[],
+      excludePathLst=[],
+    ):
+    """
+    Being used by assertDict and assertObj which should be easier to use.
+    """
+    keyLst = [i for i in sorted(lstFxn(dobj1)) if i not in excludeKeyLst]
+    keyLst2 = [i for i in sorted(lstFxn(dobj2)) if i not in excludeKeyLst]
+    self.assertEqual(
+      keyLst,
+      keyLst2,
+      {
+        "version 1": keyLst,
+        "version 2": keyLst2,
+        "path": pathLst,
+        "excludeKeyLst": excludeKeyLst
+      }
+    )
+    for key in keyLst:
+      if key in excludeKeyLst:
+        continue
+      child = getFxn(dobj1, key)
+      child2 = getFxn(dobj2, key)
+      if isinstance(child, dict) or isinstance(child, type):
+        # Only continue the recursion when child is a dict or an object
+        childPathLst = pathLst + [key]
+        if childPathLst not in excludeKeyLst:
+          self.assertDataBlock(
+            child,
+            child2,
+            getFxn,
+            lstFxn,
+            childPathLst,
+            excludeKeyLst,
+            excludePathLst,
+          )
+      else:
+        self.assertEqual(
+          child,
+          child2,
+          (
+            "path: {0}\n"
+            "version 1: {1}\n"
+            "version 2: {2}\n"
+          ).format(pathLst, child, child2)
+        )
+
 
 class TransactionTestCase(SimpleTestCase):
 
