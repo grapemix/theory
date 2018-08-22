@@ -65,7 +65,7 @@ class ModelFormTestCase(TestCase):
   def testSetup(self):
     form = self.getModelFormKlass()()
     for fieldName, v in form.fields.iteritems():
-      if(fieldName=="referenceField"):
+      if fieldName in ["referenceField", "m2mField", "m2mThruField"]:
         pass
       else:
         self.assertEqual(v.initData, getattr(modelObj, fieldName))
