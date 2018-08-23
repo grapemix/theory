@@ -256,6 +256,12 @@ class Reactor(theory_pb2_grpc.ReactorServicer, AutoCompleteMixin, HistoryMixin):
           cmdParamForm.fields[row["name"]],
           "dynamicChoiceLst"
         )
+        if param["required"] and (
+            "initData" not in param or param["initData"] is None
+        ):
+          # Since data in dynamicChoiceLst is assumed being updated frequently,
+          # initData is sometimes unable to know in advance.
+          param["initData"] = param["choices"][0][0]
         del param["dynamicChoiceLst"]
         if isinstance(param["choices"], set):
           param["choices"] = list(param["choices"])
