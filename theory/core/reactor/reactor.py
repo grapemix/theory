@@ -157,7 +157,18 @@ class Reactor(theory_pb2_grpc.ReactorServicer, AutoCompleteMixin, HistoryMixin):
     passed to the server, so the server can return a new set of data for the
     involved fields to the UI.
     """
-    paramForm = self.paramFormCache[request.cmdId]
+    if request.cmdId in self.paramFormCache:
+      paramForm = self.paramFormCache[request.cmdId]
+    else:
+      try:
+        cmdModel = Command.objects.get(id=request.cmdId)
+      except Exception as e:
+        self.logger.error(e, exc_info=True)
+        raise ValidationError(str(e))
+
+      cmdKlass = importClass(cmdModel.classImportPath)
+      paramForm = cmdKlass.ParamForm()
+
     try:
       val = json.loads(request.jsonData)
     except Exception as e: # eval can throw many different errors
