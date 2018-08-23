@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package theory;
-//import "google/protobuf/any.proto";
+import "google/protobuf/any.proto";
 import "google/protobuf/empty.proto";
 //import "google/protobuf/timestamp.proto";
 
@@ -68,7 +68,6 @@ message CmdFxnInput{
 
 message uiData4Adapter{
   int32 adapterBufferModelId = 1;
-  //google.protobuf.Any data = 2;
   string jsonData = 2;
 }
 
@@ -76,10 +75,47 @@ message JsonData{
   string jsonData = 1;
 }
 
+message MdlIden{
+  string appName = 1;
+  string mdlName = 2;
+}
+
+message MdlTblReq{
+  MdlIden mdl = 1;
+  int32 pageNum = 2;
+  int32 pageSize = 3;
+}
+
+message Mdl{
+  map<string, google.protobuf.Any> mdl = 1;
+}
+
 message ModelLstData{
   string appName = 1;
   string modelName = 2;
   repeated string jsonDataLst = 3;
+}
+
+message StrVsMap{
+  string k = 1;
+  map<string, string> v = 2;
+}
+
+message StrLst{
+  repeated string strLst = 1;
+}
+message IntLst{
+  repeated int32 intLst = 1;
+}
+message DataRow{
+  repeated string cell = 1;
+}
+
+message SpreadSheetData{
+  repeated DataRow dataLst = 1;
+  repeated StrVsMap fieldNameVsProp = 2;
+  int32 mdlTotalNum = 3;
+  int32 spreadSheetId = 4;
 }
 
 message Empty{
@@ -95,4 +131,5 @@ service Reactor {
   rpc callCmdSubFxn(CmdFxnInput) returns (JsonData) {}
   rpc adaptFromUi(uiData4Adapter) returns (JsonData) {}
   rpc upsertModelLst(ModelLstData) returns (ReactorReqArr) {}
+  rpc getMdlTbl(MdlTblReq) returns (SpreadSheetData) {}
 }

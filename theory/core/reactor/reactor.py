@@ -22,6 +22,7 @@ from theory.db.model import Q
 from theory.gui import theory_pb2
 from theory.gui import theory_pb2_grpc
 from theory.gui.transformer.theoryJSONEncoder import TheoryJSONEncoder
+from theory.gui.transformer.protoBufModelTblPaginator import ProtoBufModelTblPaginator
 from theory.utils.importlib import importClass
 from theory.utils.singleton import Singleton
 
@@ -97,6 +98,16 @@ class Reactor(theory_pb2_grpc.ReactorServicer, AutoCompleteMixin, HistoryMixin):
 
   def bye(self, request, context):
     sys.exit(0)
+
+  def getMdlTbl(self, request, context):
+    protoBufModelTblPaginator = ProtoBufModelTblPaginator()
+    dataComplex = protoBufModelTblPaginator.run(
+        request.mdl.appName,
+        request.mdl.mdlName,
+        request.pageNum,
+        request.pageSize
+    )
+    return theory_pb2.SpreadSheetData(**dataComplex)
 
   def upsertModelLst(self, request, context):
     modelModel = AppModel.objects.get(

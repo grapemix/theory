@@ -13,6 +13,7 @@ from google.protobuf import descriptor_pb2
 _sym_db = _symbol_database.Default()
 
 
+from google.protobuf import any_pb2 as google_dot_protobuf_dot_any__pb2
 from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 
 
@@ -20,9 +21,9 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='theory.proto',
   package='theory',
   syntax='proto3',
-  serialized_pb=_b('\n\x0ctheory.proto\x12\x06theory\x1a\x1bgoogle/protobuf/empty.proto\"4\n\x05UiReq\x12\x0e\n\x06\x61\x63tion\x18\x01 \x01(\t\x12\x0b\n\x03val\x18\x02 \x01(\t\x12\x0e\n\x06userId\x18\x03 \x01(\t\")\n\nReactorReq\x12\x0e\n\x06\x61\x63tion\x18\x01 \x01(\t\x12\x0b\n\x03val\x18\x02 \x01(\t\"3\n\rReactorReqArr\x12\"\n\x06reqLst\x18\x01 \x03(\x0b\x32\x12.theory.ReactorReq\"&\n\x04UiId\x12\n\n\x02id\x18\x01 \x01(\t\x12\x12\n\nadapterLst\x18\x02 \x03(\t\"?\n\tFieldData\x12\r\n\x05\x63mdId\x18\x01 \x01(\x05\x12\x11\n\tfieldName\x18\x02 \x01(\t\x12\x10\n\x08jsonData\x18\x03 \x01(\t\"?\n\x0b\x43mdFxnInput\x12\r\n\x05\x63mdId\x18\x01 \x01(\x05\x12\x0f\n\x07\x66xnName\x18\x02 \x01(\t\x12\x10\n\x08jsonData\x18\x03 \x01(\t\"@\n\x0euiData4Adapter\x12\x1c\n\x14\x61\x64\x61pterBufferModelId\x18\x01 \x01(\x05\x12\x10\n\x08jsonData\x18\x02 \x01(\t\"\x1c\n\x08JsonData\x12\x10\n\x08jsonData\x18\x01 \x01(\t\"G\n\x0cModelLstData\x12\x0f\n\x07\x61ppName\x18\x01 \x01(\t\x12\x11\n\tmodelName\x18\x02 \x01(\t\x12\x13\n\x0bjsonDataLst\x18\x03 \x03(\t\"\x07\n\x05\x45mpty2\x89\x03\n\x07Reactor\x12.\n\x03\x62ye\x12\r.theory.Empty\x1a\x16.google.protobuf.Empty\"\x00\x12.\n\x04\x63\x61ll\x12\r.theory.UiReq\x1a\x15.theory.ReactorReqArr\"\x00\x12\x31\n\x08register\x12\x0c.theory.UiId\x1a\x15.theory.ReactorReqArr\"\x00\x12\x35\n\x0csyncFormData\x12\x11.theory.FieldData\x1a\x10.theory.JsonData\"\x00\x12\x38\n\rcallCmdSubFxn\x12\x13.theory.CmdFxnInput\x1a\x10.theory.JsonData\"\x00\x12\x39\n\x0b\x61\x64\x61ptFromUi\x12\x16.theory.uiData4Adapter\x1a\x10.theory.JsonData\"\x00\x12?\n\x0eupsertModelLst\x12\x14.theory.ModelLstData\x1a\x15.theory.ReactorReqArr\"\x00\x62\x06proto3')
+  serialized_pb=_b('\n\x0ctheory.proto\x12\x06theory\x1a\x19google/protobuf/any.proto\x1a\x1bgoogle/protobuf/empty.proto\"4\n\x05UiReq\x12\x0e\n\x06\x61\x63tion\x18\x01 \x01(\t\x12\x0b\n\x03val\x18\x02 \x01(\t\x12\x0e\n\x06userId\x18\x03 \x01(\t\")\n\nReactorReq\x12\x0e\n\x06\x61\x63tion\x18\x01 \x01(\t\x12\x0b\n\x03val\x18\x02 \x01(\t\"3\n\rReactorReqArr\x12\"\n\x06reqLst\x18\x01 \x03(\x0b\x32\x12.theory.ReactorReq\"&\n\x04UiId\x12\n\n\x02id\x18\x01 \x01(\t\x12\x12\n\nadapterLst\x18\x02 \x03(\t\"?\n\tFieldData\x12\r\n\x05\x63mdId\x18\x01 \x01(\x05\x12\x11\n\tfieldName\x18\x02 \x01(\t\x12\x10\n\x08jsonData\x18\x03 \x01(\t\"?\n\x0b\x43mdFxnInput\x12\r\n\x05\x63mdId\x18\x01 \x01(\x05\x12\x0f\n\x07\x66xnName\x18\x02 \x01(\t\x12\x10\n\x08jsonData\x18\x03 \x01(\t\"@\n\x0euiData4Adapter\x12\x1c\n\x14\x61\x64\x61pterBufferModelId\x18\x01 \x01(\x05\x12\x10\n\x08jsonData\x18\x02 \x01(\t\"\x1c\n\x08JsonData\x12\x10\n\x08jsonData\x18\x01 \x01(\t\"+\n\x07MdlIden\x12\x0f\n\x07\x61ppName\x18\x01 \x01(\t\x12\x0f\n\x07mdlName\x18\x02 \x01(\t\"L\n\tMdlTblReq\x12\x1c\n\x03mdl\x18\x01 \x01(\x0b\x32\x0f.theory.MdlIden\x12\x0f\n\x07pageNum\x18\x02 \x01(\x05\x12\x10\n\x08pageSize\x18\x03 \x01(\x05\"j\n\x03Mdl\x12!\n\x03mdl\x18\x01 \x03(\x0b\x32\x14.theory.Mdl.MdlEntry\x1a@\n\x08MdlEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12#\n\x05value\x18\x02 \x01(\x0b\x32\x14.google.protobuf.Any:\x02\x38\x01\"G\n\x0cModelLstData\x12\x0f\n\x07\x61ppName\x18\x01 \x01(\t\x12\x11\n\tmodelName\x18\x02 \x01(\t\x12\x13\n\x0bjsonDataLst\x18\x03 \x03(\t\"c\n\x08StrVsMap\x12\t\n\x01k\x18\x01 \x01(\t\x12\"\n\x01v\x18\x02 \x03(\x0b\x32\x17.theory.StrVsMap.VEntry\x1a(\n\x06VEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\x18\n\x06StrLst\x12\x0e\n\x06strLst\x18\x01 \x03(\t\"\x18\n\x06IntLst\x12\x0e\n\x06intLst\x18\x01 \x03(\x05\"\x17\n\x07\x44\x61taRow\x12\x0c\n\x04\x63\x65ll\x18\x01 \x03(\t\"\x8a\x01\n\x0fSpreadSheetData\x12 \n\x07\x64\x61taLst\x18\x01 \x03(\x0b\x32\x0f.theory.DataRow\x12)\n\x0f\x66ieldNameVsProp\x18\x02 \x03(\x0b\x32\x10.theory.StrVsMap\x12\x13\n\x0bmdlTotalNum\x18\x03 \x01(\x05\x12\x15\n\rspreadSheetId\x18\x04 \x01(\x05\"\x07\n\x05\x45mpty2\xc4\x03\n\x07Reactor\x12.\n\x03\x62ye\x12\r.theory.Empty\x1a\x16.google.protobuf.Empty\"\x00\x12.\n\x04\x63\x61ll\x12\r.theory.UiReq\x1a\x15.theory.ReactorReqArr\"\x00\x12\x31\n\x08register\x12\x0c.theory.UiId\x1a\x15.theory.ReactorReqArr\"\x00\x12\x35\n\x0csyncFormData\x12\x11.theory.FieldData\x1a\x10.theory.JsonData\"\x00\x12\x38\n\rcallCmdSubFxn\x12\x13.theory.CmdFxnInput\x1a\x10.theory.JsonData\"\x00\x12\x39\n\x0b\x61\x64\x61ptFromUi\x12\x16.theory.uiData4Adapter\x1a\x10.theory.JsonData\"\x00\x12?\n\x0eupsertModelLst\x12\x14.theory.ModelLstData\x1a\x15.theory.ReactorReqArr\"\x00\x12\x39\n\tgetMdlTbl\x12\x11.theory.MdlTblReq\x1a\x17.theory.SpreadSheetData\"\x00\x62\x06proto3')
   ,
-  dependencies=[google_dot_protobuf_dot_empty__pb2.DESCRIPTOR,])
+  dependencies=[google_dot_protobuf_dot_any__pb2.DESCRIPTOR,google_dot_protobuf_dot_empty__pb2.DESCRIPTOR,])
 
 
 
@@ -67,8 +68,8 @@ _UIREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=53,
-  serialized_end=105,
+  serialized_start=80,
+  serialized_end=132,
 )
 
 
@@ -105,8 +106,8 @@ _REACTORREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=107,
-  serialized_end=148,
+  serialized_start=134,
+  serialized_end=175,
 )
 
 
@@ -136,8 +137,8 @@ _REACTORREQARR = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=150,
-  serialized_end=201,
+  serialized_start=177,
+  serialized_end=228,
 )
 
 
@@ -174,8 +175,8 @@ _UIID = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=203,
-  serialized_end=241,
+  serialized_start=230,
+  serialized_end=268,
 )
 
 
@@ -219,8 +220,8 @@ _FIELDDATA = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=243,
-  serialized_end=306,
+  serialized_start=270,
+  serialized_end=333,
 )
 
 
@@ -264,8 +265,8 @@ _CMDFXNINPUT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=308,
-  serialized_end=371,
+  serialized_start=335,
+  serialized_end=398,
 )
 
 
@@ -302,8 +303,8 @@ _UIDATA4ADAPTER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=373,
-  serialized_end=437,
+  serialized_start=400,
+  serialized_end=464,
 )
 
 
@@ -333,8 +334,159 @@ _JSONDATA = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=439,
-  serialized_end=467,
+  serialized_start=466,
+  serialized_end=494,
+)
+
+
+_MDLIDEN = _descriptor.Descriptor(
+  name='MdlIden',
+  full_name='theory.MdlIden',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='appName', full_name='theory.MdlIden.appName', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='mdlName', full_name='theory.MdlIden.mdlName', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=496,
+  serialized_end=539,
+)
+
+
+_MDLTBLREQ = _descriptor.Descriptor(
+  name='MdlTblReq',
+  full_name='theory.MdlTblReq',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='mdl', full_name='theory.MdlTblReq.mdl', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='pageNum', full_name='theory.MdlTblReq.pageNum', index=1,
+      number=2, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='pageSize', full_name='theory.MdlTblReq.pageSize', index=2,
+      number=3, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=541,
+  serialized_end=617,
+)
+
+
+_MDL_MDLENTRY = _descriptor.Descriptor(
+  name='MdlEntry',
+  full_name='theory.Mdl.MdlEntry',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='key', full_name='theory.Mdl.MdlEntry.key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='value', full_name='theory.Mdl.MdlEntry.value', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=_descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001')),
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=661,
+  serialized_end=725,
+)
+
+_MDL = _descriptor.Descriptor(
+  name='Mdl',
+  full_name='theory.Mdl',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='mdl', full_name='theory.Mdl.mdl', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[_MDL_MDLENTRY, ],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=619,
+  serialized_end=725,
 )
 
 
@@ -378,8 +530,228 @@ _MODELLSTDATA = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=469,
-  serialized_end=540,
+  serialized_start=727,
+  serialized_end=798,
+)
+
+
+_STRVSMAP_VENTRY = _descriptor.Descriptor(
+  name='VEntry',
+  full_name='theory.StrVsMap.VEntry',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='key', full_name='theory.StrVsMap.VEntry.key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='value', full_name='theory.StrVsMap.VEntry.value', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=_descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001')),
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=859,
+  serialized_end=899,
+)
+
+_STRVSMAP = _descriptor.Descriptor(
+  name='StrVsMap',
+  full_name='theory.StrVsMap',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='k', full_name='theory.StrVsMap.k', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='v', full_name='theory.StrVsMap.v', index=1,
+      number=2, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[_STRVSMAP_VENTRY, ],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=800,
+  serialized_end=899,
+)
+
+
+_STRLST = _descriptor.Descriptor(
+  name='StrLst',
+  full_name='theory.StrLst',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='strLst', full_name='theory.StrLst.strLst', index=0,
+      number=1, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=901,
+  serialized_end=925,
+)
+
+
+_INTLST = _descriptor.Descriptor(
+  name='IntLst',
+  full_name='theory.IntLst',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='intLst', full_name='theory.IntLst.intLst', index=0,
+      number=1, type=5, cpp_type=1, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=927,
+  serialized_end=951,
+)
+
+
+_DATAROW = _descriptor.Descriptor(
+  name='DataRow',
+  full_name='theory.DataRow',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='cell', full_name='theory.DataRow.cell', index=0,
+      number=1, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=953,
+  serialized_end=976,
+)
+
+
+_SPREADSHEETDATA = _descriptor.Descriptor(
+  name='SpreadSheetData',
+  full_name='theory.SpreadSheetData',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='dataLst', full_name='theory.SpreadSheetData.dataLst', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='fieldNameVsProp', full_name='theory.SpreadSheetData.fieldNameVsProp', index=1,
+      number=2, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='mdlTotalNum', full_name='theory.SpreadSheetData.mdlTotalNum', index=2,
+      number=3, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='spreadSheetId', full_name='theory.SpreadSheetData.spreadSheetId', index=3,
+      number=4, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=979,
+  serialized_end=1117,
 )
 
 
@@ -402,11 +774,19 @@ _EMPTY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=542,
-  serialized_end=549,
+  serialized_start=1119,
+  serialized_end=1126,
 )
 
 _REACTORREQARR.fields_by_name['reqLst'].message_type = _REACTORREQ
+_MDLTBLREQ.fields_by_name['mdl'].message_type = _MDLIDEN
+_MDL_MDLENTRY.fields_by_name['value'].message_type = google_dot_protobuf_dot_any__pb2._ANY
+_MDL_MDLENTRY.containing_type = _MDL
+_MDL.fields_by_name['mdl'].message_type = _MDL_MDLENTRY
+_STRVSMAP_VENTRY.containing_type = _STRVSMAP
+_STRVSMAP.fields_by_name['v'].message_type = _STRVSMAP_VENTRY
+_SPREADSHEETDATA.fields_by_name['dataLst'].message_type = _DATAROW
+_SPREADSHEETDATA.fields_by_name['fieldNameVsProp'].message_type = _STRVSMAP
 DESCRIPTOR.message_types_by_name['UiReq'] = _UIREQ
 DESCRIPTOR.message_types_by_name['ReactorReq'] = _REACTORREQ
 DESCRIPTOR.message_types_by_name['ReactorReqArr'] = _REACTORREQARR
@@ -415,7 +795,15 @@ DESCRIPTOR.message_types_by_name['FieldData'] = _FIELDDATA
 DESCRIPTOR.message_types_by_name['CmdFxnInput'] = _CMDFXNINPUT
 DESCRIPTOR.message_types_by_name['uiData4Adapter'] = _UIDATA4ADAPTER
 DESCRIPTOR.message_types_by_name['JsonData'] = _JSONDATA
+DESCRIPTOR.message_types_by_name['MdlIden'] = _MDLIDEN
+DESCRIPTOR.message_types_by_name['MdlTblReq'] = _MDLTBLREQ
+DESCRIPTOR.message_types_by_name['Mdl'] = _MDL
 DESCRIPTOR.message_types_by_name['ModelLstData'] = _MODELLSTDATA
+DESCRIPTOR.message_types_by_name['StrVsMap'] = _STRVSMAP
+DESCRIPTOR.message_types_by_name['StrLst'] = _STRLST
+DESCRIPTOR.message_types_by_name['IntLst'] = _INTLST
+DESCRIPTOR.message_types_by_name['DataRow'] = _DATAROW
+DESCRIPTOR.message_types_by_name['SpreadSheetData'] = _SPREADSHEETDATA
 DESCRIPTOR.message_types_by_name['Empty'] = _EMPTY
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -475,12 +863,84 @@ JsonData = _reflection.GeneratedProtocolMessageType('JsonData', (_message.Messag
   ))
 _sym_db.RegisterMessage(JsonData)
 
+MdlIden = _reflection.GeneratedProtocolMessageType('MdlIden', (_message.Message,), dict(
+  DESCRIPTOR = _MDLIDEN,
+  __module__ = 'theory_pb2'
+  # @@protoc_insertion_point(class_scope:theory.MdlIden)
+  ))
+_sym_db.RegisterMessage(MdlIden)
+
+MdlTblReq = _reflection.GeneratedProtocolMessageType('MdlTblReq', (_message.Message,), dict(
+  DESCRIPTOR = _MDLTBLREQ,
+  __module__ = 'theory_pb2'
+  # @@protoc_insertion_point(class_scope:theory.MdlTblReq)
+  ))
+_sym_db.RegisterMessage(MdlTblReq)
+
+Mdl = _reflection.GeneratedProtocolMessageType('Mdl', (_message.Message,), dict(
+
+  MdlEntry = _reflection.GeneratedProtocolMessageType('MdlEntry', (_message.Message,), dict(
+    DESCRIPTOR = _MDL_MDLENTRY,
+    __module__ = 'theory_pb2'
+    # @@protoc_insertion_point(class_scope:theory.Mdl.MdlEntry)
+    ))
+  ,
+  DESCRIPTOR = _MDL,
+  __module__ = 'theory_pb2'
+  # @@protoc_insertion_point(class_scope:theory.Mdl)
+  ))
+_sym_db.RegisterMessage(Mdl)
+_sym_db.RegisterMessage(Mdl.MdlEntry)
+
 ModelLstData = _reflection.GeneratedProtocolMessageType('ModelLstData', (_message.Message,), dict(
   DESCRIPTOR = _MODELLSTDATA,
   __module__ = 'theory_pb2'
   # @@protoc_insertion_point(class_scope:theory.ModelLstData)
   ))
 _sym_db.RegisterMessage(ModelLstData)
+
+StrVsMap = _reflection.GeneratedProtocolMessageType('StrVsMap', (_message.Message,), dict(
+
+  VEntry = _reflection.GeneratedProtocolMessageType('VEntry', (_message.Message,), dict(
+    DESCRIPTOR = _STRVSMAP_VENTRY,
+    __module__ = 'theory_pb2'
+    # @@protoc_insertion_point(class_scope:theory.StrVsMap.VEntry)
+    ))
+  ,
+  DESCRIPTOR = _STRVSMAP,
+  __module__ = 'theory_pb2'
+  # @@protoc_insertion_point(class_scope:theory.StrVsMap)
+  ))
+_sym_db.RegisterMessage(StrVsMap)
+_sym_db.RegisterMessage(StrVsMap.VEntry)
+
+StrLst = _reflection.GeneratedProtocolMessageType('StrLst', (_message.Message,), dict(
+  DESCRIPTOR = _STRLST,
+  __module__ = 'theory_pb2'
+  # @@protoc_insertion_point(class_scope:theory.StrLst)
+  ))
+_sym_db.RegisterMessage(StrLst)
+
+IntLst = _reflection.GeneratedProtocolMessageType('IntLst', (_message.Message,), dict(
+  DESCRIPTOR = _INTLST,
+  __module__ = 'theory_pb2'
+  # @@protoc_insertion_point(class_scope:theory.IntLst)
+  ))
+_sym_db.RegisterMessage(IntLst)
+
+DataRow = _reflection.GeneratedProtocolMessageType('DataRow', (_message.Message,), dict(
+  DESCRIPTOR = _DATAROW,
+  __module__ = 'theory_pb2'
+  # @@protoc_insertion_point(class_scope:theory.DataRow)
+  ))
+_sym_db.RegisterMessage(DataRow)
+
+SpreadSheetData = _reflection.GeneratedProtocolMessageType('SpreadSheetData', (_message.Message,), dict(
+  DESCRIPTOR = _SPREADSHEETDATA,
+  __module__ = 'theory_pb2'
+  # @@protoc_insertion_point(class_scope:theory.SpreadSheetData)
+  ))
+_sym_db.RegisterMessage(SpreadSheetData)
 
 Empty = _reflection.GeneratedProtocolMessageType('Empty', (_message.Message,), dict(
   DESCRIPTOR = _EMPTY,
@@ -490,6 +950,10 @@ Empty = _reflection.GeneratedProtocolMessageType('Empty', (_message.Message,), d
 _sym_db.RegisterMessage(Empty)
 
 
+_MDL_MDLENTRY.has_options = True
+_MDL_MDLENTRY._options = _descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001'))
+_STRVSMAP_VENTRY.has_options = True
+_STRVSMAP_VENTRY._options = _descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001'))
 
 _REACTOR = _descriptor.ServiceDescriptor(
   name='Reactor',
@@ -497,8 +961,8 @@ _REACTOR = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   options=None,
-  serialized_start=552,
-  serialized_end=945,
+  serialized_start=1129,
+  serialized_end=1581,
   methods=[
   _descriptor.MethodDescriptor(
     name='bye',
@@ -561,6 +1025,15 @@ _REACTOR = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_MODELLSTDATA,
     output_type=_REACTORREQARR,
+    options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='getMdlTbl',
+    full_name='theory.Reactor.getMdlTbl',
+    index=7,
+    containing_service=None,
+    input_type=_MDLTBLREQ,
+    output_type=_SPREADSHEETDATA,
     options=None,
   ),
 ])

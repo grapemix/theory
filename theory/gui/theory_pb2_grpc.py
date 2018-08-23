@@ -50,6 +50,11 @@ class ReactorStub(object):
         request_serializer=theory__pb2.ModelLstData.SerializeToString,
         response_deserializer=theory__pb2.ReactorReqArr.FromString,
         )
+    self.getMdlTbl = channel.unary_unary(
+        '/theory.Reactor/getMdlTbl',
+        request_serializer=theory__pb2.MdlTblReq.SerializeToString,
+        response_deserializer=theory__pb2.SpreadSheetData.FromString,
+        )
 
 
 class ReactorServicer(object):
@@ -105,6 +110,13 @@ class ReactorServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def getMdlTbl(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_ReactorServicer_to_server(servicer, server):
   rpc_method_handlers = {
@@ -142,6 +154,11 @@ def add_ReactorServicer_to_server(servicer, server):
           servicer.upsertModelLst,
           request_deserializer=theory__pb2.ModelLstData.FromString,
           response_serializer=theory__pb2.ReactorReqArr.SerializeToString,
+      ),
+      'getMdlTbl': grpc.unary_unary_rpc_method_handler(
+          servicer.getMdlTbl,
+          request_deserializer=theory__pb2.MdlTblReq.FromString,
+          response_serializer=theory__pb2.SpreadSheetData.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(
