@@ -266,7 +266,15 @@ class SimpleGuiFormBase(GuiFormBase):
     self.optionalMenu = optionalMenu
 
     i = 0
+    fieldNameInOrder = []
     for fieldName, fieldDesc in fieldNameVsDesc.iteritems():
+      if fieldDesc['type'].startswith("Dynamic"):
+        fieldNameInOrder.append(fieldName)
+      else:
+        fieldNameInOrder.insert(0, fieldName)
+
+    for fieldName in fieldNameInOrder:
+      fieldDesc = fieldNameVsDesc[fieldName]
       if fieldDesc["type"].startswith("Model"):
         fieldKlass = importClass(
             "theory.gui.model.{type}".format(**fieldDesc)

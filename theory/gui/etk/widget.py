@@ -111,6 +111,7 @@ class BaseLabelInput(BaseFieldInput):
         isExpandMainContainer=False
     )
     super(BaseLabelInput, self).__init__(fieldSetter, fieldGetter, win, bx, attrs, *args, **kwargs)
+    self.hasGenerate = False
 
   def _prepareInitData(self, data):
     return data
@@ -151,6 +152,7 @@ class BaseLabelInput(BaseFieldInput):
       self.packAsFrame(self.title, self.help)
     else:
       self.packAsTbl(self.title, self.help)
+    self.hasGenerate = True
 
   def packAsFrame(self, title, help):
     hBox = self._createContainer(attrs={"isFillAlign": True, "isWeightExpand": True})
@@ -270,7 +272,10 @@ class SelectBoxInput(BaseLabelInput):
   widgetClass = element.RadioBox
 
   def updateField(self):
-    self.fieldSetter({"finalData": self.widgetLst[0].finalData})
+    if self.hasGenerate:
+      self.fieldSetter({"finalData": self.widgetLst[0].finalData})
+    else:
+      self.fieldSetter({"finalData": self.initData})
 
   #def _createWidget(self, *args, **kwargs):
   #  widgetLst = super(SelectBoxInput, self)._createWidget(*args, **kwargs)
@@ -1037,7 +1042,7 @@ class QueryIdInput(StringInput):
     cmdModel = Command.objects.get(app="theory.apps", name="modelUpsert")
     cmd = bridge.getCmdComplex(
         cmdModel,
-        (self.app, self.model),
+        (self.attrs['app'], self.attrs['model']),
         {"isInNewWindow": True,},
         )
     cmd.postApplyChange = lambda: self.refreshData(
@@ -1046,14 +1051,15 @@ class QueryIdInput(StringInput):
     bridge._executeCommand(cmd, cmdModel)
 
   def _selectInstanceCallback(self, btn, dummy):
+    print "QueryIdInput _selectInstanceCallback", self.attrs
     from theory.core.bridge import Bridge
     from theory.apps.model import Command
     bridge = Bridge()
     cmdModel = Command.objects.get(app="theory.apps", name="modelSelect")
 
     kwargs = {
-        "appName": self.app,
-        "modelName": self.model,
+        "appName": self.attrs['app'],
+        "modelName": self.attrs['model'],
         "queryset": \
             self.finalData.split(",") if self.finalData != "" else []
         }

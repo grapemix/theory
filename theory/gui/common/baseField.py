@@ -1909,10 +1909,11 @@ class DynamicModelIdField(Field):
   def renderWidget(self, *args, **kwargs):
     if("attrs" not in kwargs):
       kwargs["attrs"] = {}
-    kwargs["attrs"].update({"app": None, "model": None})
+    kwargs["attrs"].update({
+      "app": self.getSibilingFieldData(self.appFieldName),
+      "model": self.getSibilingFieldData(self.modelFieldName)
+    })
     super(DynamicModelIdField, self).renderWidget(*args, **kwargs)
-    #self.widget.app = self.app
-    #self.widget.model = self.model
 
   @property
   def finalData(self):
