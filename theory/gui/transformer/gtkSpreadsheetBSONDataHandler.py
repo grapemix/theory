@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 ##### System wide lib #####
-from json import loads as jsonLoads
+from collections import OrderedDict
+import json
 
 ##### Theory lib #####
+from theory.gui import theory_pb2
 
 ##### Theory third-party lib #####
 
@@ -20,7 +22,7 @@ class GtkSpreadsheetModelBSONDataHandler(TheoryModelTblDetectorBase):
   handler, because of the limitation of gtkListModel, only modified rows are
   able to be notified, instead of modified rows and modified fields."""
 
-  def run(self, dataRow, queryLst, columnHandlerLabelZip, fieldParamMap):
+  def run(self, dataRow, columnHandlerLabelZip, fieldNameVsProp):
     """
     :param dataRow: model from the gtkListModel as list of the list format as
       input
@@ -31,37 +33,49 @@ class GtkSpreadsheetModelBSONDataHandler(TheoryModelTblDetectorBase):
     """
     self.dataRow = dataRow
 
-    super(GtkSpreadsheetModelBSONDataHandler, self).run(fieldParamMap)
-    numOfRow = len(queryLst)
-    rowCounter = 0
-    # loop for column
-    for columnLabel, handlerLabel in columnHandlerLabelZip.iteritems():
-      # fill up field type handler
-      if(handlerLabel is None):
-        self.fieldPropDict[columnLabel] = {"klassLabel": "const"}
-      else:
-        fieldProperty =  self.fieldPropDict[columnLabel]
-        if(handlerLabel=="enumField"):
-          fieldProperty["reverseChoices"] = \
-              dict([
-                (v, k) for k,v in fieldProperty["choices"].iteritems()
-                ])
-        for rowNum in range(numOfRow):
-          newValue = fieldProperty["dataHandler"](
-              rowCounter,
-              columnLabel,
-              dataRow[rowNum][rowCounter]
-              )
-          if(not newValue is None):
-            setattr(
-                queryLst[rowNum],
-                columnLabel,
-                newValue
-            )
-      rowCounter += 1
-    return queryLst
+    self._buildTypeCatMap()
+    handlerLst = []
 
-  def _fillUpTypeHandler(self, klassLabel, prefix=""):
+    for fieldName, fieldProp in fieldNameVsProp.iteritems():
+      handlerLst.append((
+        fieldName,
+        getattr(self, "_%sDataHandler" % (fieldProp["klassLabel"])),
+      ))
+    self.fieldNameVsHandlerDict = OrderedDict(handlerLst)
+    self.fieldNameVsProp = fieldNameVsProp
+
+    numOfRow = len(dataRow)
+    rowCounter = 0
+    r = []
+    for columnLabel, handlerLabel in columnHandlerLabelZip.iteritems():
+      if handlerLabel=="enumField":
+        fieldProperty =  self.fieldNameVsProp[columnLabel]
+        fieldProperty["reverseChoices"] = \
+            dict([
+              (v, k) for k,v in fieldProperty["choices"].iteritems()
+              ])
+
+    fieldNameLst = self.fieldNameVsProp.keys()
+    for rowNum in range(numOfRow):
+      row = {}
+      for colCounter, columnLabel in enumerate(fieldNameLst):
+        if columnLabel == "id":
+          # id field is a special case because it is required even it is non
+          # editable
+          row[columnLabel] = dataRow[rowNum][colCounter]
+          continue
+        newValue = self.fieldNameVsHandlerDict[columnLabel](
+            rowNum,
+            columnLabel,
+            dataRow[rowNum][colCounter]
+            )
+        if newValue is not None:
+          row[columnLabel] = newValue
+      r.append(json.dumps(row))
+
+    return r
+
+  def _getFieldNameVsHandlerDict(self, klassLabel, prefix=""):
     return {
         "klassLabel": prefix + klassLabel,
         "dataHandler": getattr(self, "_%s%sDataHandler" % (prefix, klassLabel)),
@@ -71,6 +85,7 @@ class GtkSpreadsheetModelBSONDataHandler(TheoryModelTblDetectorBase):
     pass
 
   def _nonEditableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
+    return fieldVal
     pass
 
   def _editableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
@@ -102,7 +117,7 @@ class GtkSpreadsheetModelBSONDataHandler(TheoryModelTblDetectorBase):
       ):
     if fieldVal != "Too much to display......":
       # when the fieldVal is None, we will not set the field
-      return jsonLoads(fieldVal)
+      return json.loads(fieldVal)
 
   def _listFieldembeddedFieldDataHandler(self, rowId, fieldName, fieldVal):
     pass
@@ -130,7 +145,7 @@ class GtkSpreadsheetModelBSONDataHandler(TheoryModelTblDetectorBase):
   def _enumFieldDataHandler(self, rowId, fieldName, fieldVal):
     if fieldVal == u"None":
       return None
-    return self.fieldPropDict[fieldName]["reverseChoices"][fieldVal]
+    return self.fieldNameVsProp[fieldName]["reverseChoices"][fieldVal]
 
   def _constDataHandler(self, rowId, fieldName, fieldVal):
     """This fxn is special for the fieldVal being const and hence should not
@@ -138,5 +153,3 @@ class GtkSpreadsheetModelBSONDataHandler(TheoryModelTblDetectorBase):
     this fxn is only put in here to indicate the existance of this special
     case"""
     pass
-
-

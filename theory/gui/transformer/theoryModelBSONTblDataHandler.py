@@ -21,9 +21,8 @@ class TheoryModelBSONTblDataHandler(TheoryModelTblDetectorBase):
   this class should able to handle all mongoDB datatype, but it is less
   user-friendly"""
 
-  def _fillUpTypeHandler(self, klassLabel, prefix=""):
+  def _getFieldNameVsHandlerDict(self, klassLabel, prefix=""):
     return {
-        "klassLabel": prefix + klassLabel,
         "dataHandler": getattr(self, "_%s%sDataHandler" % (prefix, klassLabel)),
         }
 
@@ -62,17 +61,15 @@ class TheoryModelBSONTblDataHandler(TheoryModelTblDetectorBase):
       return str(len(fieldVal))
     except TypeError:
       # This happen when fieldVal is None which is because there has KeyError
-      # in SpreadSheetBuilder's fieldPropDict
+      # in SpreadSheetBuilder's fieldNameVsProp
       return "0"
 
   def _modelFieldDataHandler(self, rowId, fieldName, fieldVal):
-    return "1" if(fieldVal is not None) else "0"
-    # The string data might be too long in some case
-    #try:
-    #  return str(fieldVal.id)
-    #except AttributeError:
-    #  # for example, the reference field is None
-    #  return ""
+    try:
+      return str(fieldVal.id)
+    except AttributeError:
+      # for example, the reference field is None
+      return ""
 
   def _boolFieldDataHandler(self, rowId, fieldName, fieldVal):
     return fieldVal
@@ -93,4 +90,4 @@ class TheoryModelBSONTblDataHandler(TheoryModelTblDetectorBase):
   def _enumFieldDataHandler(self, rowId, fieldName, fieldVal):
     if(fieldVal is None):
       return "None"
-    return self.fieldPropDict[fieldName]["choices"][fieldVal]
+    return self.fieldNameVsProp[fieldName]["choices"][fieldVal]

@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
 ##### System wide lib #####
+from collections import OrderedDict
 from copy import deepcopy
 from datetime import datetime
-from ludibrio import Stub
+from decimal import Decimal
+from mock import patch
+import json
 import os
 
 ##### Theory lib #####
 from theory.apps.model import AppModel
 from theory.conf import settings
 from theory.gui.transformer import *
+from theory.gui.transformer.protoBufModelTblPaginator import ProtoBufModelTblPaginator
 from theory.gui.gtk.spreadsheet import SpreadsheetBuilder
 from theory.test.testcases import TestCase
 
@@ -21,6 +25,7 @@ from testBase.patch import patchDumpdata
 
 ##### Misc #####
 from testBase.model import (
+    CombinatoryModelWithDefaultValue,
     DummyAppModelManager,
     )
 
@@ -49,45 +54,59 @@ class DummyGtkSpreadsheetBuilder(SpreadsheetBuilder):
           newRow.append(data)
       self.gtkDataModel.append(newRow)
 
-  def getDataModel(self):
-    return self.gtkDataModel
-
 class GtkSpreadsheetModelDataHandlerTestCaseBase(object):
-  fixtures = ["theory",]
+  fixtures = ["theory", "combinatory_meta",]
 
+  #@patch("theory.gui.theory_pb2.DataRow", side_effect=lambda **kwarg: kwarg)
+  #@patch("theory.gui.theory_pb2.StrVsMap", side_effect=lambda **kwarg: kwarg)
   def setUp(self):
-    dummyAppModelManager = DummyAppModelManager()
-    self.model = dummyAppModelManager.getCombinatoryModelWithDefaultValue()
-    self.queryLst = dummyAppModelManager.getCombinatoryQuerySet([self.model])
-    patchDumpdata()
+    CombinatoryModelWithDefaultValue().save()
 
-    self.appModelConfig = AppModel.objects.get(
-        app="testBase", name="CombinatoryModelWithDefaultValue"
-        )
+    protoBufModelTblPaginator = ProtoBufModelTblPaginator()
+    self.dataComplex = protoBufModelTblPaginator.run(
+        "testBase",
+        "CombinatoryModelWithDefaultValue",
+        1,
+        10
+    )
+    flatDataLst = []
+    for grpcDataRow in self.dataComplex["dataLst"]:
+      flatDataLst.append([i for i in grpcDataRow.cell])
+    self.dataComplex["dataLst"] = flatDataLst
+
+    # To convert protobuf msg of dataLst back into python list
+    fieldNameVsProp = []
+    for i in self.dataComplex["fieldNameVsProp"]:
+      row = (i.k, {})
+      for k, v in i.v.iteritems():
+        if k == "choices":
+          v = json.loads(v)
+        row[1][k] = v
+      fieldNameVsProp.append(row)
+    fieldNameVsProp = OrderedDict(fieldNameVsProp)
+    self.dataComplex["fieldNameVsProp"] = fieldNameVsProp
 
   def test_getKlasslabel(self):
     spreadsheetBuilder = DummyGtkSpreadsheetBuilder()
     spreadsheetBuilder.run(
-        self.queryLst,
-        self.appModelConfig,
-        True
+        "testBase",
+        "CombinatoryModelWithDefaultValue",
+        self.dataComplex["dataLst"],
+        self.dataComplex["fieldNameVsProp"],
+        True,
+        [],
+        None
         )
 
-    dataRow = spreadsheetBuilder.getDataModel()
+    dataRow = self.dataComplex["dataLst"]
     columnHandlerLabel = spreadsheetBuilder.getColumnHandlerLabel()
-    convertedQueryLst = self.handler.run(
-        dataRow,
-        self.queryLst,
-        columnHandlerLabel,
-        self.appModelConfig.fieldParamMap.all(),
-        )
 
-    correctFieldType = {\
+    correctFieldType = {
         #'binaryField': {'klassLabel': 'const', },
         #fileField
         #imageField
         'booleanField': {'klassLabel': 'boolField', },
-        'dateTimeField': {'klassLabel': 'const', },
+        'dateTimeField': {'klassLabel': 'nonEditableForceStrField', },
         'complexDateTimeField': {'klassLabel': 'const', },
         'uUIDField': {'klassLabel': 'const', },
         'sequenceField': {'klassLabel': 'const', },
@@ -101,16 +120,16 @@ class GtkSpreadsheetModelDataHandlerTestCaseBase(object):
         'choiceField': {'klassLabel': 'enumField', },
         #dynamicField
 
-        'id': {'klassLabel': 'const', },
+        'id': {'klassLabel': 'nonEditableForceStrField', },
 
-        'referenceField': {'klassLabel': 'const', },
+        'referenceField': {'klassLabel': 'modelField', },
         'genericReferenceField': {'klassLabel': 'const', },
         'embeddedDocumentField': {'klassLabel': 'const', },
         'genericEmbeddedDocumentField': {'klassLabel': 'const', },
 
         #'listFieldBinaryField': {'klassLabel': 'const', },
         'listFieldBooleanField': {'klassLabel': 'listFieldeditableForceStrField', },
-        'listFieldDateTimeField': {'klassLabel': 'const', },
+        'listFieldDateTimeField': {'klassLabel': 'listFieldnonEditableForceStrField', },
         'listFieldComplexDateTimeField': {'klassLabel': 'const', },
         'listFieldUUIDField': {'klassLabel': 'const', },
         'listFieldSequenceField': {'klassLabel': 'const', },
@@ -169,7 +188,7 @@ class GtkSpreadsheetModelDataHandlerTestCaseBase(object):
         'sortedListFieldEmbeddedField': {'klassLabel': 'const', },
     }
 
-    for fieldName, fieldProperty in self.handler.fieldPropDict.iteritems():
+    for fieldName, fieldProperty in self.dataComplex["fieldNameVsProp"].iteritems():
       try:
         correctFieldProperty = correctFieldType[fieldName]
       except KeyError:
@@ -184,44 +203,62 @@ class GtkSpreadsheetModelDataHandlerTestCaseBase(object):
   def test_emptyRowSelected(self):
     spreadsheetBuilder = DummyGtkSpreadsheetBuilder()
     spreadsheetBuilder.run(
-        self.queryLst,
-        self.appModelConfig,
-        True
-        )
-
-    dataRow = []
-    columnHandlerLabel = spreadsheetBuilder.getColumnHandlerLabel()
-    queryLst = []
-    convertedQueryLst = self.handler.run(
-        dataRow,
-        queryLst,
-        columnHandlerLabel,
-        self.appModelConfig.fieldParamMap.all(),
+        "testBase",
+        "CombinatoryModelWithDefaultValue",
+        self.dataComplex["dataLst"],
+        self.dataComplex["fieldNameVsProp"],
+        True,
+        [],
+        None
         )
 
   def test_getValueConversion(self):
-    fieldNameLst = self.model._meta.getAllFieldNames()
+    fieldNameLst = self.dataComplex["fieldNameVsProp"].keys()
     spreadsheetBuilder = DummyGtkSpreadsheetBuilder()
     spreadsheetBuilder.run(
-        self.queryLst,
-        self.appModelConfig,
-        True
+        "testBase",
+        "CombinatoryModelWithDefaultValue",
+        self.dataComplex["dataLst"],
+        self.dataComplex["fieldNameVsProp"],
+        True,
+        [],
+        None
         )
 
-    dataRow = spreadsheetBuilder.getDataModel()
+    dataRow = self.dataComplex["dataLst"]
     columnHandlerLabel = spreadsheetBuilder.getColumnHandlerLabel()
 
     convertedQueryLst = self.handler.run(
         dataRow,
-        self.queryLst,
         columnHandlerLabel,
-        self.appModelConfig.fieldParamMap.all(),
+        self.dataComplex["fieldNameVsProp"],
         )
+    convertedQueryLst = json.loads(convertedQueryLst[0])
 
-    for fieldName in fieldNameLst:
+    for i, fieldName in enumerate(fieldNameLst):
+      if fieldName in ["intField", "floatField", ]:
+        convertedQueryLst[fieldName] = json.dumps(convertedQueryLst[fieldName])
+      elif fieldName in [
+        "binaryField",
+        "listFieldDateTimeField",
+        "referenceField"
+      ]:
+        # The above will be ignored
+        continue
+      elif fieldName.startswith("listField"):
+        convertedQueryLst[fieldName] = json.dumps(convertedQueryLst[fieldName])
+      elif fieldName == "choiceField":
+        convertedQueryLst[fieldName] = \
+          CombinatoryModelWithDefaultValue.DUMMY_CHOICES[0][1]
+      elif fieldName == "decimalField":
+        convertedQueryLst[fieldName] = str(
+          Decimal(convertedQueryLst[fieldName]).quantize(Decimal('.001'))
+        )
+      elif fieldName == "booleanField":
+        convertedQueryLst[fieldName] = "1"
       self.assertEqual(
-          getattr(self.queryLst[0], fieldName),
-          getattr(convertedQueryLst[0], fieldName)
+          dataRow[0][i],
+          convertedQueryLst[fieldName]
           )
 
 class GtkSpreadsheetModelDataHandlerTestCase(

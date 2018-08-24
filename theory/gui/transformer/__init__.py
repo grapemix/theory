@@ -17,6 +17,7 @@ from theory.gui.transformer.theoryModelTblDataHandler \
     import TheoryModelTblDataHandler
 from theory.gui.transformer.theoryModelBSONTblDataHandler \
     import TheoryModelBSONTblDataHandler
+# Must not importing ProtoBufModelTblPaginator in here
 
 ##### Misc #####
 

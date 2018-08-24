@@ -18,6 +18,10 @@ if __name__ == "__main__":
 
   os.environ["THEORY_SETTINGS_MODULE"] = "testBase.settings"
   testLabelLst = ["theoryTest",]
+
+  # To temp fix for grpc's failure on handling multiple libprotobuf problem
+  # which is compounded with ubuntu's outdated libprotobuf dependency
+  from google.protobuf.pyext import _message
   import theory
   theory.setup()
 

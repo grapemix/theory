@@ -20,9 +20,6 @@ class TheoryModelDetectorBase(object):
   handle any data type."""
   __metaclass__ = ABCMeta
 
-  def __init__(self):
-    self.fieldPropDict = OrderedDict()
-
   def run(self, fieldParamMap):
     """
     :param queryset: db model instance queryset
@@ -31,11 +28,11 @@ class TheoryModelDetectorBase(object):
     """
 
     self._buildTypeCatMap()
+    propLst = []
+    handlerLst = []
 
-    #for fieldName, fieldParam in fieldParamMap.iteritems():
     for fieldParam in fieldParamMap:
       fieldName = fieldParam.name
-      #handlerFxnName = self._typeCatMap[fieldParam.name][0]
       if not fieldParam.isField:
         continue
       handlerFxnName = self._typeCatMap[fieldParam.data][0]
@@ -46,20 +43,38 @@ class TheoryModelDetectorBase(object):
             ][1]
       elif(handlerFxnName=="intField"):
         for i in fieldParam.childParamLst.all():
-          if(i.name=="choices"):
+          if i.name=="choices":
             handlerFxnName = self._typeCatMap["EnumField"][0]
             choices = i.data
             break
 
-      self.fieldPropDict[fieldName] = self._fillUpTypeHandler(
+      propLst.append((fieldName, self._getFieldNameVsProp(
+          handlerFxnName,
+          choices,
+          ""
+      )))
+      if handlerFxnName=="modelField":
+        for childFieldParam in fieldParam.childParamLst.all():
+          propLst[-1][1][childFieldParam.name] = childFieldParam.data
+
+      handlerLst.append((fieldName, self._getFieldNameVsHandlerDict(
           handlerFxnName,
           ""
-          )
-      if(choices is not None):
-        self.fieldPropDict[fieldName]["choices"] = dict(json.loads(i.data))
+      )))
+    self.fieldNameVsProp = OrderedDict(propLst)
+    self.fieldNameVsHandlerDict = OrderedDict(handlerLst)
+
+  def _getFieldNameVsProp(self, klassLabel, choices, prefix=""):
+    r = {
+        "klassLabel": prefix + klassLabel,
+        "type": klassLabel[:-5],
+    }
+    if(choices is not None):
+      r["choices"] = dict(json.loads(choices))
+    return r
 
   @abstractmethod
-  def _fillUpTypeHandler(self, klassLabel, prefix=""):
+  def _getFieldNameVsHandlerDict(self, klassLabel, prefix=""):
     pass
 
   @abstractmethod
