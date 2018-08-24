@@ -78,8 +78,9 @@ class Spreadsheet(object):
     return self.model
 
   def discard_change(self, button):
-    for i in self.model:
-      i[-1] = False
+    self.model = []
+    for child in self.childSpreadSheetLst:
+      child.model = []
     self.close_window()
 
   # Create a Button Box with the specified parameters
@@ -108,11 +109,17 @@ class Spreadsheet(object):
     return frame
 
   def close_window(self, *args, **kwargs):
+    r = []
+    for i in self.model:
+      if i[-1]:
+        r.append(i)
+    self.model = r
+
     for child in self.childSpreadSheetLst:
       child.close_window()
 
     self.window.destroy()
-    if(self.isMainWindow):
+    if self.isMainWindow:
       gtk.main_quit()
 
   def create_interior(self):
@@ -281,8 +288,7 @@ class Spreadsheet(object):
   def main(self):
     gtk.main()
 
-class SpreadsheetBuilder(TheoryModelBSONTblDataHandler):
-#class SpreadsheetBuilder(MongoModelTblDataHandler):
+class SpreadsheetBuilder(object):
   """This class is used to provide information in order to render the data
   field and to decide the interaction of the data field based on the
   data field type being detected. It is specific to work with spreadsheet
@@ -291,121 +297,115 @@ class SpreadsheetBuilder(TheoryModelBSONTblDataHandler):
 
   def run(
       self,
-      queryset,
-      appConfigModel,
-      isEditable=False,
-      selectedIdLst=[],
-      isMainSpreadsheet=True
+      appName,
+      mdlName,
+      data,
+      fieldNameVsProp,
+      isEditable,
+      selectedIdLst,
+      showStackFxn,
       ):
     self.idLabelIdx = None
+    self.isEditable = isEditable
     self.selectedIdLst = selectedIdLst
-    if(len(queryset)>0):
-      self.modelKlass = queryset[0].__class__
-      self.modelKlassName = self.modelKlass.__class__.__name__
+    self.showStackFxn = showStackFxn
+    self.appName = appName
+    self.mdlName = mdlName
 
-      # We need this to find rowData in queryset
+    self.childSpreadSheetBuilderLst = []
 
-      self.isEditable = isEditable
-      self.appConfigModel = appConfigModel
-      super(SpreadsheetBuilder, self).run(
-          appConfigModel.fieldParamMap.filter(parent__isnull=True)
-          )
-    else:
-      self.modelKlassName = "Unknown model"
-      super(SpreadsheetBuilder, self).run(
-          {}
-          )
-    self.queryset = queryset
+    self.fieldNameVsProp = fieldNameVsProp
+    for i, fieldName in enumerate(self.fieldNameVsProp.keys()):
+      if fieldName=="id" :
+        self.idLabelIdx = i
 
-    listStoreDataType = self._buildListStoreDataType()
-    gtkDataModel = self._buildGtkDataModel()
-    self.renderKwargsSet = self._buildRenderKwargsSet()
+    listStoreDataType, neglectColIdxLst = self._buildListStoreDataType(
+      self.fieldNameVsProp
+    )
+    essentialData = []
+    for row in data:
+      essentialRow = []
+      for i, cell in enumerate(row):
+        if i not in neglectColIdxLst:
+          essentialRow.append(cell)
+      essentialData.append(essentialRow)
 
-    self._showWidget(
-        listStoreDataType,
-        gtkDataModel,
-        self.renderKwargsSet,
-        isMainSpreadsheet
-        )
+    self.renderKwargsSet = self._buildRenderKwargsSet(self.fieldNameVsProp)
 
-  def _showWidget(
-      self,
-      listStoreDataType,
-      gtkDataModel,
-      renderKwargsSet,
-      isMainSpreadsheet
-      ):
     self.spreadsheet = Spreadsheet(
-        "Listing %s" % (self.modelKlassName),
+        "Listing {0}-{1}".format(appName, mdlName),
         listStoreDataType,
-        gtkDataModel,
-        renderKwargsSet,
+        essentialData,
+        self.renderKwargsSet,
         self.selectedIdLst,
         self.idLabelIdx,
         self.showStackData,
         )
-    if(isMainSpreadsheet):
+
+    return self.spreadsheet
+
+  def showWidget(self, isMainSpreadsheet):
+    if isMainSpreadsheet:
       self.spreadsheet.main()
     else:
       self.spreadsheet.isMainWindow = False
 
   def showStackData(self, toggleWidget, rowNum, colIdx):
     rowNum = int(rowNum)
-    queryset = getattr(
-        self.queryset[rowNum],
-        self.modelFieldnameMap[colIdx]
-        )
-    if hasattr(queryset, "all"):
-      # That is for many to many field
-      queryset = queryset.all()
-    else:
-      # This is for ForeignKey
-      # or may be for one to one?
-      queryset = [queryset] if(queryset is not None) else []
-
-    buf = self.appConfigModel.fieldParamMap.filter(
-        parent__name=self.modelFieldnameMap[colIdx]
-        )
-    for i in buf:
-      if i.name == "foreignApp":
-        appName = buf[0].data
-      elif i.name == "foreignModel":
-        modelName = buf[1].data
-
-    print appName, modelName
-    appConfigModel = AppModel.objects.get(app=appName, name=modelName)
-    clone = SpreadsheetBuilder()
-    # We don't assume modifying the stack data is possible, so we can
-    # treat the pre-selected item list as empty
-    clone.run(queryset, appConfigModel, self.isEditable, [], False)
-    self.spreadsheet.childSpreadSheetLst.append(clone.spreadsheet)
-
-  def getSelectedRow(self):
-    return self.spreadsheet.getSelectedRow()
+    fieldProp = self.fieldNameVsProp[self.renderKwargsSet[colIdx]["title"]]
+    self.showStackFxn(
+      fieldProp["foreignApp"],
+      fieldProp["foreignModel"],
+      self.isEditable,
+      self.selectedIdLst,
+      self
+    )
 
   def getDataModel(self):
     return self.spreadsheet.getDataModel()
+
+  def addChild(self, spreadsheetBuilder):
+      self.childSpreadSheetBuilderLst.append(spreadsheetBuilder)
+      self.spreadsheet.childSpreadSheetLst.append(
+        spreadsheetBuilder.spreadsheet
+      )
+
+  def getJsonDataLst(self, handlerFxn, r):
+    for childSpreadSheetBuilder in self.childSpreadSheetBuilderLst:
+      r = childSpreadSheetBuilder.getJsonDataLst(handlerFxn, r)
+    dataRow = self.getDataModel()
+    if len(dataRow) != 0:
+      columnHandlerLabel = self.getColumnHandlerLabel()
+      jsonDataLst = handlerFxn.run(
+          dataRow,
+          columnHandlerLabel,
+          self.fieldNameVsProp,
+          )
+      r.append((self.appName, self.mdlName, jsonDataLst))
+    return r
 
   def getColumnHandlerLabel(self):
     """This fxn does not required to build a spreadsheet. Instead, this fxn
     will be called to convert modified data from dataModel to other format
     (e.g. back to db instance). The value should have 2 cases: 1) in the
     dataModel and editable 2) in the dataModel and non-editable"""
-    columnHandlerLabel = OrderedDict()
+    columnHandlerLst = []
     for field in self.renderKwargsSet:
       try:
         if(field["editable"]):
-          columnHandlerLabel[field["title"]] = \
-              self.fieldPropDict[field["title"]]["klassLabel"]
+          columnHandlerLst.append((
+            field["title"],
+            self.fieldNameVsProp[field["title"]]["klassLabel"]
+          ))
         else:
-          columnHandlerLabel[field["title"]] = None
+          columnHandlerLst.append((field["title"], None))
       except KeyError:
-        columnHandlerLabel[field["title"]] = None
-    return columnHandlerLabel
+        columnHandlerLst.append((field["title"], None))
+    return OrderedDict(columnHandlerLst)
 
-  def _fillUpTypeHandler(self, klassLabel, prefix=""):
+
+  def _getFieldNameVsHandlerDict(self, klassLabel, prefix=""):
     return {
-        "klassLabel": prefix + klassLabel,
         "dataHandler": getattr(self, "_%s%sDataHandler" % (prefix, klassLabel)),
         "renderHandler": getattr(
           self,
@@ -413,10 +413,13 @@ class SpreadsheetBuilder(TheoryModelBSONTblDataHandler):
         ),
     }
 
-  def _buildRenderKwargsSet(self):
+  def _buildRenderKwargsSet(self, fieldNameVsProp):
     kwargsSet = []
-    for fieldName, fieldHandlerFxn in self.fieldPropDict.iteritems():
-      kwargs = fieldHandlerFxn["renderHandler"](fieldName)
+    for fieldName, fieldProp in fieldNameVsProp.iteritems():
+      kwargs = getattr(
+        self,
+        "_{0}FieldRenderHandler".format(fieldProp["type"])
+      )(fieldName)
       if(kwargs is not None):
         kwargs.update({"title": fieldName})
         kwargsSet.append(kwargs)
@@ -425,8 +428,8 @@ class SpreadsheetBuilder(TheoryModelBSONTblDataHandler):
   def _queryRowToGtkDataModel(self, queryrow):
     row = []
 
-    for fieldName, fieldHandlerFxnLst in self.fieldPropDict.iteritems():
-      result = fieldHandlerFxnLst["dataHandler"](
+    for fieldName, handlerDict in self.fieldNameVsHandlerDict.iteritems():
+      result = handlerDict["dataHandler"](
           id,
           fieldName,
           getattr(queryrow, fieldName)
@@ -435,47 +438,32 @@ class SpreadsheetBuilder(TheoryModelBSONTblDataHandler):
         row.append(result)
     return row
 
-  def _buildGtkDataModel(self):
-    gtkDataModel = []
-
-    for i, fieldName in enumerate(self.fieldPropDict.keys()):
-      if(fieldName=="id"):
-        self.idLabelIdx = i
-        break
-
-    for queryrow in self.queryset:
-      gtkDataModel.append(self._queryRowToGtkDataModel(queryrow))
-    return gtkDataModel
-
-  def _buildListStoreDataType(self):
+  def _buildListStoreDataType(self, fieldNameVsProp):
     args = []
     self.modelFieldnameMap = {}
-    idx = 0
-    for fieldName, fieldHandlerFxnLst in self.fieldPropDict.iteritems():
-      fieldHandlerFxn = fieldHandlerFxnLst["klassLabel"]
-      if(fieldHandlerFxn=="neglectField"):
+    idx = -1
+    neglectColIdxLst = []
+    for fieldName, fieldProp in fieldNameVsProp.iteritems():
+      idx += 1
+      if(fieldProp["type"]=="neglect"):
+        neglectColIdxLst.append(idx)
         continue
-      elif(fieldHandlerFxn=="nonEditableForceStrField"
-          or fieldHandlerFxn=="editableForceStrField"
-          or fieldHandlerFxn=="strField"
+      elif(fieldProp["type"]=="nonEditableForceStr"
+          or fieldProp["type"]=="editableForceStr"
+          or fieldProp["type"]=="str"
       ):
         args.append(str)
-      elif(fieldHandlerFxn.startswith("listField")
+      elif(fieldProp["type"].startswith("list")
           # TODO: remove me
-          or fieldHandlerFxn=="modelField"
+          or fieldProp["type"]=="model"
       ):
         self.modelFieldnameMap[idx] = fieldName
         args.append(str)
-      elif(fieldHandlerFxn=="floatField"):
-        args.append(float)
-      elif(fieldHandlerFxn=="enumField"):
+      elif fieldProp["type"] in ["float", "enum", "int"]:
         args.append(str)
-      elif(fieldHandlerFxn=="intField"):
-        args.append(str)
-      elif(fieldHandlerFxn=="boolField"):
+      elif(fieldProp["type"]=="bool"):
         args.append(bool)
-      idx += 1
-    return args
+    return (args, neglectColIdxLst)
 
   def _intFieldDataHandler(self, rowId, fieldName, fieldVal):
     if(fieldVal is None):
@@ -544,7 +532,7 @@ class SpreadsheetBuilder(TheoryModelBSONTblDataHandler):
         }
 
   def _enumFieldRenderHandler(self, field):
-    choices = self.fieldPropDict[field]["choices"].values()
+    choices = self.fieldNameVsProp[field]["choices"].values()
     return {
         "editable": self.isEditable and True,
         "fxnName": "renderComboBoxCol",

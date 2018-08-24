@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 ##### System wide lib #####
+from collections import OrderedDict
 import gevent
 import grpc
 import json
@@ -11,6 +12,8 @@ import notify2
 from theory.gui import theory_pb2
 from theory.gui import theory_pb2_grpc
 from theory.gui.etk import getDbusMainLoop
+from theory.gui.gtk.spreadsheet import SpreadsheetBuilder
+from theory.gui.transformer import GtkSpreadsheetModelBSONDataHandler
 from theory.utils.importlib import importClass
 
 ##### Theory third-party lib #####
@@ -87,6 +90,10 @@ class RpcTerminalMixin(object):
         d = json.loads(resp.val)
         self.logger.info("Loading adapater UI: {0}".format(d["importPath"]))
         self.startAdapterUi(d)
+      elif resp.action == "initSpreadSheet":
+        d = json.loads(resp.val)
+        d["parentSpreadSheetBuilder"] = None
+        self.initSpreadSheet(**d)
       elif resp.action == "getNotify":
         n = notify2.Notification(
             "Done",
@@ -153,6 +160,75 @@ class RpcTerminalMixin(object):
     else:
       # TODO: integrate with std reactor error system
       self.paramForm.showErrInFieldLabel()
+
+  def initSpreadSheet(
+      self,
+      appName,
+      mdlName,
+      isEditable,
+      selectedIdLst,
+      parentSpreadSheetBuilder
+  ):
+    r = self.stub.getMdlTbl(
+      theory_pb2.MdlTblReq(
+        mdl=theory_pb2.MdlIden(
+          appName=appName,
+          mdlName=mdlName
+        ),
+        pageNum=1,
+        pageSize=10,
+      )
+    )
+
+    # To convert protobuf msg of dataLst back into python list
+    mdlLst = [list(data.ListFields()[0][1]) for data in r.dataLst]
+    fieldNameVsProp = []
+    for i in r.fieldNameVsProp:
+      row = (i.k, {})
+      for k, v in i.v.iteritems():
+        if k == "choices":
+          v = json.loads(v)
+        row[1][k] = v
+      fieldNameVsProp.append(row)
+    fieldNameVsProp = OrderedDict(fieldNameVsProp)
+
+    # Until we support custom protobuf interface for each model, we assume
+    # all fields are being converted into str to avoid complicated protobuf
+    # scheme
+    # Special treatment for bool field
+    for colNum, fieldProp in enumerate(fieldNameVsProp.values()):
+      if fieldProp["type"] == "bool":
+        for mdl in mdlLst:
+          mdl[colNum] = True if mdl[colNum] == "1" else False
+
+    spreadsheetBuilder = SpreadsheetBuilder()
+    spreadsheet = spreadsheetBuilder.run(
+        appName,
+        mdlName,
+        mdlLst,
+        fieldNameVsProp,
+        isEditable,
+        selectedIdLst,
+        self.initSpreadSheet,
+        )
+
+    if parentSpreadSheetBuilder is not None:
+      parentSpreadSheetBuilder.addChild(spreadsheetBuilder)
+
+    spreadsheetBuilder.showWidget(
+      True if parentSpreadSheetBuilder is None else False
+    )
+    if parentSpreadSheetBuilder is None:
+
+      handlerFxn = GtkSpreadsheetModelBSONDataHandler()
+      jsonDataLstLst = spreadsheetBuilder.getJsonDataLst(handlerFxn, [])
+      for (appName, mdlName, jsonDataLst) in jsonDataLstLst:
+        self.stub.upsertModelLst(theory_pb2.ModelLstData(
+          appName=appName,
+          modelName=mdlName,
+          jsonDataLst=jsonDataLst,
+          )
+        )
 
   def callExtCmd(self):
     pass
