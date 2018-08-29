@@ -90,10 +90,10 @@ class RpcTerminalMixin(object):
         d = json.loads(resp.val)
         self.logger.info("Loading adapater UI: {0}".format(d["importPath"]))
         self.startAdapterUi(d)
-      elif resp.action == "initSpreadSheet":
+      elif resp.action == "upsertSpreadSheet":
         d = json.loads(resp.val)
         d["parentSpreadSheetBuilder"] = None
-        self.initSpreadSheet(**d)
+        self.upsertSpreadSheet(**d)
       elif resp.action == "getNotify":
         n = notify2.Notification(
             "Done",
@@ -161,7 +161,7 @@ class RpcTerminalMixin(object):
       # TODO: integrate with std reactor error system
       self.paramForm.showErrInFieldLabel()
 
-  def initSpreadSheet(
+  def initSpreadSheetBuilder(
       self,
       appName,
       mdlName,
@@ -209,7 +209,7 @@ class RpcTerminalMixin(object):
         fieldNameVsProp,
         isEditable,
         selectedIdLst,
-        self.initSpreadSheet,
+        self.upsertSpreadSheet,
         )
 
     if parentSpreadSheetBuilder is not None:
@@ -218,6 +218,24 @@ class RpcTerminalMixin(object):
     spreadsheetBuilder.showWidget(
       True if parentSpreadSheetBuilder is None else False
     )
+    return spreadsheetBuilder
+
+  def upsertSpreadSheet(
+      self,
+      appName,
+      mdlName,
+      isEditable,
+      selectedIdLst,
+      parentSpreadSheetBuilder
+  ):
+    spreadsheetBuilder = self.initSpreadSheetBuilder(
+      appName,
+      mdlName,
+      isEditable,
+      selectedIdLst,
+      parentSpreadSheetBuilder
+    )
+
     if parentSpreadSheetBuilder is None:
 
       handlerFxn = GtkSpreadsheetModelBSONDataHandler()

@@ -1051,27 +1051,17 @@ class QueryIdInput(StringInput):
     bridge._executeCommand(cmd, cmdModel)
 
   def _selectInstanceCallback(self, btn, dummy):
-    print "QueryIdInput _selectInstanceCallback", self.attrs
-    from theory.core.bridge import Bridge
-    from theory.apps.model import Command
-    bridge = Bridge()
-    cmdModel = Command.objects.get(app="theory.apps", name="modelSelect")
-
-    kwargs = {
-        "appName": self.attrs['app'],
-        "modelName": self.attrs['model'],
-        "queryset": \
-            self.finalData.split(",") if self.finalData != "" else []
-        }
-    cmd = bridge.getCmdComplex(
-        cmdModel,
-        [],
-        kwargs
-        )
-    cmd._applyChangeOnQueryset = lambda: self.refreshData(
-        cmd.queryIdSet
-        )
-    bridge._executeCommand(cmd, cmdModel)
+    from theory.gui.etk.terminal import Terminal
+    terminal = Terminal()
+    spreadsheetBuilder = terminal.initSpreadSheetBuilder(
+      self.attrs['app'],
+      self.attrs['model'],
+      False,
+      [],
+      None
+    )
+    selectedIdLst = spreadsheetBuilder.getSelectedIdLst()
+    self.refreshData(selectedIdLst)
 
   def _createWidget(self, *args, **kwargs):
     hBox = self._createContainer(

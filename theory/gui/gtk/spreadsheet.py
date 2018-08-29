@@ -370,6 +370,14 @@ class SpreadsheetBuilder(object):
         spreadsheetBuilder.spreadsheet
       )
 
+  def getSelectedIdLst(self):
+    dataRow = self.getDataModel()
+    r = []
+    for row in dataRow:
+        if row[-1]:
+          r.append(row[self.idLabelIdx])
+    return r
+
   def getJsonDataLst(self, handlerFxn, r):
     for childSpreadSheetBuilder in self.childSpreadSheetBuilderLst:
       r = childSpreadSheetBuilder.getJsonDataLst(handlerFxn, r)
