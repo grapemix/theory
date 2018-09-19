@@ -29,9 +29,8 @@ class ProbeModule(SimpleCommand):
     appNameLst = field.MultipleChoiceField(
         label="Application Name",
         helpText="The name of application being probed",
-        dynamicChoiceLst=(set([("theory.apps", "theory.apps")] +
-          [(appName, appName) for appName in settings.INSTALLED_APPS])
-        ),
+        dynamicChoiceLst=[("theory.apps", "theory.apps")] +
+          [(appName, appName) for appName in settings.INSTALLED_APPS],
     )
 
   def run(self):
