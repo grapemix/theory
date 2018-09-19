@@ -222,7 +222,7 @@ class SimpleGuiFormBase(GuiFormBase):
       raise ValidationError(str(e))
     self.fields[fieldName].finalData = None
 
-    resp = self._syncFormData(self.cmdId, fieldName, jsonData)
+    resp = self._syncFormData(self.cmdId, self.hash, fieldName, jsonData)
     try:
       formData = json.loads(resp.jsonData)
     except Exception as e: # eval can throw many different errors
@@ -346,6 +346,7 @@ class StepFormBase(SimpleGuiFormBase):
     if(kwargs.has_key("cleanUpCrtFxn")):
       btn._clicked = kwargs["cleanUpCrtFxn"]
       btn._clickedData = self
+      self.cleanUpCrtFxn = kwargs["cleanUpCrtFxn"]
     self.stepControlBox.addWidget(btn)
 
     if(hasattr(self, "_backBtnClick")):

@@ -160,6 +160,7 @@ class ModelUpsert(SimpleCommand):
         # history
         "appName": f["appName"],
         "modelName": f["modelName"],
+        "isInNewWindow": f["isInNewWindow"],
         },
         cls=TheoryJSONEncoder
       )
@@ -169,9 +170,10 @@ class ModelUpsert(SimpleCommand):
       logger.error(e, exc_info=True)
       raise ValidationError(str(e))
 
-    self.actionQ.append({
-      "action": "cleanUpCrt",
-      })
+    if not f["isInNewWindow"]:
+      self.actionQ.append({
+        "action": "cleanUpCrt",
+        })
     self.actionQ.append({
       "action": "buildParamForm",
       "val": val

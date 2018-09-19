@@ -254,7 +254,12 @@ class Reactor(theory_pb2_grpc.ReactorServicer, AutoCompleteMixin, HistoryMixin):
     return self._dumpActionQ()
 
   def _buildCmdForm(self, finalDataDict=None):
-    val = '{{"cmdId": {0}, "fieldNameVsDesc": {{'.format(self.cmdModel.id)
+    val = (
+      '{{'
+      '"cmdId": {0}, '
+      '"isFocusOnFirstChild": "true", '
+      '"fieldNameVsDesc": {{'
+    ).format(self.cmdModel.id)
     cmdParamForm = None
     for row in self.cmdModel.cmdFieldSet.exclude(param="").orderBy(
         "isOptional"

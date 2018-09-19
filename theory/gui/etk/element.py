@@ -65,8 +65,9 @@ def getNewUiParam(winTitle=""):
   return OrderedDict([
     ("win", win),
     ("bx", bx),
-    ("unFocusFxn", None),
-    ("cleanUpCrtFxn", lambda x, y: win.delete()),
+    ("unFocusFxn", lambda *args, **kwargs: None),
+    # The rpcTerminalMixin should rm the cmdFormCache instead of in here
+    ("cleanUpCrtFxn", lambda *kwargs: win.delete()),
     ])
 
 # Honestly, I am not satisfied with the code related to the GUI. So the code

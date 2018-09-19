@@ -56,14 +56,16 @@ message UiId{
 
 message FieldData{
   int32 cmdId = 1;
-  string fieldName = 2;
-  string jsonData = 3;
+  string formHash = 2;
+  string fieldName = 3;
+  string jsonData = 4;
 }
 
 message CmdFxnInput{
   int32 cmdId = 1;
-  string fxnName = 2;
-  string jsonData = 3;
+  string formHash = 2;
+  string fxnName = 3;
+  string jsonData = 4;
 }
 
 message uiData4Adapter{
@@ -84,6 +86,7 @@ message MdlTblReq{
   MdlIden mdl = 1;
   int32 pageNum = 2;
   int32 pageSize = 3;
+  string formHash = 4;
 }
 
 message Mdl{

@@ -67,6 +67,8 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
       None
     )
 
+    for i in self.reactor.actionQ:
+      print self.unJsonActionVal(i)["action"]
     self.assertEqual(len(self.reactor.actionQ), 3)
     self.assertDict(
       self.unJsonActionVal(self.reactor.actionQ[0]),
@@ -81,6 +83,7 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
         "action": "buildParamForm",
         "val": {
           "cmdId": 16,
+          "isFocusOnFirstChild": "true",
           "fieldNameVsDesc": {
             "appName": {
               "choices": [
@@ -245,6 +248,7 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
         "val": {
           "appName": "theory.apps",
           "cmdId": 16,
+          "isInNewWindow": False,
           "fieldNameVsDesc": {
             "app": {
               "errorMessages": {
@@ -477,6 +481,7 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
         "val": {
           "cmdId":1,
           "modelName":"AppModel",
+          "isInNewWindow": False,
           "fieldNameVsDesc":{
             "name":{
               "errorMessages":{

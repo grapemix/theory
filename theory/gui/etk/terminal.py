@@ -8,6 +8,7 @@ import signal
 
 ##### Theory lib #####
 from theory.gui.common.rpcTerminalMixin import RpcTerminalMixin
+from theory.gui.etk.element import getNewUiParam
 from theory.conf import settings
 from theory.utils.importlib import importClass
 from theory.utils.singleton import Singleton
@@ -42,12 +43,16 @@ class Terminal(RpcTerminalMixin):
   crlf = "<br/>"
   lastEntry = ""
 
-  def _getFilterFormUi(self):
-    return {
-      "win": self.win,
-      "bx": self.bxCrt,
-      "unFocusFxn": self.unFocusFxn,
-    }
+  def _getFilterFormUi(self, isInNewWindow=False):
+    if isInNewWindow:
+      return getNewUiParam()
+    else:
+      return {
+        "win": self.win,
+        "bx": self.bxCrt,
+        "unFocusFxn": self.unFocusFxn,
+        "cleanUpCrtFxn": self.cleanUpCrt,
+      }
 
   def _setCmdLineTxt(self, txt):
     self._cmdLineEntry.entry_set(txt)
@@ -59,10 +64,11 @@ class Terminal(RpcTerminalMixin):
   # keep the *args. It might be called from toolkits which pass widget as param
   def cleanUpCrt(self, *args, **kwargs):
     """To reset to original form."""
+    # Reactor call it a lot
     self.bxCrt.clear()
     self.win.resize(self.initCrtSize[0], self.initCrtSize[1])
     self._cmdLineEntry.focus_set(True)
-    self.paramForm = None
+    self.formHashInUse = None
 
   def _stdOutAdjuster(self, txt, crlf=None):
     if crlf is None:
@@ -141,7 +147,7 @@ class Terminal(RpcTerminalMixin):
     elif curEntryTxt.endswith(self.crlf):
       self.lastEntry = curEntryTxt[:-5]
       object.entry_set("")
-      self._runCmd()
+      self._runCmd(self.cmdFormCache[self.formHashInUse])
 
   def _cmdLineKeyDownHandler(self, entry, event, *args, **kwargs):
     # "Shift", "Control", "Alt", "Meta", "Hyper", "Super".

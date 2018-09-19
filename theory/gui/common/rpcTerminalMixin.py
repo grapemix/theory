@@ -7,6 +7,8 @@ import grpc
 import json
 from math import pow
 import notify2
+# Don't use it for security purpose
+from uuid import uuid4
 
 ##### Theory lib #####
 from theory.gui import theory_pb2
@@ -33,7 +35,8 @@ class RpcTerminalMixin(object):
   To provide interface to handle signal from reactor. And also
   to implement fxn related to paramForm and notification
   """
-  paramForm = None
+  cmdFormCache = {}
+  formHashInUse = None
 
   def _fireUiReq(self, dict):
     self._handleReactorReq(self.stub.call(theory_pb2.ReactorReq(**dict)))
@@ -106,22 +109,23 @@ class RpcTerminalMixin(object):
       elif resp.action == "cleanParamForm":
         self.cleanParamForm(None, None)
       elif resp.action == "focusOnParamFormFirstChild":
-        self.paramForm.focusOnTheFirstChild()
+        # We don't use it currently, may be in the future?
+        self.cmdFormCache[self.formHashInUse].focusOnTheFirstChild()
 
-  def _runCmd(self):
-    if self.paramForm is not None and self.paramForm.isValid():
+  def _runCmd(self, paramForm):
+    if paramForm is not None and paramForm.isValid():
       val = '{{"cmdName": "{0}", "finalDataDict": {1}}}'.format(
           self.lastEntry,
-          self.paramForm.toJson()
+          paramForm.toJson()
           )
     else:
       val = '{{"cmdName": "{0}", "finalDataDict": {{}}}}'.format(
-          self.lastEntry
+          self.lastEntry,
           )
 
     self._fireUiReq({"action": "runCmd", "val": val})
 
-  def syncFormData(self, cmdId, fieldName, jsonData):
+  def syncFormData(self, cmdId, formHash, fieldName, jsonData):
     """
     Being called when a user change a field in a form. If the form registered
     a hook for a field of an event, this fxn will be called and data will be
@@ -130,36 +134,43 @@ class RpcTerminalMixin(object):
     """
     return self.stub.syncFormData(theory_pb2.FieldData(
       cmdId=cmdId,
+      formHash=formHash,
       fieldName=fieldName,
       jsonData=jsonData
       )
     )
 
-  def cleanParamForm(self, btn, dummy):
-    self.paramForm.isLazy = False
-    self.paramForm.fullClean()
-    if self.paramForm.isValid():
-      self._runCmd()
+  def cleanParamForm(self, btn, cmdFormObj):
+    paramForm = self.cmdFormCache[cmdFormObj.hash]
+    paramForm.isLazy = False
+    paramForm.fullClean()
+    if paramForm.isValid():
+      self._runCmd(paramForm)
+      del self.cmdFormCache[cmdFormObj.hash]
     else:
       # TODO: integrate with std reactor error system
-      self.paramForm.showErrInFieldLabel()
+      paramForm.showErrInFieldLabel()
 
-  def upsertModelLst(self, btn, dummy):
-    self.paramForm.isLazy = False
-    self.paramForm.fullClean()
+  def upsertModelLst(self, btn, cmdFormObj):
+    paramForm = self.cmdFormCache[cmdFormObj.hash]
+    paramForm.isLazy = False
+    paramForm.fullClean()
 
-    if self.paramForm.isValid():
-      jsonDataLst = self.paramForm.toModelForm()
+    if paramForm.isValid():
+      jsonDataLst = paramForm.toModelForm()
       self.stub.upsertModelLst(theory_pb2.ModelLstData(
         appName=self.lastModel["appName"],
         modelName=self.lastModel["modelName"],
         jsonDataLst=[jsonDataLst]
         )
       )
+      if self.lastModel["isInNewWindow"]:
+        paramForm.cleanUpCrtFxn()
+        del self.cmdFormCache[cmdFormObj.hash]
       self.lastModel = {}
     else:
       # TODO: integrate with std reactor error system
-      self.paramForm.showErrInFieldLabel()
+      paramForm.showErrInFieldLabel()
 
   def initSpreadSheetBuilder(
       self,
@@ -254,26 +265,35 @@ class RpcTerminalMixin(object):
   def buildParamForm(self, val):
     data = json.loads(val)
     cmdParamFormKlass = importClass("theory.gui.etk.form.CommandForm")
-    self.paramForm = cmdParamFormKlass()
+    paramForm = cmdParamFormKlass()
+    paramForm.hash = str(uuid4())
     if "nextFxn" not in data:
-      self.paramForm._nextBtnClick = self.cleanParamForm
+      paramForm._nextBtnClick = self.cleanParamForm
     elif data["nextFxn"] == "upsertModelLst":
-      self.paramForm._nextBtnClick = self.upsertModelLst
+      paramForm._nextBtnClick = self.upsertModelLst
       self.lastModel = {
           "appName": data["appName"],
           "modelName": data["modelName"],
+          "isInNewWindow": data["isInNewWindow"],
           }
 
-    filterFormParam = self._getFilterFormUi()
+
+    filterFormParam = self._getFilterFormUi(data.get("isInNewWindow", False))
     filterFormParam.update({
       "cmdId": data["cmdId"],
       "fieldNameVsDesc": data["fieldNameVsDesc"],
       "syncFormDataFxn": self.syncFormData,
       "callExtCmdFxn": self.callExtCmd,
-      "_cleanUpCrtFxn": self.cleanUpCrt,
+      "cleanUpCrtFxn": filterFormParam["cleanUpCrtFxn"],
     })
-    self.paramForm.generateFilterForm(**filterFormParam)
-    self.paramForm.generateStepControl(_cleanUpCrtFxn=self.cleanUpCrt)
+    paramForm.generateFilterForm(**filterFormParam)
+    paramForm.generateStepControl(
+      cleanUpCrtFxn=filterFormParam["cleanUpCrtFxn"]
+    )
+    if data.get("isFocusOnFirstChild", False):
+      paramForm.focusOnTheFirstChild()
+    self.cmdFormCache[paramForm.hash] = paramForm
+    self.formHashInUse = paramForm.hash
 
   def start(self):
     channel = grpc.insecure_channel('localhost:50051')
