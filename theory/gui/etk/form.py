@@ -320,7 +320,6 @@ class SimpleGuiFormBase(GuiFormBase):
         del fieldDesc["childKeyFieldTemplate"]
         del fieldDesc["childValueFieldTemplate"]
       del fieldDesc["type"]
-      fieldDesc["getSibilingFieldData"] = self.getSibilingFieldData
       field = fieldKlass(**fieldDesc)
       self.fields[fieldName] = field
       if(field.required):

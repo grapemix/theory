@@ -150,7 +150,6 @@ class ModelUpsert(SimpleCommand):
           },
           "widgetIsContentChgTrigger": False,
           "required": False,
-          "isSingular": True,
           "initData": f["queryId"],
           "label": "id",
           "helpText": "",

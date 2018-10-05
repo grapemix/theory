@@ -5,7 +5,7 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 1,
     "type": ""
   },
@@ -18,7 +18,7 @@
     "name": "appName",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": \"theory.apps\", \"label\": \"Application Name\", \"choices\": [], \"helpText\": \"The name of applications to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": true, \"type\": \"ChoiceField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": \"theory.apps\", \"label\": \"Application Name\", \"choices\": [], \"helpText\": \"The name of applications to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": true, \"type\": \"ChoiceField\"}",
     "command": 1,
     "type": ""
   },
@@ -31,7 +31,7 @@
     "name": "modelName",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": null, \"label\": \"Model Name\", \"choices\": [], \"helpText\": \"The name of models to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": null, \"label\": \"Model Name\", \"choices\": [], \"helpText\": \"The name of models to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
     "command": 1,
     "type": ""
   },
@@ -44,7 +44,7 @@
     "name": "queryset",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"invalidPkValue\": \"\\\"%(pk)s\\\" is not a valid value for a primary key.\", \"list\": \"Enter a list of values.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\", \"required\": \"This field is required.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"queryset\": {\"idLst\": [\"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\"], \"modelName\": \"AppModel\", \"appName\": \"theory.apps\"}, \"isSingular\": true, \"initData\": [], \"label\": \"Queryset\", \"helpText\": \"The queryset to be processed\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ModelMultipleChoiceField\"}",
+    "param": "{\"errorMessages\": {\"invalidPkValue\": \"\\\"%(pk)s\\\" is not a valid value for a primary key.\", \"list\": \"Enter a list of values.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\", \"required\": \"This field is required.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"queryset\": {\"idLst\": [\"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\"], \"modelName\": \"AppModel\", \"appName\": \"theory.apps\"}, \"initData\": [], \"label\": \"Queryset\", \"helpText\": \"The queryset to be processed\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ModelMultipleChoiceField\"}",
     "command": 1,
     "type": ""
   },
@@ -57,7 +57,7 @@
     "name": "queryFilter",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"lenUnmatch\": \"The length of various fields unmatch.\", \"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": {}, \"label\": \"QueryFilter\", \"childValueFieldTemplate\": \"TextField\", \"helpText\": \"The simple filter being applied to the query\", \"showHiddenInitial\": false, \"localize\": false, \"childKeyFieldTemplate\": \"TextField\", \"widgetIsFocusChgTrigger\": false, \"type\": \"DictField\"}",
+    "param": "{\"errorMessages\": {\"lenUnmatch\": \"The length of various fields unmatch.\", \"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": {}, \"label\": \"QueryFilter\", \"childValueFieldTemplate\": \"TextField\", \"helpText\": \"The simple filter being applied to the query\", \"showHiddenInitial\": false, \"localize\": false, \"childKeyFieldTemplate\": \"TextField\", \"widgetIsFocusChgTrigger\": false, \"type\": \"DictField\"}",
     "command": 1,
     "type": ""
   },
@@ -70,7 +70,7 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 2,
     "type": ""
   },
@@ -83,7 +83,7 @@
     "name": "commandReady",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": null, \"label\": \"Command Ready\", \"choices\": [], \"helpText\": \"Select a command ready to be continued\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": null, \"label\": \"Command Ready\", \"choices\": [], \"helpText\": \"Select a command ready to be continued\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
     "command": 2,
     "type": ""
   },
@@ -96,7 +96,7 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 3,
     "type": ""
   },
@@ -109,7 +109,7 @@
     "name": "appLabelLst",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": [], \"label\": \"app label list\", \"helpText\": \"Restricts dumped data to the specified appLabel or appLabel.ModelName.\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": [], \"label\": \"app label list\", \"helpText\": \"Restricts dumped data to the specified appLabel or appLabel.ModelName.\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
     "command": 3,
     "type": ""
   },
@@ -122,7 +122,7 @@
     "name": "format",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": \"json\", \"label\": \"format\", \"choices\": [[\"json\", \"json\"]], \"helpText\": \"Specifies the output serialization format for fixtures.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": \"json\", \"label\": \"format\", \"choices\": [[\"json\", \"json\"]], \"helpText\": \"Specifies the output serialization format for fixtures.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
     "command": 3,
     "type": ""
   },
@@ -135,7 +135,7 @@
     "name": "indent",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": 2, \"label\": \"indent\", \"helpText\": \"Specifies the indent level to use when pretty-printing output.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": 2, \"label\": \"indent\", \"helpText\": \"Specifies the indent level to use when pretty-printing output.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 3,
     "type": ""
   },
@@ -148,7 +148,7 @@
     "name": "database",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": \"default\", \"label\": \"database\", \"helpText\": \"('Nominates a specific database to dump fixtures from.', 'Defaults to the \\\"default\\\" database.')\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": \"default\", \"label\": \"database\", \"helpText\": \"('Nominates a specific database to dump fixtures from.', 'Defaults to the \\\"default\\\" database.')\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
     "command": 3,
     "type": ""
   },
@@ -161,7 +161,7 @@
     "name": "excludeLst",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": [], \"label\": \"exclude list\", \"helpText\": \"appLabel or appLabel.ModelName to exclude \", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": [], \"label\": \"exclude list\", \"helpText\": \"appLabel or appLabel.ModelName to exclude \", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
     "command": 3,
     "type": ""
   },
@@ -174,7 +174,7 @@
     "name": "isNature",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is nature\", \"helpText\": \"Use natural keys if they are available\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": false, \"label\": \"is nature\", \"helpText\": \"Use natural keys if they are available\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
     "command": 3,
     "type": ""
   },
@@ -187,7 +187,7 @@
     "name": "isNatureForeign",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is nature foreign\", \"helpText\": \"Use natural foreign keys if they are available.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": false, \"label\": \"is nature foreign\", \"helpText\": \"Use natural foreign keys if they are available.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
     "command": 3,
     "type": ""
   },
@@ -200,7 +200,7 @@
     "name": "isNaturePrimary",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is nature primary\", \"helpText\": \"Use natural primary keys if they are available.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": false, \"label\": \"is nature primary\", \"helpText\": \"Use natural primary keys if they are available.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
     "command": 3,
     "type": ""
   },
@@ -213,7 +213,7 @@
     "name": "isUseBaseManager",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is use base manager\", \"helpText\": \"(\\\"Use Theory's base manager to dump all models stored in the database, \\\", 'including those that would otherwise be filtered or modified by ', 'a custom manager.')\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": false, \"label\": \"is use base manager\", \"helpText\": \"(\\\"Use Theory's base manager to dump all models stored in the database, \\\", 'including those that would otherwise be filtered or modified by ', 'a custom manager.')\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
     "command": 3,
     "type": ""
   },
@@ -226,7 +226,7 @@
     "name": "primaryKeyLst",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": [], \"label\": \"primary key list\", \"helpText\": \"('Only dump objects with given primary keys. ', 'Accepts a comma separated list of keys. ', 'This option will only work when you specify one model.')\", \"childFieldTemplate\": \"IntegerField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": [], \"label\": \"primary key list\", \"helpText\": \"('Only dump objects with given primary keys. ', 'Accepts a comma separated list of keys. ', 'This option will only work when you specify one model.')\", \"childFieldTemplate\": \"IntegerField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
     "command": 3,
     "type": ""
   },
@@ -239,7 +239,7 @@
     "name": "output",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": \"\", \"label\": \"output\", \"helpText\": \"Specifies file to which the output is written.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": \"\", \"label\": \"output\", \"helpText\": \"Specifies file to which the output is written.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
     "command": 3,
     "type": ""
   },
@@ -252,7 +252,7 @@
     "name": "isShowTraceback",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is show traceback\", \"helpText\": \"Show traceback if they are available.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": false, \"label\": \"is show traceback\", \"helpText\": \"Show traceback if they are available.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
     "command": 3,
     "type": ""
   },
@@ -265,7 +265,7 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 4,
     "type": ""
   },
@@ -278,7 +278,7 @@
     "name": "appLabelLst",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": [], \"label\": \"Application Name\", \"helpText\": \"Specify the app label(s) to create migrations for.\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": [], \"label\": \"Application Name\", \"helpText\": \"Specify the app label(s) to create migrations for.\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
     "command": 4,
     "type": ""
   },
@@ -291,7 +291,7 @@
     "name": "isDryRun",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is dry run\", \"helpText\": \"Just show what migrations would be made; don't actually write them.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": false, \"label\": \"is dry run\", \"helpText\": \"Just show what migrations would be made; don't actually write them.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
     "command": 4,
     "type": ""
   },
@@ -304,7 +304,7 @@
     "name": "isMerge",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is merge\", \"helpText\": \"Enable fixing of migration conflicts.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": false, \"label\": \"is merge\", \"helpText\": \"Enable fixing of migration conflicts.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
     "command": 4,
     "type": ""
   },
@@ -317,7 +317,7 @@
     "name": "isEmpty",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is empty\", \"helpText\": \"Create an empty migration.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": false, \"label\": \"is empty\", \"helpText\": \"Create an empty migration.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
     "command": 4,
     "type": ""
   },
@@ -343,7 +343,7 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 5,
     "type": ""
   },
@@ -356,7 +356,7 @@
     "name": "appNameLst",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"invalidList\": \"Enter a list of values.\", \"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": null, \"label\": \"Application Name\", \"choices\": [], \"helpText\": \"The name of applications to be managed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"MultipleChoiceField\"}",
+    "param": "{\"errorMessages\": {\"invalidList\": \"Enter a list of values.\", \"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": null, \"label\": \"Application Name\", \"choices\": [], \"helpText\": \"The name of applications to be managed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"MultipleChoiceField\"}",
     "command": 5,
     "type": ""
   },
@@ -369,7 +369,7 @@
     "name": "action",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": \"backup\", \"label\": \"Action\", \"choices\": [[\"backup\", \"backup\"], [\"drop\", \"drop\"]], \"helpText\": \"Backup is only available for third-party apps\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": \"backup\", \"label\": \"Action\", \"choices\": [[\"backup\", \"backup\"], [\"drop\", \"drop\"]], \"helpText\": \"Backup is only available for third-party apps\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
     "command": 5,
     "type": ""
   },
@@ -382,7 +382,7 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 6,
     "type": ""
   },
@@ -395,7 +395,7 @@
     "name": "appName",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": \"theory.apps\", \"label\": \"Application Name\", \"choices\": [], \"helpText\": \"The name of applications to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": true, \"type\": \"ChoiceField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": \"theory.apps\", \"label\": \"Application Name\", \"choices\": [], \"helpText\": \"The name of applications to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": true, \"type\": \"ChoiceField\"}",
     "command": 6,
     "type": ""
   },
@@ -408,7 +408,7 @@
     "name": "modelName",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": null, \"label\": \"Model Name\", \"choices\": [], \"helpText\": \"The name of models to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": null, \"label\": \"Model Name\", \"choices\": [], \"helpText\": \"The name of models to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
     "command": 6,
     "type": ""
   },
@@ -421,7 +421,7 @@
     "name": "queryset",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"invalidPkValue\": \"\\\"%(pk)s\\\" is not a valid value for a primary key.\", \"list\": \"Enter a list of values.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\", \"required\": \"This field is required.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"queryset\": {\"idLst\": [\"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\"], \"modelName\": \"AppModel\", \"appName\": \"theory.apps\"}, \"isSingular\": true, \"initData\": [], \"label\": \"Queryset\", \"helpText\": \"The queryset to be processed\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ModelMultipleChoiceField\"}",
+    "param": "{\"errorMessages\": {\"invalidPkValue\": \"\\\"%(pk)s\\\" is not a valid value for a primary key.\", \"list\": \"Enter a list of values.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\", \"required\": \"This field is required.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"queryset\": {\"idLst\": [\"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\"], \"modelName\": \"AppModel\", \"appName\": \"theory.apps\"}, \"initData\": [], \"label\": \"Queryset\", \"helpText\": \"The queryset to be processed\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ModelMultipleChoiceField\"}",
     "command": 6,
     "type": ""
   },
@@ -434,7 +434,7 @@
     "name": "queryFilter",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"lenUnmatch\": \"The length of various fields unmatch.\", \"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": {}, \"label\": \"QueryFilter\", \"childValueFieldTemplate\": \"TextField\", \"helpText\": \"The simple filter being applied to the query\", \"showHiddenInitial\": false, \"localize\": false, \"childKeyFieldTemplate\": \"TextField\", \"widgetIsFocusChgTrigger\": false, \"type\": \"DictField\"}",
+    "param": "{\"errorMessages\": {\"lenUnmatch\": \"The length of various fields unmatch.\", \"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": {}, \"label\": \"QueryFilter\", \"childValueFieldTemplate\": \"TextField\", \"helpText\": \"The simple filter being applied to the query\", \"showHiddenInitial\": false, \"localize\": false, \"childKeyFieldTemplate\": \"TextField\", \"widgetIsFocusChgTrigger\": false, \"type\": \"DictField\"}",
     "command": 6,
     "type": ""
   },
@@ -447,7 +447,7 @@
     "name": "verbosity",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": 1, \"label\": \"Verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": 1, \"label\": \"Verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 7,
     "type": ""
   },
@@ -460,7 +460,7 @@
     "name": "testRunner",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"wrong_classtype\": \"The given class is not matched\", \"invalid\": \"Unable to import the given class\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": \"\", \"label\": \"Test Runner\", \"helpText\": \"The python class of testcase runner being used\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"PythonClassField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"wrong_classtype\": \"The given class is not matched\", \"invalid\": \"Unable to import the given class\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": \"\", \"label\": \"Test Runner\", \"helpText\": \"The python class of testcase runner being used\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"PythonClassField\"}",
     "command": 7,
     "type": ""
   },
@@ -473,7 +473,7 @@
     "name": "testLabel",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": [], \"label\": \"Test Label\", \"helpText\": \"Labels must be of the form: - app.TestClass.test_method\\nRun a single specific test method - app.TestClass\\nRun all the test methods in a given class - app\\nSearch for doctests and unittests in the named application.\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": [], \"label\": \"Test Label\", \"helpText\": \"Labels must be of the form: - app.TestClass.test_method\\nRun a single specific test method - app.TestClass\\nRun all the test methods in a given class - app\\nSearch for doctests and unittests in the named application.\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
     "command": 7,
     "type": ""
   },
@@ -486,7 +486,7 @@
     "name": "testRunnerClassParam",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"lenUnmatch\": \"The length of various fields unmatch.\", \"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": {}, \"label\": \"Test Runner Class Parameter\", \"childValueFieldTemplate\": \"TextField\", \"helpText\": \"The parameter passed to the test runner class constructor\", \"showHiddenInitial\": false, \"localize\": false, \"childKeyFieldTemplate\": \"TextField\", \"widgetIsFocusChgTrigger\": false, \"type\": \"DictField\"}",
+    "param": "{\"errorMessages\": {\"lenUnmatch\": \"The length of various fields unmatch.\", \"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": {}, \"label\": \"Test Runner Class Parameter\", \"childValueFieldTemplate\": \"TextField\", \"helpText\": \"The parameter passed to the test runner class constructor\", \"showHiddenInitial\": false, \"localize\": false, \"childKeyFieldTemplate\": \"TextField\", \"widgetIsFocusChgTrigger\": false, \"type\": \"DictField\"}",
     "command": 7,
     "type": ""
   },
@@ -512,7 +512,7 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 8,
     "type": ""
   },
@@ -525,7 +525,7 @@
     "name": "appName",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": \"all\", \"label\": \"Application Name\", \"choices\": [], \"helpText\": \"Commands provided by this application\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": \"all\", \"label\": \"Application Name\", \"choices\": [], \"helpText\": \"Commands provided by this application\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
     "command": 8,
     "type": ""
   },
@@ -538,7 +538,7 @@
     "name": "mood",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": \"all\", \"label\": \"Mood\", \"choices\": [], \"helpText\": \"Commands provided by this mood\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": \"all\", \"label\": \"Mood\", \"choices\": [], \"helpText\": \"Commands provided by this mood\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
     "command": 8,
     "type": ""
   },
@@ -577,7 +577,7 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 9,
     "type": ""
   },
@@ -590,7 +590,7 @@
     "name": "appName",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": \"theory.apps\", \"label\": \"Application Name\", \"choices\": [], \"helpText\": \"The name of applications to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": \"theory.apps\", \"label\": \"Application Name\", \"choices\": [], \"helpText\": \"The name of applications to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
     "command": 9,
     "type": ""
   },
@@ -603,7 +603,7 @@
     "name": "cmdName",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": null, \"label\": \"Command Name\", \"helpText\": \" The name of command being created in lowercase.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": null, \"label\": \"Command Name\", \"helpText\": \" The name of command being created in lowercase.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
     "command": 9,
     "type": ""
   },
@@ -616,7 +616,7 @@
     "name": "cmdType",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": \"SimpleCommand\", \"label\": \"Command Type\", \"choices\": [[\"SimpleCommand\", \"SimpleCommand\"], [\"AsyncCommand\", \"AsyncCommand\"]], \"helpText\": \"The name of application being used\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": \"SimpleCommand\", \"label\": \"Command Type\", \"choices\": [[\"SimpleCommand\", \"SimpleCommand\"], [\"AsyncCommand\", \"AsyncCommand\"]], \"helpText\": \"The name of application being used\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
     "command": 9,
     "type": ""
   },
@@ -629,7 +629,7 @@
     "name": "propertyNameLst",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": [], \"label\": \"Property Name List\", \"helpText\": \" The name list of property being created\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": [], \"label\": \"Property Name List\", \"helpText\": \" The name list of property being created\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
     "command": 9,
     "type": ""
   },
@@ -642,7 +642,7 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 10,
     "type": ""
   },
@@ -655,7 +655,7 @@
     "name": "appName",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": \"theory.apps\", \"label\": \"Application Name\", \"choices\": [], \"helpText\": \"The name of applications to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": true, \"type\": \"ChoiceField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": \"theory.apps\", \"label\": \"Application Name\", \"choices\": [], \"helpText\": \"The name of applications to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": true, \"type\": \"ChoiceField\"}",
     "command": 10,
     "type": ""
   },
@@ -668,7 +668,7 @@
     "name": "modelName",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": null, \"label\": \"Model Name\", \"choices\": [], \"helpText\": \"The name of models to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": null, \"label\": \"Model Name\", \"choices\": [], \"helpText\": \"The name of models to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
     "command": 10,
     "type": ""
   },
@@ -681,7 +681,7 @@
     "name": "queryset",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"invalidPkValue\": \"\\\"%(pk)s\\\" is not a valid value for a primary key.\", \"list\": \"Enter a list of values.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\", \"required\": \"This field is required.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"queryset\": {\"idLst\": [\"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\"], \"modelName\": \"AppModel\", \"appName\": \"theory.apps\"}, \"isSingular\": true, \"initData\": [], \"label\": \"Queryset\", \"helpText\": \"The queryset to be processed\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ModelMultipleChoiceField\"}",
+    "param": "{\"errorMessages\": {\"invalidPkValue\": \"\\\"%(pk)s\\\" is not a valid value for a primary key.\", \"list\": \"Enter a list of values.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\", \"required\": \"This field is required.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"queryset\": {\"idLst\": [\"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\"], \"modelName\": \"AppModel\", \"appName\": \"theory.apps\"}, \"initData\": [], \"label\": \"Queryset\", \"helpText\": \"The queryset to be processed\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ModelMultipleChoiceField\"}",
     "command": 10,
     "type": ""
   },
@@ -694,7 +694,7 @@
     "name": "queryFilter",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"lenUnmatch\": \"The length of various fields unmatch.\", \"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": {}, \"label\": \"QueryFilter\", \"childValueFieldTemplate\": \"TextField\", \"helpText\": \"The simple filter being applied to the query\", \"showHiddenInitial\": false, \"localize\": false, \"childKeyFieldTemplate\": \"TextField\", \"widgetIsFocusChgTrigger\": false, \"type\": \"DictField\"}",
+    "param": "{\"errorMessages\": {\"lenUnmatch\": \"The length of various fields unmatch.\", \"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": {}, \"label\": \"QueryFilter\", \"childValueFieldTemplate\": \"TextField\", \"helpText\": \"The simple filter being applied to the query\", \"showHiddenInitial\": false, \"localize\": false, \"childKeyFieldTemplate\": \"TextField\", \"widgetIsFocusChgTrigger\": false, \"type\": \"DictField\"}",
     "command": 10,
     "type": ""
   },
@@ -707,7 +707,7 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 11,
     "type": ""
   },
@@ -720,7 +720,7 @@
     "name": "database",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": \"default\", \"label\": \"database\", \"helpText\": \"('Nominates a specific database to load fixtures into.', 'Defaults to the \\\"default\\\" database.')\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": \"default\", \"label\": \"database\", \"helpText\": \"('Nominates a specific database to load fixtures into.', 'Defaults to the \\\"default\\\" database.')\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
     "command": 11,
     "type": ""
   },
@@ -733,7 +733,7 @@
     "name": "isLoadInitData",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is loading initial data\", \"helpText\": \"('Tells Theory not to load any initial data after database ', 'synchronization.')\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": false, \"label\": \"is loading initial data\", \"helpText\": \"('Tells Theory not to load any initial data after database ', 'synchronization.')\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
     "command": 11,
     "type": ""
   },
@@ -746,7 +746,7 @@
     "name": "isResetSequence",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": true, \"label\": \"is reseting sequence\", \"helpText\": \"is reseting sequence\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": true, \"label\": \"is reseting sequence\", \"helpText\": \"is reseting sequence\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
     "command": 11,
     "type": ""
   },
@@ -759,7 +759,7 @@
     "name": "isAllowCascade",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is allowing cascade\", \"helpText\": \"is allowing cascade\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": false, \"label\": \"is allowing cascade\", \"helpText\": \"is allowing cascade\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
     "command": 11,
     "type": ""
   },
@@ -772,7 +772,7 @@
     "name": "isInhibitPostMigrate",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is inhibiting post-migrate\", \"helpText\": \"is inhibiting post-migrate\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": false, \"label\": \"is inhibiting post-migrate\", \"helpText\": \"is inhibiting post-migrate\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
     "command": 11,
     "type": ""
   },
@@ -785,7 +785,7 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 12,
     "type": ""
   },
@@ -798,7 +798,7 @@
     "name": "rootLst",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": [], \"label\": \"Root Directory List\", \"helpText\": \"\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": [], \"label\": \"Root Directory List\", \"helpText\": \"\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
     "command": 12,
     "type": ""
   },
@@ -811,7 +811,7 @@
     "name": "yieldMethod",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"Yield Method\", \"choices\": [[1, \"All\"], [2, \"File\"], [3, \"Line\"], [4, \"Chunk\"]], \"helpText\": \"how to send the filename in each iteration\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": 1, \"label\": \"Yield Method\", \"choices\": [[1, \"All\"], [2, \"File\"], [3, \"Line\"], [4, \"Chunk\"]], \"helpText\": \"how to send the filename in each iteration\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
     "command": 12,
     "type": ""
   },
@@ -824,7 +824,7 @@
     "name": "depth",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 0, \"label\": \"Depth\", \"helpText\": \"The recursion level. (0 = not recursive, -1 = recursive infinitely)\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": 0, \"label\": \"Depth\", \"helpText\": \"The recursion level. (0 = not recursive, -1 = recursive infinitely)\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 12,
     "type": ""
   },
@@ -837,7 +837,7 @@
     "name": "includeFileExtLst",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": [], \"label\": \"The list of file extension being included\", \"helpText\": \"File extenstion being included\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": [], \"label\": \"The list of file extension being included\", \"helpText\": \"File extenstion being included\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
     "command": 12,
     "type": ""
   },
@@ -850,7 +850,7 @@
     "name": "excludeFileExtLst",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": [], \"label\": \"The list of file extension being excluded\", \"helpText\": \"File extenstion being excluded\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": [], \"label\": \"The list of file extension being excluded\", \"helpText\": \"File extenstion being excluded\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
     "command": 12,
     "type": ""
   },
@@ -863,7 +863,7 @@
     "name": "includeDirLst",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": [], \"label\": \"The list of directory being included\", \"helpText\": \"Directory being included\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": [], \"label\": \"The list of directory being included\", \"helpText\": \"Directory being included\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
     "command": 12,
     "type": ""
   },
@@ -876,7 +876,7 @@
     "name": "excludeDirLst",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": [], \"label\": \"The list of directory being excluded\", \"helpText\": \"Directory being excluded\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": [], \"label\": \"The list of directory being excluded\", \"helpText\": \"Directory being excluded\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
     "command": 12,
     "type": ""
   },
@@ -928,7 +928,7 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 13,
     "type": ""
   },
@@ -941,7 +941,7 @@
     "name": "fixtureLabelLst",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": [], \"label\": \"Fixture Label\", \"helpText\": \"Fixture labels\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a list of values.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": [], \"label\": \"Fixture Label\", \"helpText\": \"Fixture labels\", \"childFieldTemplate\": \"TextField\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ListField\"}",
     "command": 13,
     "type": ""
   },
@@ -954,7 +954,7 @@
     "name": "database",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": \"default\", \"label\": \"database\", \"helpText\": \"(u'Nominates a specific database to load fixture into.', u'Defaults to the \\\"default\\\" database.')\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": \"default\", \"label\": \"database\", \"helpText\": \"(u'Nominates a specific database to load fixture into.', u'Defaults to the \\\"default\\\" database.')\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
     "command": 13,
     "type": ""
   },
@@ -967,7 +967,7 @@
     "name": "appLabel",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": null, \"label\": \"Application Label\", \"helpText\": \" The name of application being loaded\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": null, \"label\": \"Application Label\", \"helpText\": \" The name of application being loaded\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
     "command": 13,
     "type": ""
   },
@@ -980,7 +980,7 @@
     "name": "isIgnorenonexistent",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is ignore non existent\", \"helpText\": \"(u'Ignores entries in the serialized data for fields that do not ', u'currently exist on the model.')\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": false, \"label\": \"is ignore non existent\", \"helpText\": \"(u'Ignores entries in the serialized data for fields that do not ', u'currently exist on the model.')\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
     "command": 13,
     "type": ""
   },
@@ -993,7 +993,7 @@
     "name": "isHideEmpty",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is hiding empty\", \"helpText\": \"is hiding empty\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": false, \"label\": \"is hiding empty\", \"helpText\": \"is hiding empty\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
     "command": 13,
     "type": ""
   },
@@ -1006,7 +1006,7 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 14,
     "type": ""
   },
@@ -1019,7 +1019,7 @@
     "name": "appName",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": null, \"label\": \"Application Name\", \"helpText\": \" The name of application being created\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": null, \"label\": \"Application Name\", \"helpText\": \" The name of application being created\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
     "command": 14,
     "type": ""
   },
@@ -1032,7 +1032,7 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 15,
     "type": ""
   },
@@ -1058,7 +1058,7 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 16,
     "type": ""
   },
@@ -1071,7 +1071,7 @@
     "name": "appName",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": \"theory.apps\", \"label\": \"Application Name\", \"choices\": [], \"helpText\": \"The name of applications to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": true, \"type\": \"ChoiceField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": \"theory.apps\", \"label\": \"Application Name\", \"choices\": [], \"helpText\": \"The name of applications to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": true, \"type\": \"ChoiceField\"}",
     "command": 16,
     "type": ""
   },
@@ -1084,7 +1084,7 @@
     "name": "modelName",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": null, \"label\": \"Model Name\", \"choices\": [], \"helpText\": \"The name of models to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": null, \"label\": \"Model Name\", \"choices\": [], \"helpText\": \"The name of models to be listed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
     "command": 16,
     "type": ""
   },
@@ -1097,7 +1097,7 @@
     "name": "queryId",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"configInvalid\": \"Configuration has been invalid\", \"modelInvalid\": \"No model has been set\", \"required\": \"This field is required.\", \"invalid\": \"Unable to import the given queryset\", \"dbInvalid\": \"Unable to find data in DB\", \"appInvalid\": \"No app has been set\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": null, \"label\": \"instance id\", \"helpText\": \"The instance to be edited\", \"appFieldName\": \"appName\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"DynamicModelIdField\", \"modelFieldName\": \"modelName\"}",
+    "param": "{\"errorMessages\": {\"configInvalid\": \"Configuration has been invalid\", \"modelInvalid\": \"No model has been set\", \"required\": \"This field is required.\", \"invalid\": \"Unable to import the given queryset\", \"dbInvalid\": \"Unable to find data in DB\", \"appInvalid\": \"No app has been set\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": null, \"label\": \"instance id\", \"helpText\": \"The instance to be edited\", \"appFieldName\": \"appName\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"DynamicModelIdField\", \"modelFieldName\": \"modelName\"}",
     "command": 16,
     "type": ""
   },
@@ -1110,7 +1110,7 @@
     "name": "isInNewWindow",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"Is in new window\", \"helpText\": \"Is shown in new window\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": false, \"label\": \"Is in new window\", \"helpText\": \"Is shown in new window\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
     "command": 16,
     "type": ""
   },
@@ -1136,7 +1136,7 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 17,
     "type": ""
   },
@@ -1149,7 +1149,7 @@
     "name": "moodName",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": null, \"label\": \"Mood Name\", \"choices\": [], \"helpText\": \"The name of mood being used\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": null, \"label\": \"Mood Name\", \"choices\": [], \"helpText\": \"The name of mood being used\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"ChoiceField\"}",
     "command": 17,
     "type": ""
   },
@@ -1162,7 +1162,7 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 18,
     "type": ""
   },
@@ -1175,7 +1175,7 @@
     "name": "appLabel",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": null, \"label\": \"Application Name\", \"helpText\": \" The name of application being created\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": null, \"label\": \"Application Name\", \"helpText\": \" The name of application being created\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
     "command": 18,
     "type": ""
   },
@@ -1188,7 +1188,7 @@
     "name": "isInitialData",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": false, \"label\": \"is initial data\", \"helpText\": \"Tells Theory not to load any initial data after database synchronization.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": false, \"label\": \"is initial data\", \"helpText\": \"Tells Theory not to load any initial data after database synchronization.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
     "command": 18,
     "type": ""
   },
@@ -1201,7 +1201,7 @@
     "name": "database",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": \"default\", \"label\": \"database\", \"helpText\": \"(u'Nominates a database to synchronize.', u'Defaults to the \\\"default\\\" database.')\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": \"default\", \"label\": \"database\", \"helpText\": \"(u'Nominates a database to synchronize.', u'Defaults to the \\\"default\\\" database.')\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
     "command": 18,
     "type": ""
   },
@@ -1214,7 +1214,7 @@
     "name": "migrationName",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": null, \"label\": \"Migration Name\", \"helpText\": \"Database state will be brought to the state after that migration.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": null, \"label\": \"Migration Name\", \"helpText\": \"Database state will be brought to the state after that migration.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"TextField\"}",
     "command": 18,
     "type": ""
   },
@@ -1227,7 +1227,7 @@
     "name": "isFake",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": false, \"label\": \"is fake\", \"helpText\": \"Mark migrations as run without actually running them\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": false, \"label\": \"is fake\", \"helpText\": \"Mark migrations as run without actually running them\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
     "command": 18,
     "type": ""
   },
@@ -1240,7 +1240,7 @@
     "name": "isList",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is list\", \"helpText\": \"Show a list of all known migrations and which are applied\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": false, \"label\": \"is list\", \"helpText\": \"Show a list of all known migrations and which are applied\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
     "command": 18,
     "type": ""
   },
@@ -1253,7 +1253,7 @@
     "name": "isShowTraceback",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is show traceback\", \"helpText\": \"Show traceback if they are available.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": false, \"label\": \"is show traceback\", \"helpText\": \"Show traceback if they are available.\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
     "command": 18,
     "type": ""
   },
@@ -1266,7 +1266,7 @@
     "name": "isTestDatabase",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is test database\", \"helpText\": \"is test database\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": false, \"label\": \"is test database\", \"helpText\": \"is test database\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
     "command": 18,
     "type": ""
   },
@@ -1279,7 +1279,7 @@
     "name": "isTestFlush",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": false, \"label\": \"is test flushing database\", \"helpText\": \"is test flushing database\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": false, \"label\": \"is test flushing database\", \"helpText\": \"is test flushing database\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"BooleanField\"}",
     "command": 18,
     "type": ""
   },
@@ -1292,7 +1292,7 @@
     "name": "verbosity",
     "isOptional": true,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"isSingular\": true, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
+    "param": "{\"errorMessages\": {\"required\": \"This field is required.\", \"invalid\": \"Enter a whole number.\"}, \"widgetIsContentChgTrigger\": false, \"required\": false, \"initData\": 1, \"label\": \"verbosity\", \"helpText\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"IntegerField\"}",
     "command": 19,
     "type": ""
   },
@@ -1305,7 +1305,7 @@
     "name": "appNameLst",
     "isOptional": false,
     "isReadOnly": false,
-    "param": "{\"errorMessages\": {\"invalidList\": \"Enter a list of values.\", \"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"isSingular\": true, \"initData\": null, \"label\": \"Application Name\", \"choices\": [], \"helpText\": \"The name of application being probed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"MultipleChoiceField\"}",
+    "param": "{\"errorMessages\": {\"invalidList\": \"Enter a list of values.\", \"required\": \"This field is required.\", \"invalidChoice\": \"Select a valid choice. %(value)s is not one of the available choices.\", \"invalid\": \"Enter a valid value.\"}, \"widgetIsContentChgTrigger\": false, \"required\": true, \"initData\": null, \"label\": \"Application Name\", \"choices\": [], \"helpText\": \"The name of application being probed\", \"dynamicChoiceLst\": \"\", \"showHiddenInitial\": false, \"localize\": false, \"widgetIsFocusChgTrigger\": false, \"type\": \"MultipleChoiceField\"}",
     "command": 19,
     "type": ""
   },

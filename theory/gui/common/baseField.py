@@ -85,7 +85,6 @@ class Field(object):
   def __init__(self, required=True, label=None, initData=None,
          helpText=None, errorMessages=None, showHiddenInitial=False,
          validators=[], localize=False, isSkipInHistory=False, widget=None,
-         isSingular=True, getSibilingFieldData=None,
          uiPropagate={},):
     # required -- Boolean that specifies whether the field is required.
     #             True by default.
@@ -107,7 +106,6 @@ class Field(object):
     # validators -- List of additional validators to use
     # localize -- Boolean that specifies if the field should be localized.
     # widget -- Default widget to use when rendering this type of Field.
-    # isSingular -- Boolean that specifies if not interact with other fields
     if label is not None:
       label = smartText(label)
     self.required, self.label, self.initData = required, label, initData
@@ -136,12 +134,6 @@ class Field(object):
 
     # should we skip recording this field into history
     self.isSkipInHistory = isSkipInHistory
-    self.isSingular = isSingular # not interact with other fields
-
-    if getSibilingFieldData is None:
-      self.getSibilingFieldData = lambda x: None
-    else:
-      self.getSibilingFieldData = getSibilingFieldData
 
     self.uiPropagate = uiPropagate
 

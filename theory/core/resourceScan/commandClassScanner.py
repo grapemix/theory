@@ -50,7 +50,6 @@ class CommandClassScanner(BaseClassScanner):
     for i in [
         'helpText',
         'initData',
-        'isSingular',
         'label',
         'localize',
         'required',

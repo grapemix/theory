@@ -28,7 +28,6 @@ class TheoryModelFormDataHandler(TheoryModelDetectorBase):
   fieldParamTmpl = {
       "widgetIsFocusChgTrigger": False,
       "widgetIsContentChgTrigger":  False,
-      "isSingular": True,
       }
 
   def _buildTypeCatMap(self):
@@ -164,7 +163,6 @@ class TheoryModelFormDataHandler(TheoryModelDetectorBase):
   #    for i in [
   #        'helpText',
   #        'initData',
-  #        'isSingular',
   #        'label',
   #        'localize',
   #        'required',
