@@ -2024,18 +2024,20 @@ class DynamicModelSetField(DynamicModelIdField):
     self._finalData = finalData
 
 class QuerysetField(Field):
+  widget = QueryIdInput
   defaultErrorMessages = {
     'invalid': _('Unable to import the given queryset'),
     'dbInvalid': _('Unable to find data in DB'),
     'appInvalid': _('No app has been set'),
-    'modelInvalid': _('No model has been set'),
+    'mdlInvalid': _('No model has been set'),
     'configInvalid': _('Configuration has been invalid'),
   }
 
-  def __init__(self, appName=None, modelName=None, *args, **kwargs):
+  def __init__(self, appName=None, mdlName=None, maxLen=-1, *args, **kwargs):
     super(QuerysetField, self).__init__(*args, **kwargs)
-    self.appName = appName
-    self.modelName = modelName
+    self._appName = appName
+    self._mdlName = mdlName
+    self.maxLen = maxLen
 
   @property
   def appName(self):
@@ -2043,21 +2045,25 @@ class QuerysetField(Field):
 
   @appName.setter
   def appName(self, appName):
-    if(not isclass(self.widget)):
-      # When form level app change, widget's app ref should also be changed
-      self.widget.app = appName
     self._appName = appName
+    if not isclass(self.widget):
+      # When form level app change, widget's ref should also be changed
+      self.widget.attrs["appName"] = appName
+      # force reset
+      self.widget.fieldSetter({"finalData": None})
 
   @property
-  def modelName(self):
-    return self._modelName
+  def mdlName(self):
+    return self._mdlName
 
-  @modelName.setter
-  def modelName(self, modelName):
-    if(not isclass(self.widget)):
-      # When form level model change, widget's model ref should also be changed
-      self.widget.model = modelName
-    self._modelName = modelName
+  @mdlName.setter
+  def mdlName(self, mdlName):
+    self._mdlName = mdlName
+    if not isclass(self.widget):
+      # When form level app change, widget's ref should also be changed
+      self.widget.attrs["mdlName"] = mdlName
+      # force reset
+      self.widget.fieldSetter({"finalData": None})
 
   def clean(self, value, isEmptyForgiven=False):
     """
@@ -2066,26 +2072,44 @@ class QuerysetField(Field):
 
     Raises ValidationError for any errors.
     """
+    if not isclass(self.widget):
+      # We don't clean anything in GUI. We trust data from server
+      return value
+
     self.validate(value)
     self.runValidators(value)
 
-    if(value==[] or value is None):
+    if not value:
       return []
+
+    if self.maxLen == 1:
+      if value is None or value == "None":
+        return value
+      elif type(value.__class__.__bases__[0]).__name__ == "ModelBase":
+        return value.id
 
     try:
       dbClass = importClass('{0}.model.{1}'.format(
         self.appName,
-        self.modelName
+        self.mdlName
         )
       )
-      # We are not actually return the new queryset, instead, we just check if
-      # the id set is in the given queryset
-      if len(value)!=\
-          dbClass.objects.filter(id__in=value).count():
-        raise ValidationError(
-            self.errorMessages['dbInvalid'] % {'value': value}
-        )
-    except:
+      if self.maxLen == 1:
+        # We are not actually return the new queryset, instead, we just check if
+        # the id set is in the given queryset
+        if dbClass.objects.filter(id=value).count() == 0:
+          raise ValidationError(
+              self.errorMessages['dbInvalid'] % {'value': value}
+          )
+      else:
+        if len(value) != dbClass.objects.filter(id__in=value).count():
+          raise ValidationError(
+              self.errorMessages['dbInvalid'] % {'value': value}
+          )
+    except Exception as e:
+      import logging
+      logger = logging.getLogger(__name__)
+      logger.error(e)
       raise ValidationError(
           self.errorMessages['dbInvalid'] % {'value': value}
       )
@@ -2096,27 +2120,74 @@ class QuerysetField(Field):
     """
     Validates if the input exists in the db
     """
-    value = super(QuerysetField, self).validate(value)
-    if(not value):
-      return value
+    if self.required and not value:
+      raise ValidationError(self.errorMessages['invalid'])
 
-    if(isclass(self.widget)):
+    if isclass(self.widget):
       return True
 
-    if(value!=[] and value is not None):
-      if(self.appName is None):
+    if self.required:
+      if self.appName is None:
         raise ValidationError(
             self.errorMessages['appInvalid'] % {'value': value}
         )
-      if(self.modelName is None):
+      if self.mdlName is None:
         raise ValidationError(
-            self.errorMessages['modelInvalid'] % {'value': value}
+            self.errorMessages['mdlInvalid'] % {'value': value}
         )
 
     return True
 
   def toPython(self, value):
-    return [str(i) for i in value]
+    if self.maxLen == 1:
+      return str(value)
+    else:
+      return [str(i) for i in value]
+
+  def getModelFieldNameSuffix(self):
+    if self.maxLen == 1:
+      return "Id"
+    else:
+      return "__m2m"
+
+  @property
+  def finalData(self):
+    """It is used to store data directly from widget before validation and
+    cleaning."""
+    # TODO: allow lazy update
+    if self._finalData in validators.EMPTY_VALUES:
+      if isclass(self.widget):
+        # return initial data if widget has not been rendered and finalData
+        # is empty
+        return self.initData
+      else:
+        # force update
+        self.widget.updateField()
+
+    # That is when we want data as pk instead of queryset
+    if self.maxLen == 1 \
+        and self._finalData is not None \
+        and isinstance(self._finalData, list):
+      return self._finalData[0]
+    else:
+      return self._finalData
+
+  @finalData.setter
+  def finalData(self, finalData):
+    if self.maxLen == 1 and not isinstance(finalData, list):
+      # Since we use QueryIdInput, we have to store data and take input as qs.
+      # Output will be int though
+      finalData = [finalData,]
+    self._finalData = finalData
+
+  def renderWidget(self, *args, **kwargs):
+    if("attrs" not in kwargs):
+      kwargs["attrs"] = {}
+    kwargs["attrs"].update({
+      "appName": self.appName,
+      "mdlName": self.mdlName
+    })
+    super(QuerysetField, self).renderWidget(*args, **kwargs)
 
 class ObjectIdField(Field):
   @property

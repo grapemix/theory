@@ -184,7 +184,7 @@ class CombinatoryFormWithDefaultValue(Form):
   pythonClassField = field.PythonClassField(initData=defaultValueSet1["PythonClass"])
   querysetField = field.QuerysetField(
     appName="theory.apps",
-    modelName="Command",
+    mdlName="Command",
     initData=defaultValueSet1["Queryset"]
   )
   appNameField = field.TextField(initData="theory.apps")

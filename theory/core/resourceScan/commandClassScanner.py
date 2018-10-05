@@ -65,6 +65,7 @@ class CommandClassScanner(BaseClassScanner):
         'childKeyFieldTemplate',
         'childValueFieldTemplate',
         'uiPropagate',
+        'maxLen',
         ]:
       if hasattr(field, i):
         val = getattr(field, i)
@@ -97,10 +98,13 @@ class CommandClassScanner(BaseClassScanner):
           # Since the val has to freshly generate everytime, stored val should
           # be empty
           val = ""
+        elif i == "maxLen" and val is None:
+          continue
         row[i] =  val
     return row
 
   def geneateModelFormFieldDesc(self, form):
+    # modelUpsert use this fxn
     r = OrderedDict()
     # If baseFields are used, then the modelForm won't get field value
     for fieldName, field in form.fields.iteritems():
@@ -135,8 +139,8 @@ class CommandClassScanner(BaseClassScanner):
           "widgetIsContentChgTrigger": \
               True if(hasattr(form, contentChgFxnName)) else False
           }
-      row = self.getParmFormFieldDesc(field, row)
 
+      row = self.getParmFormFieldDesc(field, row)
       cmdField.param = json.dumps(row, cls=TheoryJSONEncoder)
       self.cmdModel.cmdFieldSet.add(cmdField)
 
