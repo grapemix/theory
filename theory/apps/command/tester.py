@@ -56,10 +56,6 @@ class Tester(SimpleCommand):
         helpText="The parameter passed to the test runner class constructor",
         required=False,
         )
-    #verbosity = field.IntegerField(
-    #    label="Verbosity",
-    #    initData=1,
-    #    )
 
   @property
   def stdOut(self):
