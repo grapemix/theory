@@ -172,22 +172,48 @@ class RpcTerminalMixin(object):
       # TODO: integrate with std reactor error system
       paramForm.showErrInFieldLabel()
 
-  def initSpreadSheetBuilder(
-      self,
-      appName,
-      mdlName,
-      isEditable,
-      selectedIdLst,
-      parentSpreadSheetBuilder
-  ):
+  def fetchMoreRow(self, appName, mdlName, pageNum, pageSize, boolIdxLst):
     r = self.stub.getMdlTbl(
       theory_pb2.MdlTblReq(
         mdl=theory_pb2.MdlIden(
           appName=appName,
           mdlName=mdlName
         ),
-        pageNum=1,
-        pageSize=10,
+        pageNum=pageNum,
+        pageSize=pageSize,
+      )
+    )
+    mdlLst = [list(data.ListFields()[0][1]) for data in r.dataLst]
+    for colNum in boolIdxLst:
+      for mdl in mdlLst:
+        mdl[colNum] = True if mdl[colNum] == "1" else False
+    return mdlLst
+
+  def initSpreadSheetBuilder(
+      self,
+      appName,
+      mdlName,
+      isEditable,
+      selectedIdLst,
+      pageNum,
+      pageSize,
+      parentSpreadSheetBuilder
+  ):
+    spData = {
+      "appName": appName,
+      "mdlName": mdlName,
+      "pageNum": pageNum,
+      "pageSize": pageSize,
+      "boolIdxLst": [],
+    }
+    r = self.stub.getMdlTbl(
+      theory_pb2.MdlTblReq(
+        mdl=theory_pb2.MdlIden(
+          appName=appName,
+          mdlName=mdlName
+        ),
+        pageNum=spData["pageNum"],
+        pageSize=spData["pageSize"],
       )
     )
 
@@ -209,6 +235,7 @@ class RpcTerminalMixin(object):
     # Special treatment for bool field
     for colNum, fieldProp in enumerate(fieldNameVsProp.values()):
       if fieldProp["type"] == "bool":
+        spData["boolIdxLst"].append(colNum)
         for mdl in mdlLst:
           mdl[colNum] = True if mdl[colNum] == "1" else False
 
@@ -220,6 +247,8 @@ class RpcTerminalMixin(object):
         fieldNameVsProp,
         isEditable,
         selectedIdLst,
+        spData,
+        self.fetchMoreRow,
         self.upsertSpreadSheet,
         )
 
@@ -237,6 +266,8 @@ class RpcTerminalMixin(object):
       mdlName,
       isEditable,
       selectedIdLst,
+      pageNum,
+      pageSize,
       parentSpreadSheetBuilder
   ):
     spreadsheetBuilder = self.initSpreadSheetBuilder(
@@ -244,6 +275,8 @@ class RpcTerminalMixin(object):
       mdlName,
       isEditable,
       selectedIdLst,
+      pageNum,
+      pageSize,
       parentSpreadSheetBuilder
     )
 

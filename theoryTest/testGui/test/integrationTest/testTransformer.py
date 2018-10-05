@@ -62,12 +62,20 @@ class GtkSpreadsheetModelDataHandlerTestCaseBase(object):
   def setUp(self):
     CombinatoryModelWithDefaultValue().save()
 
+    self.spData = {
+      "appName": "testBase",
+      "mdlName": "CombinatoryModelWithDefaultValue",
+      "pageNum": 1,
+      "pageSize": 10,
+      "boolIdxLst": [],
+    }
+
     protoBufModelTblPaginator = ProtoBufModelTblPaginator()
     self.dataComplex = protoBufModelTblPaginator.run(
-        "testBase",
-        "CombinatoryModelWithDefaultValue",
-        1,
-        10
+        self.spData["appName"],
+        self.spData["mdlName"],
+        self.spData["pageNum"],
+        self.spData["pageSize"],
     )
     flatDataLst = []
     for grpcDataRow in self.dataComplex["dataLst"]:
@@ -86,6 +94,9 @@ class GtkSpreadsheetModelDataHandlerTestCaseBase(object):
     fieldNameVsProp = OrderedDict(fieldNameVsProp)
     self.dataComplex["fieldNameVsProp"] = fieldNameVsProp
 
+  def dummyFxn(self):
+    pass
+
   def test_getKlasslabel(self):
     spreadsheetBuilder = DummyGtkSpreadsheetBuilder()
     spreadsheetBuilder.run(
@@ -95,6 +106,8 @@ class GtkSpreadsheetModelDataHandlerTestCaseBase(object):
         self.dataComplex["fieldNameVsProp"],
         True,
         [],
+        self.spData,
+        self.dummyFxn,
         None
         )
 
@@ -209,6 +222,8 @@ class GtkSpreadsheetModelDataHandlerTestCaseBase(object):
         self.dataComplex["fieldNameVsProp"],
         True,
         [],
+        self.spData,
+        self.dummyFxn,
         None
         )
 
@@ -222,6 +237,8 @@ class GtkSpreadsheetModelDataHandlerTestCaseBase(object):
         self.dataComplex["fieldNameVsProp"],
         True,
         [],
+        self.spData,
+        self.dummyFxn,
         None
         )
 

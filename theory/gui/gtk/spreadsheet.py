@@ -3,6 +3,7 @@
 ##### System wide lib #####
 from collections import OrderedDict
 import gevent
+import notify2
 
 ##### Theory lib #####
 from theory.apps.model import AppModel
@@ -31,6 +32,8 @@ class Spreadsheet(object):
       renderKwargsSet,
       selectedIdLst,
       idLabelIdx,
+      spData,
+      fetchMoreRowFxn,
       showStackDataFxn
       ):
     self.window = gtk.Window()
@@ -40,6 +43,10 @@ class Spreadsheet(object):
     self.window.connect("delete-event", self.close_window)
     self.childSpreadSheetLst = []
     self.isMainWindow = True
+    self.selectedIdLst = selectedIdLst
+    self.idLabelIdx = idLabelIdx
+    self.spData = spData
+    self.fetchMoreRowFxn = fetchMoreRowFxn
 
     self.renderKwargsSet = renderKwargsSet
     self.showStackDataFxn = showStackDataFxn
@@ -52,18 +59,22 @@ class Spreadsheet(object):
 
     self.model = gtk.ListStore(*listStoreDataType)
 
-    for i in model:
-      # Since QuerysetField should allow None as initData which means untouched
-      # data
-      if selectedIdLst is not None and i[idLabelIdx] in selectedIdLst:
-        self.model.append(i + [False, True])
-      else:
-        self.model.append(i + [False, False])
+    self._appendToModel(model)
 
     self._switchToGeventLoop()
 
     self.create_interior()
     self.window.show_all()
+
+  def _appendToModel(self, model):
+    for i in model:
+      # Since QuerysetField should allow None as initData which means untouched
+      # data
+      if self.selectedIdLst is not None \
+          and i[self.idLabelIdx] in self.selectedIdLst:
+        self.model.append(i + [False, True])
+      else:
+        self.model.append(i + [False, False])
 
   def _switchToGeventLoop(self):
     gevent.sleep(0)
@@ -100,6 +111,10 @@ class Spreadsheet(object):
     # Set the appearance of the Button Box
     bbox.set_spacing(spacing)
 
+    button = gtk.Button(stock=gtk.STOCK_GO_FORWARD)
+    button.connect("clicked", self.fetchMore)
+    bbox.add(button)
+
     button = gtk.Button(stock=gtk.STOCK_OK)
     button.connect("clicked", self.close_window)
     bbox.add(button)
@@ -109,6 +124,19 @@ class Spreadsheet(object):
     bbox.add(button)
 
     return frame
+
+  def fetchMore(self, *args, **kwargs):
+    self.spData["pageNum"] += 1
+    mdlLst = self.fetchMoreRowFxn(**self.spData)
+    if len(mdlLst) == 0:
+      n = notify2.Notification(
+          "No more data",
+          "No more data",
+          "notification-message-im"   # Icon name
+          )
+      n.show()
+    else:
+      self._appendToModel(mdlLst)
 
   def close_window(self, *args, **kwargs):
     r = []
@@ -305,6 +333,8 @@ class SpreadsheetBuilder(object):
       fieldNameVsProp,
       isEditable,
       selectedIdLst,
+      spData,
+      fetchMoreRowFxn,
       showStackFxn,
       ):
     self.idLabelIdx = None
@@ -341,6 +371,8 @@ class SpreadsheetBuilder(object):
         self.renderKwargsSet,
         self.selectedIdLst,
         self.idLabelIdx,
+        spData,
+        fetchMoreRowFxn,
         self.showStackData,
         )
 

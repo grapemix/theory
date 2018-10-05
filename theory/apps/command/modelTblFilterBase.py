@@ -72,11 +72,17 @@ class ModelTblFilterBase(SimpleCommand):
         initData={},
         helpText="The simple filter being applied to the query"
         )
-    # Not yet in this version
-    #pagination = field.IntegerField(label="pagination",
-    #    help_text="Number of items per page",
-    #    initData=50,
-    #    required=False)
+    pageNum = field.IntegerField(
+        label="page number",
+        initData=1,
+        required=False
+        )
+    pageSize = field.IntegerField(
+        label="page size",
+        helpText="Number of items per page",
+        initData=500,
+        required=False
+        )
 
     def _getQuerysetByAppAndModel(self, appName, modelName):
       appModel = AppModel.objects.only("importPath").get(
@@ -182,5 +188,7 @@ class ModelTblFilterBase(SimpleCommand):
           "mdlName": formData["modelName"],
           "isEditable": True,
           "selectedIdLst": self.selectedIdLst,
+          "pageNum": formData["pageNum"],
+          "pageSize": formData["pageSize"],
           })
         })

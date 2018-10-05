@@ -1057,6 +1057,8 @@ class QueryIdInput(StringInput):
       self.attrs['mdlName'],
       False,
       [],
+      1,
+      500,
       None
     )
     selectedIdLst = spreadsheetBuilder.getSelectedIdLst()
