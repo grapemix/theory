@@ -1842,6 +1842,8 @@ class DynamicModelIdField(Field):
     super(DynamicModelIdField, self).__init__(*args, **kwargs)
     self.appFieldName = appFieldName
     self.modelFieldName = modelFieldName
+    self._appName = None
+    self._mdlName = None
 
   def clean(self, value, isEmptyForgiven=False):
     """
@@ -1850,6 +1852,10 @@ class DynamicModelIdField(Field):
 
     Raises ValidationError for any errors.
     """
+    if not isclass(self.widget):
+      # We don't clean anything in GUI. We trust data from server
+      return value
+
     self.validate(value)
     self.runValidators(value)
 
@@ -1859,12 +1865,12 @@ class DynamicModelIdField(Field):
       return value.id
 
     appName = self.getSibilingFieldData(self.appFieldName)
-    modelName = self.getSibilingFieldData(self.modelFieldName)
+    mdlName = self.getSibilingFieldData(self.modelFieldName)
 
     try:
       dbClass = importClass('{0}.model.{1}'.format(
         appName,
-        modelName
+        mdlName
         )
       )
       # We are not actually return the new queryset, instead, we just check if
@@ -1913,10 +1919,36 @@ class DynamicModelIdField(Field):
     if("attrs" not in kwargs):
       kwargs["attrs"] = {}
     kwargs["attrs"].update({
-      "app": self.getSibilingFieldData(self.appFieldName),
-      "model": self.getSibilingFieldData(self.modelFieldName)
+      "appName": self.appName,
+      "mdlName": self.mdlName
+      #"app": self.getSibilingFieldData(self.appFieldName),
+      #"model": self.getSibilingFieldData(self.modelFieldName)
     })
     super(DynamicModelIdField, self).renderWidget(*args, **kwargs)
+
+  @property
+  def appName(self):
+    return self._appName
+
+  @appName.setter
+  def appName(self, appName):
+    self._appName = appName
+    if not isclass(self.widget):
+      # force reset
+      self.widget.attrs["appName"] = appName
+      self.widget.fieldSetter({"finalData": None})
+
+  @property
+  def mdlName(self):
+    return self._mdlName
+
+  @mdlName.setter
+  def mdlName(self, mdlName):
+    self._mdlName = mdlName
+    if not isclass(self.widget):
+      # force reset
+      self.widget.attrs["mdlName"] = mdlName
+      self.widget.fieldSetter({"finalData": None})
 
   @property
   def finalData(self):
@@ -1946,19 +1978,26 @@ class DynamicModelSetField(DynamicModelIdField):
 
     Raises ValidationError for any errors.
     """
+    if not isclass(self.widget):
+      # We don't clean anything in GUI. We trust data from server
+      return value
     self.validate(value)
     self.runValidators(value)
 
-    if(value==[] or value is None):
+    # same as value == [] or value is None
+    if not value:
       return []
 
-    appName = self.getSibilingFieldData(self.appFieldName)
-    modelName = self.getSibilingFieldData(self.modelFieldName)
+    #appName = self.getSibilingFieldData(self.appFieldName)
+    #mdlName = self.getSibilingFieldData(self.modelFieldName)
+
+    appName = self.appName
+    mdlName = self.mdlName
 
     try:
       dbClass = importClass('{0}.model.{1}'.format(
         appName,
-        modelName
+        mdlName
         )
       )
       # We are not actually return the new queryset, instead, we just check if
