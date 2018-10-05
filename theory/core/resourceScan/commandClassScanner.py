@@ -58,8 +58,6 @@ class CommandClassScanner(BaseClassScanner):
         'errorMessages',
         'choices',
         'dynamicChoiceLst',
-        'appFieldName',
-        'modelFieldName',
         'childFieldTemplate',
         'childKeyFieldTemplate',
         'childValueFieldTemplate',

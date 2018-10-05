@@ -170,8 +170,6 @@ class TheoryModelFormDataHandler(TheoryModelDetectorBase):
   #        'queryset',
   #        'errorMessages',
   #        'choices',
-  #        'appFieldName',
-  #        'modelFieldName',
   #        ]:
   #      if hasattr(field, i):
   #        val = getattr(field, i)
