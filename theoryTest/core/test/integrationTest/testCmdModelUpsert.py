@@ -241,7 +241,7 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
           "finalDataDict": {
             "appName": "theory.apps",
             "modelName": "AppModel",
-            "queryId": "1"
+            "queryId": [1]
           }
         })
       ),
@@ -310,7 +310,7 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
                 "required": "This field is required."
               },
               "helpText": "",
-              "initData": "1",
+              "initData": 1,
               "isSingular": True,
               "label": "id",
               "localize": False,
@@ -481,7 +481,7 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
       {
         "appName": "theory.apps",
         "modelName": "AppModel",
-        "queryId": "1"
+        "queryId": [1]
       }
     )
     self.assertTrue(status)
@@ -612,7 +612,7 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
                 "invalid":"Enter a whole number."
               },
               "isSingular":True,
-              "initData":"1",
+              "initData":1,
               "showHiddenInitial":False,
               "localize":False,
               "widgetIsContentChgTrigger":False,

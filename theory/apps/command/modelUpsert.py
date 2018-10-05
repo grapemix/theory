@@ -38,6 +38,9 @@ class ModelUpsert(SimpleCommand):
         initData="theory.apps",
         dynamicChoiceLst=(set([("theory.apps", "theory.apps")] +
           [(appName, appName) for appName in settings.INSTALLED_APPS])),
+        uiPropagate=[
+          ("fields", "queryId", "appName",),
+        ],
         )
     modelName = field.ChoiceField(label="Model Name",
         helpText="The name of models to be listed",
@@ -47,14 +50,16 @@ class ModelUpsert(SimpleCommand):
                app="theory.apps"
            ).orderBy("name")
           ],
+        uiPropagate=[
+          ("fields", "queryId", "mdlName",),
+        ],
         )
-    queryId = field.DynamicModelIdField(
+    queryId = field.QuerysetField(
         required=False,
         label="instance id",
         helpText="The instance to be edited",
         initData=None,
-        appFieldName="appName",
-        modelFieldName="modelName",
+        maxLen=1,
         isSkipInHistory=True,
         )
     isInNewWindow = field.BooleanField(
@@ -112,6 +117,9 @@ class ModelUpsert(SimpleCommand):
         exclude = []
     return DynamicModelForm
 
+  def isQueryIdNonEmpty(self, queryId):
+    return queryId is not None and queryId != "None" and queryId != []
+
   def run(self, *args, **kwargs):
     f = self.paramForm.clean()
     appModel = AppModel.objects.get(
@@ -121,7 +129,7 @@ class ModelUpsert(SimpleCommand):
 
     modelKlass = importClass(appModel.importPath)
     modelFormKlass = self.getModelFormKlass(appModel, modelKlass)
-    if f["queryId"] is not None and f["queryId"] != "None":
+    if self.isQueryIdNonEmpty(f["queryId"]):
       modelForm = modelFormKlass(
           instance=modelKlass.objects.get(id=f["queryId"])
           )
@@ -134,7 +142,7 @@ class ModelUpsert(SimpleCommand):
         )
     scanner = CommandClassScanner()
     fieldNameVsDesc = scanner.geneateModelFormFieldDesc(modelForm)
-    if f["queryId"] is not None and f["queryId"] != "None":
+    if self.isQueryIdNonEmpty(f["queryId"]):
       fieldNameVsDesc["id"] = {
           "errorMessages": {
             "required": "This field is required.",
