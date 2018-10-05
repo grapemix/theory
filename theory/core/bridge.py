@@ -68,7 +68,7 @@ class Bridge(object):
     cmd = cmdKlass()
     cmdParamForm = importClass(cmdModel.classImportPath).ParamForm
     cmd.paramForm = cmdParamForm()
-    cmd.paramForm.fillInitFields(cmdModel, args, kwargs)
+    cmd.paramForm.fillFinalFields(cmdModel, args, kwargs)
     cmd.paramForm.isValid()
     return cmd
 
@@ -323,8 +323,7 @@ class Bridge(object):
       cmd = cmdKlass()
       cmdParamForm = importClass(classImportPath).ParamForm
       cmd.paramForm = cmdParamForm()
-      for k,v in kwargs.iteritems():
-        cmd.paramForm.fields[k].finalData = v
+      cmd.paramForm.fillFinalFields(None, args, kwargs)
       cmd.paramForm.isValid()
       # mainly for testing theory
       dummyCmdObj = type('DummyCmdModel', (object,), {})()

@@ -53,7 +53,6 @@ class BridgeTestCase(TestCase):
   def testGetCmdComplex(self):
     self.asyncChain1CommandModel = AsyncChain1.getCmdModel()
     cmd = self.bridge.getCmdComplex(self.asyncChain1CommandModel, [], {"verbosity": 99})
-    self.assertEqual(cmd.paramForm.fields["verbosity"].initData, 99)
     self.assertEqual(cmd.paramForm.fields["verbosity"].finalData, 99)
     self.assertEqual(cmd.paramForm.clean()["verbosity"], 99)
 

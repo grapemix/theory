@@ -397,6 +397,7 @@ class FormBase(object):
     return self._changedData
 
   def fillInitFields(self, cmdModel, args, kwargs):
+    # Not being called in Gui's form
     if cmdModel is not None:
       cmdArgs = [i for i in cmdModel.cmdFieldSet.all() if(not i.isOptional)]
       if args!=[]:
@@ -409,6 +410,21 @@ class FormBase(object):
             raise CommandSyntaxError(str(e))
     for k,v in kwargs.iteritems():
       self.fields[k].initData = v
+
+  def fillFinalFields(self, cmdModel, args, kwargs):
+    # Not being called in Gui's form
+    if cmdModel is not None:
+      cmdArgs = [i for i in cmdModel.cmdFieldSet.all() if(not i.isOptional)]
+      if args!=[]:
+        for i in range(len(cmdArgs)):
+          try:
+            self.fields[cmdArgs[i].name].finalData = args[i]
+          except IndexError as e:
+            # This means the number of param given unmatch the number of param
+            # register in *.command
+            raise CommandSyntaxError(str(e))
+    for k,v in kwargs.iteritems():
+      self.fields[k].finalData = v
 
   def toPython(self):
     if self.isValid():

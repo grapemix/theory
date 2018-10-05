@@ -380,7 +380,7 @@ class Reactor(theory_pb2_grpc.ReactorServicer, AutoCompleteMixin, HistoryMixin):
       cmd.paramForm = self.paramFormCache[self.cmdModel.id]
     else:
       cmd.paramForm = cmdKlass.ParamForm()
-    cmd.paramForm.fillInitFields(self.cmdModel, [], finalDataDict)
+    cmd.paramForm.fillFinalFields(self.cmdModel, [], finalDataDict)
     cmd.paramForm.isValid()
 
     cmd = self.runCmd(cmd, self.cmdModel, self.actionQ)
