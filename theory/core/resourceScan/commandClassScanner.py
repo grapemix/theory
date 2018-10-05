@@ -64,12 +64,15 @@ class CommandClassScanner(BaseClassScanner):
         'childFieldTemplate',
         'childKeyFieldTemplate',
         'childValueFieldTemplate',
+        'uiPropagate',
         ]:
       if hasattr(field, i):
         val = getattr(field, i)
         if type(val).__name__ == "__proxy__":
           # for fields from model form
           val = unicode(val)
+        elif i == "uiPropagate" and (val is None or len(val) == 0):
+          continue
         elif isinstance(val, dict):
           # for errorMessages
           newDict = {}

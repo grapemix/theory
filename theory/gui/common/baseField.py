@@ -86,7 +86,8 @@ class Field(object):
   def __init__(self, required=True, label=None, initData=None,
          helpText=None, errorMessages=None, showHiddenInitial=False,
          validators=[], localize=False, isSkipInHistory=False, widget=None,
-         isSingular=True, getSibilingFieldData=None):
+         isSingular=True, getSibilingFieldData=None,
+         uiPropagate={},):
     # required -- Boolean that specifies whether the field is required.
     #             True by default.
     # widget -- A Widget class, or instance of a Widget class, that should
@@ -142,6 +143,8 @@ class Field(object):
       self.getSibilingFieldData = lambda x: None
     else:
       self.getSibilingFieldData = getSibilingFieldData
+
+    self.uiPropagate = uiPropagate
 
     if widget is not None:
       self.widget = widget

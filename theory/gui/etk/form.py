@@ -210,6 +210,15 @@ class SimpleGuiFormBase(GuiFormBase):
     self._changeFormWindowHeight(settings.DIMENSION_HINTS["maxHeight"] - 200)
 
   def syncFormData(self, widgetElement, fieldName):
+    if len(self.fields[fieldName].uiPropagate) > 0:
+      self.syncFormDataWithUi(fieldName, self.fields[fieldName].uiPropagate)
+    if (
+        self.fields[fieldName].widget.attrs.get("isContentChgTrigger", False)
+        or self.fields[fieldName].widget.attrs.get("isFocusChgTrigger", False)
+    ):
+      self.syncFormDataWithReactor(fieldName)
+
+  def syncFormDataWithReactor(self, fieldName):
     val = self.fields[fieldName].clean(
         self.fields[fieldName].finalData
         )
@@ -285,9 +294,13 @@ class SimpleGuiFormBase(GuiFormBase):
             )
       widgetKwargs = kwargs
       widgetKwargs["isFocusChgTrigger"] = fieldDesc["widgetIsFocusChgTrigger"]
-      widgetKwargs["isContentChgTrigger"] = \
-          fieldDesc["widgetIsContentChgTrigger"]
-      if widgetKwargs["isFocusChgTrigger"] or widgetKwargs["isContentChgTrigger"]:
+      widgetKwargs["isContentChgTrigger"] = (
+        fieldDesc["widgetIsContentChgTrigger"]
+        or len(fieldDesc.get("uiPropagate", {})) > 0,
+        )
+
+      if widgetKwargs["isFocusChgTrigger"] \
+          or widgetKwargs["isContentChgTrigger"]:
         widgetKwargs["syncFormData"] = self.syncFormData
         widgetKwargs["fieldName"] = fieldName
       del fieldDesc["widgetIsFocusChgTrigger"]
@@ -319,7 +332,14 @@ class SimpleGuiFormBase(GuiFormBase):
         field.renderWidget(self.win, self.formBx.obj, attrs=widgetKwargs)
         if(field.widget is not None):
           optionalMenu.addInput(fieldName, field.widget)
+
       i += 1
+
+    for fieldName in fieldNameInOrder:
+      self.syncFormDataWithUi(
+        fieldName,
+        self.fields[fieldName].uiPropagate,
+      )
 
     self.formBx.postGenerate()
     optionalMenu.generate()

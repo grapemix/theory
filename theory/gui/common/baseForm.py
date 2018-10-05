@@ -396,6 +396,27 @@ class FormBase(object):
           self._changedData.append(name)
     return self._changedData
 
+  def _chainGetattr(self, o, path):
+    r = o
+    for tok in path:
+      try:
+        r = getattr(r, tok)
+      except AttributeError:
+        try:
+          r = r[tok]
+        except KeyError as e:
+          raise e
+      except Exception as e:
+        raise e
+    return r
+
+  def syncFormDataWithUi(self, fieldName, uiPropagate):
+    for path in uiPropagate:
+      prop = self._chainGetattr(self, path[:-1])
+      # To avoid lazy update
+      self.fields[fieldName].forceUpdate()
+      setattr(prop, path[-1], self.fields[fieldName].finalData)
+
   def fillInitFields(self, cmdModel, args, kwargs):
     # Not being called in Gui's form
     if cmdModel is not None:
@@ -404,12 +425,21 @@ class FormBase(object):
         for i in range(len(cmdArgs)):
           try:
             self.fields[cmdArgs[i].name].initData = args[i]
+
+            self.syncFormDataWithUi(
+              cmdArgs[i].name,
+              self.fields[cmdArgs[i].name].uiPropagate,
+            )
           except IndexError as e:
             # This means the number of param given unmatch the number of param
             # register in *.command
             raise CommandSyntaxError(str(e))
     for k,v in kwargs.iteritems():
       self.fields[k].initData = v
+      self.syncFormDataWithUi(
+        k,
+        self.fields[k].uiPropagate,
+      )
 
   def fillFinalFields(self, cmdModel, args, kwargs):
     # Not being called in Gui's form
@@ -419,12 +449,21 @@ class FormBase(object):
         for i in range(len(cmdArgs)):
           try:
             self.fields[cmdArgs[i].name].finalData = args[i]
+
+            self.syncFormDataWithUi(
+              cmdArgs[i].name,
+              self.fields[cmdArgs[i].name].uiPropagate,
+            )
           except IndexError as e:
             # This means the number of param given unmatch the number of param
             # register in *.command
             raise CommandSyntaxError(str(e))
     for k,v in kwargs.iteritems():
       self.fields[k].finalData = v
+      self.syncFormDataWithUi(
+        k,
+        self.fields[k].uiPropagate,
+      )
 
   def toPython(self):
     if self.isValid():
