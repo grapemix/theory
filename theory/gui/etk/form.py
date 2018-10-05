@@ -294,10 +294,9 @@ class SimpleGuiFormBase(GuiFormBase):
             )
       widgetKwargs = kwargs
       widgetKwargs["isFocusChgTrigger"] = fieldDesc["widgetIsFocusChgTrigger"]
-      widgetKwargs["isContentChgTrigger"] = (
-        fieldDesc["widgetIsContentChgTrigger"]
-        or len(fieldDesc.get("uiPropagate", {})) > 0,
-        )
+      widgetKwargs["isContentChgTrigger"] = \
+        fieldDesc["widgetIsContentChgTrigger"] \
+        or len(fieldDesc.get("uiPropagate", {})) > 0
 
       if widgetKwargs["isFocusChgTrigger"] \
           or widgetKwargs["isContentChgTrigger"]:

@@ -184,7 +184,7 @@ class Reactor(theory_pb2_grpc.ReactorServicer, AutoCompleteMixin, HistoryMixin):
           "{0}FocusChgCallback".format(request.fieldName)
           )(val)
     else:
-      val = None
+      val = {}
 
     try:
       jsonData = json.dumps(val, cls=TheoryJSONEncoder)
