@@ -107,14 +107,6 @@ def getQuerysetDefault():
   #return [str(Command.objects.first().id)]
   return [1]
 
-def getDynamicModelIdDefault():
-  #return str(Command.objects.first().id)
-  return 1
-
-def getDynamicModelSetDefault():
-  #return [str(Command.objects.first().id)]
-  return [1]
-
 def getChoiceSelection():
   return ((1, "1",), (2, "2",), (3, "3",),)
 
@@ -147,8 +139,6 @@ defaultValueSet1 = {
     "PythonModule": getPythonModuleDefault(),
     "PythonClass": getPythonClassDefault(),
     "Queryset": getQuerysetDefault(),
-    "DynamicModelId": getDynamicModelIdDefault(),
-    "DynamicModelSet": getDynamicModelSetDefault(),
 }
 
 class CombinatoryFormWithDefaultValue(Form):
@@ -186,18 +176,6 @@ class CombinatoryFormWithDefaultValue(Form):
     appName="theory.apps",
     mdlName="Command",
     initData=defaultValueSet1["Queryset"]
-  )
-  appNameField = field.TextField(initData="theory.apps")
-  modelNameField = field.TextField(initData="Command")
-  dynamicModelIdField = field.DynamicModelIdField(
-    appFieldName="appNameField",
-    modelFieldName="modelNameField",
-    initData=defaultValueSet1["DynamicModelId"]
-  )
-  dynamicModelSetField = field.DynamicModelSetField(
-    appFieldName="appNameField",
-    modelFieldName="modelNameField",
-    initData=defaultValueSet1["DynamicModelSet"]
   )
 
   #binaryField = field.BinaryField(initData=defaultValueSet1["Binary"])
