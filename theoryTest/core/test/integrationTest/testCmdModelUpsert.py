@@ -60,6 +60,22 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
     self.bridge = Bridge()
     super(CmdModelUpsert, self).setUp()
 
+  def testCreateInstance(self):
+    val = '{{"cmdName": "modelUpsert", "finalDataDict": {0}}}'.format(
+        json.dumps({
+          "appName": "theory.apps",
+          "modelName": "AppModel",
+          "isInNewWindow": True,
+        })
+    )
+    self.reactor.call(
+      theory_pb2.ReactorReq(
+        action="runCmd",
+        val=val
+      ),
+      None
+    )
+
   def testModelUpsertFlow(self):
     # === step 1 ===
     self.reactor.call(

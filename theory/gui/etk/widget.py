@@ -3,6 +3,7 @@
 ##### System wide lib #####
 from abc import ABCMeta, abstractmethod
 import copy
+import json
 import os
 
 ##### Theory lib #####
@@ -1036,26 +1037,24 @@ class QueryIdInput(StringInput):
     entryWidget.finalData = self.finalData
 
   def _createInstanceCallback(self, btn, dummy):
-    from theory.core.bridge import Bridge
-    from theory.apps.model import Command
-    bridge = Bridge()
-    cmdModel = Command.objects.get(app="theory.apps", name="modelUpsert")
-    cmd = bridge.getCmdComplex(
-        cmdModel,
-        (self.attrs['app'], self.attrs['model']),
-        {"isInNewWindow": True,},
-        )
-    cmd.postApplyChange = lambda: self.refreshData(
-        self.finalData.split(",") + [cmd.modelForm.instance.id,]
-        )
-    bridge._executeCommand(cmd, cmdModel)
+    from theory.gui.etk.terminal import Terminal
+    terminal = Terminal()
+
+    val = '{{"cmdName": "modelUpsert", "finalDataDict": {0}}}'.format(
+        json.dumps({
+          "appName": self.attrs['appName'],
+          "modelName": self.attrs['mdlName'],
+          "isInNewWindow": True,
+        })
+    )
+    terminal._fireUiReq({"action": "runCmd", "val": val})
 
   def _selectInstanceCallback(self, btn, dummy):
     from theory.gui.etk.terminal import Terminal
     terminal = Terminal()
     spreadsheetBuilder = terminal.initSpreadSheetBuilder(
-      self.attrs['app'],
-      self.attrs['model'],
+      self.attrs['appName'],
+      self.attrs['mdlName'],
       False,
       [],
       None
