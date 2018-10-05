@@ -53,7 +53,9 @@ class Spreadsheet(object):
     self.model = gtk.ListStore(*listStoreDataType)
 
     for i in model:
-      if i[idLabelIdx] in selectedIdLst:
+      # Since QuerysetField should allow None as initData which means untouched
+      # data
+      if selectedIdLst is not None and i[idLabelIdx] in selectedIdLst:
         self.model.append(i + [False, True])
       else:
         self.model.append(i + [False, False])
