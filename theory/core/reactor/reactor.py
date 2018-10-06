@@ -167,7 +167,7 @@ class Reactor(theory_pb2_grpc.ReactorServicer, AutoCompleteMixin, HistoryMixin):
             len(modelLstData.jsonDataLst)
           )
     except Exception as e:
-      self.logger.error(e)
+      self.logger.error(e, exc_info=True)
       msg += "Status: err\n"
       msg += "Msg: {}\n".format(str(e))
 
@@ -253,7 +253,11 @@ class Reactor(theory_pb2_grpc.ReactorServicer, AutoCompleteMixin, HistoryMixin):
     return theory_pb2.JsonData(jsonData=request.jsonData)
 
   def call(self, request, context):
-    print request.action, request.val
+    if settings.DEBUG_LEVEL >= 10:
+      print "reactor call", request.action, request.val
+    elif settings.DEBUG_LEVEL > 5:
+      if request.action not in ["escapeRequest", "autocompleteRequest"]:
+        print "reactor call", request.action, request.val
     self.actionQ = []
     if request.action == "runCmd":
       self._parse(request.val)
@@ -375,7 +379,7 @@ class Reactor(theory_pb2_grpc.ReactorServicer, AutoCompleteMixin, HistoryMixin):
     bridge = Bridge()
     if not bridge._executeCommand(cmd, cmdModel, actionQ):
       # TODO: integrate with std reactor error system
-      self.logger.error(str(cmd.paramForm.errors))
+      self.logger.error(str(cmd.paramForm.errors), exc_info=True)
       self.actionQ.append({
           "action": "printStdOut",
           "val": str(cmd.paramForm.errors)

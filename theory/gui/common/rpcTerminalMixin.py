@@ -37,8 +37,14 @@ class RpcTerminalMixin(object):
   """
   cmdFormCache = {}
   formHashInUse = None
+  DEBUG_LEVEL = 0
 
   def _fireUiReq(self, dict):
+    if self.DEBUG_LEVEL >= 10:
+      print "RpcTerminalMixin _fireUiReq", dict
+    elif self.DEBUG_LEVEL > 5:
+      if dict["action"] not in ["escapeRequest", "autocompleteRequest"]:
+        print "RpcTerminalMixin _fireUiReq", dict
     self._handleReactorReq(self.stub.call(theory_pb2.ReactorReq(**dict)))
 
   def callReactor(self, fxnName, val):
@@ -73,7 +79,19 @@ class RpcTerminalMixin(object):
 
   def _handleReactorReq(self, reactorReqArr):
     for resp in reactorReqArr.reqLst:
-      #print resp.action, resp.val
+      if self.DEBUG_LEVEL >= 10:
+        print "RpcTerminalMixin _handleReactorReq", resp.action, resp.val
+      elif self.DEBUG_LEVEL > 5:
+        if resp.action not in [
+            "cleanUpCrt",
+            "setCmdLine",
+            "selectCmdLine",
+            "printStdOut",
+            "restoreCmdLine",
+            "focusOnParamFormFirstChild",
+        ]:
+          print "RpcTerminalMixin _handleReactorReq", resp.action, resp.val
+
       if resp.action in [
           "cleanUpCrt",
           "setCmdLine",
