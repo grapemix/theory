@@ -1822,7 +1822,7 @@ class QuerysetField(Field):
   widget = QueryIdInput
   defaultErrorMessages = {
     'invalid': _('Unable to import the given queryset'),
-    'dbInvalid': _('Unable to find data in DB'),
+    'dbInvalid': _('Unable to find data({}) in DB'),
     'appInvalid': _('No app has been set'),
     'mdlInvalid': _('No model has been set'),
     'configInvalid': _('Configuration has been invalid'),
@@ -1833,6 +1833,14 @@ class QuerysetField(Field):
     self._appName = appName
     self._mdlName = mdlName
     self.maxLen = maxLen
+    # values may be valid at the beginning, but may be invalid after db
+    # operation, so we allow data to be checked at the beginning.
+    # Use case: modelTblDel fills a valid id, then the cmd delete the object,
+    # but the reactor try to export the form for history which called form's
+    # toPython to clean the data again. The valid object is already checked
+    # and deleted, but if we clean/check the object id again, it will become
+    # invalid if we don't have dbCleanData
+    self.dbCleanData = set()
 
   @property
   def appName(self):
@@ -1846,6 +1854,7 @@ class QuerysetField(Field):
       self.widget.attrs["appName"] = appName
       # force reset
       self.widget.fieldSetter({"finalData": None})
+      self.dbCleanData = set()
 
   @property
   def mdlName(self):
@@ -1859,6 +1868,7 @@ class QuerysetField(Field):
       self.widget.attrs["mdlName"] = mdlName
       # force reset
       self.widget.fieldSetter({"finalData": None})
+      self.dbCleanData = set()
 
   def clean(self, value, isEmptyForgiven=False):
     """
@@ -1889,22 +1899,29 @@ class QuerysetField(Field):
         self.mdlName
         )
       )
-      if self.maxLen == 1:
+      if self.maxLen == 1 and value not in self.dbCleanData:
         # We are not actually return the new queryset, instead, we just check if
         # the id set is in the given queryset
         if dbClass.objects.filter(id=value).count() == 0:
           raise ValidationError(
               self.errorMessages['dbInvalid'] % {'value': value}
           )
+        self.dbCleanData.add(value)
       else:
+        if self.dbCleanData >= value:
+          # all values already checked before
+          return value
         if len(value) != dbClass.objects.filter(id__in=value).count():
           raise ValidationError(
               self.errorMessages['dbInvalid'] % {'value': value}
           )
+        for i in value:
+          self.dbCleanData.add(i)
+
     except Exception as e:
       import logging
       logger = logging.getLogger(__name__)
-      logger.error(e)
+      logger.error(e, exc_info=True)
       raise ValidationError(
           self.errorMessages['dbInvalid'] % {'value': value}
       )
@@ -1934,7 +1951,9 @@ class QuerysetField(Field):
     return True
 
   def toPython(self, value):
-    if self.maxLen == 1:
+    if value is None or value == []:
+      return value
+    elif self.maxLen == 1:
       return str(value)
     else:
       return [str(i) for i in value]

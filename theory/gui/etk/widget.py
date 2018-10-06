@@ -1009,12 +1009,6 @@ class QueryIdInput(StringInput):
 
   def _prepareInitData(self, initData):
     self.rawInitData = initData
-    if not self.attrs["isMultiple"]:
-      if initData is None:
-        self.finalData = ""
-        return ""
-      self.finalData = str(initData)
-      return self.finalData
     if initData is None or len(initData)==0:
       self.finalData = ""
       return ""
