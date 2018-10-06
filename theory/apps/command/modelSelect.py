@@ -20,8 +20,3 @@ class ModelSelect(ModelTblFilterBase):
   """
   name = "modelSelect"
   verboseName = "modelSelect"
-
-  def _applyChangeOnQueryset(self):
-    self.queryset = []
-    for model in self.paramForm.clean()["queryset"]:
-      self.queryset.append(model.id)

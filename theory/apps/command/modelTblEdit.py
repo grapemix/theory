@@ -21,13 +21,3 @@ class ModelTblEdit(ModelTblFilterBase):
   """
   name = "modelTblEdit"
   verboseName = "model table edit"
-
-  def _applyChangeOnQueryset(self):
-    for model in self.paramForm.clean()["queryset"]:
-      model.save()
-    self._stdOut += "{0} model has been saved."\
-        .format(len(self.paramForm.clean()["queryset"]))
-
-  def _fetchQueryset(self):
-    super(ModelTblEdit, self)._fetchQueryset()
-    return True
