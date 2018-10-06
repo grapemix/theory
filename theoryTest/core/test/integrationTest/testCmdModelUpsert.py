@@ -41,6 +41,7 @@ class ReactorTestMixin(object):
     return action
 
   def pprintActionQ(self):
+    # For debugging only
     for action in self.reactor.actionQ:
       print
       self.pprintAction(action)
@@ -429,16 +430,18 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
     self.reactor.actionQ = []
     org_name = appModelModel.name
     self.reactor.upsertModelLst(
-      theory_pb2.ModelLstData(
-        appName="theory.apps",
-        modelName="AppModel",
-        jsonDataLst=[
-          json.dumps({
-            "id": int(appModelModel.id),
-            "name": org_name + "_test"
+      theory_pb2.MultiModelLstData(
+        modelLstData=[theory_pb2.ModelLstData(
+          appName="theory.apps",
+          mdlName="AppModel",
+          jsonDataLst=[
+            json.dumps({
+              "id": int(appModelModel.id),
+              "name": org_name + "_test"
 
-          })
-        ]
+            })
+          ]
+        )]
       ),
       None
     )
@@ -448,18 +451,14 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
     self.assertDict(
       self.unJsonActionVal(self.reactor.actionQ[0]),
       {
-        "action": "cleanUpCrt"
-      }
-    )
-
-    self.assertDict(
-      self.unJsonActionVal(self.reactor.actionQ[1]),
-      {
         "action": "printStdOut",
-        "val": "1 models has been saved"
+        "val": (
+          "=== theory.apps - AppModel ===\n"
+          "Status: success\n"
+          "Msg: 1 models have been saved\n"
+        )
       }
     )
-    #self.pprintActionQ()
 
   def testBareModelUpsert(self):
     (cmd, status) = self.bridge.executeEzCommand(

@@ -158,15 +158,21 @@ class RpcTerminalMixin(object):
 
     if paramForm.isValid():
       jsonDataLst = paramForm.toModelForm()
-      self.stub.upsertModelLst(theory_pb2.ModelLstData(
-        appName=self.lastModel["appName"],
-        modelName=self.lastModel["modelName"],
-        jsonDataLst=[jsonDataLst]
+      reactorReqArr = self.stub.upsertModelLst(
+        theory_pb2.MultiModelLstData(
+          modelLstData=[theory_pb2.ModelLstData(
+            appName=self.lastModel["appName"],
+            mdlName=self.lastModel["modelName"],
+            jsonDataLst=[jsonDataLst]
+          )]
         )
       )
       if self.lastModel["isInNewWindow"]:
         paramForm.cleanUpCrtFxn()
         del self.cmdFormCache[cmdFormObj.hash]
+      else:
+        self.cleanUpCrt()
+        self._handleReactorReq(reactorReqArr)
       self.lastModel = {}
     else:
       # TODO: integrate with std reactor error system
@@ -284,13 +290,20 @@ class RpcTerminalMixin(object):
 
       handlerFxn = GtkSpreadsheetModelBSONDataHandler()
       jsonDataLstLst = spreadsheetBuilder.getJsonDataLst(handlerFxn, [])
+      msg = ""
+      modelLstData = []
       for (appName, mdlName, jsonDataLst) in jsonDataLstLst:
-        self.stub.upsertModelLst(theory_pb2.ModelLstData(
-          appName=appName,
-          modelName=mdlName,
-          jsonDataLst=jsonDataLst,
+        modelLstData.append(
+          theory_pb2.ModelLstData(
+            appName=appName,
+            mdlName=mdlName,
+            jsonDataLst=jsonDataLst,
           )
         )
+      reactorReqArr = self.stub.upsertModelLst(
+        theory_pb2.MultiModelLstData(modelLstData=modelLstData)
+      )
+      self._handleReactorReq(reactorReqArr)
 
   def callExtCmd(self):
     pass

@@ -27,7 +27,15 @@ class ModelTblFilterBase(SimpleCommand):
   """
   __metaclass__ = ABCMeta
   _gongs = ["QuerysetAsSpreadsheet", ]
-  _drums = {"Terminal": 1,}
+  # It is important to set DummyDrum in here because this cmd will call
+  # upsertSpreadSheet in client and led to upsertModelLst in srv side.
+  # If we set TerminalDrum instead, the stdOut will override the msg being
+  # sent in client side. If we don't set drum at all, reactor will print
+  # cmd has been run as usual.
+  # The design of upsertSpreadSheet will update each model type individually,
+  # but we want the output message being reported at once, but overlapping each
+  # others.
+  _drums = {"Dummy": 1,}
 
   class ParamForm(SimpleCommand.ParamForm):
     appName = field.ChoiceField(label="Application Name",
@@ -163,10 +171,6 @@ class ModelTblFilterBase(SimpleCommand):
   @appModelFieldParamMap.setter
   def appModelFieldParamMap(self, appModelFieldParamMap):
     self._appModelFieldParamMap = appModelFieldParamMap
-
-  @abstractmethod
-  def _applyChangeOnQueryset(self):
-    pass
 
   def run(self):
     formData = self.paramForm.clean()

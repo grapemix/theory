@@ -47,7 +47,7 @@ class ReactorStub(object):
         )
     self.upsertModelLst = channel.unary_unary(
         '/theory.Reactor/upsertModelLst',
-        request_serializer=theory__pb2.ModelLstData.SerializeToString,
+        request_serializer=theory__pb2.MultiModelLstData.SerializeToString,
         response_deserializer=theory__pb2.ReactorReqArr.FromString,
         )
     self.getMdlTbl = channel.unary_unary(
@@ -152,7 +152,7 @@ def add_ReactorServicer_to_server(servicer, server):
       ),
       'upsertModelLst': grpc.unary_unary_rpc_method_handler(
           servicer.upsertModelLst,
-          request_deserializer=theory__pb2.ModelLstData.FromString,
+          request_deserializer=theory__pb2.MultiModelLstData.FromString,
           response_serializer=theory__pb2.ReactorReqArr.SerializeToString,
       ),
       'getMdlTbl': grpc.unary_unary_rpc_method_handler(

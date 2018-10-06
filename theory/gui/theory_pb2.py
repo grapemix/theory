@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='theory.proto',
   package='theory',
   syntax='proto3',
-  serialized_pb=_b('\n\x0ctheory.proto\x12\x06theory\x1a\x19google/protobuf/any.proto\x1a\x1bgoogle/protobuf/empty.proto\"4\n\x05UiReq\x12\x0e\n\x06\x61\x63tion\x18\x01 \x01(\t\x12\x0b\n\x03val\x18\x02 \x01(\t\x12\x0e\n\x06userId\x18\x03 \x01(\t\")\n\nReactorReq\x12\x0e\n\x06\x61\x63tion\x18\x01 \x01(\t\x12\x0b\n\x03val\x18\x02 \x01(\t\"3\n\rReactorReqArr\x12\"\n\x06reqLst\x18\x01 \x03(\x0b\x32\x12.theory.ReactorReq\"&\n\x04UiId\x12\n\n\x02id\x18\x01 \x01(\t\x12\x12\n\nadapterLst\x18\x02 \x03(\t\"Q\n\tFieldData\x12\r\n\x05\x63mdId\x18\x01 \x01(\x05\x12\x10\n\x08\x66ormHash\x18\x02 \x01(\t\x12\x11\n\tfieldName\x18\x03 \x01(\t\x12\x10\n\x08jsonData\x18\x04 \x01(\t\"Q\n\x0b\x43mdFxnInput\x12\r\n\x05\x63mdId\x18\x01 \x01(\x05\x12\x10\n\x08\x66ormHash\x18\x02 \x01(\t\x12\x0f\n\x07\x66xnName\x18\x03 \x01(\t\x12\x10\n\x08jsonData\x18\x04 \x01(\t\"@\n\x0euiData4Adapter\x12\x1c\n\x14\x61\x64\x61pterBufferModelId\x18\x01 \x01(\x05\x12\x10\n\x08jsonData\x18\x02 \x01(\t\"\x1c\n\x08JsonData\x12\x10\n\x08jsonData\x18\x01 \x01(\t\"+\n\x07MdlIden\x12\x0f\n\x07\x61ppName\x18\x01 \x01(\t\x12\x0f\n\x07mdlName\x18\x02 \x01(\t\"^\n\tMdlTblReq\x12\x1c\n\x03mdl\x18\x01 \x01(\x0b\x32\x0f.theory.MdlIden\x12\x0f\n\x07pageNum\x18\x02 \x01(\x05\x12\x10\n\x08pageSize\x18\x03 \x01(\x05\x12\x10\n\x08\x66ormHash\x18\x04 \x01(\t\"j\n\x03Mdl\x12!\n\x03mdl\x18\x01 \x03(\x0b\x32\x14.theory.Mdl.MdlEntry\x1a@\n\x08MdlEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12#\n\x05value\x18\x02 \x01(\x0b\x32\x14.google.protobuf.Any:\x02\x38\x01\"G\n\x0cModelLstData\x12\x0f\n\x07\x61ppName\x18\x01 \x01(\t\x12\x11\n\tmodelName\x18\x02 \x01(\t\x12\x13\n\x0bjsonDataLst\x18\x03 \x03(\t\"c\n\x08StrVsMap\x12\t\n\x01k\x18\x01 \x01(\t\x12\"\n\x01v\x18\x02 \x03(\x0b\x32\x17.theory.StrVsMap.VEntry\x1a(\n\x06VEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\x18\n\x06StrLst\x12\x0e\n\x06strLst\x18\x01 \x03(\t\"\x18\n\x06IntLst\x12\x0e\n\x06intLst\x18\x01 \x03(\x05\"\x17\n\x07\x44\x61taRow\x12\x0c\n\x04\x63\x65ll\x18\x01 \x03(\t\"\x8a\x01\n\x0fSpreadSheetData\x12 \n\x07\x64\x61taLst\x18\x01 \x03(\x0b\x32\x0f.theory.DataRow\x12)\n\x0f\x66ieldNameVsProp\x18\x02 \x03(\x0b\x32\x10.theory.StrVsMap\x12\x13\n\x0bmdlTotalNum\x18\x03 \x01(\x05\x12\x15\n\rspreadSheetId\x18\x04 \x01(\x05\"\x07\n\x05\x45mpty2\xc4\x03\n\x07Reactor\x12.\n\x03\x62ye\x12\r.theory.Empty\x1a\x16.google.protobuf.Empty\"\x00\x12.\n\x04\x63\x61ll\x12\r.theory.UiReq\x1a\x15.theory.ReactorReqArr\"\x00\x12\x31\n\x08register\x12\x0c.theory.UiId\x1a\x15.theory.ReactorReqArr\"\x00\x12\x35\n\x0csyncFormData\x12\x11.theory.FieldData\x1a\x10.theory.JsonData\"\x00\x12\x38\n\rcallCmdSubFxn\x12\x13.theory.CmdFxnInput\x1a\x10.theory.JsonData\"\x00\x12\x39\n\x0b\x61\x64\x61ptFromUi\x12\x16.theory.uiData4Adapter\x1a\x10.theory.JsonData\"\x00\x12?\n\x0eupsertModelLst\x12\x14.theory.ModelLstData\x1a\x15.theory.ReactorReqArr\"\x00\x12\x39\n\tgetMdlTbl\x12\x11.theory.MdlTblReq\x1a\x17.theory.SpreadSheetData\"\x00\x62\x06proto3')
+  serialized_pb=_b('\n\x0ctheory.proto\x12\x06theory\x1a\x19google/protobuf/any.proto\x1a\x1bgoogle/protobuf/empty.proto\"4\n\x05UiReq\x12\x0e\n\x06\x61\x63tion\x18\x01 \x01(\t\x12\x0b\n\x03val\x18\x02 \x01(\t\x12\x0e\n\x06userId\x18\x03 \x01(\t\")\n\nReactorReq\x12\x0e\n\x06\x61\x63tion\x18\x01 \x01(\t\x12\x0b\n\x03val\x18\x02 \x01(\t\"3\n\rReactorReqArr\x12\"\n\x06reqLst\x18\x01 \x03(\x0b\x32\x12.theory.ReactorReq\"&\n\x04UiId\x12\n\n\x02id\x18\x01 \x01(\t\x12\x12\n\nadapterLst\x18\x02 \x03(\t\"Q\n\tFieldData\x12\r\n\x05\x63mdId\x18\x01 \x01(\x05\x12\x10\n\x08\x66ormHash\x18\x02 \x01(\t\x12\x11\n\tfieldName\x18\x03 \x01(\t\x12\x10\n\x08jsonData\x18\x04 \x01(\t\"Q\n\x0b\x43mdFxnInput\x12\r\n\x05\x63mdId\x18\x01 \x01(\x05\x12\x10\n\x08\x66ormHash\x18\x02 \x01(\t\x12\x0f\n\x07\x66xnName\x18\x03 \x01(\t\x12\x10\n\x08jsonData\x18\x04 \x01(\t\"@\n\x0euiData4Adapter\x12\x1c\n\x14\x61\x64\x61pterBufferModelId\x18\x01 \x01(\x05\x12\x10\n\x08jsonData\x18\x02 \x01(\t\"\x1c\n\x08JsonData\x12\x10\n\x08jsonData\x18\x01 \x01(\t\"+\n\x07MdlIden\x12\x0f\n\x07\x61ppName\x18\x01 \x01(\t\x12\x0f\n\x07mdlName\x18\x02 \x01(\t\"^\n\tMdlTblReq\x12\x1c\n\x03mdl\x18\x01 \x01(\x0b\x32\x0f.theory.MdlIden\x12\x0f\n\x07pageNum\x18\x02 \x01(\x05\x12\x10\n\x08pageSize\x18\x03 \x01(\x05\x12\x10\n\x08\x66ormHash\x18\x04 \x01(\t\"j\n\x03Mdl\x12!\n\x03mdl\x18\x01 \x03(\x0b\x32\x14.theory.Mdl.MdlEntry\x1a@\n\x08MdlEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12#\n\x05value\x18\x02 \x01(\x0b\x32\x14.google.protobuf.Any:\x02\x38\x01\"?\n\x11MultiModelLstData\x12*\n\x0cmodelLstData\x18\x01 \x03(\x0b\x32\x14.theory.ModelLstData\"E\n\x0cModelLstData\x12\x0f\n\x07\x61ppName\x18\x01 \x01(\t\x12\x0f\n\x07mdlName\x18\x02 \x01(\t\x12\x13\n\x0bjsonDataLst\x18\x03 \x03(\t\"c\n\x08StrVsMap\x12\t\n\x01k\x18\x01 \x01(\t\x12\"\n\x01v\x18\x02 \x03(\x0b\x32\x17.theory.StrVsMap.VEntry\x1a(\n\x06VEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\x18\n\x06StrLst\x12\x0e\n\x06strLst\x18\x01 \x03(\t\"\x18\n\x06IntLst\x12\x0e\n\x06intLst\x18\x01 \x03(\x05\"\x17\n\x07\x44\x61taRow\x12\x0c\n\x04\x63\x65ll\x18\x01 \x03(\t\"\x8a\x01\n\x0fSpreadSheetData\x12 \n\x07\x64\x61taLst\x18\x01 \x03(\x0b\x32\x0f.theory.DataRow\x12)\n\x0f\x66ieldNameVsProp\x18\x02 \x03(\x0b\x32\x10.theory.StrVsMap\x12\x13\n\x0bmdlTotalNum\x18\x03 \x01(\x05\x12\x15\n\rspreadSheetId\x18\x04 \x01(\x05\"\x07\n\x05\x45mpty2\xc9\x03\n\x07Reactor\x12.\n\x03\x62ye\x12\r.theory.Empty\x1a\x16.google.protobuf.Empty\"\x00\x12.\n\x04\x63\x61ll\x12\r.theory.UiReq\x1a\x15.theory.ReactorReqArr\"\x00\x12\x31\n\x08register\x12\x0c.theory.UiId\x1a\x15.theory.ReactorReqArr\"\x00\x12\x35\n\x0csyncFormData\x12\x11.theory.FieldData\x1a\x10.theory.JsonData\"\x00\x12\x38\n\rcallCmdSubFxn\x12\x13.theory.CmdFxnInput\x1a\x10.theory.JsonData\"\x00\x12\x39\n\x0b\x61\x64\x61ptFromUi\x12\x16.theory.uiData4Adapter\x1a\x10.theory.JsonData\"\x00\x12\x44\n\x0eupsertModelLst\x12\x19.theory.MultiModelLstData\x1a\x15.theory.ReactorReqArr\"\x00\x12\x39\n\tgetMdlTbl\x12\x11.theory.MdlTblReq\x1a\x17.theory.SpreadSheetData\"\x00\x62\x06proto3')
   ,
   dependencies=[google_dot_protobuf_dot_any__pb2.DESCRIPTOR,google_dot_protobuf_dot_empty__pb2.DESCRIPTOR,])
 
@@ -511,6 +511,37 @@ _MDL = _descriptor.Descriptor(
 )
 
 
+_MULTIMODELLSTDATA = _descriptor.Descriptor(
+  name='MultiModelLstData',
+  full_name='theory.MultiModelLstData',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='modelLstData', full_name='theory.MultiModelLstData.modelLstData', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=781,
+  serialized_end=844,
+)
+
+
 _MODELLSTDATA = _descriptor.Descriptor(
   name='ModelLstData',
   full_name='theory.ModelLstData',
@@ -526,7 +557,7 @@ _MODELLSTDATA = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='modelName', full_name='theory.ModelLstData.modelName', index=1,
+      name='mdlName', full_name='theory.ModelLstData.mdlName', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -551,8 +582,8 @@ _MODELLSTDATA = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=781,
-  serialized_end=852,
+  serialized_start=846,
+  serialized_end=915,
 )
 
 
@@ -589,8 +620,8 @@ _STRVSMAP_VENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=913,
-  serialized_end=953,
+  serialized_start=976,
+  serialized_end=1016,
 )
 
 _STRVSMAP = _descriptor.Descriptor(
@@ -626,8 +657,8 @@ _STRVSMAP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=854,
-  serialized_end=953,
+  serialized_start=917,
+  serialized_end=1016,
 )
 
 
@@ -657,8 +688,8 @@ _STRLST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=955,
-  serialized_end=979,
+  serialized_start=1018,
+  serialized_end=1042,
 )
 
 
@@ -688,8 +719,8 @@ _INTLST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=981,
-  serialized_end=1005,
+  serialized_start=1044,
+  serialized_end=1068,
 )
 
 
@@ -719,8 +750,8 @@ _DATAROW = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1007,
-  serialized_end=1030,
+  serialized_start=1070,
+  serialized_end=1093,
 )
 
 
@@ -771,8 +802,8 @@ _SPREADSHEETDATA = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1033,
-  serialized_end=1171,
+  serialized_start=1096,
+  serialized_end=1234,
 )
 
 
@@ -795,8 +826,8 @@ _EMPTY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1173,
-  serialized_end=1180,
+  serialized_start=1236,
+  serialized_end=1243,
 )
 
 _REACTORREQARR.fields_by_name['reqLst'].message_type = _REACTORREQ
@@ -804,6 +835,7 @@ _MDLTBLREQ.fields_by_name['mdl'].message_type = _MDLIDEN
 _MDL_MDLENTRY.fields_by_name['value'].message_type = google_dot_protobuf_dot_any__pb2._ANY
 _MDL_MDLENTRY.containing_type = _MDL
 _MDL.fields_by_name['mdl'].message_type = _MDL_MDLENTRY
+_MULTIMODELLSTDATA.fields_by_name['modelLstData'].message_type = _MODELLSTDATA
 _STRVSMAP_VENTRY.containing_type = _STRVSMAP
 _STRVSMAP.fields_by_name['v'].message_type = _STRVSMAP_VENTRY
 _SPREADSHEETDATA.fields_by_name['dataLst'].message_type = _DATAROW
@@ -819,6 +851,7 @@ DESCRIPTOR.message_types_by_name['JsonData'] = _JSONDATA
 DESCRIPTOR.message_types_by_name['MdlIden'] = _MDLIDEN
 DESCRIPTOR.message_types_by_name['MdlTblReq'] = _MDLTBLREQ
 DESCRIPTOR.message_types_by_name['Mdl'] = _MDL
+DESCRIPTOR.message_types_by_name['MultiModelLstData'] = _MULTIMODELLSTDATA
 DESCRIPTOR.message_types_by_name['ModelLstData'] = _MODELLSTDATA
 DESCRIPTOR.message_types_by_name['StrVsMap'] = _STRVSMAP
 DESCRIPTOR.message_types_by_name['StrLst'] = _STRLST
@@ -913,6 +946,13 @@ Mdl = _reflection.GeneratedProtocolMessageType('Mdl', (_message.Message,), dict(
 _sym_db.RegisterMessage(Mdl)
 _sym_db.RegisterMessage(Mdl.MdlEntry)
 
+MultiModelLstData = _reflection.GeneratedProtocolMessageType('MultiModelLstData', (_message.Message,), dict(
+  DESCRIPTOR = _MULTIMODELLSTDATA,
+  __module__ = 'theory_pb2'
+  # @@protoc_insertion_point(class_scope:theory.MultiModelLstData)
+  ))
+_sym_db.RegisterMessage(MultiModelLstData)
+
 ModelLstData = _reflection.GeneratedProtocolMessageType('ModelLstData', (_message.Message,), dict(
   DESCRIPTOR = _MODELLSTDATA,
   __module__ = 'theory_pb2'
@@ -982,8 +1022,8 @@ _REACTOR = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   options=None,
-  serialized_start=1183,
-  serialized_end=1635,
+  serialized_start=1246,
+  serialized_end=1703,
   methods=[
   _descriptor.MethodDescriptor(
     name='bye',
@@ -1044,7 +1084,7 @@ _REACTOR = _descriptor.ServiceDescriptor(
     full_name='theory.Reactor.upsertModelLst',
     index=6,
     containing_service=None,
-    input_type=_MODELLSTDATA,
+    input_type=_MULTIMODELLSTDATA,
     output_type=_REACTORREQARR,
     options=None,
   ),

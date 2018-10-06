@@ -93,9 +93,13 @@ message Mdl{
   map<string, google.protobuf.Any> mdl = 1;
 }
 
+message MultiModelLstData{
+  repeated ModelLstData modelLstData = 1;
+}
+
 message ModelLstData{
   string appName = 1;
-  string modelName = 2;
+  string mdlName = 2;
   repeated string jsonDataLst = 3;
 }
 
@@ -133,6 +137,6 @@ service Reactor {
   rpc syncFormData(FieldData) returns (JsonData) {}
   rpc callCmdSubFxn(CmdFxnInput) returns (JsonData) {}
   rpc adaptFromUi(uiData4Adapter) returns (JsonData) {}
-  rpc upsertModelLst(ModelLstData) returns (ReactorReqArr) {}
+  rpc upsertModelLst(MultiModelLstData) returns (ReactorReqArr) {}
   rpc getMdlTbl(MdlTblReq) returns (SpreadSheetData) {}
 }

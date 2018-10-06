@@ -18,6 +18,7 @@ from theory.core.exceptions import ValidationError
 from theory.core.reactor.autoCompleteMixin import AutoCompleteMixin
 from theory.core.reactor.historyMixin import HistoryMixin
 from theory.conf import settings
+from theory.db import transaction
 from theory.db.model import Q
 from theory.gui import theory_pb2
 from theory.gui import theory_pb2_grpc
@@ -96,6 +97,15 @@ class Reactor(theory_pb2_grpc.ReactorServicer, AutoCompleteMixin, HistoryMixin):
       r.append(theory_pb2.ReactorReq(**action))
     return theory_pb2.ReactorReqArr(reqLst=r)
 
+  def _packGrpcJsonData(self, val):
+    try:
+      jsonData = json.dumps(val, cls=TheoryJSONEncoder)
+    except Exception as e: # eval can throw many different errors
+      self.logger.error(e, exc_info=True)
+      raise ValidationError(str(e))
+
+    return theory_pb2.JsonData(jsonData=jsonData)
+
   def bye(self, request, context):
     sys.exit(0)
 
@@ -110,43 +120,60 @@ class Reactor(theory_pb2_grpc.ReactorServicer, AutoCompleteMixin, HistoryMixin):
     return theory_pb2.SpreadSheetData(**dataComplex)
 
   def upsertModelLst(self, request, context):
-    modelModel = AppModel.objects.get(
-        app=request.appName,
-        name=request.modelName
-        )
-    modelKls = importClass(modelModel.importPath)
-    for modelData in request.jsonDataLst:
-      modelData = json.loads(modelData)
-      modelDataWoM2m = {}
-      m2mKeyLst = []
-      for k, v in modelData.iteritems():
-        if k.endswith('__m2m'):
-          m2mKeyLst.append(k)
-        elif isinstance(v, dict) and len(v) == 0:
-          # This special case is for HStoreField. May be it is a bug.
-          # HStoreField can not store an empty dict
-          continue
-        else:
-          modelDataWoM2m[k] = v
-      if "id" in modelData:
-        modelKls.objects.filter(id=modelData["id"]).update(**modelDataWoM2m)
-        if len(m2mKeyLst) > 0:
-          instance = modelKls.objects.get(id=modelData["id"])
-      else:
-        instance = modelKls(**modelDataWoM2m)
-        instance.save()
+    msg = ""
+    try:
+      with transaction.atomic():
+        for modelLstData in request.modelLstData:
+          msg += "=== {} - {} ===\n".format(
+            modelLstData.appName,
+            modelLstData.mdlName
+          )
 
-      if len(m2mKeyLst) > 0:
-        for k in m2mKeyLst:
-          if modelData[k] is not None:
-            getattr(instance, k[:-5]).add(*modelData[k])
+          modelModel = AppModel.objects.get(
+              app=modelLstData.appName,
+              name=modelLstData.mdlName
+              )
+          modelKls = importClass(modelModel.importPath)
 
-    self.actionQ.append({
-        "action": "cleanUpCrt",
-        })
+          for modelData in modelLstData.jsonDataLst:
+            modelData = json.loads(modelData)
+            modelDataWoM2m = {}
+            m2mKeyLst = []
+            for k, v in modelData.iteritems():
+              if k.endswith('__m2m'):
+                m2mKeyLst.append(k)
+              elif isinstance(v, dict) and len(v) == 0:
+                # This special case is for HStoreField. May be it is a bug.
+                # HStoreField can not store an empty dict
+                continue
+              else:
+                modelDataWoM2m[k] = v
+            if "id" in modelData:
+              modelKls.objects.filter(id=modelData["id"]).update(
+                **modelDataWoM2m
+              )
+              if len(m2mKeyLst) > 0:
+                instance = modelKls.objects.get(id=modelData["id"])
+            else:
+              instance = modelKls(**modelDataWoM2m)
+              instance.save()
+
+            if len(m2mKeyLst) > 0:
+              for k in m2mKeyLst:
+                if modelData[k] is not None:
+                  getattr(instance, k[:-5]).add(*modelData[k])
+          msg += "Status: success\n"
+          msg += "Msg: {0} models have been saved\n".format(
+            len(modelLstData.jsonDataLst)
+          )
+    except Exception as e:
+      self.logger.error(e)
+      msg += "Status: err\n"
+      msg += "Msg: {}\n".format(str(e))
+
     self.actionQ.append({
         "action": "printStdOut",
-        "val": "{0} models has been saved".format(len(request.jsonDataLst))
+        "val": msg,
         })
     return self._dumpActionQ()
 
@@ -186,13 +213,7 @@ class Reactor(theory_pb2_grpc.ReactorServicer, AutoCompleteMixin, HistoryMixin):
     else:
       val = {}
 
-    try:
-      jsonData = json.dumps(val, cls=TheoryJSONEncoder)
-    except Exception as e: # eval can throw many different errors
-      self.logger.error(e, exc_info=True)
-      raise ValidationError(str(e))
-
-    return theory_pb2.JsonData(jsonData=jsonData)
+    return self._packGrpcJsonData(val)
 
   def callCmdSubFxn(self, request, context):
     try:
@@ -207,13 +228,8 @@ class Reactor(theory_pb2_grpc.ReactorServicer, AutoCompleteMixin, HistoryMixin):
 
     if type(val).__name__ == "ReactorReq":
       return val
-    try:
-      jsonData = json.dumps(val, cls=TheoryJSONEncoder)
-    except Exception as e:
-      self.logger.error(e, exc_info=True)
-      raise ValidationError(str(e))
 
-    return theory_pb2.JsonData(jsonData=jsonData)
+    return self._packGrpcJsonData(val)
 
   def adaptFromUi(self, request, context):
     bridge = Bridge()
