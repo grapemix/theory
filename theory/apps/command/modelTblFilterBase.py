@@ -99,13 +99,13 @@ class ModelTblFilterBase(SimpleCommand):
           )
       return importClass(appModel.importPath).objects.all()
 
-    def _updateQueryset(self, appName, modelName):
+    def _updateQueryset(self, appName, mdlName):
       self.fields["queryset"].appName = appName
-      self.fields["queryset"].modelName = modelName
+      self.fields["queryset"].mdlName = mdlName
       self.fields["queryset"].queryset = \
           self._getQuerysetByAppAndModel(
               appName,
-              modelName
+              mdlName
               )
 
     def fillInitFields(self, cmdModel, cmdArgs, cmdKwargs):
@@ -120,7 +120,26 @@ class ModelTblFilterBase(SimpleCommand):
           ):
         # This is for QuerysetField preset the form for modelSelect
         appName = self.fields["appName"].initData
-        self.fields["modelName"].dynamicChoiceLst = self._getModelNameChoices(appName)
+        self._updateDynamicChoiceLst(appName)
+
+    def fillFinalFields(self, cmdModel, cmdArgs, cmdKwargs):
+      super(ModelTblFilterBase.ParamForm, self).fillFinalFields(
+          cmdModel,
+          cmdArgs,
+          cmdKwargs
+          )
+      if len(cmdArgs) == 3 or (
+          cmdKwargs.has_key("appName")
+          and cmdKwargs.has_key("modelName")
+          ):
+        # This is for QuerysetField preset the form for modelSelect
+        appName = self.fields["appName"].finalData
+        self._updateDynamicChoiceLst(appName)
+
+    def _updateDynamicChoiceLst(self, appName):
+        self.fields["modelName"].dynamicChoiceLst = self._getModelNameChoices(
+          appName
+        )
         modelName = self.fields["modelName"].dynamicChoiceLst[0][0]
         self._updateQueryset(appName, modelName)
 
