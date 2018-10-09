@@ -77,6 +77,10 @@ class ModelUpsert(SimpleCommand):
           )
       return importClass(appModel.importPath).objects.all()
 
+    def _updateDynamicChoiceLst(self, appName):
+        self.fields["modelName"].dynamicChoiceLst = \
+            self._getModelNameChoices(appName)
+
     def fillInitFields(self, cmdModel, cmdArgs, cmdKwargs):
       super(ModelUpsert.ParamForm, self).fillInitFields(
           cmdModel,
@@ -85,14 +89,23 @@ class ModelUpsert(SimpleCommand):
           )
       if len(cmdArgs) == 2:
         # This is for QuerysetField preset the form for modelSelect
-        appName = self.fields["appName"].initData
-        self.fields["modelName"].dynamicChoiceLst = self._getModelNameChoices(
-          appName
-        )
+        self._updateDynamicChoiceLst(self.fields["appName"].initData)
       elif cmdKwargs.has_key("appName") and cmdKwargs.has_key("modelName"):
         # For perseting by kwargs
-        self.fields["modelName"].dynamicChoiceLst = \
-            self._getModelNameChoices(cmdKwargs["appName"])
+        self._updateDynamicChoiceLst(cmdKwargs["appName"])
+
+    def fillFinalFields(self, cmdModel, cmdArgs, cmdKwargs):
+      super(ModelUpsert.ParamForm, self).fillFinalFields(
+          cmdModel,
+          cmdArgs,
+          cmdKwargs
+          )
+      if len(cmdArgs) == 2:
+        # This is for QuerysetField preset the form for modelSelect
+        self._updateDynamicChoiceLst(self.fields["appName"].finalData)
+      elif cmdKwargs.has_key("appName") and cmdKwargs.has_key("modelName"):
+        # For perseting by kwargs
+        self._updateDynamicChoiceLst(cmdKwargs["appName"])
 
     def _getModelNameChoices(self, appName):
       return [
