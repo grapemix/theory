@@ -308,7 +308,7 @@ class Reactor(theory_pb2_grpc.ReactorServicer, AutoCompleteMixin, HistoryMixin):
         ):
           # Since data in dynamicChoiceLst is assumed being updated frequently,
           # initData is sometimes unable to know in advance.
-          param["initData"] = param["choices"][0][0]
+          param["initData"] = list(param["choices"])[0][0]
         del param["dynamicChoiceLst"]
         if isinstance(param["choices"], set):
           param["choices"] = list(param["choices"])
