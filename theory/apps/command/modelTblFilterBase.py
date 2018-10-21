@@ -134,14 +134,18 @@ class ModelTblFilterBase(SimpleCommand):
           ):
         # This is for QuerysetField preset the form for modelSelect
         appName = self.fields["appName"].finalData
-        self._updateDynamicChoiceLst(appName)
+        self._updateDynamicChoiceLst(
+            appName,
+            cmdKwargs["modelName"]
+            )
 
-    def _updateDynamicChoiceLst(self, appName):
+    def _updateDynamicChoiceLst(self, appName, mdlName=None):
         self.fields["modelName"].dynamicChoiceLst = self._getModelNameChoices(
           appName
         )
-        modelName = self.fields["modelName"].dynamicChoiceLst[0][0]
-        self._updateQueryset(appName, modelName)
+        if mdlName is None:
+          mdlName = self.fields["modelName"].dynamicChoiceLst[0][0]
+        self._updateQueryset(appName, mdlName)
 
     def _getModelNameChoices(self, appName):
       return list(set(
