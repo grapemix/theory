@@ -61,7 +61,7 @@ class ProtoBufModelTblPaginator(TheoryModelBSONTblDataHandler):
     mdlKls = importClass(appModelMdl.importPath)
     pageNum -= 1
     self.q1 = mdlKls
-    queryset = mdlKls.objects.all().orderBy("id")[
+    queryset = mdlKls.objects.all()[
       pageNum * pageSize: (pageNum + 1) * pageSize
     ]
     self.q2 = queryset
