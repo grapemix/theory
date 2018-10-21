@@ -1822,7 +1822,7 @@ class QuerysetField(Field):
   widget = QueryIdInput
   defaultErrorMessages = {
     'invalid': _('Unable to import the given queryset'),
-    'dbInvalid': _('Unable to find data({}) in DB'),
+    'dbInvalid': _('Unable to find data({value}) in DB'),
     'appInvalid': _('No app has been set'),
     'mdlInvalid': _('No model has been set'),
     'configInvalid': _('Configuration has been invalid'),
@@ -1904,16 +1904,16 @@ class QuerysetField(Field):
         # the id set is in the given queryset
         if dbClass.objects.filter(id=value).count() == 0:
           raise ValidationError(
-              self.errorMessages['dbInvalid'] % {'value': value}
+              self.errorMessages['dbInvalid'].format(value=value)
           )
         self.dbCleanData.add(value)
       else:
-        if self.dbCleanData >= value:
+        if self.dbCleanData >= set(value):
           # all values already checked before
           return value
         if len(value) != dbClass.objects.filter(id__in=value).count():
           raise ValidationError(
-              self.errorMessages['dbInvalid'] % {'value': value}
+              self.errorMessages['dbInvalid'].format(value=value)
           )
         for i in value:
           self.dbCleanData.add(i)
@@ -1923,7 +1923,7 @@ class QuerysetField(Field):
       logger = logging.getLogger(__name__)
       logger.error(e, exc_info=True)
       raise ValidationError(
-          self.errorMessages['dbInvalid'] % {'value': value}
+          self.errorMessages['dbInvalid'].format(value=value)
       )
 
     return value
