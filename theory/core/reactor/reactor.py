@@ -303,7 +303,7 @@ class Reactor(theory_pb2_grpc.ReactorServicer, AutoCompleteMixin, HistoryMixin):
           cmdParamForm.fields[row["name"]],
           "dynamicChoiceLst"
         )
-        if param["required"] and (
+        if param["required"] and param["type"] == "ChoiceField" and (
             "initData" not in param or param["initData"] is None
         ):
           # Since data in dynamicChoiceLst is assumed being updated frequently,
