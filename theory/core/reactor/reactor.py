@@ -292,6 +292,8 @@ class Reactor(theory_pb2_grpc.ReactorServicer, AutoCompleteMixin, HistoryMixin):
           param["choices"] = [[param["initData"], param["initData"]]]
           if isinstance(param["choices"], set):
             param["choices"] = list(param["choices"])
+          if len(param["dynamicChoiceLst"]) == 0:
+            del param["dynamicChoiceLst"]
         row["param"] = json.dumps(param, cls=TheoryJSONEncoder)
       elif "dynamicChoiceLst" in param:
         if cmdParamForm is None:
