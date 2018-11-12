@@ -41,7 +41,7 @@ class FilenameScanner(SimpleCommand):
     )
 
     rootLst = field.ListField(
-        field.TextField(maxLength=512),
+        field.TextField(maxLen=512),
         label="Root Directory List"
     )
     yieldMethod = field.ChoiceField(
@@ -58,25 +58,25 @@ class FilenameScanner(SimpleCommand):
         helpText="The recursion level. (0 = not recursive, -1 = recursive infinitely)"
     )
     includeFileExtLst = field.ListField(
-        field.TextField(maxLength=10),
+        field.TextField(maxLen=10),
         label="The list of file extension being included",
         helpText="File extenstion being included",
         required=False
     )
     excludeFileExtLst = field.ListField(
-        field.TextField(maxLength=10),
+        field.TextField(maxLen=10),
         label="The list of file extension being excluded",
         helpText="File extenstion being excluded",
         required=False
     )
     includeDirLst = field.ListField(
-        field.TextField(maxLength=512),
+        field.TextField(maxLen=512),
         label="The list of directory being included",
         helpText="Directory being included",
         required=False
     )
     excludeDirLst = field.ListField(
-        field.TextField(maxLength=512),
+        field.TextField(maxLen=512),
         label="The list of directory being excluded",
         helpText="Directory being excluded",
         required=False

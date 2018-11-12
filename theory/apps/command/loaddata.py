@@ -56,7 +56,7 @@ class Loaddata(SimpleCommand):
 
   class ParamForm(SimpleCommand.ParamForm):
     fixtureLabelLst = field.ListField(
-        field.TextField(maxLength=256),
+        field.TextField(maxLen=256),
         label="Fixture Label",
         helpText="Fixture labels",
         )
@@ -71,7 +71,7 @@ class Loaddata(SimpleCommand):
     appLabel = field.TextField(
         label="Application Label",
         helpText=" The name of application being loaded",
-        maxLength=32
+        maxLen=32
         )
     isIgnorenonexistent = field.BooleanField(
         label="is ignore non existent",

@@ -2,6 +2,7 @@
 ##### System wide lib #####
 from collections import namedtuple
 import json
+import sys
 
 ##### Theory lib #####
 from theory.apps.model import AppModel, Command
@@ -275,6 +276,7 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
               "showHiddenInitial": False,
               "type": "TextField",
               "widgetIsContentChgTrigger": False,
+              "maxLen": 256,
               "widgetIsFocusChgTrigger": False
             },
             "formField": {
@@ -293,6 +295,7 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
               "label": "Form field",
               "localize": False,
               "required": True,
+              "maxLen": sys.maxint,
               "showHiddenInitial": False,
               "type": "ListField",
               "widgetIsContentChgTrigger": False,
@@ -323,6 +326,7 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
               "label": "Import path",
               "localize": False,
               "required": True,
+              "maxLen": 256,
               "showHiddenInitial": False,
               "type": "TextField",
               "widgetIsContentChgTrigger": False,
@@ -352,6 +356,7 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
               "label": "App model name",
               "localize": False,
               "required": True,
+              "maxLen": 256,
               "showHiddenInitial": False,
               "type": "TextField",
               "widgetIsContentChgTrigger": False,
@@ -373,6 +378,7 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
               "label": "Table field",
               "localize": False,
               "required": True,
+              "maxLen": sys.maxint,
               "showHiddenInitial": False,
               "type": "ListField",
               "widgetIsContentChgTrigger": False,
@@ -498,6 +504,7 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
               "helpText":"Application model name",
               "showHiddenInitial":False,
               "localize":False,
+              "maxLen": 256,
               "widgetIsFocusChgTrigger":False,
               "type":"TextField"
             },
@@ -514,6 +521,7 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
               "showHiddenInitial":False,
               "localize":False,
               "widgetIsFocusChgTrigger":False,
+              "maxLen": 256,
               "type":"TextField"
             },
             "tblField":{
@@ -534,6 +542,7 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
               "childFieldTemplate":"TextField",
               "showHiddenInitial":False,
               "localize":False,
+              "maxLen": sys.maxint,
               "widgetIsFocusChgTrigger":False,
               "type":"ListField"
             },
@@ -555,6 +564,7 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
               "childFieldTemplate":"TextField",
               "showHiddenInitial":False,
               "localize":False,
+              "maxLen": sys.maxint,
               "widgetIsFocusChgTrigger":False,
               "type":"ListField"
             },
@@ -570,6 +580,7 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
               "helpText":"The path to import the model",
               "showHiddenInitial":False,
               "localize":False,
+              "maxLen": 256,
               "widgetIsFocusChgTrigger":False,
               "type":"TextField"
             },

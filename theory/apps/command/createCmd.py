@@ -33,7 +33,7 @@ class CreateCmd(SimpleCommand):
     cmdName = field.TextField(
         label="Command Name",
         helpText=" The name of command being created in lowercase.",
-        maxLength=32
+        maxLen=32
     )
     cmdType = field.ChoiceField(
         label="Command Type",
@@ -47,7 +47,7 @@ class CreateCmd(SimpleCommand):
         )
     )
     propertyNameLst = field.ListField(
-        field.TextField(maxLength=96),
+        field.TextField(maxLen=96),
         label="Property Name List",
         helpText=" The name list of property being created",
         required=False,

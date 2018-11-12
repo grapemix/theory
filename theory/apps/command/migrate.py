@@ -63,7 +63,7 @@ class Migrate(SimpleCommand):
         label="Application Name",
         helpText=" The name of application being created",
         required=False,
-        maxLength=32
+        maxLen=32
         )
     isInitialData = field.BooleanField(
         label="is initial data",
@@ -84,7 +84,7 @@ class Migrate(SimpleCommand):
           'Database state will be brought to the state after that migration.'
           ),
         required=False,
-        maxLength=64
+        maxLen=64
         )
     isFake = field.BooleanField(
         label="is fake",

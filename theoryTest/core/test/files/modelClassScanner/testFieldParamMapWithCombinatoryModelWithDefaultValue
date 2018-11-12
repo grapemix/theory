@@ -576,13 +576,13 @@
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "maxLength"
+            "name": "maxLen"
           }, 
           {
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "minLength"
+            "name": "minLen"
           }, 
           {
             "childParamLst": [], 
@@ -1375,13 +1375,13 @@
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "maxLength"
+            "name": "maxLen"
           }, 
           {
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "minLength"
+            "name": "minLen"
           }, 
           {
             "childParamLst": [], 
@@ -1487,13 +1487,13 @@
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "maxLength"
+            "name": "maxLen"
           }, 
           {
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "minLength"
+            "name": "minLen"
           }, 
           {
             "childParamLst": [], 
@@ -1738,13 +1738,13 @@
         "childParamLst": [], 
         "isCircular": false, 
         "isField": false, 
-        "name": "maxLength"
+        "name": "maxLen"
       }, 
       {
         "childParamLst": [], 
         "isCircular": false, 
         "isField": false, 
-        "name": "minLength"
+        "name": "minLen"
       }, 
       {
         "childParamLst": [], 
@@ -2938,13 +2938,13 @@
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "maxLength"
+            "name": "maxLen"
           }, 
           {
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "minLength"
+            "name": "minLen"
           }, 
           {
             "childParamLst": [], 
@@ -3701,13 +3701,13 @@
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "maxLength"
+            "name": "maxLen"
           }, 
           {
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "minLength"
+            "name": "minLen"
           }, 
           {
             "childParamLst": [], 
@@ -3807,13 +3807,13 @@
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "maxLength"
+            "name": "maxLen"
           }, 
           {
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "minLength"
+            "name": "minLen"
           }, 
           {
             "childParamLst": [], 
@@ -4413,13 +4413,13 @@
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "maxLength"
+            "name": "maxLen"
           }, 
           {
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "minLength"
+            "name": "minLen"
           }, 
           {
             "childParamLst": [], 
@@ -5212,13 +5212,13 @@
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "maxLength"
+            "name": "maxLen"
           }, 
           {
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "minLength"
+            "name": "minLen"
           }, 
           {
             "childParamLst": [], 
@@ -5324,13 +5324,13 @@
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "maxLength"
+            "name": "maxLen"
           }, 
           {
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "minLength"
+            "name": "minLen"
           }, 
           {
             "childParamLst": [], 
@@ -6011,13 +6011,13 @@
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "maxLength"
+            "name": "maxLen"
           }, 
           {
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "minLength"
+            "name": "minLen"
           }, 
           {
             "childParamLst": [], 
@@ -6774,13 +6774,13 @@
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "maxLength"
+            "name": "maxLen"
           }, 
           {
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "minLength"
+            "name": "minLen"
           }, 
           {
             "childParamLst": [], 
@@ -6880,13 +6880,13 @@
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "maxLength"
+            "name": "maxLen"
           }, 
           {
             "childParamLst": [], 
             "isCircular": false, 
             "isField": false, 
-            "name": "minLength"
+            "name": "minLen"
           }, 
           {
             "childParamLst": [], 
@@ -7079,13 +7079,13 @@
         "childParamLst": [], 
         "isCircular": false, 
         "isField": false, 
-        "name": "maxLength"
+        "name": "maxLen"
       }, 
       {
         "childParamLst": [], 
         "isCircular": false, 
         "isField": false, 
-        "name": "minLength"
+        "name": "minLen"
       }, 
       {
         "childParamLst": [], 
@@ -7138,13 +7138,13 @@
         "childParamLst": [], 
         "isCircular": false, 
         "isField": false, 
-        "name": "maxLength"
+        "name": "maxLen"
       }, 
       {
         "childParamLst": [], 
         "isCircular": false, 
         "isField": false, 
-        "name": "minLength"
+        "name": "minLen"
       }, 
       {
         "childParamLst": [], 

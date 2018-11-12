@@ -38,7 +38,7 @@ class Tester(SimpleCommand):
         required=False
         )
     testLabel = field.ListField(
-        field.TextField(maxLength=64),
+        field.TextField(maxLen=64),
         label="Test Label",
         helpText=(
           "Labels must be of the form: - app.TestClass.test_method\n"

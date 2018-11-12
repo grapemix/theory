@@ -41,7 +41,7 @@ class MakeMigration(SimpleCommand):
 
   class ParamForm(SimpleCommand.ParamForm):
     appLabelLst = field.ListField(
-        field.TextField(maxLength=32),
+        field.TextField(maxLen=32),
         label="Application Name",
         helpText='Specify the app label(s) to create migrations for.',
         required=False,

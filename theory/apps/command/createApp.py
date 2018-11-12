@@ -30,7 +30,7 @@ class CreateApp(SimpleCommand):
     appName = field.TextField(
         label="Application Name",
         helpText=" The name of application being created",
-        maxLength=32
+        maxLen=32
         )
 
   def run(self):

@@ -338,14 +338,14 @@ class TextField(Field):
   widget = StringInput
   lineBreak = "\n"
 
-  def __init__(self, maxLength=None, minLength=None, *args, **kwargs):
-    self.maxLength, self.minLength = maxLength, minLength
+  def __init__(self, maxLen=None, minLen=None, *args, **kwargs):
+    self.maxLen, self.minLen = maxLen, minLen
     super(TextField, self).__init__(*args, **kwargs)
-    if minLength is not None:
-      self.validators.append(validators.MinLengthValidator(int(minLength)))
-    if maxLength is not None:
-      self.validators.append(validators.MaxLengthValidator(int(maxLength)))
-      if(maxLength>128):
+    if minLen is not None:
+      self.validators.append(validators.MinLengthValidator(int(minLen)))
+    if maxLen is not None:
+      self.validators.append(validators.MaxLengthValidator(int(maxLen)))
+      if(maxLen>128):
         self.widget = TextInput
 
   def toPython(self, value):
@@ -355,7 +355,7 @@ class TextField(Field):
     return smartText(value)
 
   def widgetAttrs(self, widget):
-    if(self.maxLength<64):
+    if(self.maxLen<64):
       return {"isSingleLine": True}
 
   @property
@@ -661,7 +661,7 @@ class DateTimeField(BaseTemporalField):
 
 
 class RegexField(TextField):
-  def __init__(self, regex, maxLength=None, minLength=None, errorMessage=None, *args, **kwargs):
+  def __init__(self, regex, maxLen=None, minLen=None, errorMessage=None, *args, **kwargs):
     """
     regex can be either a string or a compiled regular expression object.
     errorMessage is an optional error message to use, if
@@ -672,7 +672,7 @@ class RegexField(TextField):
       errorMessages = kwargs.get('errorMessages') or {}
       errorMessages['invalid'] = errorMessage
       kwargs['errorMessages'] = errorMessages
-    super(RegexField, self).__init__(maxLength, minLength, *args, **kwargs)
+    super(RegexField, self).__init__(maxLen, minLen, *args, **kwargs)
     self._setRegex(regex)
 
   def _getRegex(self):
@@ -704,7 +704,7 @@ class FileField(Field):
     'invalid': _("No file was submitted. Check the encoding type on the form."),
     'missing': _("No file was submitted."),
     'empty': _("The submitted file is empty."),
-    'maxLength': ungettextLazy(
+    'maxLen': ungettextLazy(
       'Ensure this filename has at most %(max)d character (it has %(length)d).',
       'Ensure this filename has at most %(max)d characters (it has %(length)d).',
       'max'),
@@ -712,7 +712,7 @@ class FileField(Field):
   }
 
   def __init__(self, *args, **kwargs):
-    self.maxLength = kwargs.pop('maxLength', None)
+    self.maxLen = kwargs.pop('maxLen', None)
     self.allowEmptyFile = kwargs.pop('allowEmptyFile', False)
     self.initDir = kwargs.pop('initDir', None)
     super(FileField, self).__init__(*args, **kwargs)
@@ -735,9 +735,9 @@ class FileField(Field):
     except AttributeError:
       raise ValidationError(self.errorMessages['invalid'], code='invalid')
 
-    if self.maxLength is not None and len(fileName) > self.maxLength:
-      params = {'max': self.maxLength, 'length': len(fileName)}
-      raise ValidationError(self.errorMessages['maxLength'], code='maxLength', params=params)
+    if self.maxLen is not None and len(fileName) > self.maxLen:
+      params = {'max': self.maxLen, 'length': len(fileName)}
+      raise ValidationError(self.errorMessages['maxLen'], code='maxLen', params=params)
     if not fileName:
       raise ValidationError(self.errorMessages['invalid'], code='invalid')
     if not self.allowEmptyFile and not fileSize:
@@ -1179,8 +1179,8 @@ class ListField(Field):
       self,
       field,
       initData=[],
-      minLength=0,
-      maxLength=sys.maxint,
+      minLen=0,
+      maxLen=sys.maxint,
       *args,
       **kwargs
       ):
@@ -1191,9 +1191,9 @@ class ListField(Field):
     self.fields = []
     self.childFieldTemplate = copy.deepcopy(field)
     # It stores the minium number of elements is required in this field
-    self.minLength = minLength
+    self.minLen = minLen
     # It stores the maxium number of elements is required in this field
-    self.maxLength = maxLength
+    self.maxLen = maxLen
 
     kwargs["initData"] = initData
     super(ListField, self).__init__(*args, **kwargs)
@@ -1251,8 +1251,8 @@ class ListField(Field):
     del self.fields[idx]
 
   def validate(self, valueList):
-    if((self.required and len(valueList)<self.minLength) \
-        or len(valueList)>self.maxLength):
+    if((self.required and len(valueList)<self.minLen) \
+        or len(valueList)>self.maxLen):
       raise ValidationError(self.errorMessages['required'])
 
   def clean(self, valueList, isEmptyForgiven=False):
@@ -1262,8 +1262,8 @@ class ListField(Field):
     """
     cleanData = []
     errors = ErrorList()
-    if((self.required and len(valueList)<self.minLength) \
-        or len(valueList)>self.maxLength):
+    if((self.required and len(valueList)<self.minLen) \
+        or len(valueList)>self.maxLen):
       raise ValidationError(self.errorMessages['required'])
 
     for value in valueList:
@@ -1335,7 +1335,7 @@ class DictField(Field):
   }
 
   def __init__(
-      self, keyField, valueField, initData={}, minLength=0, maxLength=sys.maxint,
+      self, keyField, valueField, initData={}, minLen=0, maxLen=sys.maxint,
       *args, **kwargs
       ):
 
@@ -1349,9 +1349,9 @@ class DictField(Field):
     self.childKeyFieldTemplate = copy.deepcopy(keyField)
     self.childValueFieldTemplate = copy.deepcopy(valueField)
     # It stores the minium number of elements is required in this field
-    self.minLength = minLength
+    self.minLen = minLen
     # It stores the maxium number of elements is required in this field
-    self.maxLength = maxLength
+    self.maxLen = maxLen
 
     kwargs["initData"] = initData
     super(DictField, self).__init__(*args, **kwargs)
@@ -1390,8 +1390,8 @@ class DictField(Field):
     del self.valueFields[idx]
 
   def validate(self, valueDict):
-    if((self.required and len(valueDict)<self.minLength) \
-        or len(valueDict)>self.maxLength):
+    if((self.required and len(valueDict)<self.minLen) \
+        or len(valueDict)>self.maxLen):
       raise ValidationError(self.errorMessages['required'])
 
   def clean(self, valueOrderedDict, isEmptyForgiven=False):
@@ -1402,8 +1402,8 @@ class DictField(Field):
     cleanData = OrderedDict()
     errors = ErrorList()
     valueOrderedDictLen = len(valueOrderedDict)
-    if((self.required and valueOrderedDictLen<self.minLength) \
-        or valueOrderedDictLen>self.maxLength):
+    if((self.required and valueOrderedDictLen<self.minLen) \
+        or valueOrderedDictLen>self.maxLen):
       raise ValidationError(self.errorMessages['required'])
     if(valueOrderedDictLen==0
         and len(self.keyFields)==1
@@ -1754,7 +1754,7 @@ class PythonModuleField(Field):
     'invalid': _('Unable to import the given module'),
   }
 
-  def __init__(self, maxLength=None, minLength=None, autoImport=False, *args, **kwargs):
+  def __init__(self, maxLen=None, minLen=None, autoImport=False, *args, **kwargs):
     super(PythonModuleField, self).__init__(*args, **kwargs)
     self.widget = StringInput
     self.autoImport = autoImport
@@ -1787,7 +1787,7 @@ class PythonClassField(Field):
     'wrong_classtype': _('The given class is not matched'),
   }
 
-  def __init__(self, maxLength=None, minLength=None, autoImport=False, klassType=None, *args, **kwargs):
+  def __init__(self, maxLen=None, minLen=None, autoImport=False, klassType=None, *args, **kwargs):
     super(PythonClassField, self).__init__(*args, **kwargs)
     self.widget = StringInput
     self.autoImport = autoImport
@@ -1899,14 +1899,17 @@ class QuerysetField(Field):
         self.mdlName
         )
       )
-      if self.maxLen == 1 and value not in self.dbCleanData:
-        # We are not actually return the new queryset, instead, we just check if
-        # the id set is in the given queryset
-        if dbClass.objects.filter(id=value).count() == 0:
-          raise ValidationError(
-              self.errorMessages['dbInvalid'].format(value=value)
-          )
-        self.dbCleanData.add(value)
+      if self.maxLen == 1:
+        if value in self.dbCleanData:
+          return value
+        else:
+          # We are not actually return the new queryset, instead, we just check if
+          # the id set is in the given queryset
+          if dbClass.objects.filter(id=value).count() == 0:
+            raise ValidationError(
+                self.errorMessages['dbInvalid'].format(value=value)
+            )
+          self.dbCleanData.add(value)
       else:
         if self.dbCleanData >= set(value):
           # all values already checked before

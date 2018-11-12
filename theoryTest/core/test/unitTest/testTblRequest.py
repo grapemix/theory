@@ -60,107 +60,68 @@ class TestTblRequest(TestCase):
         1,
         3
     )
-    self.assertDict(
-      dataComplex,
-      {
-        "fieldNameVsProp": [
-          {
-            "k": "comment",
-            "v": {
-              "klassLabel": "strField",
-              "type": "str"
-            }
-          },
-          {
-            "k": "isReadOnly",
-            "v": {
-              "klassLabel": "boolField",
-              "type": "bool"
-            }
-          },
-          {
-            "k": "isOptional",
-            "v": {
-              "klassLabel": "boolField",
-              "type": "bool"
-            }
-          },
-          {
-            "k": "param",
-            "v": {
-              "klassLabel": "strField",
-              "type": "str"
-            }
-          },
-          {
-            "k": "type",
-            "v": {
-              "klassLabel": "strField",
-              "type": "str"
-            }
-          },
-          {
-            "k": "name",
-            "v": {
-              "klassLabel": "strField",
-              "type": "str"
-            }
-          },
-          {
-            "k": "id",
-            "v": {
-              "klassLabel": "nonEditableForceStrField",
-              "type": "nonEditableForceStr"
-            }
-          },
-          {
-            "k": "command",
-            "v": {
-              "klassLabel": "modelField",
-              "foreignModel": "Command",
-              "type": "model",
-              "foreignApp": "theory.apps"
-            }
+    self.assertEqual(
+      dataComplex["fieldNameVsProp"],
+      [
+        {
+          "k": "comment",
+          "v": {
+            "klassLabel": "strField",
+            "type": "str"
           }
-        ],
-        "mdlTotalNum": 102,
-        "dataLst": [
-          {
-            'cell': [
-              u'',
-              '0',
-              '1',
-              u'{"errorMessages": {"required": "This field is required.", "invalid": "Enter a whole number."}, "widgetIsContentChgTrigger": false, "required": false, "initData": 1, "label": "verbosity", "helpText": "", "showHiddenInitial": false, "localize": false, "widgetIsFocusChgTrigger": false, "type": "IntegerField"}',
-              u'',
-              u'verbosity',
-              u'1',
-              '1'
-            ]
-          },
-          {
-            'cell': [
-              u'',
-              '0',
-              '0',
-              u'{"errorMessages": {"required": "This field is required.", "invalidChoice": "Select a valid choice. %(value)s is not one of the available choices.", "invalid": "Enter a valid value."}, "widgetIsContentChgTrigger": false, "required": true, "initData": "theory.apps", "label": "Application Name", "choices": [], "helpText": "The name of applications to be listed", "dynamicChoiceLst": "", "showHiddenInitial": false, "localize": false, "widgetIsFocusChgTrigger": true, "type": "ChoiceField"}',
-              u'',
-              u'appName',
-              u'2',
-              '1'
-            ]
-          },
-          {
-            'cell': [
-              u'',
-              '0',
-              '0',
-              u'{"errorMessages": {"required": "This field is required.", "invalidChoice": "Select a valid choice. %(value)s is not one of the available choices.", "invalid": "Enter a valid value."}, "widgetIsContentChgTrigger": false, "required": true, "initData": null, "label": "Model Name", "choices": [], "helpText": "The name of models to be listed", "dynamicChoiceLst": "", "showHiddenInitial": false, "localize": false, "widgetIsFocusChgTrigger": false, "type": "ChoiceField"}',
-              u'',
-              u'modelName',
-              u'3',
-              '1'
-            ]
+        },
+        {
+          "k": "isReadOnly",
+          "v": {
+            "klassLabel": "boolField",
+            "type": "bool"
           }
-        ]
-      }
+        },
+        {
+          "k": "isOptional",
+          "v": {
+            "klassLabel": "boolField",
+            "type": "bool"
+          }
+        },
+        {
+          "k": "param",
+          "v": {
+            "klassLabel": "strField",
+            "type": "str"
+          }
+        },
+        {
+          "k": "type",
+          "v": {
+            "klassLabel": "strField",
+            "type": "str"
+          }
+        },
+        {
+          "k": "name",
+          "v": {
+            "klassLabel": "strField",
+            "type": "str"
+          }
+        },
+        {
+          "k": "id",
+          "v": {
+            "klassLabel": "nonEditableForceStrField",
+            "type": "nonEditableForceStr"
+          }
+        },
+        {
+          "k": "command",
+          "v": {
+            "klassLabel": "modelField",
+            "foreignModel": "Command",
+            "type": "model",
+            "foreignApp": "theory.apps"
+          }
+        }
+      ],
     )
+    self.assertEqual(dataComplex["mdlTotalNum"], 102)
+    self.assertEqual(len(dataComplex["dataLst"]), 3)

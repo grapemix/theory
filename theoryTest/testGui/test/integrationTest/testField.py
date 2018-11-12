@@ -261,14 +261,14 @@ class FileFieldTestCase(FieldTestCaseBase, TestCase):
     initData=os.path.join(self.testCaseFileAbsPath, "jpeg.jpg")
     self.field = self.fieldKlass(
         initData=initData,
-        maxLength=1,
+        maxLen=1,
         )
     self.renderWidget(self.field)
 
     with self.assertRaises(ValidationError):
       self.assertEqual(self.field.clean(self.field.finalData), {})
 
-    self.field.maxLength = 99999
+    self.field.maxLen = 99999
     self.assertEqual(
         self.field.clean(self.field.finalData).filepath,
         LocalFileObject(initData).filepath
@@ -305,14 +305,14 @@ class FilePathFieldTestCase(FieldTestCaseBase, TestCase):
     initData=os.path.join(self.testCaseFileAbsPath, "jpeg.jpg")
     self.field = self.fieldKlass(
         initData=initData,
-        maxLength=1,
+        maxLen=1,
         )
     self.renderWidget(self.field)
 
     with self.assertRaises(ValidationError):
       self.assertEqual(self.field.clean(self.field.finalData), {})
 
-    self.field.maxLength = 99999
+    self.field.maxLen = 99999
     self.assertEqual(
         self.field.clean(self.field.finalData).filepath,
         LocalFileObject(initData).filepath
@@ -396,10 +396,10 @@ class ListFieldTestCase(FieldTestCaseBase, TestCase):
   def testEmptyFinalValue(self):
     self.field = self.fieldKlass(**self.extraInitParam())
     self.renderWidget(self.field)
-    self.field.minLength = 5
+    self.field.minLen = 5
     with self.assertRaises(ValidationError):
       self.assertEqual(self.field.clean(self.field.finalData), [])
-    self.field.minLength = 0
+    self.field.minLen = 0
     self.assertEqual(self.field.clean(self.field.finalData), [])
 
   def testSingleElementInitValue(self):
@@ -438,10 +438,10 @@ class DictFieldTestCase(FieldTestCaseBase, TestCase):
   def testEmptyFinalValue(self):
     self.field = self.fieldKlass(**self.extraInitParam())
     self.renderWidget(self.field)
-    self.field.minLength = 5
+    self.field.minLen = 5
     with self.assertRaises(ValidationError):
       self.field.clean(self.field.finalData)
-    self.field.minLength = 0
+    self.field.minLen = 0
     self.assertEqual(self.field.clean(self.field.finalData), {})
 
 class PythonModuleFieldTestCase(FieldTestCaseBase, TestCase):

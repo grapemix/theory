@@ -37,7 +37,7 @@ class Dumpdata(SimpleCommand):
 
   class ParamForm(SimpleCommand.ParamForm):
     appLabelLst = field.ListField(
-        field.TextField(maxLength=64),
+        field.TextField(maxLen=64),
         label="app label list",
         helpText='Restricts dumped data to the specified appLabel or appLabel.ModelName.',
         initData=[],
@@ -64,7 +64,7 @@ class Dumpdata(SimpleCommand):
         initData=DEFAULT_DB_ALIAS,
         )
     excludeLst = field.ListField(
-        field.TextField(maxLength=64),
+        field.TextField(maxLen=64),
         label="exclude list",
         helpText='appLabel or appLabel.ModelName to exclude ',
         initData=[],

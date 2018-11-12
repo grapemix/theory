@@ -38,7 +38,7 @@ class FormBaseTestCase(TestCase):
   To test the FormBase.
   """
   class TestForm(StepForm):
-    initField = field.TextField(initData="test", maxLength=5)
+    initField = field.TextField(initData="test", maxLen=5)
     emptyField = field.TextField()
 
 

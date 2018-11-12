@@ -47,7 +47,13 @@ class CommandClassScanner(BaseClassScanner):
     pass
 
   def getParmFormFieldDesc(self, field, row):
-    optionalParamLst = ["maxLen", "uiPropagate", "appName", "mdlName"]
+    optionalParamLst = [
+      "maxLen",
+      "minLen",
+      "uiPropagate",
+      "appName",
+      "mdlName"
+    ]
     for i in [
         'helpText',
         'initData',
@@ -64,6 +70,7 @@ class CommandClassScanner(BaseClassScanner):
         'childValueFieldTemplate',
         'uiPropagate',
         'maxLen',
+        'minLen',
         'appName',
         'mdlName',
         ]:
@@ -72,7 +79,7 @@ class CommandClassScanner(BaseClassScanner):
         if type(val).__name__ == "__proxy__":
           # for fields from model form
           val = unicode(val)
-        elif (val is None or val == "" or val == 0) and i in optionalParamLst:
+        elif (val is None or val == "" or val == 0 or val == {}) and i in optionalParamLst:
           continue
         elif isinstance(val, dict):
           # for errorMessages

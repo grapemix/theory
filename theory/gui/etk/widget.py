@@ -608,8 +608,8 @@ class ListInput(BaseLabelInput):
     self.widgetClass = childFieldTemplate.widget.widgetClass
 
     if(self.widgetClass==StringInput.widgetClass):
-      if(hasattr(childFieldTemplate, "maxLength") \
-          and childFieldTemplate.maxLength>20):
+      if(hasattr(childFieldTemplate, "maxLen") \
+          and childFieldTemplate.maxLen>20):
         self.widgetClass = TextInput.widgetClass
         self._createWidget = self._createLongStringWidget
         self.lineBreak = childFieldTemplate.widget.lineBreak

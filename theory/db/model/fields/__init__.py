@@ -839,6 +839,9 @@ class Field(RegisterLookupMixin):
     defaults.update(kwargs)
     if formClass is None:
       formClass = field.TextField
+    if "maxLength" in defaults:
+      defaults["maxLen"] = defaults["maxLength"]
+      del defaults["maxLength"]
     return formClass(**defaults)
 
   def valueFromObject(self, obj):
