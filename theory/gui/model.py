@@ -1153,8 +1153,8 @@ class ModelChoiceField(Field):
       })
     super(ModelChoiceField, self).renderWidget(*args, **kwargs)
     self.widget.queryset = self.queryset
-    self.widget.app = appName
-    self.widget.model = self.queryset.modal.__name__
+    self.widget.attrs["appName"] = appName
+    self.widget.attrs["mdlName"] = self.queryset.modal.__name__
 
   #def __deepcopy__(self, memo):
   #  result = super(ChoiceField, self).__deepcopy__(memo)
@@ -1181,8 +1181,8 @@ class ModelChoiceField(Field):
       self.widget.queryset = queryset
       module = queryset.modal.__module__
       appName = module[:module.find(".model")]
-      self.widget.app = appName
-      self.widget.model = queryset.modal.__name__
+      self.widget.attrs["appName"] = appName
+      self.widget.attrs["mdlName"] = queryset.modal.__name__
 
   queryset = property(_getQueryset, _setQueryset)
 
