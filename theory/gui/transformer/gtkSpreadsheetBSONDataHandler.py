@@ -36,7 +36,7 @@ class GtkSpreadsheetModelBSONDataHandler(TheoryModelTblDetectorBase):
     self._buildTypeCatMap()
     handlerLst = []
 
-    for fieldName, fieldProp in fieldNameVsProp.iteritems():
+    for fieldName, fieldProp in fieldNameVsProp.items():
       handlerLst.append((
         fieldName,
         getattr(self, "_%sDataHandler" % (fieldProp["klassLabel"])),
@@ -47,12 +47,12 @@ class GtkSpreadsheetModelBSONDataHandler(TheoryModelTblDetectorBase):
     numOfRow = len(dataRow)
     rowCounter = 0
     r = []
-    for columnLabel, handlerLabel in columnHandlerLabelZip.iteritems():
+    for columnLabel, handlerLabel in columnHandlerLabelZip.items():
       if handlerLabel=="enumField":
         fieldProperty =  self.fieldNameVsProp[columnLabel]
         fieldProperty["reverseChoices"] = \
             dict([
-              (v, k) for k,v in fieldProperty["choices"].iteritems()
+              (v, k) for k,v in fieldProperty["choices"].items()
               ])
 
     fieldNameLst = self.fieldNameVsProp.keys()
@@ -85,11 +85,11 @@ class GtkSpreadsheetModelBSONDataHandler(TheoryModelTblDetectorBase):
     pass
 
   def _nonEditableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
-    return fieldVal
+    return str(fieldVal)
     pass
 
   def _editableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
-    return unicode(fieldVal.decode("utf8"))
+    return str(fieldVal)
 
   def _dictFieldDataHandler(self, rowId, fieldName, fieldVal):
     # it is supposed to be no editable in this version
@@ -134,13 +134,13 @@ class GtkSpreadsheetModelBSONDataHandler(TheoryModelTblDetectorBase):
   def _strFieldDataHandler(self, rowId, fieldName, fieldVal):
     if fieldVal == u"None":
       return None
-    return unicode(fieldVal.decode("utf8"))
+    return str(fieldVal)
 
   def _floatFieldDataHandler(self, rowId, fieldName, fieldVal):
     return float(fieldVal)
 
   def _intFieldDataHandler(self, rowId, fieldName, fieldVal):
-    return long(fieldVal)
+    return int(fieldVal)
 
   def _enumFieldDataHandler(self, rowId, fieldName, fieldVal):
     if fieldVal == u"None":

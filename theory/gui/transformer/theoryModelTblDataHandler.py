@@ -24,7 +24,7 @@ class TheoryModelTblDataHandler(TheoryModelBSONTblDataHandler):
   """
 
   def _editableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
-    return unicode(fieldVal)
+    return str(fieldVal)
 
   def _listFieldeditableForceStrFieldDataHandler(
       self,

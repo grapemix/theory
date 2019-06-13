@@ -4,7 +4,7 @@ from collections import OrderedDict
 from copy import deepcopy
 from datetime import datetime
 from decimal import Decimal
-from mock import patch
+from unittest.mock import patch
 import json
 import os
 
@@ -86,7 +86,7 @@ class GtkSpreadsheetModelDataHandlerTestCaseBase(object):
     fieldNameVsProp = []
     for i in self.dataComplex["fieldNameVsProp"]:
       row = (i.k, {})
-      for k, v in i.v.iteritems():
+      for k, v in i.v.items():
         if k == "choices":
           v = json.loads(v)
         row[1][k] = v
@@ -201,12 +201,12 @@ class GtkSpreadsheetModelDataHandlerTestCaseBase(object):
         'sortedListFieldEmbeddedField': {'klassLabel': 'const', },
     }
 
-    for fieldName, fieldProperty in self.dataComplex["fieldNameVsProp"].iteritems():
+    for fieldName, fieldProperty in self.dataComplex["fieldNameVsProp"].items():
       try:
         correctFieldProperty = correctFieldType[fieldName]
       except KeyError:
         continue
-      for k,correctValue in correctFieldProperty.iteritems():
+      for k,correctValue in correctFieldProperty.items():
         self.assertEqual(
             fieldProperty[k],
             correctValue,

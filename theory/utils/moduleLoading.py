@@ -90,7 +90,7 @@ def autodiscoverModules(*args, **kwargs):
 
 if sys.version_info[:2] >= (3, 3):
   if sys.version_info[:2] >= (3, 4):
-    from importlib.util import findSpec as importlibFind
+    from importlib.util import find_spec as importlibFind
   else:
     from importlib import findLoader as importlibFind
 

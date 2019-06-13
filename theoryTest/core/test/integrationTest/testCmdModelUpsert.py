@@ -49,11 +49,11 @@ class ReactorTestMixin(object):
 
   def pprintAction(self, action):
     # Helper fxn
-    print json.dumps(
+    print(json.dumps(
       self.unJsonActionVal(action),
       indent=2,
       sort_keys=True
-    ).replace("true", "True").replace("false", "False").replace("null", "None")
+    ).replace("true", "True").replace("false", "False").replace("null", "None"))
 
 class CmdModelUpsert(ReactorTestMixin, TestCase):
   fixtures = ["theory",]
@@ -85,8 +85,6 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
       None
     )
 
-    for i in self.reactor.actionQ:
-      print self.unJsonActionVal(i)["action"]
     self.assertEqual(len(self.reactor.actionQ), 3)
     self.assertDict(
       self.unJsonActionVal(self.reactor.actionQ[0]),
@@ -219,6 +217,7 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
       excludeKeyLst=[
         "cmdId",
         "helpText",
+        "appName",
       ]
     )
 
@@ -295,7 +294,6 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
               "label": "Form field",
               "localize": False,
               "required": True,
-              "maxLen": sys.maxint,
               "showHiddenInitial": False,
               "type": "ListField",
               "widgetIsContentChgTrigger": False,
@@ -378,7 +376,6 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
               "label": "Table field",
               "localize": False,
               "required": True,
-              "maxLen": sys.maxint,
               "showHiddenInitial": False,
               "type": "ListField",
               "widgetIsContentChgTrigger": False,
@@ -542,7 +539,6 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
               "childFieldTemplate":"TextField",
               "showHiddenInitial":False,
               "localize":False,
-              "maxLen": sys.maxint,
               "widgetIsFocusChgTrigger":False,
               "type":"ListField"
             },
@@ -564,7 +560,6 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
               "childFieldTemplate":"TextField",
               "showHiddenInitial":False,
               "localize":False,
-              "maxLen": sys.maxint,
               "widgetIsFocusChgTrigger":False,
               "type":"ListField"
             },

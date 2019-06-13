@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##### System wide lib #####
-from ludibrio import Stub
 
 ##### Theory lib #####
 from theory.apps.model import AppModel

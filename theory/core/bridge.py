@@ -162,7 +162,7 @@ class Bridge(object):
     adapterModel = adapterBufferModel.adapter
     adapterKlass = importClass(adapterModel.importPath)
     adapter = adapterKlass()
-    for k,v in jsonData.iteritems():
+    for k,v in jsonData.items():
       setattr(adapter, k, v)
 
     adapter.fromDb()
@@ -264,7 +264,14 @@ class Bridge(object):
               pass
     else:
       # TODO: somehow show/log/raise errors
-      print form.errors
+      import logging
+      logger = logging.getLogger("theory.usr")
+      logger.error(
+        f"bridge _assignAdapterPropertiesFromCmd err: {form.errors}"
+      )
+      print(
+        f"bridge _assignAdapterPropertiesFromCmd err: {form.errors}"
+      )
     return adapter
 
   def _executeCommand(

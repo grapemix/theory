@@ -88,10 +88,10 @@ class TheoryModelFormDataHandler(TheoryModelDetectorBase):
     pass
 
   def _nonEditableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
-    return unicode(fieldVal)
+    return str(fieldVal)
 
   def _editableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
-    return unicode(fieldVal)
+    return str(fieldVal)
 
   def _listFieldneglectFieldDataHandler(self, rowId, fieldName, fieldVal):
     pass
@@ -102,7 +102,7 @@ class TheoryModelFormDataHandler(TheoryModelDetectorBase):
       fieldName,
       fieldVal
       ):
-    return unicode(fieldVal)
+    return str(fieldVal)
 
   def _listFieldeditableForceStrFieldDataHandler(
       self,
@@ -135,7 +135,7 @@ class TheoryModelFormDataHandler(TheoryModelDetectorBase):
     return fieldVal
 
   def _strFieldDataHandler(self, rowId, fieldName, fieldVal):
-    return unicode(fieldVal)
+    return str(fieldVal)
 
   def _floatFieldDataHandler(self, rowId, fieldName, fieldVal):
     if(fieldVal is None):
@@ -175,13 +175,13 @@ class TheoryModelFormDataHandler(TheoryModelDetectorBase):
   #        val = getattr(field, i)
   #        if type(val).__name__ == "__proxy__":
   #          # for fields from model form
-  #          val = unicode(val)
+  #          val = str(val)
   #        elif isinstance(val, dict):
   #          # for errorMessages
   #          newDict = {}
-  #          for k, v in val.iteritems():
+  #          for k, v in val.items():
   #            if type(v).__name__ == "__proxy__":
-  #              newDict[k] = unicode(v)
+  #              newDict[k] = str(v)
   #          if len(newDict) > 0:
   #            val = newDict
   #        row[i] =  val

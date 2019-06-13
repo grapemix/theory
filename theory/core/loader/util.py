@@ -77,11 +77,11 @@ def detectScreenResolution(configPath):
 
   for line in fileinput.input(configPath, inplace=True):
     if line == "RESOLUTION = ()":
-      print "RESOLUTION = ({0},)".format(",".join(resolution))
+      print("RESOLUTION = ({0},)".format(",".join(resolution)))
     elif line == "\n":
       continue
     else:
-      print line,
+      print(line,)
 
 def checkModuleType(path):
   if(os.path.isfile(path)):
@@ -110,7 +110,7 @@ def findFilesInAppDir(appName, dirName, isIncludeInit=False):
   # of the appName but the project directory itself isn't on the path.
   try:
     f, path, descr = imp.find_module(part,path)
-  except ImportError,e:
+  except ImportError as e:
     if os.path.basename(os.getcwd()) != part:
       raise e
 
@@ -124,7 +124,7 @@ def findFilesInAppDir(appName, dirName, isIncludeInit=False):
     filterFxn = lambda i: i.endswith(".py") and i!="__init__.py"
   try:
     r = (path, [i[:-3] for i in os.listdir(path) if(filterFxn(i))])
-  except OSError, e:
+  except OSError as e:
     if(checkModuleType(path)==FILE_MODULE):
       return ("/".join(path.split("/")[:-1]), ["__init__"])
     else:
@@ -208,13 +208,13 @@ class CommandModuleLoader(ModuleLoader):
       "updateUiApi": ["dev"],
     }
     for o in lst:
-      if(moodCommandRel.has_key(o[1])):
+      if o[1] in moodCommandRel:
         o[-1] = moodCommandRel[o[1]]
     return lst
 
   def postPackFxn(self, lst):
     for o in lst:
-     if(self.moodAppRel.has_key(o[0])):
+     if o[0] in self.moodAppRel:
         o[-1] = self.moodAppRel[o[0]]
     return lst
 
@@ -223,7 +223,7 @@ def probeApps(apps, isDropAll=False):
   for moodDirName in settings.INSTALLED_MOODS:
     config = importModule("%s.config" % (moodDirName))
     for appName in config.APPS:
-      if(moodAppRel.has_key(appName)):
+      if appName in moodAppRel:
         moodAppRel[appName].append(moodDirName)
       else:
         moodAppRel[appName] = [moodDirName]

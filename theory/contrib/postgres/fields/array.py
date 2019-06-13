@@ -1,5 +1,4 @@
 import json
-import sys
 
 #from theory.contrib.postgres.forms import SimpleArrayField
 from theory.gui.common.baseField import ListField
@@ -153,18 +152,12 @@ class ArrayField(Field):
         )
 
   def formfield(self, **kwargs):
-    if self.size is None:
-      # maxLength has be an int according to field. However, postgres will
-      # complain during table creation if maxint is used.
-      maxLength = sys.maxint
-    else:
-      maxLength = self.size
     defaults = {
       'formClass': ListField,
       #'formClass': SimpleArrayField,
       #'baseField': self.baseField.formfield(),
       'field': self.baseField.formfield(),
-      'maxLength': maxLength,
+      'maxLength': self.size,
     }
     defaults.update(kwargs)
     return super(ArrayField, self).formfield(**defaults)

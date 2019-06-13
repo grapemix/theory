@@ -67,7 +67,7 @@ def wakeup(settings_mod, argv=None):
     Command.objects.count()
   except:
     # DB has been flushed
-    from core.bridge import Bridge
+    from theory.core.bridge import Bridge
     from theory.apps.command.makeMigration import MakeMigration
     from theory.apps.command.migrate import Migrate
     cmd = MakeMigration()

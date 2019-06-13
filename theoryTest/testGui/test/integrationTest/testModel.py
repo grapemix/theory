@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 ##### System wide lib #####
 from collections import OrderedDict
-from ludibrio import Stub
 
 ##### Theory lib #####
 from theory.apps.model import Command, AppModel
@@ -64,12 +63,12 @@ class ModelFormTestCase(TestCase):
 
   def testSetup(self):
     form = self.getModelFormKlass()()
-    for fieldName, v in form.fields.iteritems():
+    for fieldName, v in form.fields.items():
       if fieldName in ["referenceField", "m2mField", "m2mThruField"]:
         pass
       else:
         self.assertEqual(v.initData, getattr(modelObj, fieldName))
-    #for fieldName, v in form.fields.iteritems():
+    #for fieldName, v in form.fields.items():
     #  fieldTypeStr = type(v).__name__
     #  if(len(fieldName)>len(fieldTypeStr)):
     #    if(fieldName.startswith("sortedList")):

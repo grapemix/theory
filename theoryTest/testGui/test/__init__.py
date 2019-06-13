@@ -6,8 +6,8 @@
 ##### Theory third-party lib #####
 
 ##### Local app #####
-from unitTest import *
-from integrationTest import *
+from testGui.test.unitTest import *
+from testGui.test.integrationTest import *
 
 ##### Theory app #####
 

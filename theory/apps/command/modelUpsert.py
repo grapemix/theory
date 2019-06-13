@@ -90,7 +90,7 @@ class ModelUpsert(SimpleCommand):
       if len(cmdArgs) == 2:
         # This is for QuerysetField preset the form for modelSelect
         self._updateDynamicChoiceLst(self.fields["appName"].initData)
-      elif cmdKwargs.has_key("appName") and cmdKwargs.has_key("modelName"):
+      elif "appName" in cmdKwargs and "modelName" in cmdKwargs:
         # For perseting by kwargs
         self._updateDynamicChoiceLst(cmdKwargs["appName"])
 
@@ -103,7 +103,7 @@ class ModelUpsert(SimpleCommand):
       if len(cmdArgs) == 2:
         # This is for QuerysetField preset the form for modelSelect
         self._updateDynamicChoiceLst(self.fields["appName"].finalData)
-      elif cmdKwargs.has_key("appName") and cmdKwargs.has_key("modelName"):
+      elif "appName" in cmdKwargs and "modelName" in cmdKwargs:
         # For perseting by kwargs
         self._updateDynamicChoiceLst(cmdKwargs["appName"])
 

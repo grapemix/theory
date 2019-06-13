@@ -432,7 +432,7 @@ class FormBase(object):
             # This means the number of param given unmatch the number of param
             # register in *.command
             raise CommandSyntaxError(str(e))
-    for k,v in kwargs.iteritems():
+    for k,v in kwargs.items():
       self.fields[k].initData = v
       self.syncFormDataWithUi(
         k,
@@ -456,7 +456,7 @@ class FormBase(object):
             # This means the number of param given unmatch the number of param
             # register in *.command
             raise CommandSyntaxError(str(e))
-    for k,v in kwargs.iteritems():
+    for k,v in kwargs.items():
       self.fields[k].finalData = v
       self.syncFormDataWithUi(
         k,
@@ -466,7 +466,7 @@ class FormBase(object):
   def toPython(self):
     if self.isValid():
       pythonDict = {}
-      for fieldName, field in self.fields.iteritems():
+      for fieldName, field in self.fields.items():
         # Make sure not getting data from widget because the widget may be
         # destroied
         tmpWidget = field.widget
@@ -493,7 +493,7 @@ class FormBase(object):
     if self.isValid():
       pythonDict = {}
       # Never cache model form data
-      for fieldName, field in self.fields.iteritems():
+      for fieldName, field in self.fields.items():
         # Make sure not getting data from widget because the widget may be
         # destroied
         tmpWidget = field.widget
@@ -524,7 +524,7 @@ class FormBase(object):
   def exportToHistory(self):
     data = self.toPython()
     r = {}
-    for fieldName, field in self.fields.iteritems():
+    for fieldName, field in self.fields.items():
       if field.isSkipInHistory:
         continue
       r[fieldName] = data[fieldName]

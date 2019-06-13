@@ -2,7 +2,7 @@
 import grpc
 
 from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
-import theory_pb2 as theory__pb2
+import theory.gui.theory_pb2 as theory__pb2
 
 
 class ReactorStub(object):

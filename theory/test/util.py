@@ -473,9 +473,9 @@ class ObjectDumper(object):
           and len(self.absorbTermSet)>0
           and self.absorbTermSet.issubset(nodeKeySet)
           ):
-        loopFxn = node[intersetAbsorbTermSet.pop()].iteritems
+        loopFxn = node[intersetAbsorbTermSet.pop()].items
       else:
-        loopFxn = node.iteritems
+        loopFxn = node.items
       for key, val in loopFxn():
         if(self._filterFxn(key)):
           cur_node = self.filterNestedDict(val)

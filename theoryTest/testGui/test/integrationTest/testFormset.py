@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 ##### System wide lib #####
 from collections import OrderedDict
-from ludibrio import Stub
 
 ##### Theory lib #####
 from theory.gui import field

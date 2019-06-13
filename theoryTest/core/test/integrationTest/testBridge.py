@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 ##### System wide lib #####
-from ludibrio import Stub
 import os
 import sys
+from unittest import mock
 
 ##### Theory lib #####
-from theory.apps.model import AdapterBuffer
+from theory.apps.model import AdapterBuffer, Command
 from theory.db.model.query import QuerySet
 from theory.test.testcases import TestCase
 
@@ -37,10 +37,18 @@ class TestBridgeTestCase(TestCase):
 
     self.adapterBufferModel = AdapterBuffer()
 
-  def _getMockCommandObject(self, cmd, classImportPath):
-    with Stub(proxy=cmd) as cmd:
-      cmd.classImportPath >> "%s.%s" % (self.__module__, classImportPath)
-    return cmd
+  def _bridgeTwoMockCommandObject(
+    self,
+    firstCmdMdl,
+    secondCmdMdl,
+    classImportPath
+    ):
+    with mock.patch(
+      'theory.apps.model.Command.classImportPath',
+      new_callable=mock.PropertyMock
+    ) as mockCmd:
+      mockCmd.__get__ = mock.Mock(return_value=classImportPath)
+      return self.bridge.bridge(firstCmdMdl, secondCmdMdl)
 
   def testSimpleCommandToSimpleCommand(self):
     firstCmd = SimpleChain1()
@@ -50,8 +58,11 @@ class TestBridgeTestCase(TestCase):
     self.bridge._executeCommand(firstCmd, firstCmd.getCmdModel())
 
     secondCmdModel = self.simpleChain2CommandModel
-    secondCmdModel = self._getMockCommandObject(secondCmdModel, "SimpleChain2")
-    (chain2Class, secondCmdStorage) = self.bridge.bridge(firstCmd, secondCmdModel)
+    (chain2Class, secondCmdStorage) = self._bridgeTwoMockCommandObject(
+      firstCmd,
+      secondCmdModel,
+      f"{self.__module__}.SimpleChain2",
+      )
     secondCmd = self.bridge.getCmdComplex(secondCmdModel, [], secondCmdStorage)
     self.bridge._executeCommand(secondCmd, secondCmdModel)
 
@@ -65,8 +76,11 @@ class TestBridgeTestCase(TestCase):
     self.bridge._executeCommand(firstCmd, firstCmd.getCmdModel())
 
     secondCmdModel = self.simpleChain2CommandModel
-    secondCmdModel = self._getMockCommandObject(secondCmdModel, "SimpleChain2")
-    (chain2Class, storage) = self.bridge.bridge(firstCmd, secondCmdModel)
+    (chain2Class, storage) = self._bridgeTwoMockCommandObject(
+      firstCmd,
+      secondCmdModel,
+      f"{self.__module__}.SimpleChain2",
+      )
     secondCmd = self.bridge.getCmdComplex(secondCmdModel, [], storage)
 
     self.bridge._executeCommand(secondCmd, secondCmdModel)
@@ -78,8 +92,11 @@ class TestBridgeTestCase(TestCase):
     self.bridge._executeCommand(firstCmd, firstCmd.getCmdModel())
 
     secondCmdModel = self.asyncChain2CommandModel
-    secondCmdModel = self._getMockCommandObject(secondCmdModel, "AsyncChain2")
-    (chain2Class, storage) = self.bridge.bridge(firstCmd, secondCmdModel)
+    (chain2Class, storage) = self._bridgeTwoMockCommandObject(
+      firstCmd,
+      secondCmdModel,
+      f"{self.__module__}.AsyncChain2",
+      )
     cmd = self.bridge.getCmdComplex(secondCmdModel, [], storage)
     self.bridge._executeCommand(cmd, secondCmdModel)
     self.assertEqual(cmd._stdOut, "simpleChain1 received")
@@ -90,8 +107,11 @@ class TestBridgeTestCase(TestCase):
     self.bridge._executeCommand(firstCmd, firstCmd.getCmdModel())
 
     secondCmdModel = self.asyncChain2CommandModel
-    secondCmdModel = self._getMockCommandObject(secondCmdModel, "AsyncChain2")
-    (chain2Class, storage) = self.bridge.bridge(firstCmd, secondCmdModel)
+    (chain2Class, storage) = self._bridgeTwoMockCommandObject(
+      firstCmd,
+      secondCmdModel,
+      f"{self.__module__}.AsyncChain2",
+      )
     cmd = self.bridge.getCmdComplex(secondCmdModel, [], storage)
     self.bridge._executeCommand(cmd, secondCmdModel)
     self.assertEqual(cmd._stdOut, "asyncChain1 received")

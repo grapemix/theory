@@ -124,7 +124,7 @@ class ModelClassScanner(BaseClassScanner):
   #def _createFieldParamMap(self, modelFieldTypeDict):
   #  mongoTypeDict = self._getMongoTypeDict()
   #  r = {}
-  #  for fieldName, fieldType in modelFieldTypeDict.iteritems():
+  #  for fieldName, fieldType in modelFieldTypeDict.items():
   #    fieldParam = self._createFieldParam(fieldType, mongoTypeDict)
   #    if(fieldParam is not None):
   #      fieldParam.name = fieldParam.data = fieldType.__class__.__name__
@@ -133,7 +133,7 @@ class ModelClassScanner(BaseClassScanner):
   #  return r
 
   #def _createFieldParam(self, fieldType, mongoTypeDict):
-  #  for typeName, typeKlass in mongoTypeDict.iteritems():
+  #  for typeName, typeKlass in mongoTypeDict.items():
   #    if(isinstance(fieldType, typeKlass)
   #        or (inspect.isclass(fieldType) and issubclass(fieldType, typeKlass))
   #        ):
@@ -302,7 +302,7 @@ class ModelClassScanner(BaseClassScanner):
     return r
 
   def _createFieldParam(self, fieldType, theoryTypeDict, appModel):
-    for typeName, typeKlass in theoryTypeDict.iteritems():
+    for typeName, typeKlass in theoryTypeDict.items():
       if (isinstance(fieldType, typeKlass)
           or (
             inspect.isclass(fieldType)
@@ -439,7 +439,7 @@ class ModelClassScanner(BaseClassScanner):
           data.isoformat()
       elif(isinstance(data, Promise)):
         # that's for lazy translation(_)
-        data = unicode(data)
+        data = str(data)
       #elif(isinstance(data, MongoEngineField.BaseField)):
       #  if(attrName=="field"):
       #    continue

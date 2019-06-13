@@ -1,10 +1,9 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # Get it from https://github.com/aeosynth/Pim/blob/master/pim
 # Copyright (c) 2010 James Campos
 # Pim is released under the MIT license.
 
-# Dependencies: python2, pygtk
 ### TODO ###
 # resolve scrollbar issue
 # hide pointer in fullscreen
@@ -15,9 +14,6 @@
 # mouse panning / keybinds
 # fit width / height
 # marking (echo $current >> pim-marked)
-# set as wallpaper
-# animated gifs
-# python3
 
 ### Thanks ###
 # alterecco, for making [visible](http://drop.dotright.net/visible) (dead),
@@ -29,15 +25,12 @@
 # v0.2.0
 
 from optparse import OptionParser
-from gi.repository import GLib as glib
-from gi.repository import Gtk as gtk
-from gi.overrides import keysyms as keys
-from gi.repository import Gdk as gdk
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import GLib
+from gi.repository import Gtk
+from gi.repository import Gdk
 from gi.repository.GdkPixbuf import Pixbuf
-#import glib
-#import gtk
-#from gtk import keysyms as keys
-#from gtk import gdk
 
 
 class Pim(object):
@@ -54,36 +47,36 @@ class Pim(object):
 
     self.binds = [
       #(modifer, key, function, args)
-      #supported modifiers: gdk.SHIFT_MASK, gdk.CONTROL_MASK, gdk.MOD1_MASK (alt key)
-      (0,              keys.q,     self.quit),
-      (0,              keys.f,     self.toggleFullscreen),
+      #supported modifiers: Gdk.SHIFT_MASK, Gdk.CONTROL_MASK, Gdk.MOD1_MASK (alt key)
+      (0,              Gdk.KEY_q,     self.quit),
+      (0,              Gdk.KEY_f,     self.toggleFullscreen),
 
       #if True, scroll in the horizontal direction.
-      (0,              keys.Left,  self.scroll, gtk.ScrollType.STEP_BACKWARD, True),
-      (0,              keys.Down,  self.scroll, gtk.ScrollType.STEP_FORWARD, False),
-      (0,              keys.Up,    self.scroll, gtk.ScrollType.STEP_BACKWARD, False),
-      (0,              keys.Right, self.scroll, gtk.ScrollType.STEP_FORWARD, True),
+      (0,              Gdk.KEY_Left,  self.scroll, Gtk.ScrollType.STEP_BACKWARD, True),
+      (0,              Gdk.KEY_Down,  self.scroll, Gtk.ScrollType.STEP_FORWARD, False),
+      (0,              Gdk.KEY_Up,    self.scroll, Gtk.ScrollType.STEP_BACKWARD, False),
+      (0,              Gdk.KEY_Right, self.scroll, Gtk.ScrollType.STEP_FORWARD, True),
 
-      (0,              keys.g,     self.scroll, gtk.ScrollType.START, False),
-      (gdk.ModifierType.SHIFT_MASK, keys.G,     self.scroll, gtk.ScrollType.END, False),
+      (0,              Gdk.KEY_g,     self.scroll, Gtk.ScrollType.START, False),
+      (Gdk.ModifierType.SHIFT_MASK, Gdk.KEY_G,     self.scroll, Gtk.ScrollType.END, False),
 
       (0,              0x02d,     self.zoomDelta, -.5),
       (0,              0x03d,     self.zoomDelta, +.5),
-      (0,              keys.e,     self.toggleSlideshow),
-      (0,              keys.z,     self.toggleZoomLock),
+      (0,              Gdk.KEY_e,     self.toggleSlideshow),
+      (0,              Gdk.KEY_z,     self.toggleZoomLock),
 
-      (gdk.ModifierType.SHIFT_MASK, keys._1,    self.zoomTo, 1),
-      (gdk.ModifierType.SHIFT_MASK, keys._2,    self.zoomTo, 2),
-      (gdk.ModifierType.SHIFT_MASK, keys._3,    self.zoomTo, 3),
+      (Gdk.ModifierType.SHIFT_MASK, Gdk.KEY_1,    self.zoomTo, 1),
+      (Gdk.ModifierType.SHIFT_MASK, Gdk.KEY_2,    self.zoomTo, 2),
+      (Gdk.ModifierType.SHIFT_MASK, Gdk.KEY_3,    self.zoomTo, 3),
       #back to fullscreen
-      (gdk.ModifierType.SHIFT_MASK, keys._5,    self.zoomTo, 0),
+      (Gdk.ModifierType.SHIFT_MASK, Gdk.KEY_5,    self.zoomTo, 0),
 
-      (0,              keys.space, self.toggleFileSelection),
+      (0,              Gdk.KEY_space, self.toggleFileSelection),
 
-      (gdk.ModifierType.SHIFT_MASK, keys.Right, self.moveFileIndex, 1),
-      (gdk.ModifierType.SHIFT_MASK, keys.Left, self.moveFileIndex, -1),
-      (gdk.ModifierType.SHIFT_MASK, keys.Down,  self.scroll, gtk.ScrollType.PAGE_FORWARD, False),
-      (gdk.ModifierType.SHIFT_MASK, keys.Up,    self.scroll, gtk.ScrollType.PAGE_BACKWARD, False),
+      (Gdk.ModifierType.SHIFT_MASK, Gdk.KEY_Right, self.moveFileIndex, 1),
+      (Gdk.ModifierType.SHIFT_MASK, Gdk.KEY_Left, self.moveFileIndex, -1),
+      (Gdk.ModifierType.SHIFT_MASK, Gdk.KEY_Down,  self.scroll, Gtk.ScrollType.PAGE_FORWARD, False),
+      (Gdk.ModifierType.SHIFT_MASK, Gdk.KEY_Up,    self.scroll, Gtk.ScrollType.PAGE_BACKWARD, False),
       ]
     for i in additionalBinds:
       i[1] = getattr(keys, i[1])
@@ -116,7 +109,7 @@ class Pim(object):
     return self._selectedFileDict.keys()
 
   def toggleFileSelection(self):
-    if(not self._selectedFileDict.has_key(self._fileIndex)):
+    if self._fileIndex not in self._selectedFileDict:
       self._selectedFileDict[self._fileIndex] = self.fileLst[self._fileIndex]
     else:
       del self._selectedFileDict[self._fileIndex]
@@ -127,7 +120,6 @@ class Pim(object):
 
 
   def quit(self):
-    #gtk.main_quit()
     self.win.destroy()
 
 
@@ -140,7 +132,7 @@ class Pim(object):
     scrollCurrent = self.scrolledWin.get_vadjustment().get_value()
 
     isPageEnd = (scrollEnd == scrollCurrent)
-    if(isPageEnd and (scrolltype==gtk.ScrollType.STEP_FORWARD or scrolltype==gtk.ScrollType.PAGE_FORWARD)):
+    if(isPageEnd and (scrolltype==Gtk.ScrollType.STEP_FORWARD or scrolltype==Gtk.ScrollType.PAGE_FORWARD)):
       self.moveFileIndex(1)
     else:
       self.scrolledWin.emit('scroll-child', scrolltype, horizontal)
@@ -149,9 +141,9 @@ class Pim(object):
   def toggleSlideshow(self):
     self.slideshow = not self.slideshow
     if self.slideshow:
-      self.timerId = glib.timeout_add_seconds(self.slideshowDelay, self.moveFileIndex, 1)
+      self.timerId = Glib.timeout_add_seconds(self.slideshowDelay, self.moveFileIndex, 1)
     else:
-      glib.source_remove(self.timerId)
+      Glib.source_remove(self.timerId)
     self.updateTitle()
 
 
@@ -201,8 +193,8 @@ class Pim(object):
 
 
   def resizeWindow(self, pbfWidth, pbfHeight):
-    #this doesn't work well with the scrollbars. I don't know if I just need to call some random function or if it's a gtk bug.
-    #http://www.gtkforums.com/about6831.html
+    #this doesn't work well with the scrollbars. I don't know if I just need to call some random function or if it's a Gtk bug.
+    #http://www.Gtkforums.com/about6831.html
     winWidth = pbfWidth if pbfWidth < self.sWidth else self.sWidth
     winHeight = pbfHeight if pbfHeight < self.sHeight else self.sHeight
 
@@ -217,7 +209,7 @@ class Pim(object):
           self.zoomPercent * 100,
           self.fileLst[self._fileIndex],
           ' [slideshow]' if self.slideshow else '',
-          '[selected]' if self._selectedFileDict.has_key(self._fileIndex) else '',
+          '[selected]' if self._fileIndex in self._selectedFileDict else '',
           )
         )
 
@@ -245,8 +237,8 @@ class Pim(object):
     self.updateImage()
     self.image.set_from_pixbuf(self.pixbufOriginal)
 
-    self.scroll(gtk.ScrollType.START, False)
-    self.scroll(gtk.ScrollType.START, True)
+    self.scroll(Gtk.ScrollType.START, False)
+    self.scroll(Gtk.ScrollType.START, True)
 
     if self.fileSelectChangeCallbackFxn is not None:
       self.fileSelectChangeCallbackFxn(self._fileIndex)
@@ -256,7 +248,7 @@ class Pim(object):
 
   def handleKeyPress(self, widget, event):
     #ignore everything but shift, control, and alt modifiers
-    state = event.state & (gdk.ModifierType.SHIFT_MASK | gdk.ModifierType.CONTROL_MASK | gdk.ModifierType.MOD1_MASK)
+    state = event.state & (Gdk.ModifierType.SHIFT_MASK | Gdk.ModifierType.CONTROL_MASK | Gdk.ModifierType.MOD1_MASK)
     keyval = event.keyval
     for bind in self.binds:
       if keyval == bind[1] and state == bind[0]:
@@ -264,33 +256,33 @@ class Pim(object):
         args = bind[3:]
         funk(*args)
         return
-    print event
+    print(event)
 
 
   def main(self):
-    screen = gdk.Screen.get_default()
+    screen = Gdk.Screen.get_default()
     self.sWidth = screen.get_width()
     self.sHeight = screen.get_height()
     self.sRatio = float(self.sWidth) / float(self.sHeight)
 
-    self.win = gtk.Window()
-    self.win.connect('destroy', gtk.main_quit)
+    self.win = Gtk.Window()
+    self.win.connect('destroy', Gtk.main_quit)
     self.win.connect("key_press_event", self.handleKeyPress)
 
-    self.scrolledWin = gtk.ScrolledWindow()
-    self.scrolledWin.set_policy(gtk.PolicyType.AUTOMATIC, gtk.PolicyType.AUTOMATIC)
+    self.scrolledWin = Gtk.ScrolledWindow()
+    self.scrolledWin.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
     self.win.add(self.scrolledWin)
 
-    viewport = gtk.Viewport()
-    viewport.modify_bg(gtk.StateFlags.NORMAL, gdk.color_parse('#000000'))
-    viewport.set_shadow_type(gtk.ShadowType.NONE)
+    viewport = Gtk.Viewport()
+    viewport.modify_bg(Gtk.StateFlags.NORMAL, Gdk.color_parse('#000000'))
+    viewport.set_shadow_type(Gtk.ShadowType.NONE)
     self.scrolledWin.add(viewport)
 
-    self.image = gtk.Image()
+    self.image = Gtk.Image()
     viewport.add(self.image)
 
     self.moveFileIndex(0)
     self.win.show_all()
     if self.fullscreen:
       self.win.fullscreen()
-    gtk.main()
+    Gtk.main()

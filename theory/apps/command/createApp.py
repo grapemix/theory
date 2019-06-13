@@ -44,8 +44,5 @@ class CreateApp(SimpleCommand):
           "Don't forget to add the app name into the INSTALLED_APP within "\
           "your project's setting. To make your app recognized by theory, you "\
           "will also need to restart theory or run the probeModule command"
-    except (OSError,), e:
+    except OSError as e:
       self._stdOut += str(e)
-
-
-

@@ -83,7 +83,7 @@ class AdapterClassScanner(BaseClassScanner):
         adapter.importPath =".".join(token)
 
       buffer = [] # del me when arrayField is supported
-      # Don't use __dict__.iteritems() which unable to retrieve property
+      # Don't use __dict__.items() which unable to retrieve property
       # inheritate from parents
       for k in dir(adapterClass):
         v = getattr(adapterClass, k)
@@ -131,7 +131,7 @@ class AdapterClassScanner(BaseClassScanner):
       adapter.name = adapterClassName
       adapter.importPath += ".adapter." + adapterClassName
 
-      for k,v in adapterClass.__dict__.iteritems():
+      for k,v in adapterClass.__dict__.items():
         if(isinstance(v, property)):
           if(getattr(getattr(adapterClass, k), "fset")!=None):
             adapter.property.append(k)

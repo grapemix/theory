@@ -76,17 +76,17 @@ class CommandClassScanner(BaseClassScanner):
         ]:
       if hasattr(field, i):
         val = getattr(field, i)
-        if type(val).__name__ == "__proxy__":
-          # for fields from model form
-          val = unicode(val)
-        elif (val is None or val == "" or val == 0 or val == {}) and i in optionalParamLst:
+        if (
+            (val is None or val == "" or val == 0 or val == {})
+            and i in optionalParamLst
+        ):
           continue
         elif isinstance(val, dict):
           # for errorMessages
           newDict = {}
-          for k, v in val.iteritems():
+          for k, v in val.items():
             if type(v).__name__ == "__proxy__":
-              newDict[k] = unicode(v)
+              newDict[k] = str(v)
           if len(newDict) > 0:
             val = newDict
         elif i == "childFieldTemplate":
@@ -112,7 +112,7 @@ class CommandClassScanner(BaseClassScanner):
     # modelUpsert use this fxn
     r = OrderedDict()
     # If baseFields are used, then the modelForm won't get field value
-    for fieldName, field in form.fields.iteritems():
+    for fieldName, field in form.fields.items():
       row = {
           "type": type(field).__name__,
           "widgetIsFocusChgTrigger": False,
@@ -129,7 +129,7 @@ class CommandClassScanner(BaseClassScanner):
     focusChgFxnNameTmpl = "{0}FocusChgCallback"
     contentChgFxnNameTmpl = "{0}ContentChgCallback"
 
-    for fieldName, field in form.baseFields.iteritems():
+    for fieldName, field in form.baseFields.items():
       if(field.required):
         cmdField = CmdField(name=fieldName, isOptional=False)
       else:
@@ -175,7 +175,7 @@ class CommandClassScanner(BaseClassScanner):
     self.addParmFormFieldLst(cmdClass.ParamForm)
 
     # Class properties will be able to be captured and passed to adapter
-    for k,v in cmdClass.__dict__.iteritems():
+    for k,v in cmdClass.__dict__.items():
       if(isinstance(v, property)):
         param = CmdField(name=k)
         if(getattr(getattr(cmdClass, k), "fset") is None):

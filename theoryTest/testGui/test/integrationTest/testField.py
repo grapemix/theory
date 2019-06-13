@@ -3,7 +3,7 @@
 from collections import OrderedDict
 import copy
 from inspect import isclass
-from ludibrio import Stub
+from unittest import mock
 import os
 import sys
 
@@ -56,11 +56,6 @@ class FieldTestCaseBase(object):
         "field"
         )
     self.dummyWin = None
-
-  def _getMockModelValidateGroupObject(self, modelValidateGroup, classImportPath):
-    with Stub(proxy=modelValidateGroup) as modelValidateGroup:
-      modelValidateGroup.classImportPath >> "%s.%s" % (self.__module__, classImportPath)
-    return modelValidateGroup
 
   def extraInitParam(self):
     return {}

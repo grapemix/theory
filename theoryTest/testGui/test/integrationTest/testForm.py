@@ -2,7 +2,6 @@
 ##### System wide lib #####
 from collections import OrderedDict
 import copy
-from ludibrio import Stub
 
 ##### Theory lib #####
 from theory.gui import field
@@ -104,7 +103,8 @@ class FormBaseTestCase(TestCase):
     )
     self.assertEqual(self.form.fields["emptyField"].finalData, None)
     self.form.fields["emptyField"].finalData = "test"
-    self.form.fields["initField"].widget.finalData = "test2"
+    with self.assertRaises(AttributeError):
+      self.form.fields["initField"].widget.finalData = "test2"
     self.form.fullClean()
     self.assertTrue(self.form.isValid())
     self.assertEqual(self.form.clean()["emptyField"], "test")

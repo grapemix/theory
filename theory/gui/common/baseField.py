@@ -151,9 +151,10 @@ class Field(object):
       widget = self.widget(self.widgetSetter, self.widgetGetter, *args, **kwargs)
       # In some case, ListInput for example, their children input only want the
       # core part instead of the whole part including the instruction
-      if(not kwargs.has_key("attrs") \
-          or not kwargs["attrs"].has_key("isSkipInstruction") \
-          or not kwargs["attrs"]["isSkipInstruction"]):
+      if ("attrs" not in kwargs
+          or "isSkipInHistory" not in kwargs["attrs"]
+          or not kwargs["attrs"]["isSkipInstruction"]
+          ):
         widget.setupInstructionComponent()
 
     # Trigger the localization machinery if needed.
@@ -172,8 +173,11 @@ class Field(object):
       widget.attrs.update(extraAttrs)
 
     widget.attrs["initData"] = widget._prepareInitData(self.initData)
-    if(settings.UI_DEBUG and settings.DEBUG_LEVEL>5):
-      print widget.attrs
+    if settings.UI_DEBUG and settings.DEBUG_LEVEL > 5 :
+      if not hasattr(self, "logger"):
+        import logging
+        self.logger = logging.getLogger("theory.internal")
+      self.logger.debug(f"baseField renderWidget: {widget.attrs}")
     self.widget = widget
 
   def getModelFieldNameSuffix(self):
@@ -364,7 +368,7 @@ class TextField(Field):
 
   @initData.setter
   def initData(self, initData=""):
-    if self.lineBreak!="\n" and isinstance(initData, basestring):
+    if self.lineBreak!="\n" and isinstance(initData, str):
       self._initData = initData.replace("\n", self.lineBreak)
     elif isinstance(initData, (list, tuple)):
       self._initData = "\n".join(initData)
@@ -1180,7 +1184,7 @@ class ListField(Field):
       field,
       initData=[],
       minLen=0,
-      maxLen=sys.maxint,
+      maxLen=sys.maxsize,
       *args,
       **kwargs
       ):
@@ -1271,7 +1275,7 @@ class ListField(Field):
         cleanData.append(self.childFieldTemplate.clean(value))
       except IndexError:
         pass
-      except ValidationError, e:
+      except ValidationError as e:
         # Collect all validation errors in a single list, which we'll
         # raise at the end of clean(), rather than raising a single
         # exception for the first error we encounter.
@@ -1335,8 +1339,14 @@ class DictField(Field):
   }
 
   def __init__(
-      self, keyField, valueField, initData={}, minLen=0, maxLen=sys.maxint,
-      *args, **kwargs
+      self,
+      keyField,
+      valueField,
+      initData={},
+      minLen=0,
+      maxLen=sys.maxsize,
+      *args,
+      **kwargs
       ):
 
     # Set 'required' to False on the individual fields, because the
@@ -1418,13 +1428,13 @@ class DictField(Field):
       raise ValidationError(self.errorMessages['lenUnmatch'])
 
     i = 0
-    for k, v in valueOrderedDict.iteritems():
+    for k, v in valueOrderedDict.items():
       try:
         cleanData[self.keyFields[i].clean(k)] = \
             self.valueFields[i].clean(v)
       except IndexError:
         pass
-      except ValidationError, e:
+      except ValidationError as e:
         # Collect all validation errors in a single list, which we'll
         # raise at the end of clean(), rather than raising a single
         # exception for the first error we encounter.
@@ -1489,7 +1499,7 @@ class DictField(Field):
       for v in self.validators:
         try:
           v(value)
-        except ValidationError, e:
+        except ValidationError as e:
           if hasattr(e, 'code') and e.code in self.errorMessages:
             message = self.errorMessages[e.code]
             if e.params:

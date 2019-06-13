@@ -128,7 +128,7 @@ class E17Widget(object):
       else:
         self.obj.size_hint_align = FILL_HORIZ
 
-    if(isinstance(self.obj, EBox) and self.attrs.has_key("layout")):
+    if isinstance(self.obj, EBox) and "layout" in self.attrs:
       self.obj.layout_set(self.attrs["layout"])
     self.obj.show()
     if(self.attrs["isFocus"]):
@@ -155,9 +155,9 @@ class Label(E17Widget):
   def reset(self, **kwargs):
     if(not hasattr(self, "obj")):
       self.generate()
-    elif(kwargs.has_key("finalData")):
+    elif "finalData" in kwargs:
       self.obj.text_set(kwargs["finalData"].replace("\n", "<br/>"))
-    elif(kwargs.has_key("errData")):
+    elif "errData" in kwargs:
       # The color should be in red, but elementary has a bug and unable to
       # display text in red!
       kwargs["errData"] = \
@@ -328,7 +328,7 @@ class ListValidator(Genlist):
     if(e.keyname=="space"):
       item = gl.selected_item
       pos = item.data[0]
-      if(self.checkboxRelMap.has_key(pos)):
+      if pos in self.checkboxRelMap:
         (startIdx, endIdx) = self.checkboxRelMap[pos]
         initState = self.checkboxLst[startIdx].obj.state
         for idx in range(startIdx, endIdx):
@@ -336,9 +336,9 @@ class ListValidator(Genlist):
           ck.obj.state = not initState
           #if(idx!=startIdx):
           #  continue
-          if(not self.dataPos.has_key(idx+1)):
+          if idx+1 not in self.dataPos:
             continue
-          elif(self.changedRow.has_key(self.dataPos[idx+1])):
+          elif self.dataPos[idx+1] in self.changedRow:
             del self.changedRow[self.dataPos[idx+1]]
           else:
             self.changedRow[self.dataPos[idx+1]] = True
@@ -346,7 +346,7 @@ class ListValidator(Genlist):
       else:
         self.checkboxLst[pos].obj.state = not self.checkboxLst[pos].obj.state
         item.next.selected = True
-        if(self.changedRow.has_key(self.dataPos[pos+1])):
+        if self.dataPos[pos+1] in self.changedRow:
           del self.changedRow[self.dataPos[pos+1]]
         else:
           self.changedRow[self.dataPos[pos+1]] = True
@@ -658,11 +658,11 @@ class Entry(E17Widget):
 
   def reset(self, **kwargs):
     txt = ""
-    if(kwargs.has_key("initData")):
+    if "initData" in kwargs:
       txt = kwargs["initData"]
-    elif(kwargs.has_key("finalData")):
+    elif "finalData" in kwargs:
       txt = kwargs["finalData"]
-    self.obj.entry_set(unicode(txt))
+    self.obj.entry_set(str(txt))
 
 class Button(E17Widget):
   icon = None
@@ -950,7 +950,7 @@ class Multibuttonentry(Entry):
 #    mbe = elementary.MultiButtonEntry(self.win)
 #    self.obj = mbe
 #
-#    if(self.attrs.has_key("helperLabel")):
+#    if("helperLabel" in self.attrs):
 #      mbe.text = self.attrs["helperLabel"]
 #    mbe.part_text_set("guide", "Tap to add")
 #    mbe.filter_append(self.cb_filter1)

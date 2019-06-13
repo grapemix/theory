@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ##### System wide lib #####
-from mock import patch
+from unittest.mock import patch
 
 ##### Theory lib #####
 from theory.apps.model import AppModel
@@ -61,8 +61,8 @@ class TestTblRequest(TestCase):
         3
     )
     self.assertEqual(
-      dataComplex["fieldNameVsProp"],
-      [
+      sorted(dataComplex["fieldNameVsProp"], key=lambda x: x["k"]),
+      sorted([
         {
           "k": "comment",
           "v": {
@@ -121,7 +121,7 @@ class TestTblRequest(TestCase):
             "foreignApp": "theory.apps"
           }
         }
-      ],
+      ], key=lambda x: x["k"]),
     )
     self.assertEqual(dataComplex["mdlTotalNum"], 102)
     self.assertEqual(len(dataComplex["dataLst"]), 3)

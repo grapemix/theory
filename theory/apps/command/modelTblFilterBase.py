@@ -115,8 +115,8 @@ class ModelTblFilterBase(SimpleCommand):
           cmdKwargs
           )
       if len(cmdArgs) == 3 or (
-          cmdKwargs.has_key("appName")
-          and cmdKwargs.has_key("modelName")
+          "appName" in cmdKwargs
+          and "modelName" in cmdKwargs
           ):
         # This is for QuerysetField preset the form for modelSelect
         appName = self.fields["appName"].initData
@@ -129,8 +129,8 @@ class ModelTblFilterBase(SimpleCommand):
           cmdKwargs
           )
       if len(cmdArgs) == 3 or (
-          cmdKwargs.has_key("appName")
-          and cmdKwargs.has_key("modelName")
+          "appName" in cmdKwargs
+          and "modelName" in cmdKwargs
           ):
         # This is for QuerysetField preset the form for modelSelect
         appName = self.fields["appName"].finalData

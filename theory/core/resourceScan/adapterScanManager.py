@@ -4,13 +4,15 @@
 
 ##### Theory lib #####
 from theory.conf import settings
-from theory.core.resourceScan.adapterClassScanner import AdapterClassScanner
+from theory.core.resourceScan.adapterClassScanner import (
+  AdapterClassScanner
+)
+from theory.core.resourceScan.baseScanManager import BaseScanManager
 from theory.apps.model import Adapter
 
 ##### Theory third-party lib #####
 
 ##### Local app #####
-from baseScanManager import BaseScanManager
 
 ##### Theory app #####
 

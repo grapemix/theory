@@ -50,5 +50,5 @@ class SwitchMood(SimpleCommand):
       "The following config is applied:\n"
     ).format(moodName)
 
-    for k,v in settings.MOOD.iteritems():
-      self._stdOut += "    %s: %s\n" % (k, unicode(v))
+    for k,v in settings.MOOD.items():
+      self._stdOut += "    %s: %s\n" % (k, v)

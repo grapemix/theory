@@ -30,10 +30,10 @@ class TheoryModelBSONTblDataHandler(TheoryModelTblDetectorBase):
     pass
 
   def _nonEditableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
-    return unicode(fieldVal)
+    return str(fieldVal)
 
   def _editableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
-    return unicode(fieldVal)
+    return str(fieldVal)
 
   def _listFieldneglectFieldDataHandler(self, rowId, fieldName, fieldVal):
     pass
@@ -44,7 +44,7 @@ class TheoryModelBSONTblDataHandler(TheoryModelTblDetectorBase):
       fieldName,
       fieldVal
       ):
-    return unicode(fieldVal)
+    return str(fieldVal)
 
   def _listFieldeditableForceStrFieldDataHandler(
       self,
@@ -75,7 +75,7 @@ class TheoryModelBSONTblDataHandler(TheoryModelTblDetectorBase):
     return fieldVal
 
   def _strFieldDataHandler(self, rowId, fieldName, fieldVal):
-    return unicode(fieldVal)
+    return str(fieldVal)
 
   def _floatFieldDataHandler(self, rowId, fieldName, fieldVal):
     if(fieldVal is None):

@@ -43,7 +43,7 @@ class TheoryJSONEncoder(json.JSONEncoder):
       if o.microsecond:
         r = r[:12]
       return r
-    elif(isinstance(o, decimal.Decimal) or isinstance(o, UUID)):
+    elif isinstance(o, decimal.Decimal) or isinstance(o, UUID):
       return str(o)
     elif type(o.__class__.__bases__[0]).__name__ == "ModelBase":
       module = o.__module__
@@ -59,9 +59,15 @@ class TheoryJSONEncoder(json.JSONEncoder):
           "modelName": o.modal.__name__,
           "idLst": [str(i.id) for i in o]
           }
-    elif type(o).__name__=="LocalFileObject":
+    elif type(o).__name__ == "LocalFileObject":
       # We don't want to store the data because JSON cannot store binary
       # natively and no storing solution can provide human readibility
       return o.filepath
+    elif (
+      type(o).__name__ == "__proxy__"
+      and str(type(o)) == (
+        "<class 'theory.utils.functional.lazy.<locals>.__proxy__'>"
+      )):
+      return str(o)
     else:
       return super(TheoryJSONEncoder, self).default(o)

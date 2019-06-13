@@ -4,7 +4,10 @@
 import sys
 import os
 import operator
-from StringIO import StringIO
+try:
+  from StringIO import StringIO
+except:
+  from io import StringIO
 
 ##### Theory lib #####
 from theory.apps.command.baseCommand import SimpleCommand

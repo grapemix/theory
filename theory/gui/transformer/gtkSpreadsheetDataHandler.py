@@ -29,7 +29,7 @@ class GtkSpreadsheetModelDataHandler(GtkSpreadsheetModelBSONDataHandler):
   """
 
   def _editableForceStrFieldDataHandler(self, rowId, fieldName, fieldVal):
-    return unicode(fieldVal.decode("utf8"))
+    return str(fieldVal)
 
   def _listFieldeditableForceStrFieldDataHandler(
       self,

@@ -37,7 +37,7 @@ from efl import evas
 
 __all__ = ("Terminal",)
 
-class Terminal(RpcTerminalMixin):
+class Terminal(RpcTerminalMixin, metaclass=Singleton):
   __metaclass__ = Singleton
   lb = None
   crlf = "<br/>"
@@ -105,7 +105,7 @@ class Terminal(RpcTerminalMixin):
     bg.show()
 
     ly = Layout(self.win)
-    ly.file_set("gui/background.edj", "layout")
+    #ly.file_set("gui/background.edj", "layout")
     ly.size_hint_weight_set(evas.EVAS_HINT_EXPAND, evas.EVAS_HINT_EXPAND)
     self.win.resize_object_add(ly)
     ly.show()

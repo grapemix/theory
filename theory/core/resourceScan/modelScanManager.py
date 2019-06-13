@@ -4,13 +4,15 @@
 from collections import defaultdict
 
 ##### Theory lib #####
-from theory.core.resourceScan.modelClassScanner import ModelClassScanner
+from theory.core.resourceScan.baseScanManager import BaseScanManager
+from theory.core.resourceScan.modelClassScanner import (
+  ModelClassScanner
+)
 from theory.apps.model import AppModel
 
 ##### Theory third-party lib #####
 
 ##### Local app #####
-from baseScanManager import BaseScanManager
 
 ##### Theory app #####
 
@@ -31,7 +33,7 @@ class ModelScanManager(BaseScanManager):
       return True
     if(refLabel in parentLabelLst):
       return False
-    elif(self.modelDepMap.has_key(refLabel)):
+    elif refLabel in self.modelDepMap:
       isEitherOneCircular = False
       parentLabelLst.append(refLabel)
       for i in self.modelDepMap[refLabel]:
@@ -60,7 +62,7 @@ class ModelScanManager(BaseScanManager):
       o.scan()
       modelLst.extend(o.modelList)
 
-    for k, v in self.modelDepMap.iteritems():
+    for k, v in self.modelDepMap.items():
       for i in v:
         self._markCircular(k, i)
 

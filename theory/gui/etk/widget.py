@@ -7,6 +7,7 @@ import json
 import os
 
 ##### Theory lib #####
+import theory.gui.etk.element
 from theory.gui.util import LocalFileObject
 from theory.utils import datetimeSafe, formats
 from theory.utils.importlib import importClass
@@ -14,7 +15,6 @@ from theory.utils.importlib import importClass
 ##### Theory third-party lib #####
 
 ##### Local app #####
-import element
 
 ##### Theory app #####
 
@@ -66,7 +66,7 @@ class BasePacker(object):
     return (widget,)
 
   def _createContainer(self, attrs=None, *args, **kwargs):
-    hBox = element.Box(attrs)
+    hBox = theory.gui.etk.element.Box(attrs)
     hBox.win = self.win
     if(not self.attrs["isContainerAFrame"]):
       hBox.bx = self.bx
@@ -94,7 +94,16 @@ class BasePacker(object):
     return data.get(name, None)
 
 class BaseFieldInput(BasePacker):
-  def __init__(self, fieldSetter, fieldGetter, win, bx, attrs=None, *args, **kwargs):
+  def __init__(
+      self,
+      fieldSetter,
+      fieldGetter,
+      win,
+      bx,
+      attrs=None,
+      *args,
+      **kwargs
+  ):
     self.fieldSetter = fieldSetter
     self.fieldGetter = fieldGetter
     super(BaseFieldInput, self).__init__(win, bx, attrs, *args, **kwargs)
@@ -106,12 +115,29 @@ class BaseLabelInput(BaseFieldInput):
   much control on the main container and all attr simply pass to the widget."""
 
   __metaclass__ = ABCMeta
-  def __init__(self, fieldSetter, fieldGetter, win, bx, attrs=None, *args, **kwargs):
+  def __init__(
+      self,
+      fieldSetter,
+      fieldGetter,
+      win,
+      bx,
+      attrs=None,
+      *args,
+      **kwargs
+  ):
     attrs = self._buildAttrs(
         attrs,
         isExpandMainContainer=False
     )
-    super(BaseLabelInput, self).__init__(fieldSetter, fieldGetter, win, bx, attrs, *args, **kwargs)
+    super(BaseLabelInput, self).__init__(
+      fieldSetter,
+      fieldGetter,
+      win,
+      bx,
+      attrs,
+      *args,
+      **kwargs
+    )
     self.hasGenerate = False
 
   def _prepareInitData(self, data):
@@ -125,21 +151,25 @@ class BaseLabelInput(BaseFieldInput):
 
   def initLabelMainContainerAsFrame(self):
     if(self.attrs["isExpandMainContainer"]):
-      fr = element.Frame({"isFillAlign": True, "isWeightExpand": True})
+      fr = theory.gui.etk.element.Frame(
+        {"isFillAlign": True, "isWeightExpand": True}
+      )
     else:
-      fr = element.Frame({"isFillAlign": False, "isWeightExpand": False})
+      fr = theory.gui.etk.element.Frame(
+        {"isFillAlign": False, "isWeightExpand": False}
+      )
     fr.win = self.win
     fr.bx = self.bx
     self.mainContainer = fr
-    helpLabel = element.Label()
+    helpLabel = theory.gui.etk.element.Label()
     helpLabel.win = self.win
     self.widgetLst.append(helpLabel)
 
   def initLabelMainContainerAsTbl(self):
-    lb = element.Label()
+    lb = theory.gui.etk.element.Label()
     lb.win = self.win
     self.widgetLst.append(lb)
-    lb = element.Label()
+    lb = theory.gui.etk.element.Label()
     lb.win = self.win
     self.widgetLst.append(lb)
 
@@ -159,10 +189,10 @@ class BaseLabelInput(BaseFieldInput):
     hBox = self._createContainer(attrs={"isFillAlign": True, "isWeightExpand": True})
     hBox.generate()
     self.mainContainer.content = hBox
-    self.mainContainer.title = unicode(title)
+    self.mainContainer.title = str(title)
     self.mainContainer.generate()
 
-    self.widgetLst[-1].attrs["initData"] = unicode(help)
+    self.widgetLst[-1].attrs["initData"] = str(help)
 
     widgetLst = list(self._createWidget())
     self.widgetLst = widgetLst + self.widgetLst
@@ -175,8 +205,8 @@ class BaseLabelInput(BaseFieldInput):
   def packAsTbl(self, title, help):
     hBox = self.mainContainer
 
-    self.widgetLst[0].attrs["initData"] = unicode(title)
-    self.widgetLst[-1].attrs["initData"] = unicode(help)
+    self.widgetLst[0].attrs["initData"] = str(title)
+    self.widgetLst[-1].attrs["initData"] = str(help)
 
     widgetLst = self._createWidget()
     self.widgetLst = self.widgetLst[0] + widgetLst + self.widgetLst[1]
@@ -210,8 +240,8 @@ class BaseLabelInput(BaseFieldInput):
     pass
 
   def reset(self, **kwargs):
-    """ To redraw the element when data got update"""
-    for k, v in kwargs.iteritems():
+    """ To redraw the theory.gui.etk.element when data got update"""
+    for k, v in kwargs.items():
       kwargs[k] = self._prepareInitData(v)
     self.widgetLst[0].reset(**kwargs)
 
@@ -224,7 +254,7 @@ class HiddenInput(BaseLabelInput):
     pass
 
 class StringInput(BaseLabelInput):
-  widgetClass = element.Entry
+  widgetClass = theory.gui.etk.element.Entry
   lineBreak = "<br/>"
 
   def _getData(self):
@@ -254,9 +284,26 @@ class TextInput(StringInput):
     )
 
 class NumericInput(StringInput):
-  def __init__(self, fieldSetter, fieldGetter, win, bx, attrs=None, *args, **kwargs):
+  def __init__(
+      self,
+      fieldSetter,
+      fieldGetter,
+      win,
+      bx,
+      attrs=None,
+      *args,
+      **kwargs
+  ):
     attrs = self._buildAttrs(attrs, isExpandMainContainer=False)
-    super(NumericInput, self).__init__(fieldSetter, fieldGetter, win, bx, attrs, *args, **kwargs)
+    super(NumericInput, self).__init__(
+      fieldSetter,
+      fieldGetter,
+      win,
+      bx,
+      attrs,
+      *args,
+      **kwargs
+    )
 
   def _prepareInitData(self, initData):
     return str(initData)
@@ -270,7 +317,7 @@ class FileSizeInput(NumericInput):
 
 class SelectBoxInput(BaseLabelInput):
   """Assuming labels are unique."""
-  widgetClass = element.RadioBox
+  widgetClass = theory.gui.etk.element.RadioBox
 
   def updateField(self):
     if self.hasGenerate:
@@ -285,7 +332,7 @@ class SelectBoxInput(BaseLabelInput):
   #  return widgetLst
 
 class CheckBoxInput(BaseLabelInput):
-  widgetClass = element.CheckBox
+  widgetClass = theory.gui.etk.element.CheckBox
 
   def _createWidget(self, *args, **kwargs):
     hBox = self._createContainer({
@@ -321,7 +368,7 @@ class CheckBoxInput(BaseLabelInput):
     self.fieldSetter({"finalData": choices})
 
 class FileselectInput(BaseLabelInput):
-  widgetClass = element.FileSelector
+  widgetClass = theory.gui.etk.element.FileSelector
 
   def updateField(self):
     path = self.widgetLst[0].finalData
@@ -329,12 +376,18 @@ class FileselectInput(BaseLabelInput):
       if(self.attrs["initData"] is None):
         # file path has not been touched and no initData has been assigned
         path = None
-      elif(self.attrs.has_key("isFolderOnly") and self.attrs["isFolderOnly"]):
+      elif(
+        "isFolderOnly" in self.attrs
+        and self.attrs["isFolderOnly"]
+      ):
         path = self.attrs["initData"]
       else:
         # file path has not been touched
         path = LocalFileObject(self.attrs["initData"])
-    elif(self.attrs.has_key("isFolderOnly") and self.attrs["isFolderOnly"]):
+    elif(
+      "isFolderOnly" in self.attrs
+      and self.attrs["isFolderOnly"]
+    ):
       # Folder mode and we only want to return dir path
       pass
     else:
@@ -343,7 +396,7 @@ class FileselectInput(BaseLabelInput):
     self.fieldSetter({"finalData": path})
 
 class DateInput(StringInput):
-  widgetClass = element.Entry
+  widgetClass = theory.gui.etk.element.Entry
 
   def __init__(self, fieldSetter, fieldGetter, win, bx,
       attrs=None, *args, **kwargs):
@@ -356,7 +409,7 @@ class DateInput(StringInput):
         *args,
         **kwargs
     )
-    if(kwargs.has_key("format") and kwargs["format"]):
+    if "format" in kwargs and kwargs["format"]:
       self.format = format
       self.manualFormat = True
     else:
@@ -372,7 +425,7 @@ class DateInput(StringInput):
     return value
 
 class DateTimeInput(StringInput):
-  widgetClass = element.Entry
+  widgetClass = theory.gui.etk.element.Entry
 
   def __init__(self, fieldSetter, fieldGetter, win, bx,
       attrs=None, *args, **kwargs):
@@ -385,7 +438,7 @@ class DateTimeInput(StringInput):
         *args,
         **kwargs
     )
-    if(kwargs.has_key("format") and kwargs["format"]):
+    if "format" in kwargs and kwargs["format"]:
       self.format = format
       self.manualFormat = True
     else:
@@ -401,7 +454,7 @@ class DateTimeInput(StringInput):
     return value
 
 class TimeInput(StringInput):
-  widgetClass = element.Entry
+  widgetClass = theory.gui.etk.element.Entry
 
   def __init__(self, fieldSetter, fieldGetter, win, bx,
       attrs=None, *args, **kwargs):
@@ -414,7 +467,7 @@ class TimeInput(StringInput):
         *args,
         **kwargs
     )
-    if(kwargs.has_key("format") and kwargs["format"]):
+    if "format" in kwargs and kwargs["format"]:
       self.format = format
       self.manualFormat = True
     else:
@@ -429,12 +482,29 @@ class TimeInput(StringInput):
     return value
 
 class StringGroupFilterInput(BaseLabelInput):
-  #widgetClass = element.ListModelValidator
-  widgetClass = element.ListValidator
+  #widgetClass = theory.gui.etk.element.ListModelValidator
+  widgetClass = theory.gui.etk.element.ListValidator
 
-  def __init__(self, fieldSetter, fieldGetter, win, bx, attrs=None, *args, **kwargs):
+  def __init__(
+      self,
+      fieldSetter,
+      fieldGetter,
+      win,
+      bx,
+      attrs=None,
+      *args,
+      **kwargs
+  ):
     attrs = self._buildAttrs(attrs, initData=())
-    super(StringGroupFilterInput, self).__init__(fieldSetter, fieldGetter, win, bx, attrs, *args, **kwargs)
+    super(StringGroupFilterInput, self).__init__(
+      fieldSetter,
+      fieldGetter,
+      win,
+      bx,
+      attrs,
+      *args,
+      **kwargs
+    )
 
   @property
   def changedData(self):
@@ -444,7 +514,7 @@ class StringGroupFilterInput(BaseLabelInput):
     self.fieldSetter({"finalData": self.widgetLst[0].finalData})
 
 class ModelValidateGroupInput(BaseLabelInput):
-  widgetClass = element.ListModelValidator
+  widgetClass = theory.gui.etk.element.ListModelValidator
 
   def __init__(
       self,
@@ -517,7 +587,7 @@ class EmbeddedInput(BaseLabelInput):
 
 
     widgetLst = [embeddedBox,]
-    for fieldName, fieldObj in self.embeddedFieldDict.iteritems():
+    for fieldName, fieldObj in self.embeddedFieldDict.items():
       fieldObj.renderWidget(
           self.win,
           embeddedBox.obj,
@@ -562,7 +632,7 @@ class ListInput(BaseLabelInput):
     """Will be only called by generic widget."""
     idx = self.btnIdxMap[btnHash]
 
-    for k, v in self.btnIdxMap.iteritems():
+    for k, v in self.btnIdxMap.items():
       if(v>idx):
         self.btnIdxMap[k] += 1
 
@@ -588,7 +658,7 @@ class ListInput(BaseLabelInput):
       del self.widgetLst[startIdx]
 
     del self.btnIdxMap[btnHash]
-    for k, v in self.btnIdxMap.iteritems():
+    for k, v in self.btnIdxMap.items():
       if(v>idx):
         self.btnIdxMap[k] -= 1
 
@@ -614,7 +684,7 @@ class ListInput(BaseLabelInput):
         self._createWidget = self._createLongStringWidget
         self.lineBreak = childFieldTemplate.widget.lineBreak
       else:
-        self.widgetClass = element.Multibuttonentry
+        self.widgetClass = theory.gui.etk.element.Multibuttonentry
         self._createWidget = self._createShortStringWidget
       self.isOverridedData = True
       del self.addChildField
@@ -657,13 +727,13 @@ class ListInput(BaseLabelInput):
     #)
     #buttonControlBox.generate()
 
-    #btn = element.Button({"isWeightExpand": True, "isFillAlign": False, })
+    #btn = theory.gui.etk.element.Button({"isWeightExpand": True, "isFillAlign": False, })
     #btn.win = self.win
     #btn.label = "Toggle Expand"
     #btn._clicked = lambda btn: mbe.expanded_set(not mbe.expanded_get())
     #buttonControlBox.addWidget(btn)
 
-    #btn = element.Button({"isWeightExpand": True, "isFillAlign": False, })
+    #btn = theory.gui.etk.element.Button({"isWeightExpand": True, "isFillAlign": False, })
     #btn.win = self.win
     #btn.label = "Clear"
     #btn._clicked = lambda bt: widget.obj.clear()
@@ -726,7 +796,9 @@ class ListInput(BaseLabelInput):
     })
     buttonControlBox.generate()
 
-    btn = element.Button({"isWeightExpand": True, "isFillAlign": False})
+    btn = theory.gui.etk.element.Button(
+      {"isWeightExpand": True, "isFillAlign": False}
+    )
     btn.win = self.win
     btn.label = "Add"
     btn._clicked = self._addDataWidget
@@ -736,7 +808,9 @@ class ListInput(BaseLabelInput):
     buttonControlBox.addWidget(btn)
 
     if(not isFirstBtn):
-      btn = element.Button({"isWeightExpand": True, "isFillAlign": False,})
+      btn = theory.gui.etk.element.Button(
+        {"isWeightExpand": True, "isFillAlign": False,}
+      )
       btn.win = self.win
       btn.label = "Remove"
       btn._clicked = self._rmDataWidget
@@ -746,7 +820,7 @@ class ListInput(BaseLabelInput):
     return buttonControlBox
 
   def updateField(self):
-    if(self.widgetClass == element.Multibuttonentry):
+    if(self.widgetClass == theory.gui.etk.element.Multibuttonentry):
       self.fieldSetter(
           {
             "finalData": self._inputLst[0].finalData,
@@ -846,7 +920,9 @@ class DictInput(ListInput):
     )
     keyInputBox.generate()
 
-    lb = element.Label({"isFillAlign": False, "isWeightExpand": False})
+    lb = theory.gui.etk.element.Label(
+      {"isFillAlign": False, "isWeightExpand": False}
+    )
     lb.win = self.win
     lb.attrs["initData"] = "Key:"
     keyInputBox.addWidget(lb)
@@ -874,7 +950,9 @@ class DictInput(ListInput):
     )
     valueInputBox.generate()
 
-    lb = element.Label({"isFillAlign": False, "isWeightExpand": False})
+    lb = theory.gui.etk.element.Label(
+      {"isFillAlign": False, "isWeightExpand": False}
+    )
     lb.win = self.win
     lb.attrs["initData"] = "Value:"
     valueInputBox.addWidget(lb)
@@ -904,7 +982,9 @@ class DictInput(ListInput):
         })
     buttonControlBox.generate()
 
-    btn = element.Button({"isWeightExpand": True, "isFillAlign": False})
+    btn = theory.gui.etk.element.Button(
+      {"isWeightExpand": True, "isFillAlign": False}
+    )
     btn.win = self.win
     btn.label = "Add"
     btn._clicked = self._addDataWidget
@@ -914,7 +994,9 @@ class DictInput(ListInput):
     buttonControlBox.addWidget(btn)
 
     if(not isFirstBtn):
-      btn = element.Button({"isWeightExpand": True, "isFillAlign": False,})
+      btn = theory.gui.etk.element.Button(
+        {"isWeightExpand": True, "isFillAlign": False,}
+      )
       btn.win = self.win
       btn.label = "Remove"
       btn._clicked = self._rmDataWidget
@@ -963,7 +1045,7 @@ class DictInput(ListInput):
       for k in kwargsKeyLst:
         row[k] = kwargs[k][idx]
 
-      for fieldName, dataKey in fieldNameDataKeyDict.iteritems():
+      for fieldName, dataKey in fieldNameDataKeyDict.items():
         row[fieldName] = dataKey[i]
 
       keyInputBox = self.childFieldPairLst[i][0].widget
@@ -975,7 +1057,7 @@ class DictInput(ListInput):
       for k in kwargsKeyLst:
         row[k] = kwargs[k][idx]
 
-      for fieldName, dataKey in fieldNameDataKeyDict.iteritems():
+      for fieldName, dataKey in fieldNameDataKeyDict.items():
         row[fieldName] = kwargs[fieldName][dataKey[i]]
 
       valueInputBox = self.childFieldPairLst[i][1].widget
@@ -1064,7 +1146,7 @@ class QueryIdInput(StringInput):
         )
     hBox.generate()
 
-    widget = element.Entry()
+    widget = theory.gui.etk.element.Entry()
     widget.win = self.win
     widget.attrs["initData"] = self.initData
     hBox.addWidget(widget)
@@ -1078,14 +1160,18 @@ class QueryIdInput(StringInput):
     vBox.bx = hBox.obj
     vBox.generate()
 
-    btn = element.Button({"isFillAlign": False, "isWeightExpand": False})
+    btn = theory.gui.etk.element.Button(
+      {"isFillAlign": False, "isWeightExpand": False}
+    )
     btn.win = self.win
     btn.label = u"+"
     btn.attrs["isShrink"] = True
     btn._clicked = self._createInstanceCallback
     vBox.addWidget(btn)
 
-    btn = element.Button({"isFillAlign": False, "isWeightExpand": False})
+    btn = theory.gui.etk.element.Button(
+      {"isFillAlign": False, "isWeightExpand": False}
+    )
     btn.win = self.win
     btn.label = u"☷"
     btn.attrs["isShrink"] = True
@@ -1106,7 +1192,7 @@ class QueryIdInput(StringInput):
           queryset = int(entryWidget.finalData.split(",")[0])
       else:
         queryset = None
-    except AttributeError, KeyError:
+    except (AttributeError, KeyError):
       queryset = self.rawInitData
     self.fieldSetter({"finalData": queryset})
 
@@ -1118,7 +1204,7 @@ class FilterFormLayout(BasePacker):
         isExpandMainContainer=True
         )
     super(FilterFormLayout, self).__init__(win, bxInput.obj, attrs)
-    if(attrs.has_key("unFocusFxn")):
+    if "unFocusFxn" in attrs:
       self.unFocusFxn = attrs["unFocusFxn"]
     self.labelTitle = "Param Filter:"
     self.inputLst = []
@@ -1155,12 +1241,16 @@ class FilterFormLayout(BasePacker):
     )
     filterEntryBox.generate()
 
-    lb = element.Label({"isFillAlign": False, "isWeightExpand": False})
+    lb = theory.gui.etk.element.Label(
+      {"isFillAlign": False, "isWeightExpand": False}
+    )
     lb.win = self.win
     lb.attrs["initData"] = self.labelTitle
     filterEntryBox.addWidget(lb)
 
-    en = element.Entry({"isFillAlign": False, "isWeightExpand": False})
+    en = theory.gui.etk.element.Entry(
+      {"isFillAlign": False, "isWeightExpand": False}
+    )
     en.win = self.win
     en._contentChanged = self._filterField
     en._fieldName = None

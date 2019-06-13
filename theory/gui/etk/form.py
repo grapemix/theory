@@ -13,14 +13,14 @@ from theory.gui.common.baseForm import (
     FormBase,
     DeclarativeFieldsMetaclass,
     )
+from theory.gui.etk.element import Button
+from theory.gui.etk.widget import BasePacker, FilterFormLayout
 from theory.gui.transformer.theoryJSONEncoder import TheoryJSONEncoder
 from theory.utils.importlib import importClass
 
 ##### Theory third-party lib #####
 
 ##### Local app #####
-from widget import BasePacker, FilterFormLayout
-from element import Button
 
 ##### Theory app #####
 
@@ -44,7 +44,7 @@ class GuiFormBase(BasePacker):
     It should be faster and allow previous reference to it. Only useful for the
     reset button in the future.
     """
-    for fieldName, data in initDataAsDict.iteritems():
+    for fieldName, data in initDataAsDict.items():
       try:
         self.fields[fieldName].initData = data
         # To force widget to update in next time
@@ -72,20 +72,24 @@ class FlexibleGuiFormBase(GuiFormBase):
     return combineFieldName
 
   def updateModelInOrderedDict(self):
-    for modelName, fieldNameLst in self.modelFieldNameLst.iteritems():
+    for modelName, fieldNameLst in self.modelFieldNameLst.items():
       modelObj = self.modelCacheDict[modelName]
       for fieldName in fieldNameLst:
         combineFieldName = self._generateCombineFieldName(modelName, fieldName)
         formData = self.clean()
-        if (formData.has_key(combineFieldName)
+        if (combineFieldName in formData
             and not isinstance(modelObj, (list, tuple))
             ):
-          print formData[combineFieldName], getattr(modelObj, fieldName)
+          print(
+            "FlexibleGuiFormBase updateModelInOrderedDict",
+            formData[combineFieldName],
+            getattr(modelObj, fieldName)
+          )
 
   def modelObjVsRelationToOrderedDict(self, modelObjVsRelation):
     r = OrderedDict()
 
-    for modelObj, relation in modelObjVsRelation.iteritems():
+    for modelObj, relation in modelObjVsRelation.items():
       modelName = modelObj.__class__.__name__
       fieldNameLst = self.modelFieldNameLst[modelName]
       if(relation is not None):
@@ -117,7 +121,7 @@ class FlexibleGuiFormBase(GuiFormBase):
 
   def getModelInOrderedDict(self, modelKlassVsId):
     r = OrderedDict()
-    for modelKlass, id in modelKlassVsId.iteritems():
+    for modelKlass, id in modelKlassVsId.items():
       modelName = modelKlass.__name__
       fieldNameLst = self.modelFieldNameLst[modelName]
       if("." in str(id)):
@@ -240,10 +244,10 @@ class SimpleGuiFormBase(GuiFormBase):
       logger.error(e, exc_info=True)
       raise ValidationError(str(e))
 
-    for fieldName, attrNameVsAttr in formData.iteritems():
+    for fieldName, attrNameVsAttr in formData.items():
       # TODO: simplify this procedure later
       field = self.fields[fieldName]
-      for attrName, attr in attrNameVsAttr.iteritems():
+      for attrName, attr in attrNameVsAttr.items():
         setattr(field, attrName, attr)
         if attrName == "choices":
           field.widget.reset(choices=field.choices)
@@ -276,7 +280,7 @@ class SimpleGuiFormBase(GuiFormBase):
 
     i = 0
     fieldNameInOrder = []
-    for fieldName, fieldDesc in fieldNameVsDesc.iteritems():
+    for fieldName, fieldDesc in fieldNameVsDesc.items():
       if fieldDesc['type'].startswith("Dynamic"):
         fieldNameInOrder.append(fieldName)
       else:
@@ -345,7 +349,7 @@ class SimpleGuiFormBase(GuiFormBase):
     self._changeFormWindowHeight(settings.DIMENSION_HINTS["maxHeight"])
 
   def showErrInFieldLabel(self):
-    for fieldName, errMsg in self.errors.iteritems():
+    for fieldName, errMsg in self.errors.items():
       self.fields[fieldName].widget.reFillLabel(errMsg)
 
 class StepFormBase(SimpleGuiFormBase):
@@ -353,7 +357,9 @@ class StepFormBase(SimpleGuiFormBase):
     pass
 
   def generateStepControl(self, *args, **kwargs):
-    self.stepControlBox = self._createContainer({"isHorizontal": True, "isWeightExpand": False})
+    self.stepControlBox = self._createContainer(
+      {"isHorizontal": True, "isWeightExpand": False}
+    )
     self.stepControlBox.bx = self.bx
     self.stepControlBox.generate()
 
@@ -361,7 +367,7 @@ class StepFormBase(SimpleGuiFormBase):
     btn.win = self.win
     btn.bx = self.stepControlBox.obj
     btn.label = "Cancel"
-    if(kwargs.has_key("cleanUpCrtFxn")):
+    if "cleanUpCrtFxn" in kwargs:
       btn._clicked = kwargs["cleanUpCrtFxn"]
       btn._clickedData = self
       self.cleanUpCrtFxn = kwargs["cleanUpCrtFxn"]
@@ -394,22 +400,42 @@ class CommandFormBase(StepFormBase):
     pass
 
   def focusOnTheFirstChild(self):
-    if(self.firstRequiredInputIdx!=-1):
-      self.fields.values()[self.firstRequiredInputIdx].widget.setFocus()
+    if self.firstRequiredInputIdx != -1:
+      list(self.fields.values())[self.firstRequiredInputIdx].widget.setFocus()
     elif(hasattr(self, "optionalMenu")):
       self.optionalMenu.setFocusOnFilterEntry()
 
-class GuiForm(FormBase, GuiFormBase):
+class GuiForm(
+    FormBase,
+    GuiFormBase,
+    metaclass=DeclarativeFieldsMetaclass
+):
   __metaclass__ = DeclarativeFieldsMetaclass
 
-class SimpleGuiForm(FormBase, SimpleGuiFormBase):
+class SimpleGuiForm(
+    FormBase,
+    SimpleGuiFormBase,
+    metaclass=DeclarativeFieldsMetaclass
+):
   __metaclass__ = DeclarativeFieldsMetaclass
 
-class FlexibleGuiForm(FormBase, FlexibleGuiFormBase):
+class FlexibleGuiForm(
+    FormBase,
+    FlexibleGuiFormBase,
+    metaclass=DeclarativeFieldsMetaclass
+):
   __metaclass__ = DeclarativeFieldsMetaclass
 
-class StepForm(FormBase, StepFormBase):
+class StepForm(
+    FormBase,
+    StepFormBase,
+    metaclass=DeclarativeFieldsMetaclass
+):
   __metaclass__ = DeclarativeFieldsMetaclass
 
-class CommandForm(FormBase, CommandFormBase):
+class CommandForm(
+    FormBase,
+    CommandFormBase,
+    metaclass=DeclarativeFieldsMetaclass
+):
   __metaclass__ = DeclarativeFieldsMetaclass

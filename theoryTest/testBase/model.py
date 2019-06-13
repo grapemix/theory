@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 ##### System wide lib #####
 from collections import defaultdict
-from datetime import datetime
-from ludibrio import Stub
+import datetime
 import os
 
 ##### Theory lib #####
@@ -32,7 +31,7 @@ def getTestCaseFileAbsPath():
   )
 
 def getBinaryDefault():
-  return bin(10)
+  return b'10'
 
 def getImageDefault():
   # All errors should not be catched
@@ -48,7 +47,7 @@ def getBooleanDefault():
   return True
 
 def getDateTimeDefault():
-  return datetime(1970, 01, 01, 00, 00, 01, 999),
+  return datetime.datetime(1970, 1, 1, 0, 0, 1, 999)
 
 def getDecimalDefault():
   return 1.0
@@ -74,7 +73,7 @@ defaultValueSet1 = {
     "Image": getImageDefault(),
     "File": getImageDefault(),
     "Boolean": True,
-    "DateTime": datetime(1970, 01, 01, 00, 00, 01, 999),
+    "DateTime": datetime.datetime(1970, 1, 1, 0, 0, 1, 999),
     "Decimal": 1.0,
     "Float": 1.0,
     "Int": 1,

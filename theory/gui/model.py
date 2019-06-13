@@ -1126,7 +1126,7 @@ class ModelChoiceField(Field):
       cacheChoices = False
     self.cacheChoices = cacheChoices
 
-    if not kwargs.has_key("widget"):
+    if "widget" not in kwargs:
       kwargs["widget"] = self.widget
     # Call Field instead of ChoiceField __init__() because we don't need
     # ChoiceField.__init__().
@@ -1149,7 +1149,7 @@ class ModelChoiceField(Field):
       "appName": appName,
       "modelName": self.queryset.modal.__name__,
       "queryset": self.initData,
-      "isMultiple": self.defaultErrorMessages.has_key('list'),
+      "isMultiple": "list" in self.defaultErrorMessages,
       })
     super(ModelChoiceField, self).renderWidget(*args, **kwargs)
     self.widget.queryset = self.queryset

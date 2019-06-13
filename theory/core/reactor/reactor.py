@@ -37,7 +37,12 @@ from theory.utils.singleton import Singleton
 
 __all__ = ('Reactor',)
 
-class Reactor(theory_pb2_grpc.ReactorServicer, AutoCompleteMixin, HistoryMixin):
+class Reactor(
+    theory_pb2_grpc.ReactorServicer,
+    AutoCompleteMixin,
+    HistoryMixin,
+    metaclass=Singleton,
+):
   """
   It should be in charge to handle the high level user interaction bewteen
   theory and user. And it should dedicated on the GUI part, but able to
@@ -62,7 +67,7 @@ class Reactor(theory_pb2_grpc.ReactorServicer, AutoCompleteMixin, HistoryMixin):
     self._moodName = moodName
 
   def __init__(self):
-    self.logger = logging.getLogger(__name__)
+    self.logger = logging.getLogger("theory.usr")
     super(Reactor, self).__init__()
 
   #def _actionQGenerator(self):
@@ -139,7 +144,7 @@ class Reactor(theory_pb2_grpc.ReactorServicer, AutoCompleteMixin, HistoryMixin):
             modelData = json.loads(modelData)
             modelDataWoM2m = {}
             m2mKeyLst = []
-            for k, v in modelData.iteritems():
+            for k, v in modelData.items():
               if k.endswith('__m2m'):
                 m2mKeyLst.append(k)
               elif isinstance(v, dict) and len(v) == 0:
@@ -254,10 +259,10 @@ class Reactor(theory_pb2_grpc.ReactorServicer, AutoCompleteMixin, HistoryMixin):
 
   def call(self, request, context):
     if settings.DEBUG_LEVEL >= 10:
-      print "reactor call", request.action, request.val
+      self.logger.debug(f"reactor call {request.action}, {request.val}")
     elif settings.DEBUG_LEVEL > 5:
       if request.action not in ["escapeRequest", "autocompleteRequest"]:
-        print "reactor call", request.action, request.val
+        self.logger.debug(f"reactor call {request.action}, {request.val}")
     self.actionQ = []
     if request.action == "runCmd":
       self._parse(request.val)
@@ -310,7 +315,11 @@ class Reactor(theory_pb2_grpc.ReactorServicer, AutoCompleteMixin, HistoryMixin):
         ):
           # Since data in dynamicChoiceLst is assumed being updated frequently,
           # initData is sometimes unable to know in advance.
-          param["initData"] = list(param["choices"])[0][0]
+          try:
+            param["initData"] = list(param["choices"])[0][0]
+          except IndexError as e:
+            self.logger.error(f"Choice not found in {self.cmdModel}")
+            raise ValidationError(str(e))
         del param["dynamicChoiceLst"]
         if isinstance(param["choices"], set):
           param["choices"] = list(param["choices"])
@@ -337,7 +346,7 @@ class Reactor(theory_pb2_grpc.ReactorServicer, AutoCompleteMixin, HistoryMixin):
   def _performDrums(self, cmd):
     debugLvl = settings.DEBUG_LEVEL
     bridge = Bridge()
-    for adapterName, leastDebugLvl in cmd._drums.iteritems():
+    for adapterName, leastDebugLvl in cmd._drums.items():
       if leastDebugLvl <= debugLvl:
         (adapterModel, drum) = bridge.adaptFromCmd(adapterName, cmd)
         self.actionQ.extend(drum.render(None, None, None))

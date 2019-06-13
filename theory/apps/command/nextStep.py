@@ -47,9 +47,10 @@ class NextStep(SimpleCommand):
 
     # Copied from core/reactor.py, should update this part if the original is
     # modified.
-    if(not cmd.paramForm.isValid()):
-      # TODO: integrate with std reactor error system
-      print cmd.paramForm.errors
+    if not cmd.paramForm.isValid():
+      import logging
+      logger = logger.getLogger("theory.usr")
+      logger.error(f"nextStep paramForm err: {cmd.paramForm.errors}")
       return
 
     # Copied from reactor, should be refactor to bridge in the futher
@@ -57,7 +58,7 @@ class NextStep(SimpleCommand):
 
     debugLvl = settings.DEBUG_LEVEL
     bridge = Bridge()
-    for adapterName, leastDebugLvl in cmd._drums.iteritems():
+    for adapterName, leastDebugLvl in cmd._drums.items():
       if(leastDebugLvl<=debugLvl):
         (adapterModel, drum) = bridge.adaptFromCmd(adapterName, cmd)
         drum.render(uiParam=self._uiParam)

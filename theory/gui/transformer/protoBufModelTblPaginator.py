@@ -52,7 +52,7 @@ class ProtoBufModelTblPaginator(TheoryModelBSONTblDataHandler):
 
     bufSet = set(appModelMdl.tblField)
     self.fieldNameLst = []
-    for fieldName in self.fieldNameVsProp.keys():
+    for fieldName in list(self.fieldNameVsProp.keys()):
       if fieldName not in bufSet:
         del self.fieldNameVsProp[fieldName]
       else:
@@ -76,13 +76,14 @@ class ProtoBufModelTblPaginator(TheoryModelBSONTblDataHandler):
             getattr(queryrow, fieldName)
             )
         if result is None:
-          print fieldName, result
           result = "None"
         row.append(result)
       try:
         r["dataLst"].append(theory_pb2.DataRow(cell=row))
-      except:
-        print row
+      except Exception as e:
+        import logging
+        logger = logging.getLogger("theory.usr")
+        logger.error(f"ProtoBufModelTblPaginator run: {row}")
         raise
 
     r["dataLst"] = r["dataLst"]
@@ -91,11 +92,11 @@ class ProtoBufModelTblPaginator(TheoryModelBSONTblDataHandler):
       # Since protobuf does not support OrderedDict, in order to preserve order,
       # the gui should reconstrct the list to OrderedDict
       r["fieldNameVsProp"] = []
-      for k, map in self.fieldNameVsProp.iteritems():
+      for k, map in self.fieldNameVsProp.items():
         # That is mainly for choices which stores in dict instead of str,
         # and protobuf assume prop is map<string, string> type, so we have
         # to jsonize in here
-        for keyInMap, v in map.iteritems():
+        for keyInMap, v in map.items():
           if isinstance(v, dict):
             map[keyInMap] = json.dumps(v)
         r["fieldNameVsProp"].append(theory_pb2.StrVsMap(k=k, v=map))

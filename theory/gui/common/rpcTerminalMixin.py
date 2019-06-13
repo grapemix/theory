@@ -41,10 +41,16 @@ class RpcTerminalMixin(object):
 
   def _fireUiReq(self, dict):
     if self.DEBUG_LEVEL >= 10:
-      print "RpcTerminalMixin _fireUiReq", dict
+      if not hasattr(self, "logger"):
+        import logging
+        self.logger = logger.getLogger("theory.internal")
+      self.logger.debug(f"RpcTerminalMixin _fireUiReq {dict}")
     elif self.DEBUG_LEVEL > 5:
       if dict["action"] not in ["escapeRequest", "autocompleteRequest"]:
-        print "RpcTerminalMixin _fireUiReq", dict
+        if not hasattr(self, "logger"):
+          import logging
+          self.logger = logger.getLogger("theory.internal")
+        self.logger.debug(f"RpcTerminalMixin _fireUiReq {dict}")
     self._handleReactorReq(self.stub.call(theory_pb2.ReactorReq(**dict)))
 
   def callReactor(self, fxnName, val):
@@ -70,6 +76,7 @@ class RpcTerminalMixin(object):
           raise e
         gevent.sleep(pow(2, int(errAttemptCounter)))
         errAttemptCounter += 0.5
+    print("_registerToReactor all good")
 
   def dieTogether(self):
     try:
@@ -80,7 +87,13 @@ class RpcTerminalMixin(object):
   def _handleReactorReq(self, reactorReqArr):
     for resp in reactorReqArr.reqLst:
       if self.DEBUG_LEVEL >= 10:
-        print "RpcTerminalMixin _handleReactorReq", resp.action, resp.val
+        if not hasattr(self, "logger"):
+          import logging
+          self.logger = logger.getLogger("theory.internal")
+        print(f"RpcTerminalMixin _handleReactorReq {resp.action}, {resp.val}")
+        self.logger.debug(
+          f"RpcTerminalMixin _handleReactorReq {resp.action}, {resp.val}"
+        )
       elif self.DEBUG_LEVEL > 5:
         if resp.action not in [
             "cleanUpCrt",
@@ -90,7 +103,12 @@ class RpcTerminalMixin(object):
             "restoreCmdLine",
             "focusOnParamFormFirstChild",
         ]:
-          print "RpcTerminalMixin _handleReactorReq", resp.action, resp.val
+          if not hasattr(self, "logger"):
+            import logging
+            self.logger = logger.getLogger("theory.internal")
+          self.logger.debug(
+            f"RpcTerminalMixin _handleReactorReq {resp.action}, {resp.val}"
+          )
 
       if resp.action in [
           "cleanUpCrt",
@@ -246,7 +264,7 @@ class RpcTerminalMixin(object):
     fieldNameVsProp = []
     for i in r.fieldNameVsProp:
       row = (i.k, {})
-      for k, v in i.v.iteritems():
+      for k, v in i.v.items():
         if k == "choices":
           v = json.loads(v)
         row[1][k] = v

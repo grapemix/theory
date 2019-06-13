@@ -58,7 +58,6 @@ class Spreadsheet(object):
     listStoreDataType.append(bool)
 
     self.model = gtk.ListStore(*listStoreDataType)
-
     self._appendToModel(model)
 
     self._switchToGeventLoop()
@@ -347,7 +346,7 @@ class SpreadsheetBuilder(object):
     self.childSpreadSheetBuilderLst = []
 
     self.fieldNameVsProp = fieldNameVsProp
-    for i, fieldName in enumerate(self.fieldNameVsProp.keys()):
+    for i, fieldName in enumerate(list(self.fieldNameVsProp.keys())):
       if fieldName=="id" :
         self.idLabelIdx = i
 
@@ -457,7 +456,7 @@ class SpreadsheetBuilder(object):
 
   def _buildRenderKwargsSet(self, fieldNameVsProp):
     kwargsSet = []
-    for fieldName, fieldProp in fieldNameVsProp.iteritems():
+    for fieldName, fieldProp in fieldNameVsProp.items():
       kwargs = getattr(
         self,
         "_{0}FieldRenderHandler".format(fieldProp["type"])
@@ -470,7 +469,7 @@ class SpreadsheetBuilder(object):
   def _queryRowToGtkDataModel(self, queryrow):
     row = []
 
-    for fieldName, handlerDict in self.fieldNameVsHandlerDict.iteritems():
+    for fieldName, handlerDict in self.fieldNameVsHandlerDict.items():
       result = handlerDict["dataHandler"](
           id,
           fieldName,
@@ -485,7 +484,7 @@ class SpreadsheetBuilder(object):
     self.modelFieldnameMap = {}
     idx = -1
     neglectColIdxLst = []
-    for fieldName, fieldProp in fieldNameVsProp.iteritems():
+    for fieldName, fieldProp in fieldNameVsProp.items():
       idx += 1
       if(fieldProp["type"]=="neglect"):
         neglectColIdxLst.append(idx)

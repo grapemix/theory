@@ -29,7 +29,6 @@ class HistoryMixin(object):
   historyLen = 0
 
   def __init__(self, *args, **kwargs):
-    print "HistoryMixin init"
     self.historyModel = History.objects.all()
     self.historyLen = len(self.historyModel)
     super(HistoryMixin, self).__init__()

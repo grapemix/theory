@@ -2,7 +2,10 @@
 #!/usr/bin/env python
 from __future__ import unicode_literals
 ##### System wide lib #####
-from cStringIO import StringIO
+try:
+  from cStringIO import StringIO
+except:
+  from io import StringIO
 import glob
 import gzip
 import os

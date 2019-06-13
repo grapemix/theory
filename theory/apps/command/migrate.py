@@ -6,8 +6,10 @@ from collections import OrderedDict
 from importlib import import_module
 import itertools
 import traceback
-from StringIO import StringIO
-
+try:
+  from StringIO import StringIO
+except:
+  from io import StringIO
 
 ##### Theory lib #####
 from theory.apps.command.baseCommand import SimpleCommand
@@ -36,7 +38,7 @@ from theory.utils.moduleLoading import moduleHasSubmodule
 
 #class TextPrinter(StringIO):
 #  def write(self, *args, **kwargs):
-#    if kwargs.has_key("ending"):
+#    if "ending" in kwargs:
 #      del kwargs["ending"]
 #    return TextPrinter.write(*args, **kwargs)
 

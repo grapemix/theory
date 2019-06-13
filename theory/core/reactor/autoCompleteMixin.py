@@ -25,7 +25,6 @@ class AutoCompleteMixin(object):
   originalQuest = ""
 
   def __init__(self, *args, **kwargs):
-    print "AutoCompleteMixin init"
     self.parser = TxtCmdParser()
     super(AutoCompleteMixin, self).__init__()
 

@@ -59,7 +59,7 @@ def importClass(name, package=None):
   chunk = name.split(".")
   klassName = chunk[-1]
   moduleName = ".".join(chunk[:-1])
-  if(sys.modules.has_key(moduleName)):
+  if moduleName in sys.modules:
     return getattr(sys.modules[moduleName], klassName)
 
   module = importModule(moduleName, package)

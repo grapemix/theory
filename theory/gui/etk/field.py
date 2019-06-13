@@ -5,11 +5,11 @@
 ##### Theory lib #####
 from theory.gui.common import baseField
 from theory.gui.common.baseField import *
+from theory.gui.etk.widget import *
 
 ##### Theory third-party lib #####
 
 ##### Local app #####
-from widget import *
 
 ##### Theory app #####
 
