@@ -360,6 +360,9 @@ class SpreadsheetBuilder(object):
         if i not in neglectColIdxLst:
           essentialRow.append(cell)
       essentialData.append(essentialRow)
+    for neglectColIdx in neglectColIdxLst:
+      if neglectColIdx <= self.idLabelIdx:
+        self.idLabelIdx -= 1
 
     self.renderKwargsSet = self._buildRenderKwargsSet(self.fieldNameVsProp)
 
