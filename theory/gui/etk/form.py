@@ -13,7 +13,6 @@ from theory.gui.common.baseForm import (
     FormBase,
     DeclarativeFieldsMetaclass,
     )
-from theory.gui.etk.element import Button
 from theory.gui.etk.widget import BasePacker, FilterFormLayout
 from theory.gui.transformer.theoryJSONEncoder import TheoryJSONEncoder
 from theory.utils.importlib import importClass
@@ -161,6 +160,7 @@ class FlexibleGuiFormBase(GuiFormBase):
     contentChgFxnNameTmpl = "{0}ContentChgCallback"
 
     for name, field in self.fields.items():
+      field._isInGui = True
       kwargs = {}
       focusChgFxnName = focusChgFxnNameTmpl.format(name)
       contentChgFxnName = contentChgFxnNameTmpl.format(name)
@@ -357,6 +357,7 @@ class StepFormBase(SimpleGuiFormBase):
     pass
 
   def generateStepControl(self, *args, **kwargs):
+    from theory.gui.etk.element import Button
     self.stepControlBox = self._createContainer(
       {"isHorizontal": True, "isWeightExpand": False}
     )

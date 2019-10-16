@@ -1,7 +1,6 @@
 import datetime
 import os
 
-from theory.gui import form
 from theory.db.model.fields import Field
 from theory.core import checks
 from theory.core.exceptions import ImproperlyConfigured

@@ -4,7 +4,6 @@ from theory.core.exceptions import ValidationError
 from theory.gui.common.baseForm import Form
 from theory.gui.field import IntegerField, BooleanField
 from theory.gui.util import ErrorList
-from theory.gui.widget import HiddenInput
 from theory.utils.encoding import python2UnicodeCompatible
 from theory.utils.functional import cachedProperty
 from theory.utils.safestring import markSafe
@@ -30,6 +29,7 @@ DEFAULT_MIN_NUM = 0
 DEFAULT_MAX_NUM = 1000
 
 
+#  Todo: may be del it in the future
 class ManagementForm(Form):
   """
   ``ManagementForm`` is used to keep track of how many form instances
@@ -37,13 +37,6 @@ class ManagementForm(Form):
   increment the count field of this form as well.
   """
   def __init__(self, *args, **kwargs):
-    self.baseFields[TOTAL_FORM_COUNT] = IntegerField(widget=HiddenInput)
-    self.baseFields[INITIAL_FORM_COUNT] = IntegerField(widget=HiddenInput)
-    # MIN_NUM_FORM_COUNT and MAX_NUM_FORM_COUNT are output with the rest of
-    # the management form, but only for the convenience of client-side
-    # code. The POST value of them returned from the client is not checked.
-    self.baseFields[MIN_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
-    self.baseFields[MAX_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
     super(ManagementForm, self).__init__(*args, **kwargs)
 
 

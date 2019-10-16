@@ -14,10 +14,6 @@ from theory.gui.field import Field
 from theory.gui.common.baseForm import DeclarativeFieldsMetaclass, FormBase
 from theory.gui.formset import BaseFormSet, formsetFactory
 from theory.gui.util import ErrorList
-from theory.gui.widget import (
-    QueryIdInput,
-    HiddenInput,
-    )
 from theory.utils import six
 from theory.utils.deprecation import RemovedInTheory19Warning
 from theory.utils.encoding import smartText, forceText
@@ -820,9 +816,9 @@ class BaseModelFormSet(BaseFormSet):
         qs = self.model._defaultManager.getQueryset()
       qs = qs.using(form.instance._state.db)
       if form._meta.widgets:
-        widget = form._meta.widgets.get(self._pkField.name, HiddenInput)
+        raise
       else:
-        widget = HiddenInput
+        widget = "HiddenInput"
       form.fields[self._pkField.name] = ModelChoiceField(qs, initData=pkValue, required=False, widget=widget)
     super(BaseModelFormSet, self).addFields(form, index)
 
@@ -1043,7 +1039,7 @@ class InlineForeignKeyField(Field):
   A basic integer field that deals with validating the given value to a
   given parent instance in an inline.
   """
-  widget = HiddenInput
+  widget = "HiddenInput"
   defaultErrorMessages = {
     'invalidChoice': _('The inline foreign key did not match the parent instance primary key.'),
   }
@@ -1112,7 +1108,7 @@ class ModelChoiceField(Field):
     'invalidChoice': _('Select a valid choice. That choice is not one of'
               ' the available choices.'),
   }
-  widget = QueryIdInput
+  widget = "QueryIdInput"
 
   def __init__(self, queryset, cacheChoices=None,
          required=True, widget=None, label=None, initData=None,
@@ -1166,7 +1162,9 @@ class ModelChoiceField(Field):
     return self._queryset
 
   def _setQueryset(self, queryset):
-    if isinstance(queryset, dict):
+    if isinstance(self.widget, str):
+      self._queryset = queryset
+    elif isinstance(queryset, dict):
       self.widget.app = queryset["appName"]
       self.widget.model = queryset["modelName"]
       modelKlass = importClass("{appName}.model.{modelName}".format(**queryset))
@@ -1247,7 +1245,7 @@ class ModelChoiceField(Field):
 
 class ModelMultipleChoiceField(ModelChoiceField):
   """A MultipleChoiceField whose choices are a model QuerySet."""
-  widget =  QueryIdInput
+  widget =  "QueryIdInput"
   defaultErrorMessages = {
     'list': _('Enter a list of values.'),
     'invalidChoice': _('Select a valid choice. %(value)s is not one of the'

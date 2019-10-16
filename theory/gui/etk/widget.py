@@ -675,14 +675,24 @@ class ListInput(BaseLabelInput):
     pass
 
   def _probeChildWidget(self, childFieldTemplate):
-    self.widgetClass = childFieldTemplate.widget.widgetClass
+    if isinstance(childFieldTemplate.widget, str):
+      if "." in childFieldTemplate.widget:
+        widgetKlass = importClass(f"{childFieldTemplate.widget}")
+      else:
+        widgetKlass = importClass(
+          f"theory.gui.widget.{childFieldTemplate.widget}"
+        )
+      self.widgetClass = widgetKlass.widgetClass
+    else:
+      self.widgetClass = childFieldTemplate.widget.widgetClass
 
-    if(self.widgetClass==StringInput.widgetClass):
-      if(hasattr(childFieldTemplate, "maxLen") \
-          and childFieldTemplate.maxLen>20):
+    if self.widgetClass == StringInput.widgetClass:
+      if (hasattr(childFieldTemplate, "maxLen")
+          and childFieldTemplate.maxLen > 20
+          ):
         self.widgetClass = TextInput.widgetClass
         self._createWidget = self._createLongStringWidget
-        self.lineBreak = childFieldTemplate.widget.lineBreak
+        self.lineBreak = TextInput.lineBreak
       else:
         self.widgetClass = theory.gui.etk.element.Multibuttonentry
         self._createWidget = self._createShortStringWidget
@@ -699,7 +709,13 @@ class ListInput(BaseLabelInput):
     """The adding child mechanism is handled by the widget itself."""
     initDataLst = []
     if(len(self.childFieldLst)>0):
-      tmpChildWidget = self.childFieldLst[0].widget(None, None, None, None)
+      widgetKlass = self.childFieldLst[0].widget
+      if isinstance(widgetKlass, str):
+        if "." in widgetKlass:
+          widgetKlass = importClass(f"{widgetKlass}")
+        else:
+          widgetKlass = importClass(f"theory.gui.widget.{widgetKlass}")
+      tmpChildWidget = widgetKlass(None, None, None, None)
     for field in self.childFieldLst:
       if(field.initData!="" or field.initData is not None):
         initDataLst.append(tmpChildWidget._prepareInitData(field.initData))

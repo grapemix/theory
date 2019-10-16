@@ -3,8 +3,6 @@
 ##### System wide lib #####
 
 ##### Theory lib #####
-from theory.gui import field as FormField
-from theory.gui.form import SimpleGuiForm
 
 ##### Theory third-party lib #####
 
@@ -23,16 +21,6 @@ class ReactorAdapter(object):
   lastEntry = ""
   crlf = ""
   entrySetterFxn = None
-
-  class TerminalForm(SimpleGuiForm):
-    stdOut = FormField.TextField(label="Standard Output")
-
-  def printTxt(self, txt):
-    o = self.TerminalForm()
-    o.fields["stdOut"].initData = txt
-    o.generateForm(**self.uiParam)
-    self.terminalForm = o
-    self.stdOutAdjuster(txt)
 
   def __init__(self, signal):
     self.signal = signal

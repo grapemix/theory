@@ -4,7 +4,7 @@
 from abc import ABCMeta, abstractmethod
 from celery import Task
 from theory.gui import field
-from theory.gui.form import CommandForm, Form
+from theory.gui.common.baseForm import Form
 
 ##### Theory lib #####
 
@@ -64,7 +64,7 @@ class _BaseCommand(object):
   # 8) For static field, data of field don't have to being accessed when importing class.
   # 9) Work with adapter
 
-  class ParamForm(CommandForm):
+  class ParamForm(Form):
     verbosity = field.IntegerField(
         label="verbosity",
         required=False,

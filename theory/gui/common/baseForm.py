@@ -467,10 +467,6 @@ class FormBase(object):
     if self.isValid():
       pythonDict = {}
       for fieldName, field in self.fields.items():
-        # Make sure not getting data from widget because the widget may be
-        # destroied
-        tmpWidget = field.widget
-        field.widget = field.widget.__class__
         try:
           pythonDict[fieldName] = field.toPython(field.clean(field.finalData))
         except Exception as e:

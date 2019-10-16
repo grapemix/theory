@@ -5,7 +5,6 @@
 ##### Theory lib #####
 from theory.gui.common import baseField
 from theory.gui.common.baseField import *
-from theory.gui.etk.widget import *
 
 ##### Theory third-party lib #####
 
@@ -36,18 +35,18 @@ __all__ = (
 
 
 class TextField(baseField.TextField):
-  widget = TextInput
+  widget = "TextInput"
   lineBreak = "<br/>"
 
 class IntegerField(baseField.IntegerField):
-  widget = NumericInput
+  widget = "NumericInput"
   def widget_attrs(self, widget):
     attrs = super(IntegerField, self).widget_attrs(widget)
     attrs.update({"isWeightExpand": False, "isFillAlign": False})
     return attrs
 
 class FloatField(baseField.FloatField):
-  widget = NumericInput
+  widget = "NumericInput"
 
 class DecimalField(baseField.DecimalField):
-  widget = NumericInput
+  widget = "NumericInput"

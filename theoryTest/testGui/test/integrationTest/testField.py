@@ -193,7 +193,7 @@ class AdapterFieldTestCase(FieldTestCaseBase, TestCase):
     initData = self.getInitData()
     self.field = self.fieldKlass(**{"initData": initData})
     self.renderWidget(self.field)
-    if(isclass(self.field.widget)):
+    if not isinstance(widget, str):
       self.assertEqual(self.field.clean(self.field.finalData), initData)
     else:
       self.assertEqual(
