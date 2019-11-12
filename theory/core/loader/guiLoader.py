@@ -41,14 +41,6 @@ def getDimensionHints():
       }
 
 def wakeup(settings_mod, argv=None):
-  # TODO: Make reactor to generate all choices for all fields to rm all deps
-  from theory.apps import apps
-  from copy import deepcopy
-  appNameLst = deepcopy(settings.INSTALLED_APPS)
-  appNameLst.insert(0, "theory.apps")
-  apps.populate(appNameLst)
-
   loadMoodData()
-
   getDimensionHints()
   Terminal().start()

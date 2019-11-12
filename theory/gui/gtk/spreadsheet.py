@@ -2,11 +2,10 @@
 #!/usr/bin/env python
 ##### System wide lib #####
 from collections import OrderedDict
-import gevent
+from theory.thevent import gevent
 import notify2
 
 ##### Theory lib #####
-from theory.apps.model import AppModel
 from theory.gui.transformer import TheoryModelBSONTblDataHandler
 
 ##### Theory third-party lib #####

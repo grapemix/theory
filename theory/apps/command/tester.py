@@ -74,8 +74,8 @@ class Tester(SimpleCommand):
 
   #  standardAloneTheoryTestScript = \
   #    theoryDirPath + "/theoryTest/runTheoryTest.py"
-  #  from gevent import subprocess
-  #  p1 = subprocess.Popen(
+  #  from theory.thevent import gevent
+  #  p1 = gevent.subprocess.Popen(
   #      [
   #        'python',
   #        standardAloneTheoryTestScript,
@@ -86,7 +86,7 @@ class Tester(SimpleCommand):
   #        "--testLabelLst",
   #        testLabelLst
   #      ],
-  #      #stdout=subprocess.PIPE
+  #      #stdout=gevent.subprocess.PIPE
   #      )
   #  #gevent.wait([p1,], timeout=10)
   #  #while True:

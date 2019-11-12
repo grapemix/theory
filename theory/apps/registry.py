@@ -1,7 +1,7 @@
 from collections import Counter, defaultdict, OrderedDict
 import os
 import sys
-from gevent import threading
+from theory.thevent import gevent
 import warnings
 
 from theory.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
@@ -46,7 +46,7 @@ class Apps(object):
     self.appsReady = self.modelsReady = self.ready = False
 
     # Lock for thread-safe population.
-    self._lock = threading.Lock()
+    self._lock = gevent.threading.Lock()
 
     # Pending lookups for lazy relations.
     self._pendingLookups = {}

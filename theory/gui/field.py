@@ -36,6 +36,8 @@ def _importModule():
   )
 
   module = importModule("theory.gui.{0}.field".format(settings.UI_TOOLKIT))
+  # WARNING: make sure all UI's dbus import are not inside the fxn or
+  # grpc+gevent hell will be shown
 
   for field in supportModuleLst:
     if(hasattr(module, field)):

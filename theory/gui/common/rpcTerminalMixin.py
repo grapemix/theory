@@ -2,10 +2,12 @@
 #!/usr/bin/env python
 ##### System wide lib #####
 from collections import OrderedDict
-import gevent
+from theory.thevent import gevent
 import grpc
 import json
 from math import pow
+# Have to be imported before notify2
+from theory.gui.etk.widget import getDbusMainLoop
 import notify2
 # Don't use it for security purpose
 from uuid import uuid4
@@ -13,7 +15,6 @@ from uuid import uuid4
 ##### Theory lib #####
 from theory.gui import theory_pb2
 from theory.gui import theory_pb2_grpc
-from theory.gui.etk import getDbusMainLoop
 from theory.gui.gtk.spreadsheet import SpreadsheetBuilder
 from theory.gui.transformer import GtkSpreadsheetModelBSONDataHandler
 from theory.utils.importlib import importClass
@@ -76,7 +77,6 @@ class RpcTerminalMixin(object):
           raise e
         gevent.sleep(pow(2, int(errAttemptCounter)))
         errAttemptCounter += 0.5
-    print("_registerToReactor all good")
 
   def dieTogether(self):
     try:

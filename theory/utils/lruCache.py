@@ -6,10 +6,9 @@ except ImportError:
   # licensed under MIT license, from:
   # <http://code.activestate.com/recipes/578078-py26-and-py30-backport-of-python-33s-lru-cache/>
   # Should be removed when Theory only supports Python 3.2 and above.
-
+  from theory.thevent import gevent
   from collections import namedtuple
   from functools import update_wrapper
-  from gevent.lock import RLock
 
   _CacheInfo = namedtuple("CacheInfo", ["hits", "misses", "maxsize", "currsize"])
 
@@ -75,7 +74,7 @@ except ImportError:
       makeKey = _makeKey
       cacheGet = cache.get           # bound method to lookup key or return None
       _len = len                      # localize the global len() function
-      lock = RLock()                  # because linkedlist updates aren't threadsafe
+      lock = gevent.lock.RLock()                  # because linkedlist updates aren't threadsafe
       root = []                       # root of the circular doubly linked list
       root[:] = [root, root, None, None]      # initialize by pointing to self
       nonlocalRoot = [root]                  # make updateable non-locally

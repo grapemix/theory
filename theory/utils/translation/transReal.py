@@ -7,8 +7,7 @@ import os
 import re
 import sys
 import gettext as gettextModule
-from gevent.local import local
-#from threading import local
+from theory.thevent import gevent
 import warnings
 
 ##### Theory lib #####
@@ -34,7 +33,7 @@ from theory.utils.translation import TranslatorCommentWarning
 # Translations are cached in a dictionary for every language+app tuple.
 # The active translations are stored by threadid to make them thread local.
 _translations = {}
-_active = local()
+_active = gevent.local.local()
 
 # The default translation is based on the settings file.
 _default = None

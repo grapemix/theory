@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 ##### System wide lib #####
-from gevent import monkey; monkey.patch_all()
+from theory.thevent import gevent
 import os
 #from theory.conf import settings
 #os.environ["BROKER_URL"] = settings.CELERY_SETTINGS["BROKER_URL"]

@@ -20,7 +20,7 @@ from theory.utils.deprecation import RenameMethodsBase, RemovedInTheory20Warning
 from theory.utils.translation import ugettextLazy as _
 from theory.utils.functional import curry, cachedProperty
 from theory.core import exceptions
-from theory.gui import model
+from theory.gui.common.modelField import ModelChoiceField, ModelMultipleChoiceField
 
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
 
@@ -1745,7 +1745,7 @@ class ForeignKey(ForeignObject):
                "its related modal %r has not been loaded yet" %
                (self.name, self.rel.to))
     defaults = {
-      'formClass': model.ModelChoiceField,
+      'formClass': ModelChoiceField,
       'queryset': self.rel.to._defaultManager.using(db),
       'toFieldName': self.rel.fieldName,
     }
@@ -2284,7 +2284,7 @@ class ManyToManyField(RelatedField):
   def formfield(self, **kwargs):
     db = kwargs.pop('using', None)
     defaults = {
-      'formClass': model.ModelMultipleChoiceField,
+      'formClass': ModelMultipleChoiceField,
       'queryset': self.rel.to._defaultManager.using(db),
     }
     defaults.update(kwargs)

@@ -10,7 +10,7 @@ from theory.utils.encoding import forceBytes
 from theory.utils.functional import cachedProperty
 from theory.utils.six.moves import input
 from theory.utils.six import StringIO
-from theory.apps.command.dumpdata import sortDependencies
+from theory.apps.util import sortDependencies
 from theory.db import router
 from theory.apps import apps
 from theory.core import serializers

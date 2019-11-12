@@ -7,7 +7,7 @@ This module uses pytz when it's available and fallbacks when it isn't.
 """
 
 from datetime import datetime, timedelta, tzinfo
-from gevent.local import local
+from theory.thevent import gevent
 import sys
 import time as _time
 
@@ -191,7 +191,7 @@ def getDefaultTimezoneName():
   """
   return _getTimezoneName(getDefaultTimezone())
 
-_active = local()
+_active = gevent.local.local()
 
 
 def getCurrentTimezone():

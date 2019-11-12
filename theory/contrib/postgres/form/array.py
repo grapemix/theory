@@ -2,13 +2,13 @@ import copy
 
 from theory.contrib.postgres.validator import ArrayMinLengthValidator, ArrayMaxLengthValidator
 from theory.core.exceptions import ValidationError
-from theory.gui import field
+from theory.gui.field import Field, TextField
 from theory.utils.safestring import markSafe
 from theory.utils import six
 from theory.utils.translation import stringConcat, ugettextLazy as _
 
 
-class SimpleArrayField(field.TextField):
+class SimpleArrayField(TextField):
   defaultErrorMessages = {
     'itemInvalid': _('Item %(nth)s in the array did not validate: '),
   }
@@ -83,7 +83,7 @@ class SimpleArrayField(field.TextField):
       raise ValidationError(errors)
 
 
-class SplitArrayField(field.Field):
+class SplitArrayField(Field):
   defaultErrorMessages = {
     'itemInvalid': _('Item %(nth)s in the array did not validate: '),
   }

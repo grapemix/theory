@@ -2,6 +2,7 @@
 #!/usr/bin/env python
 ##### System wide lib #####
 from abc import ABCMeta, abstractmethod
+from efl.dbus_mainloop import DBusEcoreMainLoop
 import copy
 import json
 import os
@@ -20,13 +21,19 @@ from theory.utils.importlib import importClass
 
 ##### Misc #####
 
+
+
 __all__ = (
-    "HiddenInput", "StringInput", "TextInput", "NumericInput", "SelectBoxInput",
-    "CheckBoxInput", "DateInput", "DateTimeInput", "TimeInput",
-    "StringGroupFilterInput", "ModelValidateGroupInput", "FileselectInput",
-    "EmbeddedInput", "ListInput", "DictInput", "FilterFormLayout",
-    "FileSizeInput", "QueryIdInput",
+    "getDbusMainLoop", "HiddenInput", "StringInput", "TextInput",
+    "NumericInput", "SelectBoxInput", "CheckBoxInput", "DateInput",
+    "DateTimeInput", "TimeInput", "StringGroupFilterInput",
+    "ModelValidateGroupInput", "FileselectInput", "EmbeddedInput", "ListInput",
+    "DictInput", "FilterFormLayout", "FileSizeInput", "QueryIdInput",
     )
+
+def getDbusMainLoop():
+  # WARNING: cannot put into __init__.py or grpc+gevent hell will be shown
+  return DBusEcoreMainLoop()
 
 # Honestly, I am not satisfied with the code related to the GUI. So the code
 # related to GUI might have a big change in the future

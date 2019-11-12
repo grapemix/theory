@@ -1,23 +1,14 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 ##### Patch #####
+from theory.thevent import gevent
 import concurrent.futures
-import gevent
-
-# Comment these two lines if you need to use fabric's ssl cert
-from gevent import monkey
-monkey.patch_all(thread=False)
-
-from gevent.threadpool import ThreadPoolExecutor
-concurrent.futures.ThreadPoolExecutor = ThreadPoolExecutor
-
-#import os
-#os.environ.setdefault("CELERY_LOADER", "theory.core.loader.celeryLoader.CeleryLoader")
+import os
+os.environ.setdefault("CELERY_LOADER", "theory.core.loader.celeryLoader.CeleryLoader")
 
 ##### System wide lib #####
 from celery import Celery
 from copy import deepcopy
-from gevent.event import Event
 import grpc
 import time
 
@@ -93,5 +84,5 @@ def wakeup(settings_mod, argv=None):
   celeryApp.config_from_object('theory.conf:settings', namespace='CELERY')
   celeryApp.loader.autodiscover()
 
-  celeryApp.asyncEvt = Event()
+  celeryApp.asyncEvt = gevent.event.Event()
   _startGrpcLoop(celeryApp)

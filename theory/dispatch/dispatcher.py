@@ -1,5 +1,5 @@
 import sys
-from gevent import threading
+from theory.thevent import gevent
 import weakref
 
 from theory.utils.six.moves import xrange
@@ -40,7 +40,7 @@ class Signal(object):
     if providingArgs is None:
       providingArgs = []
     self.providingArgs = set(providingArgs)
-    self.lock = threading.Lock()
+    self.lock = gevent.threading.Lock()
     self.useCaching = useCaching
     # For convenience we create empty caches even if they are not used.
     # A note about caching: if useCaching is defined, then for each

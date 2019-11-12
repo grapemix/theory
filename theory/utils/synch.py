@@ -10,9 +10,9 @@ Synchronization primitives:
 
 import contextlib
 try:
-  from gevent import coros as threading
+  from theory.thevent import gevent
 except ImportError:
-  import dummyThreading as threading
+  import dummyThreading as gevent.coros
 
 
 class RWLock(object):
@@ -29,9 +29,9 @@ class RWLock(object):
     writerLeaves()
   """
   def __init__(self):
-    self.mutex = threading.RLock()
-    self.canRead = threading.Semaphore(0)
-    self.canWrite = threading.Semaphore(0)
+    self.mutex = gevent.coros.RLock()
+    self.canRead = gevent.coros.Semaphore(0)
+    self.canWrite = gevent.coros.Semaphore(0)
     self.activeReaders = 0
     self.activeWriters = 0
     self.waitingReaders = 0

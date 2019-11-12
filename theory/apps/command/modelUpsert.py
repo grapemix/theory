@@ -10,8 +10,6 @@ from theory.conf import settings
 from theory.core.exceptions import ValidationError
 from theory.core.resourceScan.commandClassScanner import CommandClassScanner
 from theory.gui import field
-from theory.gui.etk.form import StepFormBase
-from theory.gui.model import ModelForm
 from theory.gui.transformer.theoryJSONEncoder import TheoryJSONEncoder
 from theory.utils.importlib import importClass
 
@@ -123,6 +121,8 @@ class ModelUpsert(SimpleCommand):
     return self._stdOut
 
   def getModelFormKlass(self, appModel, modelKlass):
+    from theory.gui.model import ModelForm
+    from theory.gui.etk.form import StepFormBase
     class DynamicModelForm(ModelForm, StepFormBase):
       class Meta:
         model = modelKlass

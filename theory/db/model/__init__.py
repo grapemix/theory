@@ -21,7 +21,6 @@ from theory.db.model.lookups import Lookup, Transform  # NOQA
 from theory.db.model import signals  # NOQA
 from theory.utils.deprecation import RemovedInTheory19Warning
 
-
 def permalink(func):
   """
   Decorator that calls urlresolvers.reverse() to return a URL using
