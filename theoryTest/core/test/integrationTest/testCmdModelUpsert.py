@@ -10,6 +10,7 @@ from theory.core.bridge import Bridge
 from theory.core.reactor.reactor import Reactor
 from theory.gui import theory_pb2
 from theory.test.testcases import TestCase
+from theory.test.util import tag
 
 ##### Theory third-party lib #####
 
@@ -23,6 +24,12 @@ __all__ = (
     'TestCmdModelUpsert',
     )
 
+"""
+WARNING: this test case will use cmd modelUpsert getModelFormKlass and hence it
+can not mix anything with gevent subprocess stuff. This tc eventually have to
+rewrite after core and GUI separated because this tc require both core and GUI's
+component. This should be in the truly integration test.
+"""
 class ReactorTestMixin(object):
   def setUp(self):
     self.reactor = Reactor()
@@ -62,6 +69,7 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
     self.bridge = Bridge()
     super(CmdModelUpsert, self).setUp()
 
+  @tag('gui')
   def testCreateInstance(self):
     val = '{{"cmdName": "modelUpsert", "finalDataDict": {0}}}'.format(
         json.dumps({
@@ -78,6 +86,7 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
       None
     )
 
+  @tag('gui')
   def testModelUpsertFlow(self):
     # === step 1 ===
     self.reactor.call(
@@ -463,6 +472,7 @@ class CmdModelUpsert(ReactorTestMixin, TestCase):
       }
     )
 
+  @tag('gui')
   def testBareModelUpsert(self):
     (cmd, status) = self.bridge.executeEzCommand(
       "theory.apps",

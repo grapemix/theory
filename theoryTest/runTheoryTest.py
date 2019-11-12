@@ -17,7 +17,7 @@ if __name__ == "__main__":
       )
 
   os.environ["THEORY_SETTINGS_MODULE"] = "testBase.settings"
-  testLabelLst = ["theoryTest",]
+  testLabelLst = ["theoryTest.core",]
 
   # To temp fix for grpc's failure on handling multiple libprotobuf problem
   # which is compounded with ubuntu's outdated libprotobuf dependency
@@ -29,5 +29,13 @@ if __name__ == "__main__":
   from theory.test.util import getRunner
 
   testRunnerClass = getRunner(settings, "")
+  runnerKwargs["tagLst"] = ["gevent",]
+
+  testRunner = testRunnerClass(**runnerKwargs)
+  testRunner.runTests(testLabelLst)
+
+  del runnerKwargs["tagLst"]
+  runnerKwargs["excludeTagLst"] = ["gevent",]
+  testLabelLst = ["theoryTest",]
   testRunner = testRunnerClass(**runnerKwargs)
   testRunner.runTests(testLabelLst)
