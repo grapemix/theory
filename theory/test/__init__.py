@@ -7,11 +7,10 @@ from theory.test.testcases import (
   SimpleTestCase, skipIfDBFeature,
   skipUnlessDBFeature
 )
-from theory.test.util import modifySettings, overrideSettings, overrideSystemChecks
+from theory.test.util import modifySettings, overrideSettings
 
 __all__ = [
   'TestCase', 'TransactionTestCase',
   'SimpleTestCase', 'skipIfDBFeature',
   'skipUnlessDBFeature', 'modifySettings', 'overrideSettings',
-  'overrideSystemChecks'
 ]
