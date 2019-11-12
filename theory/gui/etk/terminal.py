@@ -147,7 +147,7 @@ class Terminal(RpcTerminalMixin, metaclass=Singleton):
     elif curEntryTxt.endswith(self.crlf):
       self.lastEntry = curEntryTxt[:-5]
       object.entry_set("")
-      self._runCmd(self.cmdFormCache[self.formHashInUse])
+      self._runCmd(self.cmdFormCache.get(self.formHashInUse, None))
 
   def _cmdLineKeyDownHandler(self, entry, event, *args, **kwargs):
     # "Shift", "Control", "Alt", "Meta", "Hyper", "Super".
