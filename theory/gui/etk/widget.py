@@ -345,7 +345,7 @@ class CheckBoxInput(BaseLabelInput):
     hBox = self._createContainer({
       "isFillAlign": False,
       "isWeightExpand": False,
-      "isHorizontal": True,
+      "isHorizontal": False,
       })
     hBox.generate()
 
@@ -695,6 +695,7 @@ class ListInput(BaseLabelInput):
 
     if self.widgetClass == StringInput.widgetClass:
       if (hasattr(childFieldTemplate, "maxLen")
+          and childFieldTemplate.maxLen
           and childFieldTemplate.maxLen > 20
           ):
         self.widgetClass = TextInput.widgetClass
@@ -1114,6 +1115,8 @@ class QueryIdInput(StringInput):
 
   def _prepareInitData(self, initData):
     self.rawInitData = initData
+    if isinstance(initData, int):
+      return str(initData)
     if initData is None or len(initData)==0:
       self.finalData = ""
       return ""

@@ -417,7 +417,7 @@ class ListModelValidator(Genlist):
     # "Shift", "Control", "Alt", "Meta", "Hyper", "Super".
     #if(e.keyname=="space" and e.modifier_is_set("Control")):
     if(e.keyname=="space"):
-      item = gl.selected_item
+      item = gl.focused_item
       pos = item.data[1]
       if item.parent is None:
         currentState = self.grpAState[pos]
