@@ -1136,21 +1136,26 @@ class ModelChoiceField(Field):
   def renderWidget(self, *args, **kwargs):
     if("attrs" not in kwargs):
       kwargs["attrs"] = {}
-    module = self.queryset.modal.__module__
-    appName = module[:module.find(".model")]
+    if isinstance(self.queryset, dict):
+      appName = self.queryset["appName"]
+      mdlName = self.queryset["modelName"]
+    else:
+      module = self.queryset.modal.__module__
+      appName = module[:module.find(".model")]
+      mdlName = self.queryset.modal.__name__
     kwargs["initData"] = self.initData
 
     # queryset in here means all objects in db
     kwargs["attrs"].update({
       "appName": appName,
-      "modelName": self.queryset.modal.__name__,
+      "modelName": mdlName,
       "queryset": self.initData,
       "isMultiple": "list" in self.defaultErrorMessages,
       })
     super(ModelChoiceField, self).renderWidget(*args, **kwargs)
     self.widget.queryset = self.queryset
     self.widget.attrs["appName"] = appName
-    self.widget.attrs["mdlName"] = self.queryset.modal.__name__
+    self.widget.attrs["mdlName"] = mdlName
 
   #def __deepcopy__(self, memo):
   #  result = super(ChoiceField, self).__deepcopy__(memo)
@@ -1225,6 +1230,8 @@ class ModelChoiceField(Field):
     elif type(value.__class__.__bases__[0]).__name__ == "ModelBase":
       # Already an model instance
       return value
+    elif isinstance(self.queryset, dict):
+      return value
     try:
       key = self.toFieldName or 'pk'
       value = self.queryset.get(**{key: value})
@@ -1270,7 +1277,13 @@ class ModelMultipleChoiceField(ModelChoiceField):
     if self.required and not value:
       raise ValidationError(self.errorMessages['required'], code='required')
     elif not self.required and not value:
-      return self.queryset.none()
+      if type(value).__name__=="QuerySet":
+        raise NotImplementedError("Don't use queryset in GUI")
+        return self.queryset.none()
+      elif value is None:
+        return []
+      else:
+        return value
     elif type(value).__name__=="QuerySet":
       return value
     if not isinstance(value, (list, tuple)):
@@ -1280,22 +1293,31 @@ class ModelMultipleChoiceField(ModelChoiceField):
       value = [i["id"] for i in value]
     key = self.toFieldName or 'pk'
 
-    # if the initData is none, the queryset is empty and hence any id lst
-    # provided by user will be invalid
-    if self.initData is None:
-      self.queryset = self.queryset.modal.objects.all()
+    if type(value).__name__=="QuerySet":
+      # if the initData is none, the queryset is empty and hence any id lst
+      # provided by user will be invalid
+      if self.initData is None:
+        self.queryset = self.queryset.modal.objects.all()
 
-    for pk in value:
-      try:
-        self.queryset.filter(**{key: pk})
-      except ValueError:
-        raise ValidationError(
-          self.errorMessages['invalidPkValue'],
-          code='invalidPkValue',
-          params={'pk': pk},
-        )
-    qs = self.queryset.filter(**{'%s__in' % key: value})
-    pks = set(forceText(getattr(o, key)) for o in qs)
+      for pk in value:
+        try:
+          self.queryset.filter(**{key: pk})
+        except ValueError:
+          raise ValidationError(
+            self.errorMessages['invalidPkValue'],
+            code='invalidPkValue',
+            params={'pk': pk},
+          )
+      qs = self.queryset.filter(**{'%s__in' % key: value})
+      pks = set(forceText(getattr(o, key)) for o in qs)
+    elif isinstance(self.queryset, dict):
+      pks = self.queryset["idLst"]
+      qs = value
+    else:
+      raise NotImplementedError((
+        f"Queryset{self.queryset} in ModelChoiceField "
+        "is not Queryset nor dict type"
+      ))
     for val in value:
       if forceText(val) not in pks:
         raise ValidationError(
