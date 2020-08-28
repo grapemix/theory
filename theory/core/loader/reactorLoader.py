@@ -57,15 +57,22 @@ def wakeup(settings_mod, argv=None):
   try:
     Command.objects.count()
   except:
-    # DB has been flushed
-    from theory.core.bridge import Bridge
-    from theory.apps.command.makeMigration import MakeMigration
+    from theory.db import connection
     from theory.apps.command.migrate import Migrate
-    cmd = MakeMigration()
-    cmd.paramForm = MakeMigration.ParamForm()
-    cmd.paramForm.fields["appLabelLst"].finalData = ["apps", ]
-    cmd.paramForm.isValid()
-    cmd.run()
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT to_regclass('schema_name.apps_command')")
+        # If rowcount == 1(Yip, not a typo), it means the table apps_command
+        # does not exist and the db is completely fleshed. Therefore, calling
+        # MakeMigration will yield error.
+        if cursor.rowcount > 1:
+          # DB has been flushed
+          from theory.core.bridge import Bridge
+          from theory.apps.command.makeMigration import MakeMigration
+          cmd = MakeMigration()
+          cmd.paramForm = MakeMigration.ParamForm()
+          cmd.paramForm.fields["appLabelLst"].finalData = ["apps", ]
+          cmd.paramForm.isValid()
+          cmd.run()
 
     cmd = Migrate()
     cmd.paramForm = Migrate.ParamForm()
