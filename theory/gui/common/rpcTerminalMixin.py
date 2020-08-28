@@ -13,6 +13,7 @@ import notify2
 from uuid import uuid4
 
 ##### Theory lib #####
+from theory.conf import settings
 from theory.gui import theory_pb2
 from theory.gui import theory_pb2_grpc
 from theory.gui.gtk.spreadsheet import SpreadsheetBuilder
@@ -378,7 +379,7 @@ class RpcTerminalMixin(object):
     self.formHashInUse = paramForm.hash
 
   def start(self):
-    channel = grpc.insecure_channel('localhost:50051')
+    channel = grpc.insecure_channel(settings.REACTOR_URI)
     self.stub = theory_pb2_grpc.ReactorStub(channel)
     gevent.joinall(
         [

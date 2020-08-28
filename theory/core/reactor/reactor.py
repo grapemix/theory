@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 ##### System wide lib #####
+from grpc_health.v1 import health_pb2
 import json
 import logging
 import sys
@@ -57,6 +58,7 @@ class Reactor(
   actionQ = []
   uiIdVsAdapterLst = {}
   paramFormCache = {}
+  isReady = False
 
   @property
   def moodName(self):
@@ -69,6 +71,22 @@ class Reactor(
   def __init__(self):
     self.logger = logging.getLogger("theory.usr")
     super(Reactor, self).__init__()
+    self.isReady = True
+
+  def Check(self, request, context):
+    if self.isReady:
+      return health_pb2.HealthCheckResponse(
+        status=health_pb2.HealthCheckResponse.SERVING
+      )
+    else:
+      return health_pb2.HealthCheckResponse(
+        status=health_pb2.HealthCheckResponse.NOT_SERVING
+      )
+
+  def Watch(self, request, context, send_response_callback=None):
+    while True:
+      gevent.sleep(1)
+      yield self.Check(request, context)
 
   #def _actionQGenerator(self):
   #  print "_actionQGenerator"
@@ -387,6 +405,7 @@ class Reactor(
     return True
 
   def runCmd(self, cmd, cmdModel, actionQ):
+    self.isReady = False
     bridge = Bridge()
     if not bridge._executeCommand(cmd, cmdModel, actionQ):
       # TODO: integrate with std reactor error system
@@ -400,6 +419,7 @@ class Reactor(
           })
 
     self._performDrums(cmd)
+    self.isReady = True
     return cmd
 
   # TODO: refactor this function, may be with bridge

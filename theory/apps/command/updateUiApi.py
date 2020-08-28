@@ -20,6 +20,8 @@ class UpdateUiApi(AsyncCommand):
   """
   update UI Api. You can also run this command by
   `THEORY_SETTINGS_MODULE="YOUR_MODULE" python apps/command/updateUiApi.py`
+  you might need to replace "import theory_pb2 as theory__pb2" to
+  "import theory.gui.theory_pb2 as theory__pb2" in "gui/theory_pb2_grpc.py"
   """
   name = "updateUiApi"
   verboseName = "updateUiApi"
@@ -53,6 +55,7 @@ class UpdateUiApi(AsyncCommand):
     param.append('--python_out=./gui/')
     param.append('--grpc_python_out=./gui/')
     param.append('./gui/theory.proto')
+    param.append('./gui/grpc_health_check.proto')
     protoc.main(tuple(param))
 
     #includeRootPath = []

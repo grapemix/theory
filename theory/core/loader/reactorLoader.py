@@ -10,6 +10,8 @@ os.environ.setdefault("CELERY_LOADER", "theory.core.loader.celeryLoader.CeleryLo
 from celery import Celery
 from copy import deepcopy
 import grpc
+from grpc_health.v1 import health
+from grpc_health.v1 import health_pb2_grpc
 import time
 
 ##### Theory lib #####
@@ -41,9 +43,18 @@ def _startGrpcLoop(celeryApp):
   _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
   server = grpc.server(concurrent.futures.ThreadPoolExecutor(max_workers=10))
-  theory_pb2_grpc.add_ReactorServicer_to_server(Reactor(), server)
+  servicer = Reactor()
+  # Ref: https://grpc.github.io/grpc/python/grpc_health_checking.html
+  # Ref: https://github.com/GoogleCloudPlatform/microservices-demo/blob/master/src/recommendationservice/recommendation_server.py  # noqa
+  # The servicer will return service unhealthy (responded with "NOT_SERVING")
+  #servicer.isReady = False
+  theory_pb2_grpc.add_ReactorServicer_to_server(servicer, server)
+  health_pb2_grpc.add_HealthServicer_to_server(servicer, server)
   server.add_insecure_port('[::]:50051')
   server.start()
+
+  # TODO: move this block at the end and merged w/ wakeup() to better take
+  # advantage of GRPC's health svc flow
   try:
     while True:
       time.sleep(_ONE_DAY_IN_SECONDS)
