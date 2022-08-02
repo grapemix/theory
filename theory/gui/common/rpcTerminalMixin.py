@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 ##### System wide lib #####
-from collections import OrderedDict
 from theory.thevent import gevent
 import grpc
 import json
@@ -9,6 +8,8 @@ from math import pow
 # Have to be imported before notify2
 from theory.gui.etk.widget import getDbusMainLoop
 import notify2
+import os
+import subprocess
 # Don't use it for security purpose
 from uuid import uuid4
 
@@ -16,8 +17,6 @@ from uuid import uuid4
 from theory.conf import settings
 from theory.gui import theory_pb2
 from theory.gui import theory_pb2_grpc
-from theory.gui.gtk.spreadsheet import SpreadsheetBuilder
-from theory.gui.transformer import GtkSpreadsheetModelBSONDataHandler
 from theory.utils.importlib import importClass
 
 ##### Theory third-party lib #####
@@ -215,94 +214,6 @@ class RpcTerminalMixin(object):
       # TODO: integrate with std reactor error system
       paramForm.showErrInFieldLabel()
 
-  def fetchMoreRow(self, appName, mdlName, pageNum, pageSize, boolIdxLst):
-    r = self.stub.getMdlTbl(
-      theory_pb2.MdlTblReq(
-        mdl=theory_pb2.MdlIden(
-          appName=appName,
-          mdlName=mdlName
-        ),
-        pageNum=pageNum,
-        pageSize=pageSize,
-      )
-    )
-    mdlLst = [list(data.ListFields()[0][1]) for data in r.dataLst]
-    for colNum in boolIdxLst:
-      for mdl in mdlLst:
-        mdl[colNum] = True if mdl[colNum] == "1" else False
-    return mdlLst
-
-  def initSpreadSheetBuilder(
-      self,
-      appName,
-      mdlName,
-      isEditable,
-      selectedIdLst,
-      pageNum,
-      pageSize,
-      parentSpreadSheetBuilder
-  ):
-    spData = {
-      "appName": appName,
-      "mdlName": mdlName,
-      "pageNum": pageNum,
-      "pageSize": pageSize,
-      "boolIdxLst": [],
-    }
-    r = self.stub.getMdlTbl(
-      theory_pb2.MdlTblReq(
-        mdl=theory_pb2.MdlIden(
-          appName=appName,
-          mdlName=mdlName
-        ),
-        pageNum=spData["pageNum"],
-        pageSize=spData["pageSize"],
-      )
-    )
-
-    # To convert protobuf msg of dataLst back into python list
-    mdlLst = [list(data.ListFields()[0][1]) for data in r.dataLst]
-    fieldNameVsProp = []
-    for i in r.fieldNameVsProp:
-      row = (i.k, {})
-      for k, v in i.v.items():
-        if k == "choices":
-          v = json.loads(v)
-        row[1][k] = v
-      fieldNameVsProp.append(row)
-    fieldNameVsProp = OrderedDict(fieldNameVsProp)
-
-    # Until we support custom protobuf interface for each model, we assume
-    # all fields are being converted into str to avoid complicated protobuf
-    # scheme
-    # Special treatment for bool field
-    for colNum, fieldProp in enumerate(fieldNameVsProp.values()):
-      if fieldProp["type"] == "bool":
-        spData["boolIdxLst"].append(colNum)
-        for mdl in mdlLst:
-          mdl[colNum] = True if mdl[colNum] == "1" else False
-
-    spreadsheetBuilder = SpreadsheetBuilder()
-    spreadsheet = spreadsheetBuilder.run(
-        appName,
-        mdlName,
-        mdlLst,
-        fieldNameVsProp,
-        isEditable,
-        selectedIdLst,
-        spData,
-        self.fetchMoreRow,
-        self.upsertSpreadSheet,
-        )
-
-    if parentSpreadSheetBuilder is not None:
-      parentSpreadSheetBuilder.addChild(spreadsheetBuilder)
-
-    spreadsheetBuilder.showWidget(
-      True if parentSpreadSheetBuilder is None else False
-    )
-    return spreadsheetBuilder
-
   def upsertSpreadSheet(
       self,
       appName,
@@ -313,34 +224,23 @@ class RpcTerminalMixin(object):
       pageSize,
       parentSpreadSheetBuilder
   ):
-    spreadsheetBuilder = self.initSpreadSheetBuilder(
+    self.restoreCmdLine()
+    self.cleanUpCrt()
+    parentPath = os.path.dirname(os.path.dirname(__file__))
+    cmd = [
+      "python",
+      f"{parentPath}/cellFish.py",
+      "edit",
       appName,
       mdlName,
-      isEditable,
-      selectedIdLst,
-      pageNum,
-      pageSize,
-      parentSpreadSheetBuilder
-    )
-
-    if parentSpreadSheetBuilder is None:
-
-      handlerFxn = GtkSpreadsheetModelBSONDataHandler()
-      jsonDataLstLst = spreadsheetBuilder.getJsonDataLst(handlerFxn, [])
-      msg = ""
-      modelLstData = []
-      for (appName, mdlName, jsonDataLst) in jsonDataLstLst:
-        modelLstData.append(
-          theory_pb2.ModelLstData(
-            appName=appName,
-            mdlName=mdlName,
-            jsonDataLst=jsonDataLst,
-          )
-        )
-      reactorReqArr = self.stub.upsertModelLst(
-        theory_pb2.MultiModelLstData(modelLstData=modelLstData)
-      )
-      self._handleReactorReq(reactorReqArr)
+      "--pageNum",
+      str(pageNum),
+      "--pageSize",
+      str(pageSize),
+    ]
+    if selectedIdLst:
+      cmd.extend(["--queryset", " ".join(selectedIdLst)])
+    subprocess.Popen(cmd, preexec_fn=os.setsid)
 
   def callExtCmd(self):
     pass
@@ -383,7 +283,7 @@ class RpcTerminalMixin(object):
     self.stub = theory_pb2_grpc.ReactorStub(channel)
     gevent.joinall(
         [
-          gevent.spawn(self._drawAll),
           gevent.spawn(self._registerToReactor),
+          gevent.spawn(self._drawAll),
         ]
     )

@@ -59,8 +59,6 @@ class Spreadsheet(object):
     self.model = gtk.ListStore(*listStoreDataType)
     self._appendToModel(model)
 
-    self._switchToGeventLoop()
-
     self.create_interior()
     self.window.show_all()
 
@@ -73,14 +71,6 @@ class Spreadsheet(object):
         self.model.append(i + [False, True])
       else:
         self.model.append(i + [False, False])
-
-  def _switchToGeventLoop(self):
-    gevent.sleep(0)
-    gobject.timeout_add(
-        3,
-        self._switchToGeventLoop,
-        priority=gobject.PRIORITY_HIGH
-    )
 
   def getSelectedRow(self):
     return [i for i, v in enumerate(self.model) if(v[-1])]

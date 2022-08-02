@@ -6,6 +6,7 @@ from efl.dbus_mainloop import DBusEcoreMainLoop
 import copy
 import json
 import os
+import subprocess
 
 ##### Theory lib #####
 import theory.gui.etk.element
@@ -1152,18 +1153,20 @@ class QueryIdInput(StringInput):
     terminal._fireUiReq({"action": "runCmd", "val": val})
 
   def _selectInstanceCallback(self, btn, dummy):
-    from theory.gui.etk.terminal import Terminal
-    terminal = Terminal()
-    spreadsheetBuilder = terminal.initSpreadSheetBuilder(
+    parentPath = os.path.dirname(os.path.dirname(__file__))
+
+    messyStdout = subprocess.check_output([
+      "python",
+      f"{parentPath}/cellFish.py",
+      "select",
       self.attrs['appName'],
       self.attrs['mdlName'],
-      False,
-      [],
-      1,
-      500,
-      None
-    )
-    selectedIdLst = spreadsheetBuilder.getSelectedIdLst()
+    ], stderr=subprocess.DEVNULL).decode('UTF-8')
+
+    # We get some Ecore's DEVELOPER WARNING
+    messyStdout = messyStdout.split("\n")
+    selectedIdInStr = messyStdout[-2]
+    selectedIdLst = selectedIdInStr.split(",")
     self.refreshData(selectedIdLst)
 
   def _createWidget(self, *args, **kwargs):
