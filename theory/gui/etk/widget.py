@@ -4,6 +4,7 @@
 from abc import ABCMeta, abstractmethod
 from efl.dbus_mainloop import DBusEcoreMainLoop
 import copy
+from html import escape as htmlEscape, unescape as htmlUnescape
 import json
 import os
 import subprocess
@@ -265,8 +266,11 @@ class StringInput(BaseLabelInput):
   widgetClass = theory.gui.etk.element.Entry
   lineBreak = "<br/>"
 
+  def _prepareInitData(self, data):
+    return htmlEscape(data) if data else data
+
   def _getData(self):
-    return self.widgetLst[0].finalData
+    return htmlUnescape(self.widgetLst[0].finalData)
 
   def updateField(self):
     self.fieldSetter({"finalData": self._getData()})
@@ -782,7 +786,8 @@ class ListInput(BaseLabelInput):
     }
 
     if(len(initDataLst)>0):
-      defaultParam["initData"] = self.lineBreak.join(initDataLst)
+      defaultParam["initData"] = htmlEscape(self.lineBreak.join(initDataLst)) \
+        if initDataLst else ""
 
     widget = self.widgetClass(defaultParam)
     widget.win = self.win
@@ -934,6 +939,13 @@ class DictInput(ListInput):
   def _postRmDataWidget(self, startIdx):
     pass
 
+  def _escapeValueFieldData(self, data):
+    #I assume child widget will handle the unescape part
+    if valueField.initData and isinstance(str, valueField.initData):
+      return htmlEscape(valueField.initData)
+    else:
+      return valueField.initData
+
   def _createGenericWidget(self, newChildField, idx):
     (keyField, valueField) = newChildField
     keyInputBox = self._createContainer(
@@ -986,7 +998,7 @@ class DictInput(ListInput):
         "isWeightExpand": True,
         "isFillAlign": False,
         "isSkipInstruction": True,
-        "initData": valueField.initData,
+        "initData": self._escapeValueFieldData(valueField)
     }
 
     valueField.renderWidget(self.win, valueInputBox.obj, attrs=defaultParam)
