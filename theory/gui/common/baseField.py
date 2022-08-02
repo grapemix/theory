@@ -941,6 +941,10 @@ class NullBooleanField(BooleanField):
   """
   widget = "SelectBoxInput"
 
+  def renderWidget(self, *args, **kwargs):
+    super().renderWidget(*args, **kwargs)
+    self.widget.attrs["choices"] = ((-1, "None"), (0, "False"), (1, "True"))
+
   def toPython(self, value):
     """
     Explicitly checks for the string 'True' and 'False', which is what a
