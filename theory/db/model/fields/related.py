@@ -1576,7 +1576,7 @@ class ForeignObject(RelatedField):
     # Internal FK's - i.e., those with a related name ending with '+' -
     # and swapped model don't get a related descriptor.
     if not self.rel.isHidden() and not related.modal._meta.swapped:
-      setattr(cls, related.getAccessorName(), self.relatedAccessorClass(related))
+      setattr(cls, str(related.getAccessorName()), self.relatedAccessorClass(related))
       # While 'limitChoicesTo' might be a callable, simply pass
       # it along for later - this is too early because it's still
       # modal load time.
@@ -2257,7 +2257,7 @@ class ManyToManyField(RelatedField):
     # Internal M2Ms (i.e., those with a related name ending with '+')
     # and swapped model don't get a related descriptor.
     if not self.rel.isHidden() and not related.modal._meta.swapped:
-      setattr(cls, related.getAccessorName(), ManyRelatedObjectsDescriptor(related))
+      setattr(cls, str(related.getAccessorName()), ManyRelatedObjectsDescriptor(related))
 
     # Set up the accessors for the column names on the m2m table
     self.m2mColumnName = curry(self._getM2mAttr, related, 'column')
