@@ -77,7 +77,6 @@ def wakeup(settings_mod, argv=None):
         # MakeMigration will yield error.
         if cursor.rowcount > 1:
           # DB has been flushed
-          from theory.core.bridge import Bridge
           from theory.apps.command.makeMigration import MakeMigration
           cmd = MakeMigration()
           cmd.paramForm = MakeMigration.ParamForm()
