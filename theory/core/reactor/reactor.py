@@ -369,8 +369,10 @@ class Reactor(
         (adapterModel, drum) = bridge.adaptFromCmd(adapterName, cmd)
         self.actionQ.extend(drum.render(None, None, None))
         self.formHasBeenCleared = True
-    if not self.formHasBeenCleared \
-        or self.cmdModel.runMode == Command.RUN_MODE_ASYNC:
+    if not self.formHasBeenCleared or (
+      self.cmdModel is not None
+      and self.cmdModel.runMode == Command.RUN_MODE_ASYNC
+    ):
       self.actionQ.append({
           "action": "printStdOut",
           "val": "Command '{0}' has been run".format(self.cmdModel.name)
