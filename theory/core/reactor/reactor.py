@@ -432,16 +432,18 @@ class Reactor(
     else:
       cmd.paramForm = cmdKlass.ParamForm()
     cmd.paramForm.fillFinalFields(self.cmdModel, [], finalDataDict)
-    cmd.paramForm.isValid()
+    if cmd.paramForm.isValid():
+      cmd = self.runCmd(cmd, self.cmdModel, self.actionQ)
 
-    cmd = self.runCmd(cmd, self.cmdModel, self.actionQ)
+      if cmd.isSaveToHistory:
+        try:
+          self._updateHistory(cmd.paramForm.exportToHistory())
+        except Exception as e:
+          self.logger.error(e, exc_info=True)
 
-    if cmd.isSaveToHistory:
-      try:
-        self._updateHistory(cmd.paramForm.exportToHistory())
-      except Exception as e:
-        self.logger.error(e, exc_info=True)
-
-    if self.cmdModel.id in self.paramFormCache:
-      del self.paramFormCache[self.cmdModel.id]
-    self.reset()
+      if self.cmdModel.id in self.paramFormCache:
+        del self.paramFormCache[self.cmdModel.id]
+      self.reset()
+    else:
+      # TODO: Add a flow for updating err msg from reactor -> client
+      print(cmd.paramForm.errors)
