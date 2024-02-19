@@ -41,6 +41,8 @@ class TheoryModelDetectorBase(object):
         handlerFxnName += self._typeCatMap[
             fieldParam.childParamLst.first().data
             ][1]
+      elif fieldParam.data == "NullBooleanField":
+        choices = '[[true, "True"], [false, "False"], [null, "None"]]'
       elif(handlerFxnName=="intField"):
         for i in fieldParam.childParamLst.all():
           if i.name=="choices":
