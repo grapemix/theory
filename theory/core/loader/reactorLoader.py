@@ -95,6 +95,7 @@ def wakeup(settings_mod, argv=None):
   if Command.objects.count()==0:
     from .util import reprobeAllModule
     reprobeAllModule(settings_mod, argv)
+    print("reprobeAllModule is completed")
 
   loadMoodData()
   celeryApp = Celery(loader=CeleryLoader)

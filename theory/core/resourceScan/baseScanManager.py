@@ -29,4 +29,5 @@ class BaseScanManager(object):
     pass
 
   def __init__(self):
+    print(self)
     self._paramList = []
