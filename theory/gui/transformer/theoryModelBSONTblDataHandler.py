@@ -90,4 +90,10 @@ class TheoryModelBSONTblDataHandler(TheoryModelTblDetectorBase):
   def _enumFieldDataHandler(self, rowId, fieldName, fieldVal):
     if(fieldVal is None):
       return "None"
-    return self.fieldNameVsProp[fieldName]["choices"][fieldVal]
+    try:
+      return self.fieldNameVsProp[fieldName]["choices"][fieldVal]
+    except KeyError as e:
+      print(e)
+      print(f"fieldName: {fieldName}, fieldVal: {fieldVal}")
+      print(f"fieldNameVsProp: {self.fieldNameVsProp}")
+      raise e
